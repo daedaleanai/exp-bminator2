@@ -6191,7 +6191,7 @@ struct SCB_Type {
 	__IO uint32_t SHPR1; // @24 System handler priority registers
 	__IO uint32_t SHPR2; // @28 System handler priority registers
 	__IO uint32_t SHPR3; // @32 System handler priority registers
-	__IO uint32_t SHCRS; // @36 System handler control and state register
+	__IO uint32_t SHCSR; // @36 System handler control and state register
 	__IO uint32_t CFSR_UFSR_BFSR_MMFSR; // @40 Configurable fault status register
 	__IO uint32_t HFSR; // @44 Hard fault status register
 	 uint8_t RESERVED2[4]; // @48 
@@ -6299,22 +6299,22 @@ inline void scb_shpr3_set_pri_14(struct SCB_Type* p, uint32_t val) { p->SHPR3 = 
 inline uint32_t scb_shpr3_get_pri_15(struct SCB_Type* p) { return (p->SHPR3 & SCB_SHPR3_PRI_15) >> 24 ; }
 inline uint32_t scb_shpr3_get_pri_14(struct SCB_Type* p) { return (p->SHPR3 & SCB_SHPR3_PRI_14) >> 16 ; }
 
-// SCB->SHCRS System handler control and state register
+// SCB->SHCSR System handler control and state register
 enum {
-	SCB_SHCRS_USGFAULTENA = 1UL<<18, // Usage fault enable bit
-	SCB_SHCRS_BUSFAULTENA = 1UL<<17, // Bus fault enable bit
-	SCB_SHCRS_MEMFAULTENA = 1UL<<16, // Memory management fault enable bit
-	SCB_SHCRS_SVCALLPENDED = 1UL<<15, // SVC call pending bit
-	SCB_SHCRS_BUSFAULTPENDED = 1UL<<14, // Bus fault exception pending bit
-	SCB_SHCRS_MEMFAULTPENDED = 1UL<<13, // Memory management fault exception pending bit
-	SCB_SHCRS_USGFAULTPENDED = 1UL<<12, // Usage fault exception pending bit
-	SCB_SHCRS_SYSTICKACT = 1UL<<11, // SysTick exception active bit
-	SCB_SHCRS_PENDSVACT = 1UL<<10, // PendSV exception active bit
-	SCB_SHCRS_MONITORACT = 1UL<<8, // Debug monitor active bit
-	SCB_SHCRS_SVCALLACT = 1UL<<7, // SVC call active bit
-	SCB_SHCRS_USGFAULTACT = 1UL<<3, // Usage fault exception active bit
-	SCB_SHCRS_BUSFAULTACT = 1UL<<1, // Bus fault exception active bit
-	SCB_SHCRS_MEMFAULTACT = 1UL<<0, // Memory management fault exception active bit		
+	SCB_SHCSR_USGFAULTENA = 1UL<<18, // Usage fault enable bit
+	SCB_SHCSR_BUSFAULTENA = 1UL<<17, // Bus fault enable bit
+	SCB_SHCSR_MEMFAULTENA = 1UL<<16, // Memory management fault enable bit
+	SCB_SHCSR_SVCALLPENDED = 1UL<<15, // SVC call pending bit
+	SCB_SHCSR_BUSFAULTPENDED = 1UL<<14, // Bus fault exception pending bit
+	SCB_SHCSR_MEMFAULTPENDED = 1UL<<13, // Memory management fault exception pending bit
+	SCB_SHCSR_USGFAULTPENDED = 1UL<<12, // Usage fault exception pending bit
+	SCB_SHCSR_SYSTICKACT = 1UL<<11, // SysTick exception active bit
+	SCB_SHCSR_PENDSVACT = 1UL<<10, // PendSV exception active bit
+	SCB_SHCSR_MONITORACT = 1UL<<8, // Debug monitor active bit
+	SCB_SHCSR_SVCALLACT = 1UL<<7, // SVC call active bit
+	SCB_SHCSR_USGFAULTACT = 1UL<<3, // Usage fault exception active bit
+	SCB_SHCSR_BUSFAULTACT = 1UL<<1, // Bus fault exception active bit
+	SCB_SHCSR_MEMFAULTACT = 1UL<<0, // Memory management fault exception active bit		
 };
 
 // SCB->CFSR_UFSR_BFSR_MMFSR Configurable fault status register
