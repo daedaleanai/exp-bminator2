@@ -1,6 +1,6 @@
 #include "usart.h"
-extern inline void usart_start(struct USART_Type* usart);
-extern inline void usart_wait(struct USART_Type* usart);
+extern inline void usart_start(struct USART1_Type* usart);
+extern inline void usart_wait(struct USART1_Type* usart);
 
 void usart_init(struct USART1_Type* usart, int baud) {
 	usart->CR1 = 0; 

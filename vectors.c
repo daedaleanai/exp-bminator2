@@ -3,9 +3,11 @@
 
 extern void _estack(void);              // fake definition, will be filled in by linker script.
 
+extern void unhandled_interrupt(uint32_t irq); // in fault.c
+
+
 void default_IRQ_Handler(void) {
-    for(;;)
-        __NOP();
+    unhandled_interrupt(scb_icsr_get_vectactive(&SCB));
 }
 
 
