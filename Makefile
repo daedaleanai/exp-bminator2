@@ -23,7 +23,6 @@ OBJS = \
 	gpio2.o \
 	ringbuffer.o \
 	tprintf.o \
-	usart.o \
 	main.o \
 
 $(OBJS): Makefile 
