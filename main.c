@@ -106,21 +106,6 @@ void main(void) {
 
 	usart_wait(&USART2);
 
-	if(0)
-	for (;;) {
-
-		digitalToggle(LED_PIN);
-
-		uint64_t now = cycleCount();
-		now /= C_US; // microseconds
-		uint64_t sec = now / 1000000;
-		now %= 1000000;
-		printf("\nuptime %llu.%06llu\n", sec, now);
-
-		delay(1000*1000);
-	}
-
-
 	TIM2.DIER |= TIM1_DIER_UIE;
     TIM2.PSC = (CLOCKSPEED_HZ/10000) - 1;
     TIM2.ARR = 10000 - 1; // 10KHz/10000 = 1Hz
