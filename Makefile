@@ -31,9 +31,9 @@ $(OBJS): Makefile
 %.o: %.c
 	$(CC) -c -o $@ $(CFLAGS) $<
 
-%.elf: stm32l43x.ld
+%.elf: stm32l432kc.ld
 %.elf: $(OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS) -Tstm32l43x.ld
+	$(CC) -o $@ $^ $(LDFLAGS) -Tstm32l432kc.ld
 
 %.hex: %.elf
 	$(SIZE) $<
