@@ -1,9 +1,12 @@
+// Print a somewhat informative crash report. 
+// We assume USART1/2 is up and clocks are running.
+
 #include "cortex_m4.h"
 #include "stm32l4xx.h"
 #include <stdarg.h>
 #include <stddef.h>
 
-// TODO: we assume USART2 is up and running and clocks are sane
+// putc_ has the only reference to the used USART in this file.
 static void putc_(char c) {
 	while ((USART2.ISR & USART1_ISR_TXE) == 0)
 		__NOP();
@@ -97,7 +100,6 @@ static const char* const cfsrflags[] = {
 static void handlefault(uint32_t stack, const char* lbl) __attribute__ ((noreturn));
 
 static void handlefault(uint32_t stack, const char* lbl) {
-	// setSysclockToHSI16();
 	uint32_t cfsr = SCB.CFSR_UFSR_BFSR_MMFSR;
 	dbg_printf("%s FAULT CFSR: %x\n", lbl, cfsr);
 	dumpstack((uint32_t*)stack); 
@@ -129,14 +131,10 @@ void MemoryManagement_Handler(void) { handlefault(__get_MSP(), "MEM"); }
 void BusFault_Handler(void) { handlefault(__get_MSP(), "BUS"); }
 void UsageFault_Handler(void) { handlefault(__get_MSP(), "USAGE"); }
 
-
 // called from vector.c default_IRQ_Handler
 void unhandled_interrupt(uint32_t irq) {
-	// setSysclockToHSI16();
-
 	dbg_printf("Unhandled IRQ %x\n----HALT\n", irq);
 	__BKPT(1);
 	for (;;)
 		__NOP();
-
 }

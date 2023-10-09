@@ -89,9 +89,8 @@ void main(void) {
 		gpioConfig(p->pins, p->mode);
 	}
 
-	//gpioLock(PAAll);
-	//gpioLock(PBAll);
-	//gpioLock(PCAll);
+	gpioLock(PAAll);
+	gpioLock(PBAll);
 
 	ringbuffer_clear(&usart2tx);
 	usart_init(&USART2, 115200);
