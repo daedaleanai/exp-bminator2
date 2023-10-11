@@ -9,6 +9,7 @@
 #include "spi.h"
 #include "bmxspi.h"
 #include "bmi08x.h"
+#include "msgq.h"
 
 #define printf tprintf
 
@@ -21,6 +22,7 @@ enum {
     SPI1_SCK_PIN  = PA5,
     SPI1_MISO_PIN = PA6,
     SPI1_MOSI_PIN = PA7,
+    
     BMI_CSB2G_PIN = PB0,
     BMI_CSB1A_PIN = PB1,
 
@@ -31,6 +33,8 @@ static const struct gpio_config_t {
     enum GPIO_Pin  pins;
     enum GPIO_Conf mode;
 } pin_cfgs[] = {
+    {PAAll, GPIO_ANALOG},
+    {PBAll, GPIO_ANALOG},
     {LED_PIN, GPIO_OUTPUT},
     {USART2_TX_PIN, GPIO_AF7_USART123|GPIO_HIGH},
 	{SPI1_MOSI_PIN | SPI1_SCK_PIN |SPI1_MISO_PIN, GPIO_AF5_SPI12|GPIO_HIGH},
@@ -84,8 +88,7 @@ static struct bmx_config_t accel_cfg[] = {
 #endif
 /* clang-format on */
 
-extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
-
+// USART2 is the console, for debug messages
 static struct Ringbuffer usart2tx;
 
 void _putchar(char character) {
@@ -103,23 +106,9 @@ void _putchar(char character) {
 
 void USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
 
+// SPI1 has the BMI088, BME280  ... connected to it.
+
 struct SPIQ spiq1;
-
-
-void TIM2_Handler(void) {
-    uint64_t now = cycleCount();
-
-    if ((TIM2.SR & TIM1_SR_UIF) == 0)
-            return;
-    TIM2.SR &= ~TIM1_SR_UIF;
-
-    now /= C_US; // microseconds
-    uint64_t sec = now / 1000000;
-    now %= 1000000;
-
-    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq1.head, spiq1.curr, spiq1.tail, SPI1.CR1, SPI1.SR, DMA1.CNDTR2);
- }
-
 
 static void spi1_ss(uint16_t addr, int on) {
 	switch ((enum BMXFunction)addr) {
@@ -132,10 +121,113 @@ static void spi1_ss(uint16_t addr, int on) {
 }
 
  void DMA1_CH2_Handler(void) {
-	digitalHi(LED_PIN);
-	DMA1.IFCR = DMA1.ISR & 0x00f0;
+	DMA1.IFCR = DMA1.ISR & 0x00000f0;
 	spi_rx_dma_handler(&spiq1);
  }
+
+// USART1 is the output datastream and command input
+
+static struct MsgQueue outq;
+
+static inline void usart1dmamove(uint8_t *buf, size_t len) {
+    DMA2.CCR6 = 0;  // all defaults, disable
+    DMA2.CPAR6 = (uintptr_t)&USART1.TDR;
+    DMA2.CMAR6 = (uintptr_t)buf;
+    DMA2.CNDTR6 = len;
+    DMA2.CCR6 = DMA1_CCR1_MINC | DMA1_CCR1_DIR | DMA1_CCR1_TEIE | DMA1_CCR1_TCIE | DMA1_CCR1_EN;
+}
+
+// if we ever give up all messages being 20 bytes long, we need to introduce a 'padding' message
+// to round up all packets to 960 or whatever given number of bytes, so we can stream out without
+// having to buffer. 
+
+static uint8_t usart1msgcnt = 48;
+static uint16_t usart1chksum = 0;
+
+// chksum of preceding packets, magic header and 960 bytes following (48 packets of 20 bytes)
+// the upper limit is 1024 bytes but we want to leave some headroom
+static uint8_t packetseparator[] = {0, 0, 'I', 'R', 'O', 'N', 0x03, 0xC0};
+
+static int xmitmsg() {
+    if (usart1msgcnt == 48) {
+        packetseparator[0] = usart1chksum >> 8;
+        packetseparator[1] = usart1chksum;
+        usart1chksum = 0;
+        usart1msgcnt = 0;
+        usart1dmamove(&packetseparator[0], sizeof packetseparator);
+    } else {
+        struct Msg *msg = msgq_tail(&outq);
+        if (msg == NULL) {
+            return 0;
+        }
+
+        msg->buf[3] = msg->len;  // should be 20, assert?
+        for (size_t i = 0; i < msg->len; ++i)
+            usart1chksum += msg->buf[i];
+
+        usart1dmamove(msg->buf, msg->len);
+        ++usart1msgcnt;
+    }
+
+    USART1.ICR |= USART1_ICR_TCCF;  // clear Transmission Complete status
+    USART1.CR1 |= USART1_CR1_UE | USART1_CR1_TE | USART1_CR1_TCIE;  // enable unit, TX and irq on TX Complete
+
+    return 1;
+}
+
+uint32_t dma2ch6err_cnt = 0;
+// dma error or complete
+void DMA2_CH6_Handler(void) {
+    if (DMA2.ISR & DMA1_ISR_TEIF6)
+        ++dma2ch6err_cnt;
+
+    DMA2.IFCR = DMA2.ISR & (0xf<<5);
+}
+
+// irq only on USART Transmit Complete
+void USART1_Handler(void) {
+    uint32_t isr = USART1.ISR;
+    if ((isr & USART1_ISR_TC) == 0)
+        return;
+
+    USART1.ICR |= USART1_ICR_TCCF;  // clear Transmission Complete status
+
+    // cnt is only zero after we sent a separator packet
+    if (usart1msgcnt) {
+        msgq_pop_tail(&outq);  // mark done
+    }
+
+    if (!xmitmsg()) {
+        USART1.CR1 &= ~USART1_CR1_TCIE;
+    }
+}
+
+void start_usart1(void) {
+    if ((USART1.CR1 & USART1_CR1_TCIE) == 0)  // not already running
+        xmitmsg();
+}
+
+volatile uint64_t dropped_usart1 = 0;  // queue full
+
+
+
+// Timer 2: 1Hz status
+void TIM2_Handler(void) {
+    uint64_t now = cycleCount();
+
+    if ((TIM2.SR & TIM1_SR_UIF) == 0)
+            return;
+    TIM2.SR &= ~TIM1_SR_UIF;
+
+    now /= C_US; // microseconds
+    uint64_t sec = now / 1000000;
+    now %= 1000000;
+
+//    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq1.head, spiq1.curr, spiq1.tail, SPI1.CR1, SPI1.SR, DMA1.CNDTR2);
+    printf("\nuptime %llu.%06llu  usart %ld-%ld (dropped %lld) %04lx %04lx 0x%08lx\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6);
+ }
+
+extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
@@ -146,8 +238,8 @@ void main(void) {
             NVIC_SetPriority(irqprios[i].irq, irqprios[i].prio);
     }
 
-	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN;
-	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN|RCC_AHB2ENR_GPIOBEN;
+	RCC.AHB1ENR  |= RCC_AHB1ENR_DMA1EN;
+	RCC.AHB2ENR  |= RCC_AHB2ENR_GPIOAEN|RCC_AHB2ENR_GPIOBEN;
 	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM2EN;
 	RCC.APB2ENR  |= RCC_APB2ENR_SPI1EN;
 
@@ -177,13 +269,38 @@ void main(void) {
     TIM2.CR1 |= TIM1_CR1_CEN;
     NVIC_EnableIRQ(TIM2_IRQn);
 
+    usart_init(&USART1, 8*115200);
+    USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA
+
+    NVIC_EnableIRQ(USART1_IRQn);
+    NVIC_EnableIRQ(DMA2_CH6_IRQn);
+
+
+    for(;;) {
+        delay(500*1000);
+
+        struct Msg *msg = msgq_head(&outq);
+        if (!msg) {
+            ++dropped_usart1;
+             continue;
+        }
+        msg_reset(msg);
+        msg_append64(msg, 0x6f6c616d75636861);
+        msg_append32(msg, 0x68610a);
+        msgq_push_head(&outq);
+        start_usart1();
+    }
+
+
+
 	spiq_init(&spiq1, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+
+#if 0
 
 	uint8_t val = 0;
 	uint16_t r = bmx_readreg(&spiq1, HUMID, BME280_REG_ID, &val);
 	printf("bme280 id reads (%x): %x\n", r, val);
 
-#if 0
 	int bmi_ok = (bmi_accel_poweron(&spiq1) == 0);
     if (!bmi_ok) {
         printf("BMI088 not found.\n");
