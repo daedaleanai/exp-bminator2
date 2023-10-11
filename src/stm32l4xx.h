@@ -5360,7 +5360,7 @@ enum {
 	RCC_APB1ENR1_I2C2EN = 1UL<<22, // I2C2 clock enable
 	RCC_APB1ENR1_I2C1EN = 1UL<<21, // I2C1 clock enable
 	RCC_APB1ENR1_UART4EN = 1UL<<19, // UART4 clock enable
-	RCC_APB1ENR1_USART1EN = 1UL<<18, // USART1 clock enable
+	RCC_APB1ENR1_USART3EN = 1UL<<18, // USART3 clock enable
 	RCC_APB1ENR1_USART2EN = 1UL<<17, // USART2 clock enable
 	RCC_APB1ENR1_SPI3EN = 1UL<<15, // SPI3 clock enable
 	RCC_APB1ENR1_SPI2EN = 1UL<<14, // SPI2 clock enable

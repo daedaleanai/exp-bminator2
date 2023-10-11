@@ -41,12 +41,10 @@ static const struct gpio_config_t {
 } pin_cfgs[] = {
     {PAAll, GPIO_ANALOG},
     {PBAll, GPIO_ANALOG},
-    {LED_PIN, GPIO_OUTPUT},
     {USART2_TX_PIN, GPIO_AF7_USART123|GPIO_HIGH},
 	{SPI1_MOSI_PIN | SPI1_SCK_PIN |SPI1_MISO_PIN, GPIO_AF5_SPI12|GPIO_HIGH},
-    {BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_IPU},
-    {BMI_CSB1A_PIN | BMI_CSB2G_PIN, GPIO_OUTPUT|GPIO_FAST},
-    {BME_CSB_PIN, GPIO_OUTPUT|GPIO_FAST},
+    {BMI_INT1A_PIN | BMI_INT3G_PIN | INA_ALERT_PIN, GPIO_IPU},
+    {BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN |INA_CSB_PIN, GPIO_OUTPUT|GPIO_FAST},
     {0, 0}, // sentinel
 };
 
@@ -57,8 +55,10 @@ struct {
     uint8_t        prio;
 } irqprios[] = {
     {SysTick_IRQn,  PRIO(0,0)},
-	{DMA1_CH2_IRQn, PRIO(1,0)},
+	{DMA2_CH6_IRQn, PRIO(1,0)},
+	{DMA1_CH2_IRQn, PRIO(1,1)},
     {USART2_IRQn,   PRIO(2,0)},
+    {USART1_IRQn,   PRIO(2,1)},
     {TIM2_IRQn,     PRIO(3,0)},
     {None_IRQn, 0xff},
 };
@@ -94,7 +94,7 @@ static struct bmx_config_t accel_cfg[] = {
 #endif
 /* clang-format on */
 
-// USART2 is the console, for debug messages
+// USART2 is the console, for debug messages, it runs IRQ driven.
 static struct Ringbuffer usart2tx;
 
 void _putchar(char character) {
@@ -112,7 +112,7 @@ void _putchar(char character) {
 
 void USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
 
-// SPI1 has the BMI088, BME280  ... connected to it.
+// SPI1 has the BMI088, BME280, INA299  ... connected to it.
 
 struct SPIQ spiq1;
 
@@ -122,6 +122,7 @@ static void spi1_ss(uint16_t addr, int on) {
 	case ACCEL:	if (on) digitalLo(BMI_CSB1A_PIN); else digitalHi(BMI_CSB1A_PIN); break;
 	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); break;
 	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
+	case CURRSENSE:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break;
 	}
 	printf("%d %s\n", addr, on ? "ON" : "OFF");
 }
@@ -136,11 +137,13 @@ static void spi1_ss(uint16_t addr, int on) {
 static struct MsgQueue outq;
 
 static inline void usart1dmamove(uint8_t *buf, size_t len) {
-    DMA2.CCR6 = 0;  // all defaults, disable
+    DMA2.CCR6 = 0;
+    dma1_cselr_set_c6s(&DMA2, 2); // select usart1 for dma2 ch2
     DMA2.CPAR6 = (uintptr_t)&USART1.TDR;
     DMA2.CMAR6 = (uintptr_t)buf;
     DMA2.CNDTR6 = len;
     DMA2.CCR6 = DMA1_CCR1_MINC | DMA1_CCR1_DIR | DMA1_CCR1_TEIE | DMA1_CCR1_TCIE | DMA1_CCR1_EN;
+
 }
 
 // if we ever give up all messages being 20 bytes long, we need to introduce a 'padding' message
@@ -187,7 +190,7 @@ void DMA2_CH6_Handler(void) {
     if (DMA2.ISR & DMA1_ISR_TEIF6)
         ++dma2ch6err_cnt;
 
-    DMA2.IFCR = DMA2.ISR & (0xf<<5);
+    DMA2.IFCR = DMA2.ISR & 0x00f00000;
 }
 
 // irq only on USART Transmit Complete
@@ -230,7 +233,7 @@ void TIM2_Handler(void) {
     now %= 1000000;
 
 //    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq1.head, spiq1.curr, spiq1.tail, SPI1.CR1, SPI1.SR, DMA1.CNDTR2);
-    printf("\nuptime %llu.%06llu  usart %ld-%ld (dropped %lld) %04lx %04lx 0x%08lx\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6);
+    printf("\nuptime %llu.%06llu  usart %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
  }
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
@@ -241,13 +244,13 @@ void main(void) {
 
 	NVIC_SetPriorityGrouping(IRQ_PRIORITY_GROUPING_2_2);
     for (int i = 0; irqprios[i].irq != None_IRQn; i++) {
-            NVIC_SetPriority(irqprios[i].irq, irqprios[i].prio);
+        NVIC_SetPriority(irqprios[i].irq, irqprios[i].prio);
     }
 
-	RCC.AHB1ENR  |= RCC_AHB1ENR_DMA1EN;
+	RCC.AHB1ENR  |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
 	RCC.AHB2ENR  |= RCC_AHB2ENR_GPIOAEN|RCC_AHB2ENR_GPIOBEN;
 	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM2EN;
-	RCC.APB2ENR  |= RCC_APB2ENR_SPI1EN;
+	RCC.APB2ENR  |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART1EN;
 
 	for (const struct gpio_config_t* p = pin_cfgs; p->pins; ++p) {
 		gpioConfig(p->pins, p->mode);
@@ -277,11 +280,10 @@ void main(void) {
 
     usart_init(&USART1, 8*115200);
     USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA
-
-    NVIC_EnableIRQ(USART1_IRQn);
     NVIC_EnableIRQ(DMA2_CH6_IRQn);
+    NVIC_EnableIRQ(USART1_IRQn);
 
-
+if(0)
     for(;;) {
         delay(500*1000);
 
@@ -301,11 +303,12 @@ void main(void) {
 
 	spiq_init(&spiq1, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 
-#if 0
 
 	uint8_t val = 0;
 	uint16_t r = bmx_readreg(&spiq1, HUMID, BME280_REG_ID, &val);
 	printf("bme280 id reads (%x): %x\n", r, val);
+
+#if 0
 
 	int bmi_ok = (bmi_accel_poweron(&spiq1) == 0);
     if (!bmi_ok) {
