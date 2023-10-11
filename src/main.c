@@ -15,18 +15,24 @@
 
 /* clang-format off */
 enum {
-    BMI_INT1A_PIN = PA0,
-    BMI_INT3G_PIN = PA1,
-	USART2_TX_PIN = PA2,
-	BME_CSB_PIN   = PA4,
-    SPI1_SCK_PIN  = PA5,
-    SPI1_MISO_PIN = PA6,
-    SPI1_MOSI_PIN = PA7,
-    
+    BMI_INT1A_PIN  = PA1,
+	USART2_TX_PIN  = PA2,
+    BMI_INT3G_PIN  = PA3,
+    THERMISTOR_PIN = PA4,
+    HEATER_EN_PIN  = PA5,
+    INA_ALERT_PIN  = PA7,
+	USART1_TX_PIN  = PA9,
+	USARTR_TX_PIN  = PA10,
+    TIMEPULSE_PIN  = PA15,
+
     BMI_CSB2G_PIN = PB0,
     BMI_CSB1A_PIN = PB1,
-
-	LED_PIN      = PB3,
+    SPI1_SCK_PIN  = PB3,
+    SPI1_MISO_PIN = PB4,
+    SPI1_MOSI_PIN = PB5,
+    BME_CSB_PIN   = PB6,
+    INA_CSB_PIN   = PB7,
+    
 };
 
 static const struct gpio_config_t {

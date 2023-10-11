@@ -4,8 +4,7 @@
 #include "bme280.h"
 #include "spi.h"
 
-// The BMI08x is basically 2 devices sharing an SPI, each have a separate CSB and INT line.
-enum BMXFunction { NONE = 0, GYRO, ACCEL, HUMID };
+enum BMXFunction { NONE = 0, GYRO, ACCEL, HUMID, CURRSENSE };
 
 struct bmx_config_t {
     uint8_t reg, val;
