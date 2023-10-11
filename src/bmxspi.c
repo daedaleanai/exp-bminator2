@@ -33,45 +33,19 @@ static inline uint32_t decode_le_uint32(uint8_t *buf) {
 
 // blocking write single register
 uint16_t bmx_writereg(struct SPIQ *q, enum BMXFunction bf, uint8_t reg, uint8_t val) {
-    struct SPIXmit *x = spiq_head(q);
-    if (!x) {
-        return 0xffff;
-    }
     uint8_t buf[2] = {reg, val};
-    x->addr = bf;
-    x->len = 2;
-    x->buf = buf;
-    spiq_enq_head(q);
-    spi_wait(q);
-    x = spiq_tail(q);
-    if (!x) {
-        return 0xfffe;
-    }
-    uint16_t r = x->status;
-    spiq_deq_tail(q);
-    return r;
+    return spiq_xmit(q, bf, sizeof buf, buf);
 }
 
 // blocking read single register
 uint16_t bmx_readreg(struct SPIQ *q, enum BMXFunction bf, uint8_t reg, uint8_t *val) {
-    struct SPIXmit *x = spiq_head(q);
-    if (!x) {
-        return 0xffff;
-    }
     reg |= 0x80;  // flag for reading
     uint8_t buf[3] = {reg, 0, 0};
-    x->addr = bf;
-    x->len = (bf == ACCEL) ? 3 : 2;  // accel has 1 extra byte of garbage after first
-    x->buf = buf;
-    spiq_enq_head(q);
-    spi_wait(q);
-    x = spiq_tail(q);
-    if (!x) {
-        return 0xfffe;
+    size_t len = (bf == ACCEL) ? 3 : 2;  // accel has 1 extra byte of garbage after first
+    uint16_t r = spiq_xmit(q, bf, len, buf);
+    if (r == 0) {
+        *val = buf[len - 1];
     }
-    *val = buf[x->len - 1];
-    uint16_t r = x->status;
-    spiq_deq_tail(q);
     return r;
 }
 
@@ -91,28 +65,13 @@ uint16_t bmi_accel_poweron(struct SPIQ *q) {
 }
 
 static uint16_t bmi_read_accel(struct SPIQ *q, int16_t xyz[3]) {
-    struct SPIXmit *x = spiq_head(q);
-    if (!x) {
-        return 0xffff;
-    }
     uint8_t buf[8] = {0x80 | BMI08x_ACC_X_LSB, 0, 0, 0, 0, 0, 0, 0};
-    x->addr = ACCEL;
-    x->len = sizeof buf;
-    x->buf = buf;
-    spiq_enq_head(q);
-    spi_wait(q);
-    x = spiq_tail(q);
-    if (!x) {
-        return 0xfffe;
-    }
-
-    uint16_t r = x ->status;
+    uint16_t r = spiq_xmit(q, ACCEL, sizeof buf, buf);
     if (r == 0) {
         xyz[0] = decode_le_uint16(buf + 2);
         xyz[1] = decode_le_uint16(buf + 4);
         xyz[2] = decode_le_uint16(buf + 6);
     }
-    spiq_deq_tail(q);
     return r;
 }
 
@@ -242,31 +201,19 @@ int bme280_self_test(struct SPIQ *q, struct LinearisationParameters *bmeParam) {
         return -1;
     }
 
-    (void)bmeParam;
-#if 0
-
     {
         uint8_t buf88[1 + BME280_CALIBTP_LEN] = {BME280_CALIBTP_REG | BME280_READREG};
-        spi_xmit_enq(BME_SPI, 1, sizeof buf88, buf88);
-        spi_wait(BME_SPI);
-        int dum = 0;
-        uint16_t r = spi_xmit_deq(BME_SPI, &dum, NULL, NULL);
-        if ((r != 0) || (dum != 1))
-            serial_printf(&USART1, "BME read 1: %d %x\n", r, dum);
-
         uint8_t bufe1[1 + BME280_CALIBH_LEN] = {BME280_CALIBH_REG | BME280_READREG};
-        spi_xmit_enq(BME_SPI, 2, sizeof bufe1, bufe1);
-        spi_wait(BME_SPI);
-        dum = 0;
-        r = spi_xmit_deq(BME_SPI, &dum, NULL, NULL);
-        if ((r != 0) || (dum != 2))
-            serial_printf(&USART1, "BME read 2: %d %x\n", r, dum);
+        if (spiq_xmit(q, HUMID, sizeof buf88, buf88) != 0) {
+            return -1;
+        }
+        if (spiq_xmit(q, HUMID, sizeof bufe1, bufe1) != 0) {
+            return -1;
+        }
 
-        bme_decodeLinearisationParameters(&linparm, buf88 + 1, bufe1 + 1);
+        bme_decodeLinearisationParameters(bmeParam, buf88 + 1, bufe1 + 1);
     }
 
-#endif
-printf("Humid ok\n");
     return 0;
 }
 

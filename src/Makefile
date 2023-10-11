@@ -25,6 +25,7 @@ OBJS = \
 	tprintf.o \
 	spi.o \
 	bmxspi.o \
+	bme280.o \
 	main.o \
 
 $(OBJS): Makefile 

@@ -144,3 +144,23 @@ void spi_wait(struct SPIQ *q) {
         __WFI();
     }
 }
+
+
+uint16_t spiq_xmit(struct SPIQ *q, uint16_t addr, size_t len, uint8_t* buf) {
+    struct SPIXmit *x = spiq_head(q);
+    if (!x) {
+        return 0xffff;
+    }
+    x->addr = addr;
+    x->len = len;
+    x->buf = buf;
+    spiq_enq_head(q);
+    spi_wait(q);
+    if (x != spiq_tail(q)) {
+        // someone else got our result, expect massive problems
+        return 0xffff;
+    }
+    uint16_t r = x->status;
+    spiq_deq_tail(q);
+    return r;
+}

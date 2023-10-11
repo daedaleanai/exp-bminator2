@@ -92,6 +92,14 @@ static struct bmx_config_t accel_cfg[] = {
         {BMI08x_INT1_INT2_MAP_DATA, 0x04},  // Map int to int1
         {0xFF, 0},  // sentinel
 };
+
+static struct bmx_config_t humid_cfg[] = {
+    {BME280_REG_CONFIG, BME280_CONFIG_TSB10|BME280_CONFIG_FLT16},
+    {BME280_REG_CTRLHUM, BME280_CTRLHUM_H16},
+    {BME280_REG_CTRLMEAS, BME280_CTRLMEAS_P16|BME280_CTRLMEAS_T16|BME280_CTRLMEAS_NORMAL},
+    {0xFF, 0},  // sentinel
+};
+
 /* clang-format on */
 
 // USART2 is the console, for debug messages, it runs IRQ driven.
@@ -232,8 +240,9 @@ void TIM2_Handler(void) {
     uint64_t sec = now / 1000000;
     now %= 1000000;
 
-    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
+//    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
 //    printf("\nuptime %llu.%06llu  usart %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
+      printf("\nuptime %llu.%06llu\n", sec, now);
  }
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
@@ -336,10 +345,36 @@ void main(void) {
         printf("BMI Enabled\n");
     }
 
-	int bme_ok = bme280_self_test(&spiq, &bmeParam);
+	int bme_ok = (bme280_self_test(&spiq, &bmeParam) == 0);
+    if (bme_ok) {
+        printf("T:");
+        for (size_t i = 1; i < 4; ++i)
+            printf(" %ld", bmeParam.T[i]);
+        printf("\n");
+
+        printf("P:");
+        for (size_t i = 1; i < 10; ++i)
+            printf(" %ld", bmeParam.P[i]);
+        printf("\n");
+
+        printf("H:");
+        for (size_t i = 1; i < 7; ++i)
+            printf(" %ld", bmeParam.H[i]);
+        printf("\n");
+
+        uint16_t r = bmx_config(&spiq, HUMID, humid_cfg);
+        if (r != 0) {
+            printf("error configuring BME humidity sensor: %x\n", r);
+            bme_ok = 0;
+        }
+
+    }
+
     if (!(bmi_ok && bme_ok)) {
         printf("BMI or BME not functional, watchdog will reboot....\n");
     }
+
+
 
     for(;;)
     	__WFI();

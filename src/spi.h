@@ -96,3 +96,10 @@ inline void spiq_deq_tail(struct SPIQ *q) {
 // spi_wait blocks until the spi's queue has at least one finished xmit to deq,
 // or the queue is idle.
 void spi_wait(struct SPIQ *q);
+
+// utility for just doing a sync transaction.
+// Do not use while async transactions are going on!
+// returns the transaction status or 0xffff if something went wrong.
+// in which case expect all SPI comms to be sufficiently messed up that you should reboot!
+// you have been warned!
+uint16_t spiq_xmit(struct SPIQ *q, uint16_t addr, size_t len, uint8_t* buf);
