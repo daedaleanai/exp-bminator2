@@ -120,7 +120,7 @@ static void spi1_ss(uint16_t addr, int on) {
 	switch ((enum BMXFunction)addr) {
 	case NONE:  break;
 	case ACCEL:	if (on) digitalLo(BMI_CSB1A_PIN); else digitalHi(BMI_CSB1A_PIN); break;
-	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); break;
+	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); delay(1000); break;
 //	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
 	case HUMID:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break; // test
 	case CURRSENSE:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break;
@@ -238,6 +238,8 @@ void TIM2_Handler(void) {
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
 
+struct LinearisationParameters bmeParam;
+
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
 	RCC.CSR |= RCC_CSR_RMVF; // Set RMVF bit to clear the reset flags
@@ -303,16 +305,8 @@ void main(void) {
 #endif
 
 
-	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+	spiq_init(&spiq, &SPI1, 5, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 
-if (1) {
-
-	uint8_t val = 0;
-	uint16_t r = bmx_readreg(&spiq, HUMID, BME280_REG_ID, &val);
-	r = bmx_readreg(&spiq, HUMID, BME280_REG_ID, &val);
-	printf("bme280 id reads (%x): %x\n", r, val);
-
-}
 
 	int bmi_ok = (bmi_accel_poweron(&spiq) == 0);
     if (!bmi_ok) {
@@ -342,7 +336,7 @@ if (1) {
         printf("BMI Enabled\n");
     }
 
-	int bme_ok = 1;
+	int bme_ok = bme280_self_test(&spiq, &bmeParam);
     if (!(bmi_ok && bme_ok)) {
         printf("BMI or BME not functional, watchdog will reboot....\n");
     }

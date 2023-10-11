@@ -61,7 +61,7 @@ uint16_t bmx_readreg(struct SPIQ *q, enum BMXFunction bf, uint8_t reg, uint8_t *
     reg |= 0x80;  // flag for reading
     uint8_t buf[3] = {reg, 0, 0};
     x->addr = bf;
-    x->len = (bf != ACCEL) ? 2 : 3;  // accel has 1 extra byte of garbage after first
+    x->len = (bf == ACCEL) ? 3 : 2;  // accel has 1 extra byte of garbage after first
     x->buf = buf;
     spiq_enq_head(q);
     spi_wait(q);
@@ -227,64 +227,46 @@ int bmi088_self_test(struct SPIQ *q) {
 }
 
 int bme280_self_test(struct SPIQ *q, struct LinearisationParameters *bmeParam) {
-    uint16_t r = bmx_writereg(q, NONE, BME280_REG_RESET, BME280_RESET);
+    uint16_t r = bmx_writereg(q, HUMID, BME280_REG_RESET, BME280_RESET);
     if (r != 0) {
-        printf("baro reset spi error: %x\n", r);
+        printf("Humid reset spi error: %x\n", r);
         return -1;
     }
     delay(20000);
 
     uint8_t chip_id = 0;
-    r = bmx_readreg(q, NONE, BME280_REG_ID, &chip_id);
+    r = bmx_readreg(q, HUMID, BME280_REG_ID, &chip_id);
 
     if ((r != 0) || (chip_id != 0x60)) {
-        printf("Baro chip_id %i (result %x)\n", chip_id, r);
+        printf("Humid chip_id %i (result %x)\n", chip_id, r);
         return -1;
     }
 
     (void)bmeParam;
 #if 0
-    struct SPIXmit *x = spiq_head(q);
-    if (!x) {
-        return -1;
-    }
-    uint8_t buf[BME280_CALIBTP_LEN+1] = {0x80 | BME280_CALIBTP_REG, 0};
-    
-    x->addr = HUMID;
-    x->len = sizeof buf;
-    x->buf = buf;
-    spiq_enq_head(q);
-    spi_wait(q);
-    x = spiq_tail(q);
-    if (!x) {
-        return -1;
-    }
 
-    r = x ->status;
-    printf("BCLBR:");
-    if (r != 0) {
-        spiq_deq_tail(q);
-        printf(" ERROR %x:\n", r);
-        return -1;
-    } else {
-        for (int i = 2; i < sizeof buf; ++i) {
-            printf(" %i", buf[i]);
-        }
-        printf("\n");
-        bme_decodeLinearisationParameters(bmeParam, buf + 2);
-        spiq_deq_tail(q);
+    {
+        uint8_t buf88[1 + BME280_CALIBTP_LEN] = {BME280_CALIBTP_REG | BME280_READREG};
+        spi_xmit_enq(BME_SPI, 1, sizeof buf88, buf88);
+        spi_wait(BME_SPI);
+        int dum = 0;
+        uint16_t r = spi_xmit_deq(BME_SPI, &dum, NULL, NULL);
+        if ((r != 0) || (dum != 1))
+            serial_printf(&USART1, "BME read 1: %d %x\n", r, dum);
 
-        for (int i = 1; i < 4; ++i) {
-            printf("\tT[%i]=%li\n", i, bmeParam->T[i]);
-        }
-        for (int i = 1; i < 10; ++i) {
-            printf("\tP[%i]=%li\n", i, bmeParam->P[i]);
-        }
+        uint8_t bufe1[1 + BME280_CALIBH_LEN] = {BME280_CALIBH_REG | BME280_READREG};
+        spi_xmit_enq(BME_SPI, 2, sizeof bufe1, bufe1);
+        spi_wait(BME_SPI);
+        dum = 0;
+        r = spi_xmit_deq(BME_SPI, &dum, NULL, NULL);
+        if ((r != 0) || (dum != 2))
+            serial_printf(&USART1, "BME read 2: %d %x\n", r, dum);
+
+        bme_decodeLinearisationParameters(&linparm, buf88 + 1, bufe1 + 1);
     }
 
-    // TODO Humid calibration
 #endif
-
+printf("Humid ok\n");
     return 0;
 }
 
