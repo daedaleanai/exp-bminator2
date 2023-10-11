@@ -138,6 +138,7 @@ int bmi088_self_test(struct SPIQ *q) {
         ++err;
     }
 
+    // TODO maybe report this back so we know what range we have on the ACC.
     switch(chip_id) {
     case 0x1f:
         printf("Detected BMI085\n"); break;
@@ -150,7 +151,7 @@ int bmi088_self_test(struct SPIQ *q) {
 
     printf("Starting accel self test.\n");
 
-    // Note: the manual states an incorrect value for CONF
+    // Note: the bmi085 manual states an incorrect value for CONF
     bmx_writereg(q, ACCEL, BMI08x_ACC_RANGE, BMI085_ACC_RANGE_16G);  // ±16g range: +2^15 ~ 16G -> 1G = 2^11
     bmx_writereg(q, ACCEL, BMI08x_ACC_CONF,  BMI08x_ACC_CONF_1600HZ);  // ODR=1.6kHz, continuous sampling mode, “normal mode” (norm_avg4)
     delay(2500);  // wait > 2ms
