@@ -14,8 +14,7 @@ TODO(lvd) heater servo control logic
 | PA1  | EXTINT A1  | in  | PullUp               | bmi088 INT1 (Accel) open drain/active low |
 | PA2  | USART2 TX  | out | AF_PP 50MHz          | debug serial/ boot0 loader console RX     |
 | PA3  | EXTINT A3  | in  | PullUp               | bmi088 INT3 (Gyro) open drain/active low  |
-| PA3  | ADC1 IN8   | in  | Analog Input         | Heater Thermistor input                   |
-| PA4  |            |     |                      |                                           |
+| PA4  | ADC1 IN9   | in  | Analog Input         | Heater Thermistor input                   |
 | PA5  | SPI1 SCK   | out | AF_PP 50MHz          | bmi088/bme280/... SPI sck                 |
 | PA6  | SPI1 MISO  | in  | PullUp               | bmi088/bme280/... SPI miso (sdo2/sdo1)    |
 | PA7  | SPI1 MOSI  | out | AF_PP 50MHz          | bmi088/bme280/... SPI mosi (sdi)          |
