@@ -49,15 +49,15 @@ void spiq_init(
     q->ss_func = ss_func;
     q->head = q->curr = q->tail = 0;
 
-    spi->CR1 &= ~SPI1_CR1_SPE;
+    spi->CR1 = 0;
     // 8 bit master mode
     spi->CR1 = SPI1_CR1_MSTR | ((clock_div & 0x7) << 3);
-    spi->CR2 = SPI1_CR2_SSOE | SPI1_CR2_RXDMAEN | SPI1_CR2_TXDMAEN;
+    spi->CR2 = SPI1_CR2_FRXTH | SPI1_CR2_RXDMAEN | SPI1_CR2_TXDMAEN;
 
     if (ss_func != NULL) {
-        // disable use of the NSS pin
         spi->CR1 |= SPI1_CR1_SSM | SPI1_CR1_SSI;
-        spi->CR2 &= ~SPI1_CR2_SSOE;
+    } else {
+        spi->CR2 |= SPI1_CR2_SSOE;
     }
 
     switch (dma) {

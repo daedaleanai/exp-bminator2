@@ -48,7 +48,8 @@ static const struct gpio_config_t {
     {0, 0}, // sentinel
 };
 
-enum { IRQ_PRIORITY_GROUPING_2_2 = 5 }; // prio[7:6] : 4 groups,  prio[5:4] : 4 subgroups
+ // prio[7:6] : 4 groups,  prio[5:4] : 4 subgroups
+enum { IRQ_PRIORITY_GROUPING_2_2 = 5 };
 #define PRIO(grp, sub) (((grp)<<6)|((sub)<<4))
 struct {
     enum IRQn_Type irq;
@@ -74,7 +75,7 @@ struct {
     uint32_t accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
 
 */
-#if 0
+
 static struct bmx_config_t gyro_cfg[] = {
         {BMI08x_GYRO_RANGE, BMI08x_GYRO_RANGE_250DEG_S},  // SEE NOTE ABOVE
         {BMI08x_GYRO_BANDWIDTH, BMI08x_GYRO_BANDWIDTH_2000_532HZ},
@@ -91,7 +92,6 @@ static struct bmx_config_t accel_cfg[] = {
         {BMI08x_INT1_INT2_MAP_DATA, 0x04},  // Map int to int1
         {0xFF, 0},  // sentinel
 };
-#endif
 /* clang-format on */
 
 // USART2 is the console, for debug messages, it runs IRQ driven.
@@ -114,7 +114,7 @@ void USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
 
 // SPI1 has the BMI088, BME280, INA299  ... connected to it.
 
-struct SPIQ spiq1;
+struct SPIQ spiq;
 
 static void spi1_ss(uint16_t addr, int on) {
 	switch ((enum BMXFunction)addr) {
@@ -124,12 +124,11 @@ static void spi1_ss(uint16_t addr, int on) {
 	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
 	case CURRSENSE:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break;
 	}
-	printf("%d %s\n", addr, on ? "ON" : "OFF");
 }
 
  void DMA1_CH2_Handler(void) {
 	DMA1.IFCR = DMA1.ISR & 0x00000f0;
-	spi_rx_dma_handler(&spiq1);
+	spi_rx_dma_handler(&spiq);
  }
 
 // USART1 is the output datastream and command input
@@ -232,8 +231,8 @@ void TIM2_Handler(void) {
     uint64_t sec = now / 1000000;
     now %= 1000000;
 
-//    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq1.head, spiq1.curr, spiq1.tail, SPI1.CR1, SPI1.SR, DMA1.CNDTR2);
-    printf("\nuptime %llu.%06llu  usart %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
+    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
+//    printf("\nuptime %llu.%06llu  usart %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
  }
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
@@ -259,6 +258,8 @@ void main(void) {
 	gpioLock(PAAll);
 	gpioLock(PBAll);
 
+    digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN |INA_CSB_PIN);
+
 	ringbuffer_clear(&usart2tx);
 	usart_init(&USART2, 115200);
 	NVIC_EnableIRQ(USART2_IRQn);
@@ -278,12 +279,12 @@ void main(void) {
     TIM2.CR1 |= TIM1_CR1_CEN;
     NVIC_EnableIRQ(TIM2_IRQn);
 
+#if 0
     usart_init(&USART1, 8*115200);
     USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA
     NVIC_EnableIRQ(DMA2_CH6_IRQn);
     NVIC_EnableIRQ(USART1_IRQn);
 
-if(0)
     for(;;) {
         delay(500*1000);
 
@@ -298,39 +299,41 @@ if(0)
         msgq_push_head(&outq);
         start_usart1();
     }
+#endif
 
 
+	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 
-	spiq_init(&spiq1, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
-
+if (0) {
 
 	uint8_t val = 0;
-	uint16_t r = bmx_readreg(&spiq1, HUMID, BME280_REG_ID, &val);
+	uint16_t r = bmx_readreg(&spiq, HUMID, BME280_REG_ID, &val);
+	r = bmx_readreg(&spiq, HUMID, BME280_REG_ID, &val);
 	printf("bme280 id reads (%x): %x\n", r, val);
 
-#if 0
+}
 
-	int bmi_ok = (bmi_accel_poweron(&spiq1) == 0);
+	int bmi_ok = (bmi_accel_poweron(&spiq) == 0);
     if (!bmi_ok) {
         printf("BMI088 not found.\n");
     } else {
         printf("BMI088 Accel enabled.\n");
-        bmi_ok = (bmi088_self_test(&spiq1) == 0);
+        bmi_ok = (bmi088_self_test(&spiq) == 0);
     }
     if (bmi_ok) {
-        uint16_t r = bmi_accel_poweron(&spiq1);
+        uint16_t r = bmi_accel_poweron(&spiq);
         if (r) {
             printf("BMI088 Accel failed to reset (%x).\n", r);
             bmi_ok = 0;
         }
     }
     if (bmi_ok) {
-        uint16_t r = bmx_config(&spiq1, ACCEL, accel_cfg);
+        uint16_t r = bmx_config(&spiq, ACCEL, accel_cfg);
         if (r != 0) {
             printf("error configuring BMI Accel: %x\n", r);
             bmi_ok = 0;
         }
-        r = bmx_config(&spiq1, GYRO, gyro_cfg);
+        r = bmx_config(&spiq, GYRO, gyro_cfg);
         if (r != 0) {
             printf("error configuring BMI Gyro: %x\n", r);
             bmi_ok = 0;
@@ -342,7 +345,6 @@ if(0)
     if (!(bmi_ok && bme_ok)) {
         printf("BMI or BME not functional, watchdog will reboot....\n");
     }
-#endif
 
     for(;;)
     	__WFI();
