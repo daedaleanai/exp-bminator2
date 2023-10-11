@@ -15,9 +15,9 @@ TODO(lvd) heater servo control logic
 | PA2  | USART2 TX  | out | AF_PP 50MHz          | debug serial/ boot0 loader console RX     |
 | PA3  | EXTINT A3  | in  | PullUp               | bmi088 INT3 (Gyro) open drain/active low  |
 | PA4  | ADC1 IN9   | in  | Analog Input         | Heater Thermistor input                   |
-| PA5  | SPI1 SCK   | out | AF_PP 50MHz          | bmi088/bme280/... SPI sck                 |
-| PA6  | SPI1 MISO  | in  | PullUp               | bmi088/bme280/... SPI miso (sdo2/sdo1)    |
-| PA7  | SPI1 MOSI  | out | AF_PP 50MHz          | bmi088/bme280/... SPI mosi (sdi)          |
+| PA5  | GPIO PA5   | out | OUT_PP 2MHz          | Heater 24V  Enable                        |
+| PA6  |            |     |                      |                                           |
+| PA7  |            |     |                      |                                           |
 | PA8  |            |     |                      |                                           |
 | PA9  | USART1 TX  | out | AF_PP 50MHz          | host serial input                         |
 | PA10 | USART1 RX  | in  | PullUp (5V tolerant) | host serial output                        |
@@ -26,15 +26,14 @@ TODO(lvd) heater servo control logic
 | PA13 | JTMS/SWDIO |     |                      | debug SWD connector                       |
 | PA14 | JTCK/SWCLK |     |                      | debug SWD connector                       |
 | PA15 | TIM2 CH1   | in  | Input (5V tolerant)  | host reference time pulse                 |
-| PA15 | GPIO PA15  | out | OUT_PP 2MHz          | Heater 24V  Enable                        |
 | PB0  | GPIO B0    | out | OUT_PP 2MHz          | bmi088 CSB2 (Gyro)  active low            |
 | PB1  | GPIO B1    | out | OUT_PP 2MHz          | bmi088 CSB1 (Accel) active low            |
 | PB2  |            |     |                      | (not exposed on 32-pin package)           |
-| PB3  | GPIO B3    | out | OUT_PP 2MHz          | bme280 CSB  (Humid) active low            |
-| PB4  | GPIO B4    | out | OUT_PP 2MHz          | heater current sense CSB active low       |
-| PB5  |            |     |                      |                                           |
-| PB6  |            |     |                      |                                           |
-| PB7  |            |     |                      |                                           |
+| PB3  | SPI1 SCK   | out | AF_PP 50MHz          | bmi088/bme280/... SPI sck                 |
+| PB4  | SPI1 MISO  | in  | PullUp               | bmi088/bme280/... SPI miso (sdo2/sdo1)    |
+| PB5  | SPI1 MOSI  | out | AF_PP 50MHz          | bmi088/bme280/... SPI mosi (sdi)          |
+| PB6  | GPIO B6    | out | OUT_PP 2MHz          | bme280 CSB  (Humid) active low            |
+| PB7  | GPIO B7    | out | OUT_PP 2MHz          | xxx CSB (heater current sense) active low |
 
 If desired, PA0/CK_IN can be used as an external clock source 4..48MHz, see
 RMA0394 Section 6.1.1 p.182 'External Clock (HSE Bypass)'
