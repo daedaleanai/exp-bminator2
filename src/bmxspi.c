@@ -61,7 +61,7 @@ uint16_t bmx_readreg(struct SPIQ *q, enum BMXFunction bf, uint8_t reg, uint8_t *
     reg |= 0x80;  // flag for reading
     uint8_t buf[3] = {reg, 0, 0};
     x->addr = bf;
-    x->len = (bf == GYRO) ? 2 : 3;  // accel has 1 extra byte of garbage after first
+    x->len = (bf != ACCEL) ? 2 : 3;  // accel has 1 extra byte of garbage after first
     x->buf = buf;
     spiq_enq_head(q);
     spi_wait(q);

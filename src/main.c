@@ -121,7 +121,8 @@ static void spi1_ss(uint16_t addr, int on) {
 	case NONE:  break;
 	case ACCEL:	if (on) digitalLo(BMI_CSB1A_PIN); else digitalHi(BMI_CSB1A_PIN); break;
 	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); break;
-	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
+//	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
+	case HUMID:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break; // test
 	case CURRSENSE:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break;
 	}
 }
@@ -304,7 +305,7 @@ void main(void) {
 
 	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 
-if (0) {
+if (1) {
 
 	uint8_t val = 0;
 	uint16_t r = bmx_readreg(&spiq, HUMID, BME280_REG_ID, &val);
