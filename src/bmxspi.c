@@ -133,8 +133,18 @@ int bmi088_self_test(struct SPIQ *q) {
     if (r == 0) {
         r = bmx_readreg(q, ACCEL, BMI08x_ACC_ERR_REG, &err_code);
     }
-    if ((r != 0) || (chip_id != 0x1f) || (err_code != 0)) {
+    if ((r != 0) || (err_code != 0)) {
         printf("Accel chip_id %i error code %i (result %x)\n", chip_id, err_code, r);
+        ++err;
+    }
+
+    switch(chip_id) {
+    case 0x1f:
+        printf("Detected BMI085\n"); break;
+    case 0x1e:
+        printf("Detected BMI088\n"); break;
+    default:
+        printf("Unexpected accel chip id %x\n", chip_id);
         ++err;
     }
 
