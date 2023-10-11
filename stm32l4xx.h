@@ -2717,52 +2717,38 @@ inline uint32_t dfsdm_dfsdm3_cnvtimr_get_cnvcnt(struct DFSDM_Type* p) { return (
 struct DMA1_Type {
 	__I uint32_t ISR; // @0 interrupt status register
 	__O uint32_t IFCR; // @4 interrupt flag clear register
-	__IO uint16_t CCR1; // @8 channel x configuration register
-	 uint8_t RESERVED0[2]; // @10 
-	__IO uint16_t CNDTR1; // @12 channel x number of data register
-	 uint8_t RESERVED1[2]; // @14 
+	__IO uint32_t CCR1; // @8 channel x configuration register
+	__IO uint32_t CNDTR1; // @12 channel x number of data register
 	__IO uint32_t CPAR1; // @16 channel x peripheral address register
 	__IO uint32_t CMAR1; // @20 channel x memory address register
 	 uint8_t RESERVED2[4]; // @24 
-	__IO uint16_t CCR2; // @28 channel x configuration register
-	 uint8_t RESERVED3[2]; // @30 
-	__IO uint16_t CNDTR2; // @32 channel x number of data register
-	 uint8_t RESERVED4[2]; // @34 
+	__IO uint32_t CCR2; // @28 channel x configuration register
+	__IO uint32_t CNDTR2; // @32 channel x number of data register
 	__IO uint32_t CPAR2; // @36 channel x peripheral address register
 	__IO uint32_t CMAR2; // @40 channel x memory address register
 	 uint8_t RESERVED5[4]; // @44 
-	__IO uint16_t CCR3; // @48 channel x configuration register
-	 uint8_t RESERVED6[2]; // @50 
-	__IO uint16_t CNDTR3; // @52 channel x number of data register
-	 uint8_t RESERVED7[2]; // @54 
+	__IO uint32_t CCR3; // @48 channel x configuration register
+	__IO uint32_t CNDTR3; // @52 channel x number of data register
 	__IO uint32_t CPAR3; // @56 channel x peripheral address register
 	__IO uint32_t CMAR3; // @60 channel x memory address register
 	 uint8_t RESERVED8[4]; // @64 
-	__IO uint16_t CCR4; // @68 channel x configuration register
-	 uint8_t RESERVED9[2]; // @70 
-	__IO uint16_t CNDTR4; // @72 channel x number of data register
-	 uint8_t RESERVED10[2]; // @74 
+	__IO uint32_t CCR4; // @68 channel x configuration register
+	__IO uint32_t CNDTR4; // @72 channel x number of data register
 	__IO uint32_t CPAR4; // @76 channel x peripheral address register
 	__IO uint32_t CMAR4; // @80 channel x memory address register
 	 uint8_t RESERVED11[4]; // @84 
-	__IO uint16_t CCR5; // @88 channel x configuration register
-	 uint8_t RESERVED12[2]; // @90 
-	__IO uint16_t CNDTR5; // @92 channel x number of data register
-	 uint8_t RESERVED13[2]; // @94 
+	__IO uint32_t CCR5; // @88 channel x configuration register
+	__IO uint32_t CNDTR5; // @92 channel x number of data register
 	__IO uint32_t CPAR5; // @96 channel x peripheral address register
 	__IO uint32_t CMAR5; // @100 channel x memory address register
 	 uint8_t RESERVED14[4]; // @104 
-	__IO uint16_t CCR6; // @108 channel x configuration register
-	 uint8_t RESERVED15[2]; // @110 
-	__IO uint16_t CNDTR6; // @112 channel x number of data register
-	 uint8_t RESERVED16[2]; // @114 
+	__IO uint32_t CCR6; // @108 channel x configuration register
+	__IO uint32_t CNDTR6; // @112 channel x number of data register
 	__IO uint32_t CPAR6; // @116 channel x peripheral address register
 	__IO uint32_t CMAR6; // @120 channel x memory address register
 	 uint8_t RESERVED17[4]; // @124 
-	__IO uint16_t CCR7; // @128 channel x configuration register
-	 uint8_t RESERVED18[2]; // @130 
-	__IO uint16_t CNDTR7; // @132 channel x number of data register
-	 uint8_t RESERVED19[2]; // @134 
+	__IO uint32_t CCR7; // @128 channel x configuration register
+	__IO uint32_t CNDTR7; // @132 channel x number of data register
 	__IO uint32_t CPAR7; // @136 channel x peripheral address register
 	__IO uint32_t CMAR7; // @140 channel x memory address register
 	 uint8_t RESERVED20[24]; // @144 
@@ -5377,7 +5363,7 @@ enum {
 	RCC_APB1ENR1_USART1EN = 1UL<<18, // USART1 clock enable
 	RCC_APB1ENR1_USART2EN = 1UL<<17, // USART2 clock enable
 	RCC_APB1ENR1_SPI3EN = 1UL<<15, // SPI3 clock enable
-	RCC_APB1ENR1_SPI1EN = 1UL<<14, // SPI1 clock enable
+	RCC_APB1ENR1_SPI2EN = 1UL<<14, // SPI2 clock enable
 	RCC_APB1ENR1_WWDGEN = 1UL<<11, // Window watchdog clock enable
 	RCC_APB1ENR1_RTCAPBEN = 1UL<<10, // RTC APB clock enable
 	RCC_APB1ENR1_LCDEN = 1UL<<9, // LCD clock enable
@@ -5452,7 +5438,7 @@ enum {
 	RCC_APB1SMENR1_I2C1SMEN = 1UL<<21, // I2C1 clocks enable during Sleep and Stop modes
 	RCC_APB1SMENR1_USART2SMEN = 1UL<<18, // USART2 clocks enable during Sleep and Stop modes
 	RCC_APB1SMENR1_USART1SMEN = 1UL<<17, // USART1 clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_SP3SMEN = 1UL<<15, // SPI3 clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_SPI3SMEN = 1UL<<15, // SPI3 clocks enable during Sleep and Stop modes
 	RCC_APB1SMENR1_SPI2SMEN = 1UL<<14, // SPI2 clocks enable during Sleep and Stop modes
 	RCC_APB1SMENR1_WWDGSMEN = 1UL<<11, // Window watchdog clocks enable during Sleep and Stop modes
 	RCC_APB1SMENR1_RTCAPBSMEN = 1UL<<10, // RTC APB clock enable during Sleep and Stop modes

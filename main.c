@@ -33,10 +33,10 @@ static const struct gpio_config_t {
 } pin_cfgs[] = {
     {LED_PIN, GPIO_OUTPUT},
     {USART2_TX_PIN, GPIO_AF7_USART123|GPIO_HIGH},
-	{SPI1_MOSI_PIN | SPI1_SCK_PIN, GPIO_AF5_SPI12|GPIO_HIGH},
-    {SPI1_MISO_PIN, GPIO_IPU},
+	{SPI1_MOSI_PIN | SPI1_SCK_PIN |SPI1_MISO_PIN, GPIO_AF5_SPI12|GPIO_HIGH},
     {BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_IPU},
-    {BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN, GPIO_OUTPUT|GPIO_FAST},
+    {BMI_CSB1A_PIN | BMI_CSB2G_PIN, GPIO_OUTPUT|GPIO_FAST},
+    {BME_CSB_PIN, GPIO_OUTPUT|GPIO_FAST},
     {0, 0}, // sentinel
 };
 
@@ -64,6 +64,7 @@ struct {
     uint32_t accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
 
 */
+#if 0
 static struct bmx_config_t gyro_cfg[] = {
         {BMI08x_GYRO_RANGE, BMI08x_GYRO_RANGE_250DEG_S},  // SEE NOTE ABOVE
         {BMI08x_GYRO_BANDWIDTH, BMI08x_GYRO_BANDWIDTH_2000_532HZ},
@@ -80,8 +81,7 @@ static struct bmx_config_t accel_cfg[] = {
         {BMI08x_INT1_INT2_MAP_DATA, 0x04},  // Map int to int1
         {0xFF, 0},  // sentinel
 };
-
-
+#endif
 /* clang-format on */
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
@@ -103,6 +103,9 @@ void _putchar(char character) {
 
 void USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
 
+struct SPIQ spiq1;
+
+
 void TIM2_Handler(void) {
     uint64_t now = cycleCount();
 
@@ -114,26 +117,25 @@ void TIM2_Handler(void) {
     uint64_t sec = now / 1000000;
     now %= 1000000;
 
-	digitalToggle(LED_PIN);
-
-    printf("\nuptime %llu.%06llu\n", sec, now);
+    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq1.head, spiq1.curr, spiq1.tail, SPI1.CR1, SPI1.SR, DMA1.CNDTR2);
  }
 
-struct SPIQ spiq1;
 
 static void spi1_ss(uint16_t addr, int on) {
 	switch ((enum BMXFunction)addr) {
-		case NONE:  digitalHi(BMI_CSB1A_PIN|BMI_CSB2G_PIN|BME_CSB_PIN); break;
-		case ACCEL:	if (on) digitalLo(BMI_CSB1A_PIN); else digitalHi(BMI_CSB1A_PIN); break;
-		case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); break;
-		case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
+	case NONE:  break;
+	case ACCEL:	if (on) digitalLo(BMI_CSB1A_PIN); else digitalHi(BMI_CSB1A_PIN); break;
+	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); break;
+	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
 	}
+	printf("%d %s\n", addr, on ? "ON" : "OFF");
 }
 
-//  void DMA1_CH2_Handler(void) {
-// 	DMA1.IFCR = DMA1.ISR & 0x00f0;
-// 	spi_rx_dma_handler(&spiq1);
-//  }
+ void DMA1_CH2_Handler(void) {
+	digitalHi(LED_PIN);
+	DMA1.IFCR = DMA1.ISR & 0x00f0;
+	spi_rx_dma_handler(&spiq1);
+ }
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
@@ -144,9 +146,10 @@ void main(void) {
             NVIC_SetPriority(irqprios[i].irq, irqprios[i].prio);
     }
 
-//	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN;
+	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN;
 	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN|RCC_AHB2ENR_GPIOBEN;
-	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM2EN /*| RCC_APB1ENR1_SPI1EN*/;
+	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM2EN;
+	RCC.APB2ENR  |= RCC_APB2ENR_SPI1EN;
 
 	for (const struct gpio_config_t* p = pin_cfgs; p->pins; ++p) {
 		gpioConfig(p->pins, p->mode);
@@ -168,21 +171,30 @@ void main(void) {
 
 	usart_wait(&USART2);
 
-if(0) {
+	TIM2.DIER |= TIM1_DIER_UIE;
+    TIM2.PSC = (CLOCKSPEED_HZ/10000) - 1;
+    TIM2.ARR = 10000 - 1; // 10KHz/10000 = 1Hz
+    TIM2.CR1 |= TIM1_CR1_CEN;
+    NVIC_EnableIRQ(TIM2_IRQn);
 
 	spiq_init(&spiq1, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 
+	uint8_t val = 0;
+	uint16_t r = bmx_readreg(&spiq1, HUMID, BME280_REG_ID, &val);
+	printf("bme280 id reads (%x): %x\n", r, val);
+
+#if 0
 	int bmi_ok = (bmi_accel_poweron(&spiq1) == 0);
     if (!bmi_ok) {
-        printf("BMI085 not found.\n");
+        printf("BMI088 not found.\n");
     } else {
-        printf("BMI085 Accel enabled.\n");
+        printf("BMI088 Accel enabled.\n");
         bmi_ok = (bmi088_self_test(&spiq1) == 0);
     }
     if (bmi_ok) {
         uint16_t r = bmi_accel_poweron(&spiq1);
         if (r) {
-            printf("BMI085 Accel failed to reset (%x).\n", r);
+            printf("BMI088 Accel failed to reset (%x).\n", r);
             bmi_ok = 0;
         }
     }
@@ -200,21 +212,11 @@ if(0) {
         printf("BMI Enabled\n");
     }
 
-	int bmp_ok = 1;
-    if (!(bmi_ok && bmp_ok)) {
-        printf("BMI or BMP not functional, watchdog will reboot....\n");
+	int bme_ok = 1;
+    if (!(bmi_ok && bme_ok)) {
+        printf("BMI or BME not functional, watchdog will reboot....\n");
     }
-
-}
-
-	TIM2.DIER |= TIM1_DIER_UIE;
-    TIM2.PSC = (CLOCKSPEED_HZ/10000) - 1;
-    TIM2.ARR = 10000 - 1; // 10KHz/10000 = 1Hz
-    TIM2.CR1 |= TIM1_CR1_CEN;
-    NVIC_EnableIRQ(TIM2_IRQn);
-
-
-
+#endif
 
     for(;;)
     	__WFI();

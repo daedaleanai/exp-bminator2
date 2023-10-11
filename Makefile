@@ -23,6 +23,8 @@ OBJS = \
 	gpio2.o \
 	ringbuffer.o \
 	tprintf.o \
+	spi.o \
+	bmxspi.o \
 	main.o \
 
 $(OBJS): Makefile 
