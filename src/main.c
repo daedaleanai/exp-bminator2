@@ -129,7 +129,7 @@ static void spi1_ss(uint16_t addr, int on) {
 	case NONE:  break;
 	case ACCEL:	if (on) digitalLo(BMI_CSB1A_PIN); else digitalHi(BMI_CSB1A_PIN); break;
 	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); delay(1000); break;
-//	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
+//	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break; // for some reason PB6 breaks things on the nucleo
 	case HUMID:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break; // test
 	case CURRSENSE:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break;
 	}
@@ -314,36 +314,32 @@ void main(void) {
 #endif
 
 
-	spiq_init(&spiq, &SPI1, 5, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 
 
-	int bmi_ok = (bmi_accel_poweron(&spiq) == 0);
-    if (!bmi_ok) {
-        printf("BMI088 not found.\n");
-    } else {
+    if (bmi_accel_poweron(&spiq) == 0) {
         printf("BMI088 Accel enabled.\n");
-        bmi_ok = (bmi088_self_test(&spiq) == 0);
+    } else {
+        printf("BMI088 not found.\n");
+    } 
+    int bmi_ok = (bmi088_self_test(&spiq) == 0);
+
+    if (bmi_accel_poweron(&spiq)) {
+        printf("BMI088 Accel failed to reset.\n");
+        bmi_ok = 0;
+    }
+
+    if (bmx_config(&spiq, ACCEL, accel_cfg) != 0) {
+        printf("error configuring BMI Accel.\n");
+        bmi_ok = 0;
+    }
+    if (bmx_config(&spiq, GYRO, gyro_cfg) != 0) {
+        printf("error configuring BMI Gyro\n");
+        bmi_ok = 0;
     }
     if (bmi_ok) {
-        uint16_t r = bmi_accel_poweron(&spiq);
-        if (r) {
-            printf("BMI088 Accel failed to reset (%x).\n", r);
-            bmi_ok = 0;
-        }
-    }
-    if (bmi_ok) {
-        uint16_t r = bmx_config(&spiq, ACCEL, accel_cfg);
-        if (r != 0) {
-            printf("error configuring BMI Accel: %x\n", r);
-            bmi_ok = 0;
-        }
-        r = bmx_config(&spiq, GYRO, gyro_cfg);
-        if (r != 0) {
-            printf("error configuring BMI Gyro: %x\n", r);
-            bmi_ok = 0;
-        }
         printf("BMI Enabled\n");
-    }
+    }   
 
 	int bme_ok = (bme280_self_test(&spiq, &bmeParam) == 0);
     if (bme_ok) {
@@ -361,13 +357,11 @@ void main(void) {
         for (size_t i = 1; i < 7; ++i)
             printf(" %ld", bmeParam.H[i]);
         printf("\n");
+    }
 
-        uint16_t r = bmx_config(&spiq, HUMID, humid_cfg);
-        if (r != 0) {
-            printf("error configuring BME humidity sensor: %x\n", r);
-            bme_ok = 0;
-        }
-
+    if (bmx_config(&spiq, HUMID, humid_cfg) != 0) {
+        printf("error configuring BME humidity sensor\n");
+        bme_ok = 0;
     }
 
     if (!(bmi_ok && bme_ok)) {
