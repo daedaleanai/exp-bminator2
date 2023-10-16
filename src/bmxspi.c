@@ -196,12 +196,30 @@ int bme280_self_test(struct SPIQ *q, struct LinearisationParameters *bmeParam) {
     return 0;
 }
 
-uint16_t bmx_config(struct SPIQ *q, enum BMXFunction bf, struct bmx_config_t *configs) {
+uint16_t bmx_config(struct SPIQ *q, enum BMXFunction bf, const struct bmx_config_t  *configs) {
     for (; configs->reg != 0xFF; ++configs) {
         uint16_t r = bmx_writereg(q, bf, configs->reg, configs->val);
+        printf("setting %02x to %02x: %x\n", configs->reg, configs->val, r);
         if (r != 0) {
             return r;
         }
     }
     return 0;
+}
+
+uint16_t bmx_check_config(struct SPIQ *q, enum BMXFunction bf, const struct bmx_config_t *configs) {
+    int bad = 0;
+    for (; configs->reg != 0xFF; ++configs) {
+        uint8_t val = 0;
+        uint16_t r = bmx_readreg(q, bf, configs->reg, &val);
+        printf("checking %02x is %02x: %x, found %02x\n", configs->reg, configs->val, r, val);
+        if (r != 0) {
+            return r;
+        }
+        if (val != configs->val) {
+            printf("Config register 0x%02x check failed, expected 0x%02x, got 0x%02x\n", configs->reg, configs->val, val);
+            ++bad;
+        }
+    }
+    return bad;
 }

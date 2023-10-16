@@ -10,7 +10,8 @@ struct bmx_config_t {
     uint8_t reg, val;
 };
 
-uint16_t bmx_config(struct SPIQ *spiq, enum BMXFunction bf, struct bmx_config_t *configs);
+uint16_t bmx_config(struct SPIQ *spiq, enum BMXFunction bf, const struct bmx_config_t *configs);
+uint16_t bmx_check_config(struct SPIQ *spiq, enum BMXFunction bf, const struct bmx_config_t *configs);
 
 // Initialisation functions
 uint16_t bmi_accel_poweron(struct SPIQ *spiq);

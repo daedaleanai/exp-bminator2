@@ -15,6 +15,11 @@
 
 #define printf tprintf
 
+#ifndef __REVISION__
+#define __REVISION__ "<REV>"
+#endif
+
+
 /* clang-format off */
 enum {
     BMI_INT1A_PIN  = PA1,
@@ -80,8 +85,15 @@ struct {
     uint32_t accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
 
 */
+static struct bmx_config_t const accel_cfg[] = {
+        {BMI08x_ACC_RANGE, BMI088_ACC_RANGE_3G},  // SEE NOTE ABOVE
+        {BMI08x_ACC_CONF, BMI08x_ACC_CONF_1600HZ_OSR4},
+        {BMI08x_INT1_IO_CONF, 0x0C},  // INT1 enable output, Active low, open drain
+        {BMI08x_INT1_INT2_MAP_DATA, 0x04},  // Map int to int1
+        {0xFF, 0},  // sentinel
+};
 
-static struct bmx_config_t gyro_cfg[] = {
+static struct bmx_config_t const gyro_cfg[] = {
         {BMI08x_GYRO_RANGE, BMI08x_GYRO_RANGE_250DEG_S},  // SEE NOTE ABOVE
         {BMI08x_GYRO_BANDWIDTH, BMI08x_GYRO_BANDWIDTH_2000_532HZ},
         {BMI08x_INT3_INT4_IO_CONF, 0x02},  // INT3 Active low, open drain
@@ -90,21 +102,12 @@ static struct bmx_config_t gyro_cfg[] = {
         {0xFF, 0},  // sentinel
 };
 
-static struct bmx_config_t accel_cfg[] = {
-        {BMI08x_ACC_RANGE, BMI088_ACC_RANGE_3G},  // SEE NOTE ABOVE
-        {BMI08x_ACC_CONF, BMI08x_ACC_CONF_1600HZ_OSR4},
-        {BMI08x_INT1_IO_CONF, 0x0C},  // INT1 enable output, Active low, open drain
-        {BMI08x_INT1_INT2_MAP_DATA, 0x04},  // Map int to int1
-        {0xFF, 0},  // sentinel
-};
-
-static struct bmx_config_t humid_cfg[] = {
+static struct bmx_config_t const humid_cfg[] = {
     {BME280_REG_CONFIG, BME280_CONFIG_TSB10|BME280_CONFIG_FLT16},
     {BME280_REG_CTRLHUM, BME280_CTRLHUM_H16},
     {BME280_REG_CTRLMEAS, BME280_CTRLMEAS_P16|BME280_CTRLMEAS_T16|BME280_CTRLMEAS_NORMAL},
     {0xFF, 0},  // sentinel
 };
-
 /* clang-format on */
 
 // ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
@@ -152,7 +155,7 @@ static void spi1_ss(uint16_t addr, int on) {
 	switch ((enum BMXFunction)addr) {
 	case NONE:  break;
 	case ACCEL:	if (on) digitalLo(BMI_CSB1A_PIN); else digitalHi(BMI_CSB1A_PIN); break;
-	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); delay(1000); break;
+	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); break;
 //	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break; // for some reason PB6 breaks things on the nucleo
 	case HUMID:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break; // test
 	case CURRSENSE:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break;
@@ -166,6 +169,9 @@ void DMA1_CH2_Handler(void) {
 
 void EXTI1_Handler(void) {
     uint64_t now = cycleCount();
+
+    _putchar('A');
+
     if ((EXTI.PR1 & Pin_1) == 0)
         return;
     EXTI.PR1 = Pin_1;
@@ -187,6 +193,9 @@ void EXTI1_Handler(void) {
 
 void EXTI3_Handler(void) {
     uint64_t now = cycleCount();
+
+    _putchar('G');
+
     if ((EXTI.PR1 & Pin_3) == 0)
         return;
     EXTI.PR1 = Pin_3;
@@ -312,9 +321,8 @@ void TIM2_Handler(void) {
     now %= 1000000;
 
 //    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
-//    printf("\nuptime %llu.%06llu  usart %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n",
-// sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
-      printf("\nuptime %llu.%06llu\n", sec, now);
+    printf("\nuptime %llu.%06llu  usart1 %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
+//      printf("\nuptime %llu.%06llu\n", sec, now);
  }
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
@@ -375,23 +383,41 @@ void main(void) {
         printf("BMI088 not found.\n");
     } 
     int bmi_ok = (bmi088_self_test(&spiq) == 0);
+    usart_wait(&USART2);
 
     if (bmi_accel_poweron(&spiq)) {
         printf("BMI088 Accel failed to reset.\n");
         bmi_ok = 0;
     }
 
+    usart_wait(&USART2);
+
     if (bmx_config(&spiq, ACCEL, accel_cfg) != 0) {
         printf("error configuring BMI Accel.\n");
         bmi_ok = 0;
     }
+
+    usart_wait(&USART2);
+    if (bmx_check_config(&spiq, ACCEL, accel_cfg) != 0) {
+        printf("BMI Accel not properly configured\n");
+        bmi_ok = 0;
+    }
+    usart_wait(&USART2);
     if (bmx_config(&spiq, GYRO, gyro_cfg) != 0) {
         printf("error configuring BMI Gyro\n");
+        bmi_ok = 0;
+    }
+
+    usart_wait(&USART2);
+    if (bmx_check_config(&spiq, GYRO, gyro_cfg) != 0) {
+        printf("BMI Gyro not properly configured\n");
         bmi_ok = 0;
     }
     if (bmi_ok) {
         printf("BMI Enabled\n");
     }   
+
+    usart_wait(&USART2);
 
 	int bme_ok = (bme280_self_test(&spiq, &bmeParam) == 0);
     if (bme_ok) {
@@ -410,15 +436,23 @@ void main(void) {
             printf(" %ld", bmeParam.H[i]);
         printf("\n");
     }
+    usart_wait(&USART2);
 
     if (bmx_config(&spiq, HUMID, humid_cfg) != 0) {
         printf("error configuring BME humidity sensor\n");
         bme_ok = 0;
     }
 
+    usart_wait(&USART2);
+    if (bmx_check_config(&spiq, HUMID, humid_cfg) != 0) {
+        printf("BME humidity sensor not properly configured.\n");
+        bme_ok = 0;
+    }
+
     if (!(bmi_ok && bme_ok)) {
         printf("BMI or BME not functional, watchdog will reboot....\n");
     }
+
 
     EXTI.IMR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN | INA_ALERT_PIN) & Pin_All;
     EXTI.FTSR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN | INA_ALERT_PIN) & Pin_All;
@@ -427,17 +461,14 @@ void main(void) {
     NVIC_EnableIRQ(EXTI9_5_IRQn); // Current sense alert interrupt
 
     // headers used in output message vary by accel/gyro configuration
-    gyro_hdr = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
-    accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
+    // gyro_hdr = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
+    // accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
 
     // Initialize the independent watchdog
-    while (IWDG.SR != 0)
-        __NOP();
-
-    IWDG.KR = 0x5555;  // enable watchdog config
-    IWDG.PR = 0;       // prescaler /4 -> 10khz
-    IWDG.RLR = 3200;   // count to 3200 -> 320ms timeout
-    IWDG.KR = 0xcccc;  // start watchdog countdown
+    // IWDG.KR = 0x5555;  // enable watchdog config
+    // IWDG.PR = 0;       // prescaler /4 -> 10khz
+    // IWDG.RLR = 3200;   // count to 3200 -> 320ms timeout
+    // IWDG.KR = 0xcccc;  // start watchdog countdown
 
     for(;;) {
     	__WFI();
@@ -457,7 +488,7 @@ void main(void) {
             }
             spiq_deq_tail(&spiq);
 
-            IWDG.KR = 0xAAAA;  // pet the watchdog
+            //IWDG.KR = 0xAAAA;  // pet the watchdog
         } 
 
     }
