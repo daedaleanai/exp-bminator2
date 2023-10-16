@@ -5,6 +5,7 @@
 
 // A SPIXmit represents a transaction on a SPI device.
 struct SPIXmit {
+    uint64_t ts; // timestamp
     int tag;  // tag to remember what this was for after xmit is done
     uint16_t addr;
     size_t len;
@@ -40,7 +41,7 @@ struct SPIQ {
     volatile uint32_t head;
     volatile uint32_t curr;
     volatile uint32_t tail;
-    struct SPIXmit elem[8];  // must be power of 2
+    struct SPIXmit elem[8];  // must be power of 2 to make the indexing % size efficient.
 };
 
 // Initializes the SPIQ structure and sets up for use with spi as master,

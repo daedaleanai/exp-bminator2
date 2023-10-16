@@ -1,6 +1,7 @@
 #include "cortex_m4.h"
 #include "stm32l4xx.h"
 
+#include "binary.h"
 #include "clock.h"
 #include "gpio2.h"
 #include "nvic.h"
@@ -10,6 +11,7 @@
 #include "bmxspi.h"
 #include "bmi08x.h"
 #include "msgq.h"
+#include "output.h"
 
 #define printf tprintf
 
@@ -58,9 +60,12 @@ struct {
     {SysTick_IRQn,  PRIO(0,0)},
 	{DMA2_CH6_IRQn, PRIO(1,0)},
 	{DMA1_CH2_IRQn, PRIO(1,1)},
+    {EXTI1_IRQn,    PRIO(1,2)},
+    {EXTI3_IRQn,    PRIO(1,3)},
     {USART2_IRQn,   PRIO(2,0)},
     {USART1_IRQn,   PRIO(2,1)},
     {TIM2_IRQn,     PRIO(3,0)},
+    {EXTI9_5_IRQn,  PRIO(3,1)},
     {None_IRQn, 0xff},
 };
 #undef PRIO
@@ -102,6 +107,14 @@ static struct bmx_config_t humid_cfg[] = {
 
 /* clang-format on */
 
+// ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
+// GYRO: cmd, 6 registers, 2dum, stat
+// TEMP: cmd, dum, 2 registers. big endian for some reason
+// Baro: d
+static uint8_t accel_buf[20];  // ACCEL BMI085_ACC_X_LSB
+static uint8_t gyro_buf[10];  // GYRO  BMI085_RATE_X_LSB
+//static uint8_t humid_buf[14];  // BME280_DATA_0
+
 // USART2 is the console, for debug messages, it runs IRQ driven.
 static struct Ringbuffer usart2tx;
 
@@ -120,9 +133,20 @@ void _putchar(char character) {
 
 void USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
 
+void hexdump(size_t len, const uint8_t* ptr) {
+    static const char* hexchar = "01234567890abcdef";
+    for (size_t i = 0; i<len; ++i) {
+        _putchar(' ');
+        _putchar(hexchar[ptr[i]>>4]);
+        _putchar(hexchar[ptr[i]&0xf]);
+    }
+}
+
+
 // SPI1 has the BMI088, BME280, INA299  ... connected to it.
 
 struct SPIQ spiq;
+static uint64_t dropped_spi1 = 0;  // how often we tried to submit a spi1 xmit but the queue was full
 
 static void spi1_ss(uint16_t addr, int on) {
 	switch ((enum BMXFunction)addr) {
@@ -135,10 +159,57 @@ static void spi1_ss(uint16_t addr, int on) {
 	}
 }
 
- void DMA1_CH2_Handler(void) {
+void DMA1_CH2_Handler(void) {
 	DMA1.IFCR = DMA1.ISR & 0x00000f0;
 	spi_rx_dma_handler(&spiq);
- }
+}
+
+void EXTI1_Handler(void) {
+    uint64_t now = cycleCount();
+    if ((EXTI.PR1 & Pin_1) == 0)
+        return;
+    EXTI.PR1 = Pin_1;
+    struct SPIXmit *x = spiq_head(&spiq);
+    if (!x) {
+        ++dropped_spi1;
+        return;
+    }
+
+    accel_buf[0] = BMI08x_ACC_X_LSB | 0x80;
+
+    x->ts = now;
+    x->tag = BMI08x_ACC_X_LSB;
+    x->addr = ACCEL;
+    x->len = sizeof accel_buf;
+    x->buf = accel_buf;
+    spiq_enq_head(&spiq);
+}
+
+void EXTI3_Handler(void) {
+    uint64_t now = cycleCount();
+    if ((EXTI.PR1 & Pin_3) == 0)
+        return;
+    EXTI.PR1 = Pin_3;
+    struct SPIXmit *x = spiq_head(&spiq);
+    if (!x) {
+        ++dropped_spi1;
+        return;
+    }
+
+    accel_buf[0] = BMI08x_RATE_X_LSB | 0x80;
+
+    x->ts = now;
+    x->tag = BMI08x_RATE_X_LSB;
+    x->addr = GYRO;
+    x->len = sizeof gyro_buf;
+    x->buf = gyro_buf;
+    spiq_enq_head(&spiq);
+    }
+
+// INA alert interrupt
+// void EXTI9_5_Handler(void) { }
+
+
 
 // USART1 is the output datastream and command input
 
@@ -241,13 +312,13 @@ void TIM2_Handler(void) {
     now %= 1000000;
 
 //    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
-//    printf("\nuptime %llu.%06llu  usart %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
+//    printf("\nuptime %llu.%06llu  usart %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n",
+// sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
       printf("\nuptime %llu.%06llu\n", sec, now);
  }
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
 
-struct LinearisationParameters bmeParam;
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
@@ -291,31 +362,12 @@ void main(void) {
     TIM2.CR1 |= TIM1_CR1_CEN;
     NVIC_EnableIRQ(TIM2_IRQn);
 
-#if 0
     usart_init(&USART1, 8*115200);
     USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA
     NVIC_EnableIRQ(DMA2_CH6_IRQn);
     NVIC_EnableIRQ(USART1_IRQn);
 
-    for(;;) {
-        delay(500*1000);
-
-        struct Msg *msg = msgq_head(&outq);
-        if (!msg) {
-            ++dropped_usart1;
-             continue;
-        }
-        msg_reset(msg);
-        msg_append64(msg, 0x6f6c616d75636861);
-        msg_append32(msg, 0x68610a);
-        msgq_push_head(&outq);
-        start_usart1();
-    }
-#endif
-
-
 	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
-
 
     if (bmi_accel_poweron(&spiq) == 0) {
         printf("BMI088 Accel enabled.\n");
@@ -368,9 +420,46 @@ void main(void) {
         printf("BMI or BME not functional, watchdog will reboot....\n");
     }
 
+    EXTI.IMR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN | INA_ALERT_PIN) & Pin_All;
+    EXTI.FTSR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN | INA_ALERT_PIN) & Pin_All;
+    NVIC_EnableIRQ(EXTI1_IRQn);   // Accelerometer ready interrupt
+    NVIC_EnableIRQ(EXTI3_IRQn);   // Gyroscope ready interrupt
+    NVIC_EnableIRQ(EXTI9_5_IRQn); // Current sense alert interrupt
 
+    // headers used in output message vary by accel/gyro configuration
+    gyro_hdr = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
+    accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
 
-    for(;;)
+    // Initialize the independent watchdog
+    while (IWDG.SR != 0)
+        __NOP();
+
+    IWDG.KR = 0x5555;  // enable watchdog config
+    IWDG.PR = 0;       // prescaler /4 -> 10khz
+    IWDG.RLR = 3200;   // count to 3200 -> 320ms timeout
+    IWDG.KR = 0xcccc;  // start watchdog countdown
+
+    for(;;) {
     	__WFI();
+
+        struct SPIXmit *x = spiq_tail(&spiq);
+        if (x != NULL) {
+            struct Msg *msg = msgq_head(&outq);
+            if (!msg) {
+                ++dropped_usart1;
+            } else {
+                msg_reset(msg);
+                if (output(msg, x)) {
+                    hexdump(msg->len, msg->buf);
+                    // msgq_push_head(&outq);
+                    // start_usart1();
+                }
+            }
+            spiq_deq_tail(&spiq);
+
+            IWDG.KR = 0xAAAA;  // pet the watchdog
+        } 
+
+    }
 
 }

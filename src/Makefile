@@ -26,6 +26,7 @@ OBJS = \
 	spi.o \
 	bmxspi.o \
 	bme280.o \
+	output.o \
 	main.o \
 
 $(OBJS): Makefile 

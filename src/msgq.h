@@ -10,16 +10,20 @@ struct Msg {
 inline void msg_reset(struct Msg *msg) {
     msg->len = 0;
 }
+
+// binary encoding big endian numbers
 inline void msg_append16(struct Msg *msg, uint16_t val) {
     msg->buf[msg->len++] = val >> 8;
     msg->buf[msg->len++] = val;
 }
+
 inline void msg_append32(struct Msg *msg, uint32_t val) {
     msg->buf[msg->len++] = val >> 24;
     msg->buf[msg->len++] = val >> 16;
     msg->buf[msg->len++] = val >> 8;
     msg->buf[msg->len++] = val;
 }
+
 inline void msg_append64(struct Msg *msg, uint64_t val) {
     msg->buf[msg->len++] = val >> 56;
     msg->buf[msg->len++] = val >> 48;
