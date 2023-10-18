@@ -300,6 +300,7 @@ void TIM2_Handler(void) {
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
 
+static const char* pplsrcstr[] = {   "NONE", "MSI", "HSI16", "HSE" };
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
@@ -334,7 +335,9 @@ void main(void) {
 	printf("DEVID:%08lx:%08lx:%08lx\n", UNIQUE_DEVICE_ID[2], UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
 	printf("RESET:%02x%s%s%s%s%s%s\n", rf, rf & 0x80 ? " LPWR" : "", rf & 0x40 ? " WWDG" : "", rf & 0x20 ? " IWDG" : "",
 	          rf & 0x10 ? " SFT" : "", rf & 0x08 ? " POR" : "", rf & 0x04 ? " PIN" : "");
-
+    printf("PPLSRC: %s%s\n", pplsrcstr[rcc_pllcfgr_get_pllsrc(&RCC)], 
+        (RCC.CR & RCC_CR_HSEBYP) && (rcc_pllcfgr_get_pllsrc(&RCC)==3) ? " (CK_IN)" :""
+    );
 	usart_wait(&USART2);
 
 	TIM2.DIER |= TIM1_DIER_UIE;

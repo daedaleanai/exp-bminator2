@@ -36,17 +36,24 @@ void Reset_Handler(void) {
 	rcc_cfgr_set_ppre2(&RCC, 0); // APB2 PCLK = AHB HCLK 
 
 	// set system clock to PLL 80 MHz, fed by MSI at 4MHz, or CK_IN(pa0) 8MHz
-#if 1
-	rcc_pllcfgr_set_pllsrc(&RCC, 1);   // select 1:MSI source (4MHz)
-	rcc_pllcfgr_set_pllm(&RCC, 0);     // 0..15       : vco_in = MSI / (1+m)  4..16MHz        4/1 = 4MHz
-#else  // TODO(lvd) to test closing SB17 on the STM32L432k nucleo board
+	// wait for HSE ready for a few ms, if not, fall back to MSI
+	// tested closing SB17 on the STM32L432k nucleo board
+
 	// enable HSE on CK_IN and wait for ready
 	RCC.CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
-	while ((RCC.CR & RCC_CR_HSERDY) == 0)
-		__NOP();
-	rcc_pllcfgr_set_pllsrc(&RCC, 3); // select 3:HSE (CK_IN via HSEBYPASS)
-	rcc_pllcfgr_set_pllm(&RCC, 1);     // 0..15       : vco_in = HSE / (1+m)  4..16MHz        8/2 = 4MHz
-#endif
+	for (uint32_t t = 0; t < 400000; t++)
+		if (RCC.CR & RCC_CR_HSERDY)
+			break;
+
+	if (RCC.CR & RCC_CR_HSERDY) {
+		rcc_pllcfgr_set_pllsrc(&RCC, 3); // select 3:HSE (CK_IN via HSEBYPASS)
+		rcc_pllcfgr_set_pllm(&RCC, 1);     // 0..15       : vco_in = HSE / (1+m)  4..16MHz        8/2 = 4MHz
+	} else {
+		RCC.CR &= ~(RCC_CR_HSEBYP | RCC_CR_HSEON);
+		rcc_pllcfgr_set_pllsrc(&RCC, 1);   // select 1:MSI source (4MHz)
+		rcc_pllcfgr_set_pllm(&RCC, 0);     // 0..15       : vco_in = MSI / (1+m)  4..16MHz        4/1 = 4MHz
+	}
+
 	rcc_pllcfgr_set_plln(&RCC, 40);     // 8...86     : vco_out = vco_in * n = 64...344MHz    4 * 40 = 160MHz
 	rcc_pllcfgr_set_pllr(&RCC, 0); 		// 0,1,2,3 -> p=2,4,6,8  : sysclk = vco_out / p <= 170MHz  4 * 40 / 2 = 80MHz
 	RCC.PLLCFGR |= RCC_PLLCFGR_PLLREN;
