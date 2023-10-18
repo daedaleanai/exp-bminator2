@@ -56,8 +56,8 @@ void Reset_Handler(void) {
 
 	rcc_pllcfgr_set_plln(&RCC, 40);     // 8...86     : vco_out = vco_in * n = 64...344MHz    4 * 40 = 160MHz
 	rcc_pllcfgr_set_pllr(&RCC, 0); 		// 0,1,2,3 -> p=2,4,6,8  : sysclk = vco_out / p <= 170MHz  4 * 40 / 2 = 80MHz
-	RCC.PLLCFGR |= RCC_PLLCFGR_PLLREN;
-	RCC.CR |= RCC_CR_PLLON;
+	RCC.PLLCFGR |= RCC_PLLCFGR_PLLREN;  // emable R output (system clock)
+	RCC.CR |= RCC_CR_PLLON;             // switch on the PLL
 
 	// prepare the flash	
 	FLASH.ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN;
@@ -69,7 +69,7 @@ void Reset_Handler(void) {
 	while ((RCC.CR & RCC_CR_PLLRDY) == 0)
 		__NOP();
 
-	// Select PLL as system clock source
+	// Select PLL as system clock source and wait until it takes effect
 	rcc_cfgr_set_sw(&RCC, 3); 
 	while (rcc_cfgr_get_sws(&RCC) != 3)
 		__NOP();

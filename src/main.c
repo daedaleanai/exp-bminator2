@@ -300,7 +300,7 @@ void TIM2_Handler(void) {
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
 
-static const char* pplsrcstr[] = {   "NONE", "MSI", "HSI16", "HSE" };
+static const char* pplsrcstr[] = { "NONE", "MSI", "HSI16", "HSE" };
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
@@ -311,6 +311,7 @@ void main(void) {
         NVIC_SetPriority(irqprios[i].irq, irqprios[i].prio);
     }
 
+    // Enable all the devices we are going to need
 	RCC.AHB1ENR  |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
 	RCC.AHB2ENR  |= RCC_AHB2ENR_GPIOAEN|RCC_AHB2ENR_GPIOBEN;
 	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM2EN;
@@ -323,8 +324,10 @@ void main(void) {
 	gpioLock(PAAll);
 	gpioLock(PBAll);
 
+    // deselect all (active low) chip select signals
     digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN |INA_CSB_PIN);
 
+    // prepare USART2 for console and debug messages
 	ringbuffer_clear(&usart2tx);
 	usart_init(&USART2, 115200);
 	NVIC_EnableIRQ(USART2_IRQn);
@@ -340,18 +343,21 @@ void main(void) {
     );
 	usart_wait(&USART2);
 
+    // set up timer2 for a 1Hz hearbeat
 	TIM2.DIER |= TIM1_DIER_UIE;
     TIM2.PSC = (CLOCKSPEED_HZ/10000) - 1;
     TIM2.ARR = 10000 - 1; // 10KHz/10000 = 1Hz
     TIM2.CR1 |= TIM1_CR1_CEN;
     NVIC_EnableIRQ(TIM2_IRQn);
 
+    // Prepare USART1 for high speed DMA driven output of the measurement data
     usart_init(&USART1, 8*115200);
     USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA
     NVIC_EnableIRQ(DMA2_CH6_IRQn);
     NVIC_EnableIRQ(USART1_IRQn);
 
-	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+    // Set up SPI1 for talking to all the connected chips.
+	spiq_init(&spiq, &SPI1, 3, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 
     if (bmi_accel_poweron(&spiq) == 0) {
         printf("BMI088 Accel enabled.\n");
