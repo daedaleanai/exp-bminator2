@@ -46,8 +46,6 @@ static const struct gpio_config_t {
     enum GPIO_Pin  pins;
     enum GPIO_Conf mode;
 } pin_cfgs[] = {
-    {PAAll, GPIO_ANALOG},
-    {PBAll, GPIO_ANALOG},
     {USART2_TX_PIN, GPIO_AF7_USART123|GPIO_HIGH},
 	{SPI1_MOSI_PIN | SPI1_SCK_PIN |SPI1_MISO_PIN, GPIO_AF5_SPI12|GPIO_HIGH},
     {BMI_INT1A_PIN | BMI_INT3G_PIN | INA_ALERT_PIN, GPIO_IPU},
