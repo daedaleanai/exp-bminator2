@@ -21,7 +21,7 @@ void Reset_Handler(void) {
 	SCB.VTOR = (uintptr_t)&vector_table; // Vector Table Relocation in Internal FLASH.
 
 	SCB.CCR |= SCB_CCR_DIV_0_TRP; // division by zero causes trap
-	// enable usage/bus/mem fault separate handlers.
+	// enable usage/bus/mem fault separate handlers (in fault.c)
 	SCB.SHCSR |= SCB_SHCSR_USGFAULTENA|SCB_SHCSR_BUSFAULTENA|SCB_SHCSR_MEMFAULTENA;
 
 	fpu_cpacr_cpacr_set_cp(&FPU_CPACR, 0xf);  	// CP10/CP11 Full Access
@@ -47,7 +47,6 @@ void Reset_Handler(void) {
 	// prepare the flash	
 	FLASH.ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN;
 	flash_acr_set_latency(&FLASH, 4);  // 4 wait states (5 cycles) cf 3.3.3 p79 table 9 
-
 	while(flash_acr_get_latency(&FLASH) != 4)
 		__NOP();
 

@@ -86,20 +86,20 @@ struct {
 
 */
 static struct bmx_config_t const accel_cfg[] = {
-        {BMI08x_ACC_RANGE, BMI088_ACC_RANGE_3G},  // SEE NOTE ABOVE
-        {BMI08x_ACC_CONF, BMI08x_ACC_CONF_1600HZ_OSR4},
-        {BMI08x_INT1_IO_CONF, 0x0C},  // INT1 enable output, Active low, open drain
-        {BMI08x_INT1_INT2_MAP_DATA, 0x04},  // Map int to int1
-        {0xFF, 0},  // sentinel
+    {BMI08x_ACC_RANGE, BMI088_ACC_RANGE_3G},  // SEE NOTE ABOVE
+    {BMI08x_ACC_CONF, BMI08x_ACC_CONF_1600HZ_OSR4},
+    {BMI08x_INT1_IO_CONF, 0x0C},  // INT1 enable output, Active low, open drain
+    {BMI08x_INT1_INT2_MAP_DATA, 0x04},  // Map int to int1
+    {0xFF, 0},  // sentinel
 };
 
 static struct bmx_config_t const gyro_cfg[] = {
-        {BMI08x_GYRO_RANGE, BMI08x_GYRO_RANGE_250DEG_S},  // SEE NOTE ABOVE
-        {BMI08x_GYRO_BANDWIDTH, BMI08x_GYRO_BANDWIDTH_2000_532HZ},
-        {BMI08x_INT3_INT4_IO_CONF, 0x02},  // INT3 Active low, open drain
-        {BMI08x_INT3_INT4_IO_MAP, 0x01},  // INT mapped to INT3
-        {BMI08x_GYRO_INT_CTRL, 0x80},  // Enable INT generation
-        {0xFF, 0},  // sentinel
+    {BMI08x_GYRO_RANGE, BMI08x_GYRO_RANGE_250DEG_S},  // SEE NOTE ABOVE
+    {BMI08x_GYRO_BANDWIDTH, BMI08x_GYRO_BANDWIDTH_2000_532HZ},
+    {BMI08x_INT3_INT4_IO_CONF, 0x02},  // INT3 Active low, open drain
+    {BMI08x_INT3_INT4_IO_MAP, 0x01},  // INT mapped to INT3
+    {BMI08x_GYRO_INT_CTRL, 0x80},  // Enable INT generation
+    {0xFF, 0},  // sentinel
 };
 
 static struct bmx_config_t const humid_cfg[] = {
@@ -167,53 +167,28 @@ void DMA1_CH2_Handler(void) {
 	spi_rx_dma_handler(&spiq);
 }
 
-void EXTI1_Handler(void) {
-    uint64_t now = cycleCount();
-
-    _putchar('A');
-
-    if ((EXTI.PR1 & Pin_1) == 0)
+static void exti_handler(uint64_t now, enum GPIO_Pin pin, uint16_t addr, uint8_t firstreg, uint8_t* buf, size_t len) {
+    if ((EXTI.PR1 & pin) == 0)
         return;
-    EXTI.PR1 = Pin_1;
+    EXTI.PR1 = pin;
     struct SPIXmit *x = spiq_head(&spiq);
     if (!x) {
         ++dropped_spi1;
         return;
     }
 
-    accel_buf[0] = BMI08x_ACC_X_LSB | 0x80;
+   buf[0] = firstreg | 0x80;
 
     x->ts = now;
-    x->tag = BMI08x_ACC_X_LSB;
-    x->addr = ACCEL;
-    x->len = sizeof accel_buf;
-    x->buf = accel_buf;
+    x->tag = firstreg;
+    x->addr = addr;
+    x->len = len;
+    x->buf = buf;
     spiq_enq_head(&spiq);
 }
+void EXTI1_Handler(void) { exti_handler(cycleCount(), Pin_1, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf); }
+void EXTI3_Handler(void) { exti_handler(cycleCount(), Pin_3, GYRO,  BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf); }
 
-void EXTI3_Handler(void) {
-    uint64_t now = cycleCount();
-
-    _putchar('G');
-
-    if ((EXTI.PR1 & Pin_3) == 0)
-        return;
-    EXTI.PR1 = Pin_3;
-    struct SPIXmit *x = spiq_head(&spiq);
-    if (!x) {
-        ++dropped_spi1;
-        return;
-    }
-
-    accel_buf[0] = BMI08x_RATE_X_LSB | 0x80;
-
-    x->ts = now;
-    x->tag = BMI08x_RATE_X_LSB;
-    x->addr = GYRO;
-    x->len = sizeof gyro_buf;
-    x->buf = gyro_buf;
-    spiq_enq_head(&spiq);
-    }
 
 // INA alert interrupt
 // void EXTI9_5_Handler(void) { }
@@ -313,7 +288,7 @@ void TIM2_Handler(void) {
     uint64_t now = cycleCount();
 
     if ((TIM2.SR & TIM1_SR_UIF) == 0)
-            return;
+        return;
     TIM2.SR &= ~TIM1_SR_UIF;
 
     now /= C_US; // microseconds
@@ -458,7 +433,7 @@ void main(void) {
     EXTI.FTSR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN | INA_ALERT_PIN) & Pin_All;
     NVIC_EnableIRQ(EXTI1_IRQn);   // Accelerometer ready interrupt
     NVIC_EnableIRQ(EXTI3_IRQn);   // Gyroscope ready interrupt
-    NVIC_EnableIRQ(EXTI9_5_IRQn); // Current sense alert interrupt
+    // NVIC_EnableIRQ(EXTI9_5_IRQn); // Current sense alert interrupt
 
     // headers used in output message vary by accel/gyro configuration
     // gyro_hdr = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
@@ -481,9 +456,8 @@ void main(void) {
             } else {
                 msg_reset(msg);
                 if (output(msg, x)) {
-                    hexdump(msg->len, msg->buf);
-                    // msgq_push_head(&outq);
-                    // start_usart1();
+                    msgq_push_head(&outq);
+                    start_usart1();
                 }
             }
             spiq_deq_tail(&spiq);

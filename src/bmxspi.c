@@ -79,9 +79,8 @@ int bmi088_self_test(struct SPIQ *q) {
     // TODO maybe report this back so we know what range we have on the ACC.
     switch(chip_id) {
     case 0x1f:
-        printf("Detected BMI085\n"); break;
     case 0x1e:
-        printf("Detected BMI088\n"); break;
+        printf("Detected BMI08%c\n", "85"[chip_id & 1]); break;
     default:
         printf("Unexpected accel chip id %x\n", chip_id);
         ++err;
