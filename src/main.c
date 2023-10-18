@@ -27,7 +27,7 @@ enum {
     BMI_INT3G_PIN  = PA3,
     THERMISTOR_PIN = PA4,
     HEATER_EN_PIN  = PA5,
-    INA_ALERT_PIN  = PA7,
+    CURRENT_SENSE_PIN = PA6,
 	USART1_TX_PIN  = PA9,
 	USARTR_TX_PIN  = PA10,
     TIMEPULSE_PIN  = PA15,
@@ -37,8 +37,7 @@ enum {
     SPI1_SCK_PIN  = PB3,
     SPI1_MISO_PIN = PB4,
     SPI1_MOSI_PIN = PB5,
-    BME_CSB_PIN   = PB6,
-    INA_CSB_PIN   = PB7,
+    BME_CSB_PIN   = PB7,  // for some reason PB6 doesnt work on the nucleo prototype
     
 };
 
@@ -48,8 +47,8 @@ static const struct gpio_config_t {
 } pin_cfgs[] = {
     {USART2_TX_PIN, GPIO_AF7_USART123|GPIO_HIGH},
 	{SPI1_MOSI_PIN | SPI1_SCK_PIN |SPI1_MISO_PIN, GPIO_AF5_SPI12|GPIO_HIGH},
-    {BMI_INT1A_PIN | BMI_INT3G_PIN | INA_ALERT_PIN, GPIO_IPU},
-    {BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN |INA_CSB_PIN, GPIO_OUTPUT|GPIO_FAST},
+    {BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_IPU},
+    {BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN, GPIO_OUTPUT|GPIO_FAST},
     {0, 0}, // sentinel
 };
 
@@ -144,7 +143,7 @@ void hexdump(size_t len, const uint8_t* ptr) {
 }
 
 
-// SPI1 has the BMI088, BME280, INA299  ... connected to it.
+// SPI1 has the BMI088, BME280 ... connected to it.
 
 struct SPIQ spiq;
 static uint64_t dropped_spi1 = 0;  // how often we tried to submit a spi1 xmit but the queue was full
@@ -154,10 +153,8 @@ static void spi1_ss(uint16_t addr, int on) {
 	case NONE:  break;
 	case ACCEL:	if (on) digitalLo(BMI_CSB1A_PIN); else digitalHi(BMI_CSB1A_PIN); break;
 	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); break;
-//	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break; // for some reason PB6 breaks things on the nucleo
-	case HUMID:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break; // test
-	case CURRSENSE:	if (on) digitalLo(INA_CSB_PIN);   else digitalHi(INA_CSB_PIN); break;
-	}
+	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
+}
 }
 
 void DMA1_CH2_Handler(void) {
@@ -325,7 +322,7 @@ void main(void) {
 	gpioLock(PBAll);
 
     // deselect all (active low) chip select signals
-    digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN |INA_CSB_PIN);
+    digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN);
 
     // prepare USART2 for console and debug messages
 	ringbuffer_clear(&usart2tx);
@@ -435,16 +432,14 @@ void main(void) {
         printf("BMI or BME not functional, watchdog will reboot....\n");
     }
 
-
-    EXTI.IMR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN | INA_ALERT_PIN) & Pin_All;
-    EXTI.FTSR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN | INA_ALERT_PIN) & Pin_All;
+    EXTI.IMR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN) & Pin_All;
+    EXTI.FTSR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN) & Pin_All;
     NVIC_EnableIRQ(EXTI1_IRQn);   // Accelerometer ready interrupt
     NVIC_EnableIRQ(EXTI3_IRQn);   // Gyroscope ready interrupt
-    // NVIC_EnableIRQ(EXTI9_5_IRQn); // Current sense alert interrupt
 
     // headers used in output message vary by accel/gyro configuration
-    // gyro_hdr = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
-    // accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
+    gyro_hdr = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
+    accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
 
     // Initialize the independent watchdog
     // IWDG.KR = 0x5555;  // enable watchdog config

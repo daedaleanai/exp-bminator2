@@ -38,7 +38,8 @@ TODO(lvd) heater servo control logic
 If desired, PA0/CK_IN can be used as an external clock source 4..48MHz, see
 RMA0394 Section 6.1.1 p.182 'External Clock (HSE Bypass)'
 
-The SPI1 bus connects SCK, MISO, MOSI to the BMI088, BME280 and the INA229.
+The SPI1 bus connects SCK, MISO, MOSI to the BMI088 and BME280. They each require their own
+separate CSB (active low).
 
 ## DMA Mappings
 
