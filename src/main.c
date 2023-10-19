@@ -45,6 +45,7 @@ static const struct gpio_config_t {
     enum GPIO_Pin  pins;
     enum GPIO_Conf mode;
 } pin_cfgs[] = {
+    {USART1_TX_PIN, GPIO_AF7_USART123|GPIO_HIGH},
     {USART2_TX_PIN, GPIO_AF7_USART123|GPIO_HIGH},
 	{SPI1_MOSI_PIN | SPI1_SCK_PIN |SPI1_MISO_PIN, GPIO_AF5_SPI12|GPIO_HIGH},
     {BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_IPU},
@@ -110,7 +111,6 @@ static struct bmx_config_t const humid_cfg[] = {
 // ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
 // GYRO: cmd, 6 registers, 2dum, stat
 // TEMP: cmd, dum, 2 registers. big endian for some reason
-// Baro: d
 static uint8_t accel_buf[20];  // ACCEL BMI085_ACC_X_LSB
 static uint8_t gyro_buf[10];  // GYRO  BMI085_RATE_X_LSB
 //static uint8_t humid_buf[14];  // BME280_DATA_0
@@ -172,7 +172,7 @@ static void exti_handler(uint64_t now, enum GPIO_Pin pin, uint16_t addr, uint8_t
         return;
     }
 
-   buf[0] = firstreg | 0x80;
+    buf[0] = firstreg | 0x80;
 
     x->ts = now;
     x->tag = firstreg;
@@ -183,11 +183,6 @@ static void exti_handler(uint64_t now, enum GPIO_Pin pin, uint16_t addr, uint8_t
 }
 void EXTI1_Handler(void) { exti_handler(cycleCount(), Pin_1, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf); }
 void EXTI3_Handler(void) { exti_handler(cycleCount(), Pin_3, GYRO,  BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf); }
-
-
-// INA alert interrupt
-// void EXTI9_5_Handler(void) { }
-
 
 
 // USART1 is the output datastream and command input
