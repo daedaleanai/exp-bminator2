@@ -9,9 +9,9 @@ uint32_t gyro_hdr = 0;   // set in main, from the gyro config
 uint32_t accel_hdr = 0;  // same for accel
 struct LinearisationParameters bmeParam;  // needed to decode humidity sensor values
 
-// last observed value from BMI088 accelerator temperature, sent along with 
-static int32_t accel_temp_mk = 0;
-
+// these are decoded in one message, but sent on in others.
+static int32_t accel_temp_mk = -1; // last observed value from BMI088 accelerator temperature 
+static int32_t bme_hume6 = -1;     // last observed value of BME280 humidity
 
 int output(struct Msg *msg , struct SPIXmit *x) {
 
@@ -48,9 +48,17 @@ int output(struct Msg *msg , struct SPIXmit *x) {
 
 
 
-    // case MSGTYPE(HUMID, ...)
-    //         bme_decode(bmeParam, uint8_t *buff7, &t_mdegc, &p_mpa, &hume6);
-    // case MSGTYPE(CURRSENSE, ...)
+    case MSGTYPE(HUMID, BME280_DATA_REG):
+    {
+        int32_t t_mdegc,  p_mpa;
+        bme_decode(&bmeParam, x->buf, &t_mdegc, &p_mpa, &bme_hume6);
+        msg_append16(msg, EVENTID_BARO);  // header
+        msg_append16(msg, 0x8014);  // header
+        msg_append64(msg, x->ts);
+        msg_append32(msg, t_mdegc);
+        msg_append32(msg, p_mpa);
+    }   
+
     }
 #undef MSGTYPE
 

@@ -10,7 +10,7 @@ TODO(lvd) heater servo control logic
 
 | Pin  | Function   | DIR | Electrical           | Connected to                              |
 | ---- | ---------- | --- | -------------------- | ----------------------------------------- |
-| PA0  | CK_IN      | in  |                      | (reserved for external clock source)      |
+| PA0  | CK_IN      | in  |                      | (reserved for 8Mhz external clock source) |
 | PA1  | EXTINT A1  | in  | PullUp               | bmi088 INT1 (Accel) open drain/active low |
 | PA2  | USART2 TX  | out | AF_PP 50MHz          | debug serial/ boot0 loader console RX     |
 | PA3  | EXTINT A3  | in  | PullUp               | bmi088 INT3 (Gyro) open drain/active low  |
@@ -50,7 +50,33 @@ separate CSB (active low).
 | SPI1 TX   | 1   | 3   | Write spi devices |
 
 ## Connectors
-Debug:  USART2TX, SWDIO, SWCLK
-Host: USART1TX, USART1RX, PA15_TIMEPULSE, (HSE Clock source)
-Heater:  Thermistor, Heater24V
+Debug:  USART2TX, SWDIO, SWCLK, nRST, GND, 3V3
+Host: USART1TX, USART1RX, PA15_TIMEPULSE, (HSE Clock source), Power, GND
+Heater:  Thermistor, GND, Heater10W+, Heater10W-
 
+
+
+
+## Requirements
+
+[] BMI088 Self test and configuration check.
+[] BMI088 Sample Gyroscope at 2Khz, 250 deg/s full scale
+[] BMI088 Sample Accelerometer at 1600Hz, 3G full scale
+[] BMI088 Sample internal temperature at 1Hz
+[] BME280 Sample environmental temperature, pressure, humidity at 1Hz
+[] Watchdog monitors gyro, accel and env t/p/h are being sampled
+[] Timepulse Sampled
+[] Heater power supply, control algorithm based on thermistor input and current sense.
+[] Heater state sampled at 1Hz
+[] Samples reported over serial port cf ICD
+[] Accept commands over serial port
+[] Get/set BMI088, BME280
+[] Get/set eeprom
+
+implementation:
+[] boot, clock, gpio, debug console for STM32L43x
+[] SPI driver using DMA
+[] USART driver using DMA
+[] ADC driver
+
+[] host tool decoder / commander

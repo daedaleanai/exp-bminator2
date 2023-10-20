@@ -15,11 +15,6 @@
 
 #define printf tprintf
 
-#ifndef __REVISION__
-#define __REVISION__ "<REV>"
-#endif
-
-
 /* clang-format off */
 enum {
     BMI_INT1A_PIN  = PA1,
@@ -113,7 +108,7 @@ static struct bmx_config_t const humid_cfg[] = {
 // TEMP: cmd, dum, 2 registers. big endian for some reason
 static uint8_t accel_buf[20];  // ACCEL BMI085_ACC_X_LSB
 static uint8_t gyro_buf[10];  // GYRO  BMI085_RATE_X_LSB
-//static uint8_t humid_buf[14];  // BME280_DATA_0
+static uint8_t humid_buf[1+BME280_DATA_LEN];  // HUMID BME280_DATA_REG
 
 // USART2 is the console, for debug messages, it runs IRQ driven.
 static struct Ringbuffer usart2tx;
@@ -163,7 +158,7 @@ void DMA1_CH2_Handler(void) {
 }
 
 static void exti_handler(uint64_t now, enum GPIO_Pin pin, uint16_t addr, uint8_t firstreg, uint8_t* buf, size_t len) {
-    if ((EXTI.PR1 & pin) == 0)
+    if ((EXTI.PR1 & pin) != pin) // also works for pin == 0
         return;
     EXTI.PR1 = pin;
     struct SPIXmit *x = spiq_head(&spiq);
@@ -269,7 +264,7 @@ void start_usart1(void) {
         xmitmsg();
 }
 
-volatile uint64_t dropped_usart1 = 0;  // queue full
+static volatile uint64_t dropped_usart1 = 0;  // queue full
 
 
 
@@ -281,13 +276,15 @@ void TIM2_Handler(void) {
         return;
     TIM2.SR &= ~TIM1_SR_UIF;
 
+    exti_handler(now, 0, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
+
     now /= C_US; // microseconds
     uint64_t sec = now / 1000000;
     now %= 1000000;
 
-//    printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
-    printf("\nuptime %llu.%06llu  usart1 %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
-//      printf("\nuptime %llu.%06llu\n", sec, now);
+//  printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
+//  printf("\nuptime %llu.%06llu  usart1 %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
+    printf("\nuptime %llu.%06llu\n", sec, now);
  }
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
@@ -437,10 +434,10 @@ void main(void) {
     accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
 
     // Initialize the independent watchdog
-    // IWDG.KR = 0x5555;  // enable watchdog config
-    // IWDG.PR = 0;       // prescaler /4 -> 10khz
-    // IWDG.RLR = 3200;   // count to 3200 -> 320ms timeout
-    // IWDG.KR = 0xcccc;  // start watchdog countdown
+    IWDG.KR = 0x5555;  // enable watchdog config
+    IWDG.PR = 0;       // prescaler /4 -> 10khz
+    IWDG.RLR = 3200;   // count to 3200 -> 320ms timeout
+    IWDG.KR = 0xcccc;  // start watchdog countdown
 
     for(;;) {
     	__WFI();
@@ -459,7 +456,7 @@ void main(void) {
             }
             spiq_deq_tail(&spiq);
 
-            //IWDG.KR = 0xAAAA;  // pet the watchdog
+            IWDG.KR = 0xAAAA;  // pet the watchdog
         } 
 
     }
