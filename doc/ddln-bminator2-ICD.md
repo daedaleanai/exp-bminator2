@@ -202,7 +202,7 @@ A packet may contain a single command message with the following layout:
 | N+3    | CRC32         | 32 bit CRC calculated over data words 1 to N+2.        |
 Control command message format  – with tag  -- cf CoaXPress Standard Version 2.1 p.61 Table 24.
 
-TODO(lvd) define CRC32
+The CRC is the one defined in CoaxPress Standard v 2.2 section 9.2.2.2. which is the Ethernet CRC with some additional byte and bit swapping (TODO).
 
 The Address space for memory read/write commands is defined in the section 'Command Address Space' below
 
