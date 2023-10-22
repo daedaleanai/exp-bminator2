@@ -79,4 +79,29 @@ implementation:
 [] USART driver using DMA
 [] ADC driver
 
-[] host tool decoder / commander
+[] host tools decoder / commander
+
+
+## Debugging
+
+the tools/ subdirectory contains two self contained Go programs, one that can read a serial stream
+on stdin and prints a readable format on stdout, and one that can produce messages to set/get
+registers.  
+
+Sample usage:
+    (stty 921600 raw && cat) < /dev/ttyXXX | go run tool/decode.go  
+    go run tools/encode.go -- register [value] > /dev/ttyXXX
+
+
+## References
+
+STM Reference documents:
+
+- PM0214 Programming manual STM32 Cortex®-M4 MCUs and MPUs programming manual
+- RM0394 Reference manual STM32L41xxx/42xxx/43xxx/44xxx/45xxx/46xxx advanced Arm®-based 32-bit MCUs
+- DS11451 STM32L432KB STM32L432KC Ultra-low-power Arm® Cortex®-M4 32-bit MCU+FPU, 100DMIPS, up to 256KB Flash, 64KB SRAM, USB FS, analog, audio
+- DS11453 STM32L431xx Ultra-low-power Arm® Cortex®-M4 32-bit MCU+FPU, 100DMIPS, up to 256KB Flash, 64KB SRAM, analog, audio
+
+Bosch reference documents:
+- BST-BMI088-DS001-13 BMI088 6-axis Motion Tracking for High-performance Applications
+- BST-BME280-DS001-18 BME280 Combined humidity and pressure sensor
