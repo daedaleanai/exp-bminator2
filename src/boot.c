@@ -78,7 +78,7 @@ void Reset_Handler(void) {
 	RCC.PLLCFGR |= RCC_PLLCFGR_PLLREN;  // emable R output (system clock)
 	RCC.CR |= RCC_CR_PLLON;             // switch on the PLL
 
-	// prepare the flash, RMA0394 section 3.3.3
+	// prepare the flash, RM0394 section 3.3.3
 	FLASH.ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN;
 	flash_acr_set_latency(&FLASH, 4);  // 4 wait states (5 cycles) cf 3.3.3 p79 table 9 
 	while(flash_acr_get_latency(&FLASH) != 4)
