@@ -45,6 +45,7 @@ static const struct gpio_config_t {
 	{SPI1_MOSI_PIN | SPI1_SCK_PIN |SPI1_MISO_PIN, GPIO_AF5_SPI12|GPIO_HIGH},
     {BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_IPU},
     {BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN, GPIO_OUTPUT|GPIO_FAST},
+    {TIMEPULSE_PIN, GPIO_AF2_TIM12 },
     {0, 0}, // sentinel
 };
 
@@ -56,20 +57,20 @@ struct {
     uint8_t        prio;
 } irqprios[] = {
     {SysTick_IRQn,  PRIO(0,0)},
+    {TIM6_DACUNDER_IRQn, PRIO(0,1)},
 	{DMA2_CH6_IRQn, PRIO(1,0)},
 	{DMA1_CH2_IRQn, PRIO(1,1)},
-    {EXTI1_IRQn,    PRIO(1,2)},
+    {USART1_IRQn,   PRIO(1,2)},
+    {EXTI1_IRQn,    PRIO(1,3)},
     {EXTI3_IRQn,    PRIO(1,3)},
     {USART2_IRQn,   PRIO(2,0)},
-    {USART1_IRQn,   PRIO(2,1)},
-    {TIM2_IRQn,     PRIO(3,0)},
-    {EXTI9_5_IRQn,  PRIO(3,1)},
     {None_IRQn, 0xff},
 };
 #undef PRIO
 
 /*
-  Configuration of the BMI and BMP sensors
+  Configuration of the BMI and BMP sensors.
+  See their respective datasheets. 
 
  NOTE: careful when modifying these  tables, the range
  must come first since it is used to choose the EventID
@@ -128,6 +129,7 @@ void _putchar(char character) {
 
 void USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
 
+// helper for debugging
 void hexdump(size_t len, const uint8_t* ptr) {
     static const char* hexchar = "01234567890abcdef";
     for (size_t i = 0; i<len; ++i) {
@@ -136,7 +138,6 @@ void hexdump(size_t len, const uint8_t* ptr) {
         _putchar(hexchar[ptr[i]&0xf]);
     }
 }
-
 
 // SPI1 has the BMI088, BME280 ... connected to it.
 
@@ -149,12 +150,12 @@ static void spi1_ss(uint16_t addr, int on) {
 	case ACCEL:	if (on) digitalLo(BMI_CSB1A_PIN); else digitalHi(BMI_CSB1A_PIN); break;
 	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); break;
 	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
-}
+    }
 }
 
 void DMA1_CH2_Handler(void) {
-	DMA1.IFCR = DMA1.ISR & 0x00000f0;
-	spi_rx_dma_handler(&spiq);
+	DMA1.IFCR = DMA1.ISR & 0x00000f0; // clear pending flag
+	spi_rx_dma_handler(&spiq);        // see spi.c
 }
 
 static void exti_handler(uint64_t now, enum GPIO_Pin pin, uint16_t addr, uint8_t firstreg, uint8_t* buf, size_t len) {
@@ -179,61 +180,104 @@ static void exti_handler(uint64_t now, enum GPIO_Pin pin, uint16_t addr, uint8_t
 void EXTI1_Handler(void) { exti_handler(cycleCount(), Pin_1, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf); }
 void EXTI3_Handler(void) { exti_handler(cycleCount(), Pin_3, GYRO,  BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf); }
 
+// Timer 2 channel 1 has the shutter time sync input
+
+static volatile uint64_t shutter_open_ts = 0;
+static volatile uint64_t shutter_close_ts = 0;
+static volatile uint64_t shutter_open_cnt = 0;
+static volatile uint64_t shutter_close_cnt = 0;
+
+inline static uint64_t unlatch(volatile uint64_t *v) {
+    __disable_irq();
+    uint64_t r = *v;
+    *v = 0;
+    __enable_irq();
+    return r;
+}
+
+void TIM2_Handler(void) {
+    uint16_t cnt = TIM2.CNT;
+    uint64_t now = cycleCount();
+    uint16_t sr = TIM2.SR;
+
+    if ((sr & TIM2_SR_CC1IF )) {
+        uint16_t latency = (cnt - TIM2.CCR1);  // * (TIM2.PSC+1)
+        shutter_open_ts = now - latency;
+        ++shutter_open_cnt;
+    }
+    if ((sr & TIM2_SR_CC2IF)) {
+        uint16_t latency = (cnt - TIM2.CCR2);  // * (TIM2.PSC+1)
+        shutter_close_ts = now - latency;
+        ++shutter_close_cnt;
+    }
+
+    TIM2.SR &= ~sr;
+}
 
 // USART1 is the output datastream and command input
 
-static struct MsgQueue outq;
+static struct MsgQueue outq = { 0,0, {} };
+static volatile uint64_t dropped_usart1 = 0;  // queue full, msqq_head returned NULL
 
+enum { FrameSize = 1020 }; // we send frames of this size
+static uint16_t framelen = FrameSize; // start by sending the separator
+static uint16_t framechk = 0;
+static int deq_after_xmit = 0;
+static struct Msg framesep;
+
+// set up DMA transaction on DMA2 channel 6 from buf[:len] to usart1 tx
+// if buf is zero, we send len zero bytes instead.
 static inline void usart1dmamove(uint8_t *buf, size_t len) {
+    static uint8_t zero = 0;
     DMA2.CCR6 = 0;
     dma1_cselr_set_c6s(&DMA2, 2); // select usart1 for dma2 ch2
     DMA2.CPAR6 = (uintptr_t)&USART1.TDR;
-    DMA2.CMAR6 = (uintptr_t)buf;
+    DMA2.CMAR6 = (uintptr_t) (buf ? buf : &zero);
     DMA2.CNDTR6 = len;
-    DMA2.CCR6 = DMA1_CCR1_MINC | DMA1_CCR1_DIR | DMA1_CCR1_TEIE | DMA1_CCR1_TCIE | DMA1_CCR1_EN;
-
+    if (buf) {
+        DMA2.CCR6 = DMA1_CCR1_DIR | DMA1_CCR1_TEIE | DMA1_CCR1_TCIE | DMA1_CCR1_EN | DMA1_CCR1_MINC;
+    } else {
+        DMA2.CCR6 = DMA1_CCR1_DIR | DMA1_CCR1_TEIE | DMA1_CCR1_TCIE | DMA1_CCR1_EN;
+    }
 }
 
-// if we ever give up all messages being 20 bytes long, we need to introduce a 'padding' message
-// to round up all packets to 960 or whatever given number of bytes, so we can stream out without
-// having to buffer. 
-
-static uint8_t usart1msgcnt = 48;
-static uint16_t usart1chksum = 0;
-
-// chksum of preceding packets, magic header and 960 bytes following (48 packets of 20 bytes)
-// the upper limit is 1024 bytes but we want to leave some headroom
-static uint8_t packetseparator[] = {0, 0, 'I', 'R', 'O', 'N', 0x03, 0xC0};
-
 static int xmitmsg() {
-    if (usart1msgcnt == 48) {
-        packetseparator[0] = usart1chksum >> 8;
-        packetseparator[1] = usart1chksum;
-        usart1chksum = 0;
-        usart1msgcnt = 0;
-        usart1dmamove(&packetseparator[0], sizeof packetseparator);
+    struct Msg *msg = msgq_tail(&outq);
+    if (msg == NULL) {
+        return 0;
+    }
+
+    if (framelen + msg->len == FrameSize) {
+        // send the separator: chksum, "IRON", framesize
+        framesep.len = 0;
+        msg_append16(&framesep, framechk);
+        msg_append32(&framesep, 0x49524f4e);  // 'IRON'
+        msg_append16(&framesep, FrameSize);
+        usart1dmamove(framesep.buf, framesep.len);
+        framechk = 0;
+        framelen = 0;
+    } else if (framelen + msg->len > FrameSize) {
+        // insert a padding message of all zeros (no length or header)
+        usart1dmamove(NULL, FrameSize - framelen);
+        // all zeros, no need to update the framecheck
+        framelen = FrameSize;
     } else {
-        struct Msg *msg = msgq_tail(&outq);
-        if (msg == NULL) {
-            return 0;
+        framelen += msg->len;
+        for (size_t i = 0; i < msg->len; ++i) {
+            framechk += msg->buf[i];
         }
-
-        msg->buf[3] = msg->len;  // should be 20, assert?
-        for (size_t i = 0; i < msg->len; ++i)
-            usart1chksum += msg->buf[i];
-
         usart1dmamove(msg->buf, msg->len);
-        ++usart1msgcnt;
+        deq_after_xmit = 1;    
     }
 
     USART1.ICR |= USART1_ICR_TCCF;  // clear Transmission Complete status
-    USART1.CR1 |= USART1_CR1_UE | USART1_CR1_TE | USART1_CR1_TCIE;  // enable unit, TX and irq on TX Complete
+    USART1.CR1 |= USART1_CR1_TCIE;  // irq on TX Complete
 
     return 1;
 }
 
 uint32_t dma2ch6err_cnt = 0;
-// dma error or complete
+// irq on dma error or complete
 void DMA2_CH6_Handler(void) {
     if (DMA2.ISR & DMA1_ISR_TEIF6)
         ++dma2ch6err_cnt;
@@ -249,32 +293,23 @@ void USART1_Handler(void) {
 
     USART1.ICR |= USART1_ICR_TCCF;  // clear Transmission Complete status
 
-    // cnt is only zero after we sent a separator packet
-    if (usart1msgcnt) {
+    if (deq_after_xmit) {
         msgq_pop_tail(&outq);  // mark done
+        deq_after_xmit = 0;
     }
 
-    if (!xmitmsg()) {
+    if (!xmitmsg()) { // start next if available
         USART1.CR1 &= ~USART1_CR1_TCIE;
     }
 }
 
-void start_usart1(void) {
-    if ((USART1.CR1 & USART1_CR1_TCIE) == 0)  // not already running
-        xmitmsg();
-}
-
-static volatile uint64_t dropped_usart1 = 0;  // queue full
-
-
-
-// Timer 2: 1Hz status
-void TIM2_Handler(void) {
+// Timer 6: 1Hz status
+void TIM6_DACUNDER_Handler(void) {
     uint64_t now = cycleCount();
 
-    if ((TIM2.SR & TIM1_SR_UIF) == 0)
+    if ((TIM6.SR & TIM1_SR_UIF) == 0)
         return;
-    TIM2.SR &= ~TIM1_SR_UIF;
+    TIM6.SR &= ~TIM1_SR_UIF;
 
     exti_handler(now, 0, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
 
@@ -282,12 +317,12 @@ void TIM2_Handler(void) {
     uint64_t sec = now / 1000000;
     now %= 1000000;
 
-//  printf("\nuptime %llu.%06llu  spiq %ld %ld %ld %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
+  printf("\nuptime %llu.%06llu  spiq %ld %ld %ld (%lld) %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail,  dropped_spi1, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
 //  printf("\nuptime %llu.%06llu  usart1 %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
-    printf("\nuptime %llu.%06llu\n", sec, now);
+//   printf("\nuptime %llu.%06llu\n", sec, now);
  }
 
-extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1
+extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1, defined in .ld file
 
 static const char* pplsrcstr[] = { "NONE", "MSI", "HSI16", "HSE" };
 
@@ -303,7 +338,7 @@ void main(void) {
     // Enable all the devices we are going to need
 	RCC.AHB1ENR  |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
 	RCC.AHB2ENR  |= RCC_AHB2ENR_GPIOAEN|RCC_AHB2ENR_GPIOBEN;
-	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM2EN;
+	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN;
 	RCC.APB2ENR  |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART1EN;
 
 	for (const struct gpio_config_t* p = pin_cfgs; p->pins; ++p) {
@@ -332,15 +367,8 @@ void main(void) {
     );
 	usart_wait(&USART2);
 
-    // set up timer2 for a 1Hz hearbeat
-	TIM2.DIER |= TIM1_DIER_UIE;
-    TIM2.PSC = (CLOCKSPEED_HZ/10000) - 1;
-    TIM2.ARR = 10000 - 1; // 10KHz/10000 = 1Hz
-    TIM2.CR1 |= TIM1_CR1_CEN;
-    NVIC_EnableIRQ(TIM2_IRQn);
-
     // Prepare USART1 for high speed DMA driven output of the measurement data
-    usart_init(&USART1, 8*115200);
+    usart_init(&USART1, 921600);
     USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA
     NVIC_EnableIRQ(DMA2_CH6_IRQn);
     NVIC_EnableIRQ(USART1_IRQn);
@@ -353,6 +381,7 @@ void main(void) {
     } else {
         printf("BMI088 not found.\n");
     } 
+
     int bmi_ok = (bmi088_self_test(&spiq) == 0);
     usart_wait(&USART2);
 
@@ -429,6 +458,28 @@ void main(void) {
     NVIC_EnableIRQ(EXTI1_IRQn);   // Accelerometer ready interrupt
     NVIC_EnableIRQ(EXTI3_IRQn);   // Gyroscope ready interrupt
 
+    // TIM2 CH1 measures shutter open/close
+    // See RM0394 section 27.3.5
+    // CC1 channel is configured as input, IC1 is mapped on TI1,
+    // CC2 channel is configured as input, IC2 is mapped on TI1
+    TIM2.CR1 = 2 << 8;  // CKD = /4, 20MHz
+    TIM2.DIER = TIM2_DIER_CC1IE | TIM2_DIER_CC2IE;
+    TIM2.PSC = 0;  // 80MHz
+    TIM2.ARR = 0xffff;
+    TIM2.CCMR1_Input = (9 << 12) | (9 << 4) | (2 << 8) | 1;  //  fSAMPLING=fDTS/8, N=8
+    TIM2.CCMR2_Input = 0;
+    TIM2.CCER = TIM2_CCER_CC1E | TIM2_CCER_CC2E | TIM2_CCER_CC2P;  // 1,2 enabled, 2 inverted
+    TIM2.CR1 |= TIM2_CR1_CEN;
+    NVIC_EnableIRQ(TIM2_IRQn);
+
+    // set up TIM6 for a 1Hz hearbeat
+    // note: it pushes spiq messages so do not start this before the BMI/BME are configured.
+	TIM6.DIER |= TIM1_DIER_UIE;
+    TIM6.PSC = (CLOCKSPEED_HZ/10000) - 1;
+    TIM6.ARR = 10000 - 1; // 10KHz/10000 = 1Hz
+    TIM6.CR1 |= TIM1_CR1_CEN;
+    NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
+
     // headers used in output message vary by accel/gyro configuration
     gyro_hdr = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
     accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
@@ -442,22 +493,51 @@ void main(void) {
     for(;;) {
     	__WFI();
 
+        struct Msg *msg = msgq_head(&outq);
         struct SPIXmit *x = spiq_tail(&spiq);
         if (x != NULL) {
-            struct Msg *msg = msgq_head(&outq);
             if (!msg) {
                 ++dropped_usart1;
             } else {
                 msg_reset(msg);
                 if (output(msg, x)) {
                     msgq_push_head(&outq);
-                    start_usart1();
+                    USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
+
+                    IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
                 }
             }
             spiq_deq_tail(&spiq);
-
-            IWDG.KR = 0xAAAA;  // pet the watchdog
         } 
+
+        uint64_t ts = 0;
+        if ((ts = unlatch(&shutter_open_ts)) != 0) {
+            if (!msg) {
+                ++dropped_usart1;
+            } else {
+                msg_reset(msg);
+                msg_append16(msg, EVENTID_SHUTTER_OPEN);  // header
+                msg_append16(msg, 0x8014);  // header
+                msg_append64(msg, ts);
+                msg_append64(msg, shutter_open_cnt);
+            }
+        } else if ((ts = unlatch(&shutter_close_ts)) != 0) {
+            if (!msg) {
+                ++dropped_usart1;
+            } else {
+                msg_reset(msg);
+                msg_append16(msg, EVENTID_SHUTTER_CLOSE);
+                msg_append16(msg, 0x8014);  // header
+                msg_append64(msg, ts);
+                msg_append64(msg, shutter_close_cnt);
+            }
+        }
+        
+        if((msg != NULL) && (ts != 0)) {
+            msgq_push_head(&outq);
+            USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
+        }
+
 
     }
 

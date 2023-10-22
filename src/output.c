@@ -20,12 +20,13 @@ int output(struct Msg *msg , struct SPIXmit *x) {
     case MSGTYPE(GYRO, BMI08x_RATE_X_LSB):
         if (x->buf[9] & 0x80) {
             msg_append16(msg, gyro_hdr);  // header
-            msg_append16(msg, 0x8014);  // header
+            msg_append16(msg, 0x8014);  // header, msg->buf[3] = len
             msg_append64(msg, x->ts);
             msg_append16(msg, decode_le_uint16(x->buf + 1));
             msg_append16(msg, decode_le_uint16(x->buf + 3));
             msg_append16(msg, decode_le_uint16(x->buf + 5));
             msg_append16(msg, 0);  // pad
+            msg->buf[3] = msg->len;
             return 1;
         }
         return 0;
@@ -42,26 +43,25 @@ int output(struct Msg *msg , struct SPIXmit *x) {
             msg_append16(msg, decode_le_uint16(x->buf + 4));
             msg_append16(msg, decode_le_uint16(x->buf + 6));
             msg_append16(msg, 0);  // pad
+            msg->buf[3] = msg->len;
             return 1;
         }
         return 0;
 
-
-
     case MSGTYPE(HUMID, BME280_DATA_REG):
-    {
-        int32_t t_mdegc,  p_mpa;
-        bme_decode(&bmeParam, x->buf, &t_mdegc, &p_mpa, &bme_hume6);
-        msg_append16(msg, EVENTID_BARO);  // header
-        msg_append16(msg, 0x8014);  // header
-        msg_append64(msg, x->ts);
-        msg_append32(msg, t_mdegc);
-        msg_append32(msg, p_mpa);
-    }   
-
+        if (1) { // TODO: look for valid flag
+            int32_t t_mdegc,  p_mpa;
+            bme_decode(&bmeParam, x->buf, &t_mdegc, &p_mpa, &bme_hume6);
+            msg_append16(msg, EVENTID_BARO);  // header
+            msg_append16(msg, 0x8014);  // header
+            msg_append64(msg, x->ts);
+            msg_append32(msg, t_mdegc + 273150); // convert to milliKelvin
+            msg_append32(msg, p_mpa);
+            msg->buf[3] = msg->len;
+            return 1;
+        }   
     }
 #undef MSGTYPE
-
 
     return 0;
 }
@@ -69,33 +69,11 @@ int output(struct Msg *msg , struct SPIXmit *x) {
 
 
 #if 0
-            struct Msg *msg = msgq_head(&outq);
-            if (!msg) {
-                ++dropped_usart1;
-                break;
-            }
-            msg_reset(msg);
 
-            uint64_t ts = raised_ts[BARO_DATA_INT];
-            uint32_t p = decode_le_uint24(x->buf + 2);
-            uint32_t t = decode_le_uint24(x->buf + 5);
-            // todo: also check timestamp
-            int32_t t_mdegc, p_mpa;
-            bmp_linearize(&bmpParam, t, p, &t_mdegc, &p_mpa);
+TODO
 
-            msg_append16(msg, EVENTID_BARO);  // header
-            msg_append16(msg, 0x8014);  // header
-            msg_append64(msg, ts);
-            msg_append32(msg, t_mdegc + 273150);  // to millikelvin
-            msg_append32(msg, p_mpa);
+    
 
-            msgq_push_head(&outq);
-        }
-
-        struct Msg *msg = msgq_head(&outq);
-        if (!msg) {
-            ++dropped_usart1;
-        } else {
             uint64_t ts = 0;
             msg_reset(msg);
             if ((ts = unlatch(&shutter_open_ts)) != 0) {
@@ -121,9 +99,6 @@ int output(struct Msg *msg , struct SPIXmit *x) {
                             USART_CONS, "%lld %lld %lld %lld %lld\n", dropped_spi1, dropped_spi2, error_spi1,
                             error_spi2, dropped_usart1);
                 }
-            }
-            if (ts != 0) {
-                msgq_push_head(&outq);
             }
         }
 
