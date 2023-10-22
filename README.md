@@ -103,5 +103,6 @@ STM Reference documents:
 - DS11453 STM32L431xx Ultra-low-power Arm® Cortex®-M4 32-bit MCU+FPU, 100DMIPS, up to 256KB Flash, 64KB SRAM, analog, audio
 
 Bosch reference documents:
+
 - BST-BMI088-DS001-13 BMI088 6-axis Motion Tracking for High-performance Applications
 - BST-BME280-DS001-18 BME280 Combined humidity and pressure sensor

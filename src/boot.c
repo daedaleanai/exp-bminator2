@@ -6,8 +6,15 @@ extern void main(void);                            // in main.c
 extern void (*vector_table[])(void);               // in vector.c
 extern char _sidata, _sdata, _edata, _sbss, _ebss; // provided by linker script
 
-enum { HSE_RDY_TIMEOUT = 5000 };
+// how many clock cycles to wait before deciding not to use HSE (CK_IN)
+enum { HSE_RDY_TIMEOUT = 40000 };  
 
+// This is the first thing that runs after the CPU comes out of reset.
+// It loads the data segment, clears the Blank Stuff segment,
+// sets up the interrupt vector table to load from flash,
+// initializes fault handling and FPU access,
+// sets up the system clock to run at 80MHz, starts the system 
+// timer and calls main().
 void Reset_Handler(void) {
 
 	// Copy data segment to RAM (see stm32XXXX.ld)
@@ -23,17 +30,22 @@ void Reset_Handler(void) {
 
 	// Vector Table Relocation in Internal FLASH
 	// PM0214 sec 4.4.4
-	SCB.VTOR = (uintptr_t)&vector_table; 
+	SCB.VTOR = (uintptr_t)&vector_table; // provided in vectors.c
 
+	// PM0214 sec 4.4.7
 	SCB.CCR |= SCB_CCR_DIV_0_TRP; // division by zero causes trap
 	// enable usage/bus/mem fault separate handlers (in fault.c)
+	// PM0214 sec 4.4.9
 	SCB.SHCSR |= SCB_SHCSR_USGFAULTENA|SCB_SHCSR_BUSFAULTENA|SCB_SHCSR_MEMFAULTENA;
 
-	fpu_cpacr_cpacr_set_cp(&FPU_CPACR, 0xf);  	// CP10/CP11 Full Access
+	// section 4.6.1 CP10/CP11 (FPU) Full Access
+	fpu_cpacr_cpacr_set_cp(&FPU_CPACR, 0xf);  	 
 
 	// Disable all interrupts and clear pending bits 
 	RCC.CIER = 0;
 	RCC.CICR = RCC.CIFR;
+
+	// See RM0394 Section 6 for details on configuration of the clock tree.
 
 	// feeding all peripherals to run at 80Mhz
 	rcc_cfgr_set_hpre(&RCC, 0);  // AHB HCLK = SYSCLK  =  80MHz
@@ -46,14 +58,16 @@ void Reset_Handler(void) {
 
 	// enable HSE on CK_IN and wait for ready
 	RCC.CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
-	for (uint32_t t = 0; t < 400000; t++)
+	for (uint32_t t = 0; t < HSE_RDY_TIMEOUT; t++)
 		if (RCC.CR & RCC_CR_HSERDY)
 			break;
 
 	if (RCC.CR & RCC_CR_HSERDY) {
+		// if we got HSE ready, use it
 		rcc_pllcfgr_set_pllsrc(&RCC, 3); // select 3:HSE (CK_IN via HSEBYPASS)
 		rcc_pllcfgr_set_pllm(&RCC, 1);     // 0..15       : vco_in = HSE / (1+m)  4..16MHz        8/2 = 4MHz
 	} else {
+		// otherwise fall back to MSI
 		RCC.CR &= ~(RCC_CR_HSEBYP | RCC_CR_HSEON);
 		rcc_pllcfgr_set_pllsrc(&RCC, 1);   // select 1:MSI source (4MHz)
 		rcc_pllcfgr_set_pllm(&RCC, 0);     // 0..15       : vco_in = MSI / (1+m)  4..16MHz        4/1 = 4MHz
@@ -64,7 +78,7 @@ void Reset_Handler(void) {
 	RCC.PLLCFGR |= RCC_PLLCFGR_PLLREN;  // emable R output (system clock)
 	RCC.CR |= RCC_CR_PLLON;             // switch on the PLL
 
-	// prepare the flash	
+	// prepare the flash, RMA0394 section 3.3.3
 	FLASH.ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN;
 	flash_acr_set_latency(&FLASH, 4);  // 4 wait states (5 cycles) cf 3.3.3 p79 table 9 
 	while(flash_acr_get_latency(&FLASH) != 4)
@@ -79,7 +93,8 @@ void Reset_Handler(void) {
 	while (rcc_cfgr_get_sws(&RCC) != 3)
 		__NOP();
 
-	initCycleCount();  // so cycleCount() and delay() work
+
+	initCycleCount();  // see clock.c so cycleCount() and delay() work
 
 	main();
 
