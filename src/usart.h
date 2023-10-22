@@ -6,7 +6,7 @@
 #include "stm32l4xx.h"
 #include "ringbuffer.h"
 
-// usart_init() initializes USART{1,2,3,4,5}.
+// usart_init() initializes USART{1,2,3,4,5} for transmission.
 //
 // The bytes will transmitted be as 8 data bits, Even Parity bit, 1 stop bit (8E1) at the specified baud rate.
 //
@@ -34,7 +34,7 @@ inline void usart_irq_handler(struct USART1_Type* usart, struct Ringbuffer* rb) 
 	return;
 }
 
-// start transmission
+// start transmission using IRQ driver. 
 inline void usart_start(struct USART1_Type* usart) { usart->CR1 |= USART1_CR1_TXEIE;  }
 
 inline void usart_wait(struct USART1_Type* usart) {
