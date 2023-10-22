@@ -9,16 +9,21 @@ extern char _sidata, _sdata, _edata, _sbss, _ebss; // provided by linker script
 enum { HSE_RDY_TIMEOUT = 5000 };
 
 void Reset_Handler(void) {
+
+	// Copy data segment to RAM (see stm32XXXX.ld)
 	char* src = &_sidata;
 	char* dst = &_sdata;
 
 	while (dst < &_edata)
 		*dst++ = *src++;
 
+	// clear BSS segment (see stm32XXXX.ld)
 	for (dst = &_sbss; dst < &_ebss; dst++)
 		*dst = 0;
 
-	SCB.VTOR = (uintptr_t)&vector_table; // Vector Table Relocation in Internal FLASH.
+	// Vector Table Relocation in Internal FLASH
+	// PM0214 sec 4.4.4
+	SCB.VTOR = (uintptr_t)&vector_table; 
 
 	SCB.CCR |= SCB_CCR_DIV_0_TRP; // division by zero causes trap
 	// enable usage/bus/mem fault separate handlers (in fault.c)

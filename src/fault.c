@@ -1,5 +1,6 @@
 // Print a somewhat informative crash report. 
 // We assume USART1/2 is up and clocks are running.
+// See PM0214  Section 2.3 for reference on the exception handling of the Cortex M4.
 
 #include "cortex_m4.h"
 #include "stm32l4xx.h"
@@ -67,6 +68,7 @@ static void printflags(uint32_t val, const char* const* flgs, const char* sep) {
 	}
 }
 
+// PM0214 sec 4.4.10
 static const char* const cfsrflags[] = {
     "Instruction access violation",
     "Data access violation",
@@ -121,17 +123,19 @@ static void handlefault(uint32_t stack, const char* lbl) {
 		__NOP();
 }
 
+// Declare core exception handlers to omit stack saving prologue
 void HardFault_Handler(void) __attribute__ ((naked));
 void MemoryManagement_Handler(void) __attribute__ ((naked));
 void BusFault_Handler(void) __attribute__ ((naked));
 void UsageFault_Handler(void) __attribute__ ((naked));
 
+// This firmware only uses the Main Stack Pointer.
 void HardFault_Handler(void) { handlefault(__get_MSP(), "HARD"); }
 void MemoryManagement_Handler(void) { handlefault(__get_MSP(), "MEM"); }
 void BusFault_Handler(void) { handlefault(__get_MSP(), "BUS"); }
 void UsageFault_Handler(void) { handlefault(__get_MSP(), "USAGE"); }
 
-// called from vector.c default_IRQ_Handler
+// Called from vector.c default_IRQ_Handler
 void unhandled_interrupt(uint32_t irq) {
 	dbg_printf("Unhandled IRQ %x\n----HALT\n", irq);
 	__BKPT(1);
