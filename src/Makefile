@@ -7,11 +7,11 @@ SIZE        := $(PREFIX)size
 REVISION := $(shell git log -1 --format="%h" || echo "<NONE>")
 
 ARCH_FLAGS	 = -mthumb -mcpu=cortex-m4
-LTO_FLAGS	 = -O3 -flto -fuse-linker-plugin -ffunction-sections -fdata-sections -fverbose-asm -ffat-lto-objects -fno-exceptions -fno-unwind-tables
+OPT_FLAGS	 = -O3 -flto -fuse-linker-plugin -ffunction-sections -fdata-sections -fverbose-asm -ffat-lto-objects -fno-exceptions -fno-unwind-tables
 WARN_FLAGS   = -Werror -Wfatal-errors -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion -Wundef  -Wno-pedantic -Wno-enum-conversion -Wno-deprecated
 DEBUG_FLAGS	 = -ggdb3 -DNDEBUG -D__REVISION__='"$(REVISION)"' 
-CFLAGS 		 = -std=gnu99 $(ARCH_FLAGS) $(LTO_FLAGS) $(WARN_FLAGS) $(DEBUG_FLAGS)
-LDFLAGS		 = -nostartfiles -lnosys -static $(ARCH_FLAGS) $(LTO_FLAGS) $(WARN_FLAGS) $(DEBUG_FLAGS) -Wl,-gc-sections,-Map,main.map -Wl,--cref
+CFLAGS 		 = -std=gnu99 $(ARCH_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(DEBUG_FLAGS)
+LDFLAGS		 = -nostartfiles -lnosys -static $(ARCH_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(DEBUG_FLAGS) -Wl,-gc-sections,-Map,main.map -Wl,--cref
 
 .DEFAULT_GOAL := main.hex
 
@@ -45,16 +45,25 @@ $(OBJS): Makefile
 
 flash: main.hex
 	st-flash --connect-under-reset --format ihex write $<
-
-debug: main.elf
-	st-util &
-	$(PREFIX)gdb $^
-	killall st-util
 	
 clean:
 	rm -f *~ *.o *.hex *.bin *.elf *.map
 
 depend:
 	makedepend -Y. -w150 *.c
+
+
 # DO NOT DELETE
 
+bme280.o: bme280.h
+bmxspi.o: stm32l4xx.h bmxspi.h bme280.h spi.h binary.h bmi08x.h clock.h tprintf.h
+boot.o: cortex_m4.h stm32l4xx.h clock.h
+clock.o: cortex_m4.h stm32l4xx.h clock.h
+fault.o: cortex_m4.h stm32l4xx.h
+gpio2.o: gpio2.h stm32l4xx.h
+main.o: cortex_m4.h stm32l4xx.h binary.h clock.h gpio2.h nvic.h tprintf.h usart.h ringbuffer.h spi.h bmxspi.h bme280.h bmi08x.h msgq.h output.h
+output.o: output.h msgq.h spi.h stm32l4xx.h binary.h bmxspi.h bme280.h bmi08x.h
+ringbuffer.o: ringbuffer.h
+spi.o: spi.h stm32l4xx.h cortex_m4.h nvic.h
+tprintf.o: tprintf.h
+vectors.o: cortex_m4.h stm32l4xx.h
