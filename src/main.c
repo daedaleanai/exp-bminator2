@@ -230,7 +230,7 @@ static struct Msg framesep;
 static inline void usart1dmamove(uint8_t *buf, size_t len) {
     static uint8_t zero = 0;
     DMA2.CCR6 = 0;
-    dma1_cselr_set_c6s(&DMA2, 2); // select usart1 for dma2 ch2
+    dma1_cselr_set_c6s(&DMA2, 2); // select usart1 for dma2 ch6
     DMA2.CPAR6 = (uintptr_t)&USART1.TDR;
     DMA2.CMAR6 = (uintptr_t) (buf ? buf : &zero);
     DMA2.CNDTR6 = len;
@@ -276,31 +276,30 @@ static int xmitmsg() {
     return 1;
 }
 
-uint32_t dma2ch6err_cnt = 0;
 // irq on dma error or complete
+uint32_t dma2ch6err_cnt = 0;
 void DMA2_CH6_Handler(void) {
     if (DMA2.ISR & DMA1_ISR_TEIF6)
         ++dma2ch6err_cnt;
-
     DMA2.IFCR = DMA2.ISR & 0x00f00000;
 }
 
 // irq only on USART Transmit Complete
 void USART1_Handler(void) {
     uint32_t isr = USART1.ISR;
-    if ((isr & USART1_ISR_TC) == 0)
-        return;
+    if ((isr & USART1_ISR_TC) != 0) {
+        USART1.ICR |= USART1_ICR_TCCF;  // clear Transmission Complete status
 
-    USART1.ICR |= USART1_ICR_TCCF;  // clear Transmission Complete status
+        if (deq_after_xmit) {
+            msgq_pop_tail(&outq);  // mark done
+            deq_after_xmit = 0;
+        }
 
-    if (deq_after_xmit) {
-        msgq_pop_tail(&outq);  // mark done
-        deq_after_xmit = 0;
+        if (!xmitmsg()) { // start next if available
+            USART1.CR1 &= ~USART1_CR1_TCIE;
+        }
     }
 
-    if (!xmitmsg()) { // start next if available
-        USART1.CR1 &= ~USART1_CR1_TCIE;
-    }
 }
 
 // Timer 6: 1Hz status
@@ -356,7 +355,9 @@ void main(void) {
 	usart_init(&USART2, 115200);
 	NVIC_EnableIRQ(USART2_IRQn);
 
+#ifdef __REVISION__
 	printf("SWREV:%s\n", __REVISION__);
+#endif
 	printf("CPUID:%08lx\n",  SCB.CPUID);
 	printf("IDCODE:%08lx\n",  DBGMCU.IDCODE);
 	printf("DEVID:%08lx:%08lx:%08lx\n", UNIQUE_DEVICE_ID[2], UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
@@ -369,7 +370,7 @@ void main(void) {
 
     // Prepare USART1 for high speed DMA driven output of the measurement data
     usart_init(&USART1, 921600);
-    USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA
+    USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA output
     NVIC_EnableIRQ(DMA2_CH6_IRQn);
     NVIC_EnableIRQ(USART1_IRQn);
 
@@ -474,10 +475,10 @@ void main(void) {
 
     // set up TIM6 for a 1Hz hearbeat
     // note: it pushes spiq messages so do not start this before the BMI/BME are configured.
-	TIM6.DIER |= TIM1_DIER_UIE;
+	TIM6.DIER |= TIM6_DIER_UIE;
     TIM6.PSC = (CLOCKSPEED_HZ/10000) - 1;
     TIM6.ARR = 10000 - 1; // 10KHz/10000 = 1Hz
-    TIM6.CR1 |= TIM1_CR1_CEN;
+    TIM6.CR1 |= TIM6_CR1_CEN;
     NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
 
     // headers used in output message vary by accel/gyro configuration
@@ -516,27 +517,31 @@ void main(void) {
                 ++dropped_usart1;
             } else {
                 msg_reset(msg);
+                msg_append16(msg, 0);  // len
                 msg_append16(msg, EVENTID_SHUTTER_OPEN);  // header
-                msg_append16(msg, 0x8014);  // header
                 msg_append64(msg, ts);
-                msg_append64(msg, shutter_open_cnt);
+                msg_append64(msg, shutter_open_cnt);         
+                msg->buf[1] = msg->len;
             }
         } else if ((ts = unlatch(&shutter_close_ts)) != 0) {
             if (!msg) {
                 ++dropped_usart1;
             } else {
                 msg_reset(msg);
+                msg_append16(msg, 0);  // len
                 msg_append16(msg, EVENTID_SHUTTER_CLOSE);
-                msg_append16(msg, 0x8014);  // header
                 msg_append64(msg, ts);
                 msg_append64(msg, shutter_close_cnt);
+                msg->buf[1] = msg->len;
             }
         }
-        
+
         if((msg != NULL) && (ts != 0)) {
             msgq_push_head(&outq);
             USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
         }
+
+        // if we received a command, 
 
 
     }

@@ -19,14 +19,14 @@ int output(struct Msg *msg , struct SPIXmit *x) {
     switch (MSGTYPE(x->addr, x->tag)) {
     case MSGTYPE(GYRO, BMI08x_RATE_X_LSB):
         if (x->buf[9] & 0x80) {
+            msg_append16(msg, 0);  // header len
             msg_append16(msg, gyro_hdr);  // header
-            msg_append16(msg, 0x8014);  // header, msg->buf[3] = len
             msg_append64(msg, x->ts);
             msg_append16(msg, decode_le_uint16(x->buf + 1));
             msg_append16(msg, decode_le_uint16(x->buf + 3));
             msg_append16(msg, decode_le_uint16(x->buf + 5));
             msg_append16(msg, 0);  // pad
-            msg->buf[3] = msg->len;
+            msg->buf[1] = msg->len;
             return 1;
         }
         return 0;
@@ -35,15 +35,14 @@ int output(struct Msg *msg , struct SPIXmit *x) {
         if (x->buf[13] & 0x80) {
             // uint32_t ts = decode_le_uint24(x->buf + 8);  innner timestamp of accelerator, not used
             accel_temp_mk = bmi08x_decode_temp_mdegc(x->buf + 18) + 273150;  // sent separately at 1Hz
-
+            msg_append16(msg, 0);  // len
             msg_append16(msg, accel_hdr);  // header
-            msg_append16(msg, 0x8014);  // header
             msg_append64(msg, x->ts);
             msg_append16(msg, decode_le_uint16(x->buf + 2));
             msg_append16(msg, decode_le_uint16(x->buf + 4));
             msg_append16(msg, decode_le_uint16(x->buf + 6));
             msg_append16(msg, 0);  // pad
-            msg->buf[3] = msg->len;
+            msg->buf[1] = msg->len;
             return 1;
         }
         return 0;
@@ -52,12 +51,12 @@ int output(struct Msg *msg , struct SPIXmit *x) {
         if (1) { // TODO: look for valid flag
             int32_t t_mdegc,  p_mpa;
             bme_decode(&bmeParam, x->buf, &t_mdegc, &p_mpa, &bme_hume6);
+            msg_append16(msg, 0);  // len
             msg_append16(msg, EVENTID_BARO);  // header
-            msg_append16(msg, 0x8014);  // header
             msg_append64(msg, x->ts);
             msg_append32(msg, t_mdegc + 273150); // convert to milliKelvin
             msg_append32(msg, p_mpa);
-            msg->buf[3] = msg->len;
+            msg->buf[1] = msg->len;
             return 1;
         }   
     }
@@ -74,18 +73,6 @@ TODO
 
     
 
-            uint64_t ts = 0;
-            msg_reset(msg);
-            if ((ts = unlatch(&shutter_open_ts)) != 0) {
-                msg_append16(msg, EVENTID_SHUTTER_OPEN);  // header
-                msg_append16(msg, 0x8014);  // header
-                msg_append64(msg, ts);
-                msg_append64(msg, shutter_open_cnt);
-            } else if ((ts = unlatch(&shutter_close_ts)) != 0) {
-                msg_append16(msg, EVENTID_SHUTTER_CLOSE);
-                msg_append16(msg, 0x8014);  // header
-                msg_append64(msg, ts);
-                msg_append64(msg, shutter_close_cnt);
             } else if ((ts = unlatch(&periodic_ts)) != 0) {
                 msg_append16(msg, periodic_headers[periodic_cnt % 3]);  // header
                 msg_append16(msg, 0x8014);  // header
@@ -94,12 +81,6 @@ TODO
                 msg_append32(msg, periodic_values[periodic_cnt % 3][1]);
                 ++periodic_cnt;
 
-                if (DEBUG && ((periodic_cnt % 4) == 0)) {
-                    serial_printf(
-                            USART_CONS, "%lld %lld %lld %lld %lld\n", dropped_spi1, dropped_spi2, error_spi1,
-                            error_spi2, dropped_usart1);
-                }
             }
-        }
 
 #endif
