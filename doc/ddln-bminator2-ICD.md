@@ -39,12 +39,12 @@ This document contains all information required to interface to the Daedalean BM
 
 #### External Documents
 
-**BMI088 Datasheet** [BST-BMI-088-DS001](https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi088-ds001.pdf)
-**BME280 Datasheet** [BST-BME-280-DS002](https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bme280-ds002.pdf)
-**STM32L4xx Reference Manual** [RM0394](https://www.st.com/resource/en/reference_manual/rm0394-stm32l41xxx42xxx43xxx44xxx45xxx46xxx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
-**STM32L431cb Datasheet** [STM32L431](https://www.st.com/resource/en/datasheet/stm32l431cb.pdf)
-**STM32L432kc Datasheet**  [STM32L432](https://www.st.com/resource/en/datasheet/stm32l432kc.pdf)
-**CoaXPress Standard Version 2.1** [JIIA CXP-001-2021](https://TODO)
+- **BMI088 Datasheet** [BST-BMI-088-DS001](https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi088-ds001.pdf)
+- **BME280 Datasheet** [BST-BME-280-DS002](https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bme280-ds002.pdf)
+- **STM32L4xx Reference Manual** [RM0394](https://www.st.com/resource/en/reference_manual/rm0394-stm32l41xxx42xxx43xxx44xxx45xxx46xxx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
+- **STM32L431cb Datasheet** [STM32L431](https://www.st.com/resource/en/datasheet/stm32l431cb.pdf)
+- **STM32L432kc Datasheet**  [STM32L432](https://www.st.com/resource/en/datasheet/stm32l432kc.pdf)
+- **CoaXPress Standard Version 2.1** [JIIA CXP-001-2021](https://TODO)
 
 #### Internal Documents
 
@@ -112,6 +112,7 @@ TODO(ph) update with pinout of the actual implementation
 |   4 | SWDIO     | PA13 SWDIO    | B <-> D   |                   | debug data            |
 |   5 | SWCLK     | PA14 SWCLK    | B <- D    |                   | debug clock           |
 |   6 | nRST      | nRST          | B <- D    |                   | reset                 |
+
 BMInator Connector Jx(DEBUG) pinout.
 
 Direction B->D means the signal or power flows from BMInator to debugger, B <- D means v.v.
@@ -126,6 +127,7 @@ The BMInator Connector Jy (IO) has the following pinout
 |   3 | Time Pulse | PA15 TIM1 CH2  | B <- H    | input 5V tolerant | Reference Time Pulse          |
 |   4 | Serial TX  | PA9 USART1 TX  | B -> H    | AF_PP 10MHz 3.3V  | serial RX                     |
 |   5 | Serial RX  | PA10 USART1 RX | B <- H    | Input 5V tolerant | serial TX 5V                  |
+
 BMInator Connector Jy(IO) pinout.
 
 Direction B->H means the signal or power flows from BMInator to Host Unit, B <- H means from Host Unit to BMInator.
@@ -165,6 +167,7 @@ Packets may be zero padded to fill up a predefined total packet length, so that 
 | uint16              | a big endian 16 bit byte count, up to 1024, of the following messages           |
 | messages            | a sequence of messages as defined below                                         |
 | uint16              | the sum over all message bytes as a big-endian 16 bit number                    |
+
 Packet Format
 
 (The checksum is a simple sum, which is not very resilient against common types of serial errors. consider replacing with a CRC16 in the future.)
@@ -186,6 +189,7 @@ A 64 bit quantity is transmitted as 2 words, in big-endian order
 | 1x32 bit | w[24:31] | w[16:23] | w[8:15]  | w[0:7]   |
 | 1x64 bit | v[56:63] | v[48:55] | v[40:47] | v[32:39] |
 |          | v[24:31] | v[16:23] | v[8:15]  | v[0:7]   |
+
 Example big-endian encoding of four 8-, two 16-, one 32- or 64-bit values in Words.
 
 ####  Command Messages (input)
@@ -198,8 +202,9 @@ A packet may contain a single command message with the following layout:
 | 2      | Cmd           | Bit 31..24: 0x00 Memory read, 0x01 Memory write        |
 |        | Size          | Bit 23..0: Number of bytes N to read or write          |
 | 3      | Addr          | 32 bit address of data to read or write                |
-| 3..N+2 | Data          | for writes: payload data , zeropadded to multiple of 4 |
+| 3..N+2 | Data          | for writes: payload data , zero padded to multiple of 4 |
 | N+3    | CRC32         | 32 bit CRC calculated over data words 1 to N+2.        |
+
 Control command message format  – with tag  -- cf CoaXPress Standard Version 2.1 p.61 Table 24.
 
 The CRC is the one defined in CoaxPress Standard v 2.2 section 9.2.2.2. which is the Ethernet CRC with some additional byte and bit swapping (TODO).
@@ -217,8 +222,9 @@ A packet may contain a single acknowledge message with the following layout:
 | 1      | 4x Tag        | Tag, matching the command being acknowledged.   |
 | 2      | 4x Code       | Acknowledgment code (repeated 4 times)          |
 | 3      | Size          | Number of bytes N in payload                    |
-| 4..N+3 | Data          | payload data , zeropadded to multiple of 4      |
+| 4..N+3 | Data          | payload data , zero padded to multiple of 4      |
 | N+4    | CRC32         | 32 bit CRC calculated over data words 1 to N+3. |
+
 Acknowledgment message format – with tag  -- cf CoaXPress Standard Version 2.1 p.63 Table 26.
 
 
@@ -258,6 +264,7 @@ A packet may contain multiple event messages with the following layout:
 | 1        | Timestamp(63:32) | 64 bit value representing the value of the Device time when the Device detected the situation    |
 | 2        | Timestamp(31:0)  | resulting in this event. (see note)                                                              |
 | 3 to M+2 | Data             | zero padded to word size.                                                                        |
+
 Event message format -- cf CoaXPress Standard Version 2.1 p.68 Table 29.
 
 Note: The BMInator does not emit events larger than 32 bytes.
@@ -284,6 +291,7 @@ The BMInator generates messages with the following ID (Namespace + EventID) and 
 | 0x803a |      |  00 14 80 3a |            | GYRO_500DEG_S              |           | see note                                                       |
 | 0x803b |      |  00 14 80 3b |            | GYRO_1000DEG_S             |           | see note                                                       |
 | 0x803c |      |  00 14 80 3c |            | GYRO_2000DEG_S             |           | see note                                                       |
+
 Event Message types. 
 
 Note: the BMInator will send only one of the message types 0x032..0x35 and of 0x038..0x3c, depending on the current sensitiviy setting of its Gyroscope and Accelerometer components.  
