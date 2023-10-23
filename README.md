@@ -46,6 +46,7 @@ separate CSB (active low).
 | Device    | DMA | Ch  | Function          |
 | --------- | --- | --- | ----------------- |
 | USART1 TX | 2   | 6   | Serial Output     |
+| USART1 RX | 2   | 7   | Serial Input      |
 | SPI1 RX   | 1   | 2   | Read spi devices  |
 | SPI1 TX   | 1   | 3   | Write spi devices |
 
@@ -55,15 +56,13 @@ Host: USART1TX, USART1RX, PA15_TIMEPULSE, (HSE Clock source), Power, GND
 Heater:  Thermistor, GND, Heater10W+, Heater10W-
 
 
-
-
 ## Requirements
 
-[] BMI088 Self test and configuration check.
-[] BMI088 Sample Gyroscope at 2Khz, 250 deg/s full scale
-[] BMI088 Sample Accelerometer at 1600Hz, 3G full scale
+[X] BMI088 Self test and configuration check.
+[X] BMI088 Sample Gyroscope at 2Khz, 250 deg/s full scale
+[X] BMI088 Sample Accelerometer at 1600Hz, 3G full scale
 [] BMI088 Sample internal temperature at 1Hz
-[] BME280 Sample environmental temperature, pressure, humidity at 1Hz
+[X] BME280 Sample environmental temperature, pressure, humidity at 1Hz
 [] Watchdog monitors gyro, accel and env t/p/h are being sampled
 [] Timepulse Sampled
 [] Heater power supply, control algorithm based on thermistor input and current sense.
@@ -74,12 +73,14 @@ Heater:  Thermistor, GND, Heater10W+, Heater10W-
 [] Get/set eeprom
 
 implementation:
-[] boot, clock, gpio, debug console for STM32L43x
-[] SPI driver using DMA
-[] USART driver using DMA
+[X] boot, clock, gpio, debug console for STM32L43x
+[X] SPI driver using DMA
+[X] USART driver using DMA
 [] ADC driver
 
-[] host tools decoder / commander
+debug tools:
+[] decoder
+[] commander
 
 
 ## Debugging
