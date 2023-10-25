@@ -181,38 +181,36 @@ void EXTI1_Handler(void) { exti_handler(cycleCount(), Pin_1, ACCEL, BMI08x_ACC_X
 void EXTI3_Handler(void) { exti_handler(cycleCount(), Pin_3, GYRO,  BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf); }
 
 // Timer 2 channel 1 has the shutter time sync input
-
-static volatile uint64_t shutter_open_ts = 0;
-static volatile uint64_t shutter_close_ts = 0;
-static volatile uint64_t shutter_open_cnt = 0;
-static volatile uint64_t shutter_close_cnt = 0;
-
-inline static uint64_t unlatch(volatile uint64_t *v) {
-    __disable_irq();
-    uint64_t r = *v;
-    *v = 0;
-    __enable_irq();
-    return r;
-}
+#if 0
+struct ShutterQ {
+    volatile uint64_t head;
+    volatile uint64_t tail;
+    struct { 
+        uint64_t ts;
+        uint8_t tag;
+    } elem[4];
+} shutterq = { 0, 0, {}};
 
 void TIM2_Handler(void) {
     uint16_t cnt = TIM2.CNT;
     uint64_t now = cycleCount();
     uint16_t sr = TIM2.SR;
 
+    // shutter open: even event
     if ((sr & TIM2_SR_CC1IF )) {
         uint16_t latency = (cnt - TIM2.CCR1);  // * (TIM2.PSC+1)
-        shutter_open_ts = now - latency;
-        ++shutter_open_cnt;
+        evq_push_head(&shutterq, EVENTID_SHUTTER_OPEN, now - latency);
     }
+
+    // shutter close: odd event
     if ((sr & TIM2_SR_CC2IF)) {
         uint16_t latency = (cnt - TIM2.CCR2);  // * (TIM2.PSC+1)
-        shutter_close_ts = now - latency;
-        ++shutter_close_cnt;
+      evq_push_head(&shutterq, EVENTID_SHUTTER_CLOSE, now - latency);
     }
 
     TIM2.SR &= ~sr;
 }
+#endif
 
 // USART1 is the output datastream and command input
 
@@ -247,6 +245,8 @@ static int xmitmsg() {
         return 0;
     }
 
+    printf("\n %d + %d\n", framelen, msg->len);
+
     if (framelen + msg->len == FrameSize) {
         // send the separator: chksum, "IRON", framesize
         framesep.len = 0;
@@ -268,10 +268,8 @@ static int xmitmsg() {
         }
         usart1dmamove(msg->buf, msg->len);
         deq_after_xmit = 1;    
-    }
 
-    USART1.ICR |= USART1_ICR_TCCF;  // clear Transmission Complete status
-    USART1.CR1 |= USART1_CR1_TCIE;  // irq on TX Complete
+    }
 
     return 1;
 }
@@ -316,14 +314,16 @@ void TIM6_DACUNDER_Handler(void) {
     uint64_t sec = now / 1000000;
     now %= 1000000;
 
-  printf("\nuptime %llu.%06llu  spiq %ld %ld %ld (%lld) %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail,  dropped_spi1, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
-//  printf("\nuptime %llu.%06llu  usart1 %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
+//  printf("\nuptime %llu.%06llu  spiq %ld %ld %ld (%lld) %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail,  dropped_spi1, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
+  printf("\nuptime %llu.%06llu  usart1 %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
 //   printf("\nuptime %llu.%06llu\n", sec, now);
  }
 
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1, defined in .ld file
 
 static const char* pplsrcstr[] = { "NONE", "MSI", "HSI16", "HSE" };
+
+static uint64_t staticvar = 19690916;
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
@@ -367,6 +367,10 @@ void main(void) {
         (RCC.CR & RCC_CR_HSEBYP) && (rcc_pllcfgr_get_pllsrc(&RCC)==3) ? " (CK_IN)" :""
     );
 	usart_wait(&USART2);
+
+    printf("static var: %llx\n", staticvar);
+    ++staticvar;
+    printf("static var: %llx\n", staticvar);
 
     // Prepare USART1 for high speed DMA driven output of the measurement data
     usart_init(&USART1, 921600);
@@ -471,7 +475,7 @@ void main(void) {
     TIM2.CCMR2_Input = 0;
     TIM2.CCER = TIM2_CCER_CC1E | TIM2_CCER_CC2E | TIM2_CCER_CC2P;  // 1,2 enabled, 2 inverted
     TIM2.CR1 |= TIM2_CR1_CEN;
-    NVIC_EnableIRQ(TIM2_IRQn);
+  //  NVIC_EnableIRQ(TIM2_IRQn);
 
     // set up TIM6 for a 1Hz hearbeat
     // note: it pushes spiq messages so do not start this before the BMI/BME are configured.
@@ -489,7 +493,7 @@ void main(void) {
     IWDG.KR = 0x5555;  // enable watchdog config
     IWDG.PR = 0;       // prescaler /4 -> 10khz
     IWDG.RLR = 3200;   // count to 3200 -> 320ms timeout
-    IWDG.KR = 0xcccc;  // start watchdog countdown
+ //   IWDG.KR = 0xcccc;  // start watchdog countdown
 
     for(;;) {
     	__WFI();
@@ -510,7 +514,10 @@ void main(void) {
             }
             spiq_deq_tail(&spiq);
         } 
+    }
+}
 
+#if 0
         uint64_t ts = 0;
         if ((ts = unlatch(&shutter_open_ts)) != 0) {
             if (!msg) {
@@ -540,10 +547,8 @@ void main(void) {
             msgq_push_head(&outq);
             USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
         }
-
         // if we received a command, 
 
 
     }
-
-}
+#endif
