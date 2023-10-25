@@ -41,7 +41,7 @@ SECTIONS
     _sdata = .;
 
     *(.data)
-    *(.data.*)
+    *(SORT_BY_ALIGNMENT(.data.*))
 
     . = ALIGN(4);
     _edata = .;
