@@ -226,10 +226,10 @@ void DMA2_CH6_Handler(void) {
 void USART1_Handler(void) {
     uint32_t isr = USART1.ISR;
     if ((isr & USART1_ISR_TC) != 0) { // Transmission Complete
-//        USART1.ICR |= USART1_ICR_TCCF;  // clear irq flag
 
         struct Msg *msg = msgq_tail(&outq);
         if (msg != NULL) {
+            USART1.ICR |= USART1_ICR_TCCF;  // clear irq flag
             DMA2.CCR6 = 0;
             dma1_cselr_set_c6s(&DMA2, 2); // select usart1 for dma2 ch6
             DMA2.CPAR6 = (uintptr_t)&USART1.TDR;
