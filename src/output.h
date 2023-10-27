@@ -30,5 +30,4 @@ extern uint32_t gyro_hdr;
 extern uint32_t accel_hdr;
 extern struct LinearisationParameters bmeParam;
 
-int output(struct Msg *msg , struct SPIXmit *x);
-
+int output(struct Msg *msg, struct SPIXmit *x);

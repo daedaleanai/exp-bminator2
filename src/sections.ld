@@ -68,6 +68,7 @@ SECTIONS
     libc.a ( * )
     libm.a ( * )
     libgcc.a ( * )
+    *(.ARM.exidx)   /* not removing this messes with the data segment initialisation */
   }
 
 }

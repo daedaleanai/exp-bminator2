@@ -180,17 +180,8 @@ static void exti_handler(uint64_t now, enum GPIO_Pin pin, uint16_t addr, uint8_t
 void EXTI1_Handler(void) { exti_handler(cycleCount(), Pin_1, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf); }
 void EXTI3_Handler(void) { exti_handler(cycleCount(), Pin_3, GYRO,  BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf); }
 
-// Timer 2 channel 1 has the shutter time sync input
 #if 0
-struct ShutterQ {
-    volatile uint64_t head;
-    volatile uint64_t tail;
-    struct { 
-        uint64_t ts;
-        uint8_t tag;
-    } elem[4];
-} shutterq = { 0, 0, {}};
-
+// Timer 2 channel 1 has the shutter time sync input
 void TIM2_Handler(void) {
     uint16_t cnt = TIM2.CNT;
     uint64_t now = cycleCount();
@@ -216,88 +207,40 @@ void TIM2_Handler(void) {
 
 static struct MsgQueue outq = { 0,0, {} };
 static volatile uint64_t dropped_usart1 = 0;  // queue full, msqq_head returned NULL
-
-enum { FrameSize = 1020 }; // we send frames of this size
-static uint16_t framelen = FrameSize; // start by sending the separator
-static uint16_t framechk = 0;
-static int deq_after_xmit = 0;
-static struct Msg framesep;
-
-// set up DMA transaction on DMA2 channel 6 from buf[:len] to usart1 tx
-// if buf is zero, we send len zero bytes instead.
-static inline void usart1dmamove(uint8_t *buf, size_t len) {
-    static uint8_t zero = 0;
-    DMA2.CCR6 = 0;
-    dma1_cselr_set_c6s(&DMA2, 2); // select usart1 for dma2 ch6
-    DMA2.CPAR6 = (uintptr_t)&USART1.TDR;
-    DMA2.CMAR6 = (uintptr_t) (buf ? buf : &zero);
-    DMA2.CNDTR6 = len;
-    if (buf) {
-        DMA2.CCR6 = DMA1_CCR1_DIR | DMA1_CCR1_TEIE | DMA1_CCR1_TCIE | DMA1_CCR1_EN | DMA1_CCR1_MINC;
-    } else {
-        DMA2.CCR6 = DMA1_CCR1_DIR | DMA1_CCR1_TEIE | DMA1_CCR1_TCIE | DMA1_CCR1_EN;
-    }
-}
-
-static int xmitmsg() {
-    struct Msg *msg = msgq_tail(&outq);
-    if (msg == NULL) {
-        return 0;
-    }
-
-    printf("\n %d + %d\n", framelen, msg->len);
-
-    if (framelen + msg->len == FrameSize) {
-        // send the separator: chksum, "IRON", framesize
-        framesep.len = 0;
-        msg_append16(&framesep, framechk);
-        msg_append32(&framesep, 0x49524f4e);  // 'IRON'
-        msg_append16(&framesep, FrameSize);
-        usart1dmamove(framesep.buf, framesep.len);
-        framechk = 0;
-        framelen = 0;
-    } else if (framelen + msg->len > FrameSize) {
-        // insert a padding message of all zeros (no length or header)
-        usart1dmamove(NULL, FrameSize - framelen);
-        // all zeros, no need to update the framecheck
-        framelen = FrameSize;
-    } else {
-        framelen += msg->len;
-        for (size_t i = 0; i < msg->len; ++i) {
-            framechk += msg->buf[i];
-        }
-        usart1dmamove(msg->buf, msg->len);
-        deq_after_xmit = 1;    
-
-    }
-
-    return 1;
-}
+static volatile uint32_t dma2ch6err_cnt = 0;
 
 // irq on dma error or complete
-uint32_t dma2ch6err_cnt = 0;
 void DMA2_CH6_Handler(void) {
-    if (DMA2.ISR & DMA1_ISR_TEIF6)
+    uint32_t isr = DMA2.ISR;
+    if (isr & DMA1_ISR_TEIF6)
         ++dma2ch6err_cnt;
-    DMA2.IFCR = DMA2.ISR & 0x00f00000;
-}
 
-// irq only on USART Transmit Complete
-void USART1_Handler(void) {
-    uint32_t isr = USART1.ISR;
-    if ((isr & USART1_ISR_TC) != 0) {
-        USART1.ICR |= USART1_ICR_TCCF;  // clear Transmission Complete status
-
-        if (deq_after_xmit) {
-            msgq_pop_tail(&outq);  // mark done
-            deq_after_xmit = 0;
-        }
-
-        if (!xmitmsg()) { // start next if available
-            USART1.CR1 &= ~USART1_CR1_TCIE;
-        }
+    if (isr & DMA1_ISR_TCIF6) {
+        if (msgq_tail(&outq))
+            msgq_pop_tail(&outq);
     }
 
+    DMA2.IFCR = isr & 0x00f00000;
+}
+
+void USART1_Handler(void) {
+    uint32_t isr = USART1.ISR;
+    if ((isr & USART1_ISR_TC) != 0) { // Transmission Complete
+//        USART1.ICR |= USART1_ICR_TCCF;  // clear irq flag
+
+        struct Msg *msg = msgq_tail(&outq);
+        if (msg != NULL) {
+            DMA2.CCR6 = 0;
+            dma1_cselr_set_c6s(&DMA2, 2); // select usart1 for dma2 ch6
+            DMA2.CPAR6 = (uintptr_t)&USART1.TDR;
+            DMA2.CMAR6 = (uintptr_t)msg->buf;
+            DMA2.CNDTR6 = msg->len;
+            DMA2.CCR6 = DMA1_CCR6_DIR | DMA1_CCR6_TEIE | DMA1_CCR6_TCIE | DMA1_CCR6_EN | DMA1_CCR6_MINC;
+        } else {
+            USART1.CR1 &= ~USART1_CR1_TCIE; // clear irq enable
+        }
+    }
+    // if (isr & USART1_ISR_RXNE) 
 }
 
 // Timer 6: 1Hz status
@@ -322,8 +265,6 @@ void TIM6_DACUNDER_Handler(void) {
 extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1, defined in .ld file
 
 static const char* pplsrcstr[] = { "NONE", "MSI", "HSI16", "HSE" };
-
-static uint64_t staticvar = 19690916;
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
@@ -367,16 +308,6 @@ void main(void) {
         (RCC.CR & RCC_CR_HSEBYP) && (rcc_pllcfgr_get_pllsrc(&RCC)==3) ? " (CK_IN)" :""
     );
 	usart_wait(&USART2);
-
-    printf("static var: %llx\n", staticvar);
-    ++staticvar;
-    printf("static var: %llx\n", staticvar);
-
-    // Prepare USART1 for high speed DMA driven output of the measurement data
-    usart_init(&USART1, 921600);
-    USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA output
-    NVIC_EnableIRQ(DMA2_CH6_IRQn);
-    NVIC_EnableIRQ(USART1_IRQn);
 
     // Set up SPI1 for talking to all the connected chips.
 	spiq_init(&spiq, &SPI1, 3, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
@@ -458,6 +389,14 @@ void main(void) {
         printf("BMI or BME not functional, watchdog will reboot....\n");
     }
 
+
+    // Prepare USART1 for high speed DMA driven output of the measurement data
+    usart_init(&USART1, 921600);
+    USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA output
+    NVIC_EnableIRQ(DMA2_CH6_IRQn);
+    NVIC_EnableIRQ(USART1_IRQn);
+
+    // BMI interrupt signals
     EXTI.IMR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN) & Pin_All;
     EXTI.FTSR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN) & Pin_All;
     NVIC_EnableIRQ(EXTI1_IRQn);   // Accelerometer ready interrupt
@@ -475,7 +414,7 @@ void main(void) {
     TIM2.CCMR2_Input = 0;
     TIM2.CCER = TIM2_CCER_CC1E | TIM2_CCER_CC2E | TIM2_CCER_CC2P;  // 1,2 enabled, 2 inverted
     TIM2.CR1 |= TIM2_CR1_CEN;
-  //  NVIC_EnableIRQ(TIM2_IRQn);
+    NVIC_EnableIRQ(TIM2_IRQn);
 
     // set up TIM6 for a 1Hz hearbeat
     // note: it pushes spiq messages so do not start this before the BMI/BME are configured.
@@ -493,7 +432,7 @@ void main(void) {
     IWDG.KR = 0x5555;  // enable watchdog config
     IWDG.PR = 0;       // prescaler /4 -> 10khz
     IWDG.RLR = 3200;   // count to 3200 -> 320ms timeout
- //   IWDG.KR = 0xcccc;  // start watchdog countdown
+//    IWDG.KR = 0xcccc;  // start watchdog countdown
 
     for(;;) {
     	__WFI();

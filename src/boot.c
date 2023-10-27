@@ -64,7 +64,7 @@ void Reset_Handler(void) {
 
 	if (RCC.CR & RCC_CR_HSERDY) {
 		// if we got HSE ready, use it
-		rcc_pllcfgr_set_pllsrc(&RCC, 3); // select 3:HSE (CK_IN via HSEBYPASS)
+		rcc_pllcfgr_set_pllsrc(&RCC, 3); // select 3:HSE (CK_IN via HSEBYPASS, assume 8MHz)
 		rcc_pllcfgr_set_pllm(&RCC, 1);     // 0..15       : vco_in = HSE / (1+m)  4..16MHz        8/2 = 4MHz
 	} else {
 		// otherwise fall back to MSI
@@ -93,11 +93,20 @@ void Reset_Handler(void) {
 	while (rcc_cfgr_get_sws(&RCC) != 3)
 		__NOP();
 
-
-	initCycleCount();  // see clock.c so cycleCount() and delay() work
+	// Prepare the Cortex system timer
+	stk_load_set_reload(&STK, STK_LOAD_RELOAD); // maximum value
+	stk_val_set_current(&STK, STK_LOAD_RELOAD);
+	STK.CTRL |= STK_CTRL_CLKSOURCE | STK_CTRL_TICKINT | STK_CTRL_ENABLE;
 
 	main();
 
 	for (;;)
 		__NOP(); // hang
 }
+
+volatile uint64_t clockticks = STK_LOAD_RELOAD+1;
+
+// when this irq has a higher priority than all userspace, we may consider update to be atomic
+// clockticks holds the counts at the _end_ of the next systick,
+// so cyclecount can just subtract current VAL (which counts down)
+void SysTick_Handler(void) { clockticks += STK_LOAD_RELOAD + 1; }
