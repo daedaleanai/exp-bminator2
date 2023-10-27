@@ -105,7 +105,7 @@ void CRS_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void I2C4_EV_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void I2C4_ER_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 
-__attribute__((section(".isr_vector"))) void (*vector_table[])(void) = {
+__attribute__((section(".isr_vector"))) void (* const vector_table[])(void) = {
     _estack,
     Reset_Handler,
     NonMaskableInt_Handler,
