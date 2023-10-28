@@ -15,17 +15,17 @@ inline void msg_reset(struct Msg *msg) {
 
 // binary encoding big endian numbers
 inline void msg_append16(struct Msg *msg, uint16_t val) {
-    encode_be_uint16(msg->buf, val);
+    encode_be_uint16(msg->buf+msg->len, val);
     msg->len += 2;
 }
 
 inline void msg_append32(struct Msg *msg, uint32_t val) {
-    encode_be_uint32(msg->buf, val);
+    encode_be_uint32(msg->buf+msg->len, val);
     msg->len += 4;
 }
 
 inline void msg_append64(struct Msg *msg, uint64_t val) {
-    encode_be_uint64(msg->buf, val);
+    encode_be_uint64(msg->buf+msg->len, val);
     msg->len += 8;
 }
 
