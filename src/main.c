@@ -1,6 +1,8 @@
 #include "cortex_m4.h"
 #include "stm32l4xx.h"
 
+#include <string.h>
+
 #include "binary.h"
 #include "clock.h"
 #include "gpio2.h"
@@ -207,41 +209,122 @@ void TIM2_Handler(void) {
 
 static struct MsgQueue outq = { 0,0, {} };
 static volatile uint64_t dropped_usart1 = 0;  // queue full, msqq_head returned NULL
-static volatile uint32_t dma2ch6err_cnt = 0;
+static volatile uint32_t usart1txdmaerr_cnt = 0;
+static volatile uint32_t usart1rxdmaerr_cnt = 0;
 
-// irq on dma error or complete
+// USART1 TX: irq on dma error or complete
 void DMA2_CH6_Handler(void) {
     uint32_t isr = DMA2.ISR;
+    DMA2.IFCR = isr & 0x00f00000;
     if (isr & DMA1_ISR_TEIF6)
-        ++dma2ch6err_cnt;
+        ++usart1txdmaerr_cnt;
 
     if (isr & DMA1_ISR_TCIF6) {
         if (msgq_tail(&outq))
             msgq_pop_tail(&outq);
     }
-
-    DMA2.IFCR = isr & 0x00f00000;
 }
 
 void USART1_Handler(void) {
-    uint32_t isr = USART1.ISR;
-    if ((isr & USART1_ISR_TC) != 0) { // Transmission Complete
+    if ((USART1.ISR & USART1_ISR_TC) == 0)
+        return; 
+        
+    // Transmission Complete
+    struct Msg *msg = msgq_tail(&outq);
+    if (msg == NULL) {
+        // queue empty, clear IRQ Enable
+        USART1.CR1 &= ~USART1_CR1_TCIE; 
+        return;
+    }
 
-        struct Msg *msg = msgq_tail(&outq);
-        if (msg != NULL) {
-            USART1.ICR |= USART1_ICR_TCCF;  // clear irq flag
-            DMA2.CCR6 = 0;
-            dma1_cselr_set_c6s(&DMA2, 2); // select usart1 for dma2 ch6
-            DMA2.CPAR6 = (uintptr_t)&USART1.TDR;
-            DMA2.CMAR6 = (uintptr_t)msg->buf;
-            DMA2.CNDTR6 = msg->len;
-            DMA2.CCR6 = DMA1_CCR6_DIR | DMA1_CCR6_TEIE | DMA1_CCR6_TCIE | DMA1_CCR6_EN | DMA1_CCR6_MINC;
-        } else {
-            USART1.CR1 &= ~USART1_CR1_TCIE; // clear irq enable
+    // queue not empty, start a new transfer
+    USART1.ICR |= USART1_ICR_TCCF;  // clear irq flag
+
+    DMA2.CCR6 = 0;
+    dma1_cselr_set_c6s(&DMA2, 2); // select usart1 for dma2 ch6
+    DMA2.CPAR6 = (uintptr_t)&USART1.TDR;
+    DMA2.CMAR6 = (uintptr_t)msg->buf;
+    DMA2.CNDTR6 = msg->len;
+    DMA2.CCR6 = DMA1_CCR6_DIR | DMA1_CCR6_TEIE | DMA1_CCR6_TCIE | DMA1_CCR6_EN | DMA1_CCR6_MINC;
+}
+
+static uint8_t cmdbuf[1024];
+static volatile size_t cmdbuf_head = 0;
+static volatile enum { RESYNC, MORE, COMPLETE } cmdbuf_state = RESYNC;
+static volatile size_t cmdpacket_size = 0;
+
+// set up usart1 rx dma for reception of len characters to be appended to cmdbuf
+// set CC7 to run at higher priority level compared to ch6 (CCR PL bits)
+void usart1_start_rx(size_t len) {
+    DMA2.CCR7 = 0;
+    dma1_cselr_set_c7s(&DMA2, 2); // select usart1 for dma2 ch7
+    DMA2.CPAR7 = (uintptr_t)&USART1.RDR;
+    DMA2.CMAR7 = (uintptr_t)cmdbuf + cmdbuf_head;
+    cmdbuf_head += len;
+    DMA2.CNDTR7 = len;
+    DMA2.CCR7 = DMA1_CCR7_PL | DMA1_CCR7_TEIE | DMA1_CCR7_TCIE | DMA1_CCR7_EN | DMA1_CCR7_MINC;
+}
+
+static inline size_t findbyte(uint8_t *buf, size_t buflen, uint8_t b) {
+    size_t i = 0;
+    for (; i < buflen; ++i)
+        if (buf[i] == b)
+            break;
+    return i;
+}
+
+static inline int haspfx(uint8_t *buf, size_t buflen, uint8_t *pfx, size_t pfxlen) {
+    if (buflen < pfxlen)
+        return 0;
+    while (pfxlen--)
+        if (*buf++ != *pfx++)
+            return 0;
+    return 1;
+}
+
+
+// USART1 RX: irq on dma error or complete
+void DMA2_CH7_Handler(void) {
+    uint32_t isr = DMA2.ISR;
+    DMA2.IFCR = isr & 0x0f000000;
+    if (isr & DMA1_ISR_TEIF7)
+        ++usart1rxdmaerr_cnt;
+
+    if (isr & DMA1_ISR_TCIF7) {
+        switch(cmdbuf_state) {
+        case RESYNC:
+            while (!haspfx(cmdbuf, cmdbuf_head, "IRON", 4)) {
+                size_t start = 1+findbyte(cmdbuf+1, cmdbuf_head-1, 'I');
+                memmove(cmdbuf, cmdbuf+start, cmdbuf_head - start);
+                cmdbuf_head -= start;
+                if (cmdbuf_head < 8) {
+                    usart1_start_rx(8-cmdbuf_head);
+                    return;
+                }
+
+                // we have at least 8 bytes starting with 'IRON', next two bytes are packet size
+                cmdpacket_size = decode_be_uint16(cmdbuf + 4);
+                memmove(cmdbuf, cmdbuf+6, cmdbuf_head - 6);
+                cmdbuf_head -= 6;
+                if (cmdpacket_size <= 1022)
+                    break;
+            }
+
+            cmdbuf_state = MORE;
+            // fallthrough
+        case MORE:
+            if (cmdbuf_head < cmdpacket_size + 2) {
+                usart1_start_rx(2+cmdpacket_size-cmdbuf_head);
+                return;
+            }
+            // now we have cmdpacket_size + 2 bytes in the buffer
+            cmdbuf_state = COMPLETE;
+
+        case COMPLETE:
         }
     }
-    // if (isr & USART1_ISR_RXNE) 
 }
+
 
 // Timer 6: 1Hz status
 void TIM6_DACUNDER_Handler(void) {
@@ -258,7 +341,7 @@ void TIM6_DACUNDER_Handler(void) {
     now %= 1000000;
 
 //  printf("\nuptime %llu.%06llu  spiq %ld %ld %ld (%lld) %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail,  dropped_spi1, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
-  printf("\nuptime %llu.%06llu  usart1 %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, dma2ch6err_cnt);
+  printf("\nuptime %llu.%06llu  usart1 %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, usart1txdmaerr_cnt);
 //   printf("\nuptime %llu.%06llu\n", sec, now);
  }
 
@@ -392,8 +475,10 @@ void main(void) {
 
     // Prepare USART1 for high speed DMA driven output of the measurement data
     usart_init(&USART1, 921600);
-    USART1.CR3 |= USART1_CR3_DMAT;  // enable DMA output
+    USART1.CR3 |= USART1_CR3_DMAT | USART1_CR3_DMAR;  // enable DMA output and input
+    usart1_start_rx(8);
     NVIC_EnableIRQ(DMA2_CH6_IRQn);
+    NVIC_EnableIRQ(DMA2_CH7_IRQn);
     NVIC_EnableIRQ(USART1_IRQn);
 
     // BMI interrupt signals
@@ -434,25 +519,70 @@ void main(void) {
     IWDG.RLR = 3200;   // count to 3200 -> 320ms timeout
 //    IWDG.KR = 0xcccc;  // start watchdog countdown
 
+    size_t packetsize = 960; // 48 messages of 20 bytes
+    size_t packetlen = 0;
+    size_t packetchk = 0;
+
+
     for(;;) {
     	__WFI();
 
-        struct Msg *msg = msgq_head(&outq);
-        struct SPIXmit *x = spiq_tail(&spiq);
-        if (x != NULL) {
+        for (;;) {
+            struct SPIXmit *x = spiq_tail(&spiq);
+            if (x == NULL)
+                break;
+        
+            struct Msg *msg = msgq_head(&outq);
             if (!msg) {
                 ++dropped_usart1;
-            } else {
-                msg_reset(msg);
-                if (output(msg, x)) {
+                break;
+            } 
+            
+            if (output(msg, x)) {
+                packetlen += msg->len;
+                for (size_t i = 0; i < msg->len; ++i)
+                    packetchk += msg->buf[i];
+
+                msgq_push_head(&outq);
+                USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
+
+                if (packetsize < packetlen + 20) { // not enough space for next message
+                    while (msgq_head(&outq) == NULL)
+                        __NOP();
+                    msg = msgq_head(&outq);
+                    msg->len = packetsize - packetlen;
+                    bzero(msg->buf, msg->len);               
+                    msgq_push_head(&outq);
+                    USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
+                }
+
+                if (packetsize == packetlen) { 
+                    while (msgq_head(&outq) == NULL)
+                        __NOP();
+                    msg = msgq_head(&outq);
+                    msg_reset(msg);
+                    msg_append16(msg, packetchk);
+                    msg_append32(msg, 0x49524F4E); // 'IRON'
+                    msg_append16(msg, packetsize);
                     msgq_push_head(&outq);
                     USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
 
-                    IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
+                    packetchk = 0;
+                    packetlen = 0;
                 }
+
+
+
+                IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
             }
+
             spiq_deq_tail(&spiq);
         } 
+
+
+
+
+
     }
 }
 

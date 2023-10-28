@@ -14,6 +14,7 @@ static int32_t accel_temp_mk = -1; // last observed value from BMI088 accelerato
 static int32_t bme_hume6 = -1;     // last observed value of BME280 humidity
 
 int output(struct Msg *msg , struct SPIXmit *x) {
+    msg_reset(msg);
 
 #define MSGTYPE(addr, tag) (((uint16_t)(addr) & 0xf) << 8) | ((uint8_t)(tag)&0x7f)
     switch (MSGTYPE(x->addr, x->tag)) {
