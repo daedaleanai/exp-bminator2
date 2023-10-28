@@ -546,7 +546,7 @@ void main(void) {
                 msgq_push_head(&outq);
                 USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
 
-                if (packetsize < packetlen + 20) { // not enough space for next message
+                if ((packetsize != packetlen) && (packetsize < packetlen + 20)) { // not enough space for next message
                     while (msgq_head(&outq) == NULL)
                         __NOP();
                     msg = msgq_head(&outq);
@@ -569,6 +569,8 @@ void main(void) {
 
                     packetchk = 0;
                     packetlen = 0;
+
+                    // check here if there's a command response packet to send
                 }
 
 
