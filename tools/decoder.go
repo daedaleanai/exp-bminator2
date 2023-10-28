@@ -44,21 +44,21 @@ const (
 	EVENTID_GYRO_2000DEG_S MsgID = 0x803c // BMI085_GYRO_RANGE_2000DEG_S = 0x00,
 )
 
-func (m MsgID) String() string { return fmt.Sprint("%04x", uint16(m)) }
+func (m MsgID) String() string { return fmt.Sprintf("%04x", uint16(m)) }
 
 type Pld4Uint16 struct {
-	ts  uint64
-	val [4]uint16
+	Ts  uint64
+	Val [4]uint16
 }
 
 type Pld2Uint32 struct {
-	ts  uint64
-	val [2]uint32
+	Ts  uint64
+	Val [2]uint32
 }
 
 type PldUint64 struct {
-	ts  uint64
-	val uint64
+	Ts  uint64
+	Val uint64
 }
 
 type ID0Msg Pld2Uint32
@@ -84,35 +84,55 @@ func scalexyz(v [4]uint16, s float64) [3]float64 {
 	return [3]float64{float64(v[0]) * s, float64(v[1]) * s, float64(v[2]) * s}
 }
 
-func (m *ID0Msg) String() string           { return fmt.Sprintf("ID0: %v", m.val) }
-func (m *ID1Msg) String() string           { return fmt.Sprintf("ID1: %v", m.val) }
-func (m *BAROMsg) String() string          { return fmt.Sprintf("BARO: %v", m.val) }
-func (m *HUMIDMsg) String() string         { return fmt.Sprintf("HUMID: %v", m.val) }
-func (m *TEMPMsg) String() string          { return fmt.Sprintf("TEMP: %v", m.val) }
-func (m *SHUTTER_OPENMsg) String() string  { return fmt.Sprintf("SHUTTER_OPEN: %v", m.val) }
-func (m *SHUTTER_CLOSEMsg) String() string { return fmt.Sprintf("SHUTTER_CLOSE: %v", m.val) }
+func (m *ID0Msg) String() string {
+	return fmt.Sprintf("%.6f ID0: %v", float64(m.Ts)/float64(time.Second), m.Val)
+}
+func (m *ID1Msg) String() string {
+	return fmt.Sprintf("%.6f ID1: %v", float64(m.Ts)/float64(time.Second), m.Val)
+}
+func (m *BAROMsg) String() string {
+	return fmt.Sprintf("%.6f BARO: %v", float64(m.Ts)/float64(time.Second), m.Val)
+}
+func (m *HUMIDMsg) String() string {
+	return fmt.Sprintf("%.6f HUMID: %v", float64(m.Ts)/float64(time.Second), m.Val)
+}
+func (m *TEMPMsg) String() string {
+	return fmt.Sprintf("%.6f TEMP: %v", float64(m.Ts)/float64(time.Second), m.Val)
+}
+func (m *SHUTTER_OPENMsg) String() string {
+	return fmt.Sprintf("%.6f SHUTTER_OPEN: %v", float64(m.Ts)/float64(time.Second), m.Val)
+}
+func (m *SHUTTER_CLOSEMsg) String() string {
+	return fmt.Sprintf("%.6f SHUTTER_CLOSE: %v", float64(m.Ts)/float64(time.Second), m.Val)
+}
 
 // note: BMI088 is 3,6,12,24G instead of 2,4,8,16
-func (m *ACCEL_2GMsg) String() string { return fmt.Sprintf("ACCEL_2G       %.3f ", scalexyz(m.val, 3)) }
-func (m *ACCEL_4GMsg) String() string { return fmt.Sprintf("ACCEL_4G       %.3f ", scalexyz(m.val, 6)) }
-func (m *ACCEL_8GMsg) String() string { return fmt.Sprintf("ACCEL_8G       %.3f ", scalexyz(m.val, 8)) }
+func (m *ACCEL_2GMsg) String() string {
+	return fmt.Sprintf("%.6f ACCEL_2G       %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 3))
+}
+func (m *ACCEL_4GMsg) String() string {
+	return fmt.Sprintf("%.6f %.6f ACCEL_4G       %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 6))
+}
+func (m *ACCEL_8GMsg) String() string {
+	return fmt.Sprintf("%.6f ACCEL_8G       %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 8))
+}
 func (m *ACCEL_16GMsg) String() string {
-	return fmt.Sprintf("ACCEL_16G      %.3f ", scalexyz(m.val, 24))
+	return fmt.Sprintf("%.6f ACCEL_16G      %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 24))
 }
 func (m *GYRO_125DEG_SMsg) String() string {
-	return fmt.Sprintf("GYRO_125DEG_S  %.3f ", scalexyz(m.val, 125))
+	return fmt.Sprintf("%.6f GYRO_125DEG_S  %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 125))
 }
 func (m *GYRO_250DEG_SMsg) String() string {
-	return fmt.Sprintf("GYRO_250DEG_S  %.3f ", scalexyz(m.val, 250))
+	return fmt.Sprintf("%.6f GYRO_250DEG_S  %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 250))
 }
 func (m *GYRO_500DEG_SMsg) String() string {
-	return fmt.Sprintf("GYRO_500DEG_S  %.3f ", scalexyz(m.val, 500))
+	return fmt.Sprintf("%.6f GYRO_500DEG_S  %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 500))
 }
 func (m *GYRO_1000DEG_SMsg) String() string {
-	return fmt.Sprintf("GYRO_1000DEG_S %.3f ", scalexyz(m.val, 1000))
+	return fmt.Sprintf("%.6f GYRO_1000DEG_S %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 1000))
 }
 func (m *GYRO_2000DEG_SMsg) String() string {
-	return fmt.Sprintf("GYRO_2000DEG_S %.3f ", scalexyz(m.val, 2000))
+	return fmt.Sprintf("%.6f GYRO_2000DEG_S %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 2000))
 }
 
 func newMsg(word0 uint32) interface{} {
@@ -157,9 +177,9 @@ func newMsg(word0 uint32) interface{} {
 }
 
 type rec struct {
-	t     time.Duration
-	count int
-	msg   interface{}
+	T     time.Duration
+	Count int
+	Msg   interface{}
 }
 
 const (
@@ -230,6 +250,8 @@ func main() {
 			log.Printf("Invalid checksum got %d, expected %d.", chksum, bsum)
 		}
 
+		//fmt.Printf("frame [%d] %x\n", framelen, buf[:framelen])
+
 		b := bytes.NewBuffer(buf[:framelen])
 		for {
 			var word0 uint32
@@ -237,18 +259,21 @@ func main() {
 				log.Println(err)
 				break
 			}
-			sz := word0 >> 16
+			//log.Printf("word0: %08x\n", word0)
+			sz := (word0 >> 16) - 4
 			if sz > 32 {
 				log.Println("Invalid message length %d", sz)
 				break
 			}
 			var pldbuf [32]byte
-			if _, err := io.ReadFull(r, pldbuf[:sz]); err != nil {
+			if _, err := io.ReadFull(b, pldbuf[:sz]); err != nil {
 				log.Fatal(err)
 			}
+			//fmt.Printf("[%d] %x\n", sz, pldbuf[:sz])
+
 			msg := newMsg(word0)
 			if msg == nil {
-				log.Println("Invalid message type")
+				log.Printf("Invalid message type %x len %d", word0&0xffff, word0>>16)
 				break
 			}
 			if err := binary.Read(bytes.NewBuffer(pldbuf[:sz]), binary.BigEndian, msg); err != nil {
@@ -264,9 +289,9 @@ func main() {
 			if seen[id] == nil {
 				seen[id] = &rec{now, 0, msg}
 			} else {
-				seen[id].t = now
-				seen[id].count++
-				seen[id].msg = msg
+				seen[id].T = now
+				seen[id].Count++
+				seen[id].Msg = msg
 			}
 
 			t, ok := <-ticker
@@ -284,15 +309,15 @@ func main() {
 
 			for _, v := range ids {
 				id := MsgID(v)
-				fmt.Println(id, seen[id].t, seen[id].count, seen[id].msg, CLREOL)
+				fmt.Println(id, seen[id].T, seen[id].Count, seen[id].Msg, CLREOL)
 			}
 			fmt.Println(CLRBOS)
 
 			for k, v := range seen {
-				if now-v.t > 2*time.Second {
+				if now-v.T > 2*time.Second {
 					delete(seen, k)
 				} else {
-					seen[id].count = 0
+					seen[id].Count = 0
 				}
 			}
 
