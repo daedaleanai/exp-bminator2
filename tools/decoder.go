@@ -201,6 +201,7 @@ func main() {
 
 	seen := map[MsgID]*rec{}
 	start := time.Now()
+	last := 0 * time.Second
 	ticker := time.Tick(time.Second)
 	resyncing := false
 	frameno := 0
@@ -236,7 +237,10 @@ func main() {
 		}
 
 		frameno++
-		log.Printf("Frame %d %d bytes.", frameno, framelen)
+		if !*fMonitorMode {
+			log.Printf("Frame %d %d bytes %f fps.", frameno, framelen, float64(time.Second)/float64(now-last))
+		}
+		last = now
 
 		var bsum, chksum uint16
 		if err := binary.Read(r, binary.BigEndian, &chksum); err != nil {
@@ -255,7 +259,12 @@ func main() {
 		b := bytes.NewBuffer(buf[:framelen])
 		for {
 			var word0 uint32
-			if err := binary.Read(b, binary.BigEndian, &word0); err != nil {
+			err := binary.Read(b, binary.BigEndian, &word0)
+			if err == io.EOF {
+				break
+			}
+
+			if err != nil {
 				log.Println(err)
 				break
 			}
@@ -285,6 +294,7 @@ func main() {
 				fmt.Println(msg)
 				continue
 			}
+
 			id := MsgID(word0 & 0xffff)
 			if seen[id] == nil {
 				seen[id] = &rec{now, 0, msg}
@@ -294,11 +304,13 @@ func main() {
 				seen[id].Msg = msg
 			}
 
-			t, ok := <-ticker
-			if !ok {
+			select {
+			case t := <-ticker:
+				now = t.Sub(start)
+			default:
 				continue
 			}
-			now = t.Sub(start)
+
 			fmt.Println(HOME, now, CLREOL)
 
 			var ids []int
@@ -317,12 +329,10 @@ func main() {
 				if now-v.T > 2*time.Second {
 					delete(seen, k)
 				} else {
-					seen[id].Count = 0
+					seen[k].Count = 0
 				}
+
 			}
-
 		}
-
 	}
-
 }
