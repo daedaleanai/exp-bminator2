@@ -1,3 +1,16 @@
+/*
+  Main body of bminator 2 firmware.
+
+  Theory of operation:
+  - initialize pinout, irqs and peripherals
+  - initialize and self-test BMI088 and BME380
+  - set up irq handlers for accel, gyro, shutter, and periodic events
+  - the accel and gyro irqs push SPI transactions on the spiq, which are handled by DMA
+  - the other irqs push messages on the event queue evq
+  - the mainloop empties both these queues and pushes output messages on the USART1 outq, which is also handled by DMA
+  - incoming packets on USART1 are parsed by the USART1 irq and then handled in the main loop
+
+*/
 #include "cortex_m4.h"
 #include "stm32l4xx.h"
 
@@ -34,14 +47,14 @@ enum {
     SPI1_SCK_PIN  = PB3,
     SPI1_MISO_PIN = PB4,
     SPI1_MOSI_PIN = PB5,
-    BME_CSB_PIN   = PB7,  // for some reason PB6 doesnt work on the nucleo prototype
+    BME_CSB_PIN   = PB7,  // TODO for some reason PB6 doesnt work on the nucleo prototype
     
 };
 
-static const struct gpio_config_t {
+static struct gpio_config_t {
     enum GPIO_Pin  pins;
     enum GPIO_Conf mode;
-} pin_cfgs[] = {
+} const pin_cfgs[] = {
     {USART1_TX_PIN, GPIO_AF7_USART123|GPIO_HIGH},
     {USART2_TX_PIN, GPIO_AF7_USART123|GPIO_HIGH},
 	{SPI1_MOSI_PIN | SPI1_SCK_PIN |SPI1_MISO_PIN, GPIO_AF5_SPI12|GPIO_HIGH},
@@ -51,28 +64,32 @@ static const struct gpio_config_t {
     {0, 0}, // sentinel
 };
 
- // prio[7:6] : 4 groups,  prio[5:4] : 4 subgroups
+// prio[7:6] : 4 groups,  prio[5:4] : 4 subgroups
 enum { IRQ_PRIORITY_GROUPING_2_2 = 5 };
 #define PRIO(grp, sub) (((grp)<<6)|((sub)<<4))
-struct {
+
+// irq handlers that push into the same queue must run at the same priority group
+static struct {
     enum IRQn_Type irq;
     uint8_t        prio;
-} irqprios[] = {
+} const irqprios[] = {
     {SysTick_IRQn,  PRIO(0,0)},
-    {TIM6_DACUNDER_IRQn, PRIO(0,1)},
-	{DMA2_CH6_IRQn, PRIO(1,0)},
-	{DMA1_CH2_IRQn, PRIO(1,1)},
-    {USART1_IRQn,   PRIO(1,2)},
-    {EXTI1_IRQn,    PRIO(1,3)},
-    {EXTI3_IRQn,    PRIO(1,3)},
-    {USART2_IRQn,   PRIO(2,0)},
-    {None_IRQn, 0xff},
+	{DMA1_CH2_IRQn, PRIO(1,0)},  // SPI RX done DMA
+    {EXTI1_IRQn,    PRIO(1,1)},  // BMI088 Accel IRQ schedules SPI xmit
+    {EXTI3_IRQn,    PRIO(1,1)},  // BMI088 Gyro IRQ schedule SPI xmit
+    {TIM2_IRQn,     PRIO(1,2)},  // Shutter open/close timer, push evq
+    {TIM6_DACUNDER_IRQn, PRIO(1,3)},  // 8Hz periodic read BME shedules SPI xmit and push evq
+	{DMA2_CH7_IRQn, PRIO(2,0)},  // USART1 RX DMA
+	{DMA2_CH6_IRQn, PRIO(2,1)},  // USART1 TX DMA done
+    {USART1_IRQn,   PRIO(2,2)},  // USART1 TX schedule next DMA
+    {USART2_IRQn,   PRIO(3,1)},  // USART2 TX 
+    {None_IRQn, 0xff}, // sentinel
 };
 #undef PRIO
 
 /*
-  Configuration of the BMI and BMP sensors.
-  See their respective datasheets. 
+ Configuration of the BMI and BMP sensors.
+ See their respective datasheets. 
 
  NOTE: careful when modifying these  tables, the range
  must come first since it is used to choose the EventID
@@ -106,13 +123,6 @@ static struct bmx_config_t const humid_cfg[] = {
 };
 /* clang-format on */
 
-// ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
-// GYRO: cmd, 6 registers, 2dum, stat
-// TEMP: cmd, dum, 2 registers. big endian for some reason
-static uint8_t accel_buf[20];  // ACCEL BMI085_ACC_X_LSB
-static uint8_t gyro_buf[10];  // GYRO  BMI085_RATE_X_LSB
-static uint8_t humid_buf[1+BME280_DATA_LEN];  // HUMID BME280_DATA_REG
-
 // USART2 is the console, for debug messages, it runs IRQ driven.
 static struct Ringbuffer usart2tx;
 
@@ -120,6 +130,7 @@ void _putchar(char character) {
 	if (!ringbuffer_full(&usart2tx)) {
 		ringbuffer_put_head(&usart2tx, character);
 	} else {
+        // overflow, tell the user we are losing messages.
 		ringbuffer_clear(&usart2tx);
 		for (const char* p = "!OVFL!"; *p != 0; ++p) {
 			ringbuffer_put_head(&usart2tx, *p);
@@ -142,13 +153,14 @@ void hexdump(size_t len, const uint8_t* ptr) {
 }
 
 // SPI1 has the BMI088, BME280 ... connected to it.
-
-struct SPIQ spiq;
+// The gyro and accel irq and periodically TIM6 trigger a SPI transaction on the accel, gyro or humid
+// sensor. The result of that transaction becomes available in the main loop.
+static struct SPIQ spiq;
 static uint64_t dropped_spi1 = 0;  // how often we tried to submit a spi1 xmit but the queue was full
 
 static void spi1_ss(uint16_t addr, int on) {
 	switch ((enum BMXFunction)addr) {
-	case NONE:  break;
+	case NONE: digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN); break;
 	case ACCEL:	if (on) digitalLo(BMI_CSB1A_PIN); else digitalHi(BMI_CSB1A_PIN); break;
 	case GYRO:	if (on) digitalLo(BMI_CSB2G_PIN); else digitalHi(BMI_CSB2G_PIN); break;
 	case HUMID:	if (on) digitalLo(BME_CSB_PIN);   else digitalHi(BME_CSB_PIN); break;
@@ -160,17 +172,14 @@ void DMA1_CH2_Handler(void) {
 	spi_rx_dma_handler(&spiq);        // see spi.c
 }
 
-static void exti_handler(uint64_t now, enum GPIO_Pin pin, uint16_t addr, uint8_t firstreg, uint8_t* buf, size_t len) {
-    if ((EXTI.PR1 & pin) != pin) // also works for pin == 0
-        return;
-    EXTI.PR1 = pin;
+static void start_spix(uint64_t now, uint16_t addr, uint8_t firstreg, uint8_t* buf, size_t len) {
     struct SPIXmit *x = spiq_head(&spiq);
     if (!x) {
         ++dropped_spi1;
         return;
     }
 
-    buf[0] = firstreg | 0x80;
+    buf[0] = firstreg | 0x80;  // set the read flag on the register address.
 
     x->ts = now;
     x->tag = firstreg;
@@ -179,31 +188,144 @@ static void exti_handler(uint64_t now, enum GPIO_Pin pin, uint16_t addr, uint8_t
     x->buf = buf;
     spiq_enq_head(&spiq);
 }
-void EXTI1_Handler(void) { exti_handler(cycleCount(), Pin_1, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf); }
-void EXTI3_Handler(void) { exti_handler(cycleCount(), Pin_3, GYRO,  BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf); }
 
-#if 0
+// ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
+// GYRO: cmd, 6 registers, 2dum, stat
+// TEMP: cmd, dum, 2 registers. big endian for some reason
+static uint8_t accel_buf[20];  // ACCEL BMI085_ACC_X_LSB
+static uint8_t gyro_buf[10];  // GYRO  BMI085_RATE_X_LSB
+static uint8_t humid_buf[1+BME280_DATA_LEN];  // HUMID BME280_DATA_REG
+
+void EXTI1_Handler(void) { 
+    uint64_t now = cycleCount();
+    if ((EXTI.PR1 & Pin_1) == 0)
+        return;
+    EXTI.PR1 = Pin_1;
+    start_spix(now, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf);
+}
+
+void EXTI3_Handler(void) { 
+    uint64_t now = cycleCount();
+    if ((EXTI.PR1 & Pin_3) == 0)
+        return;
+    EXTI.PR1 = Pin_3;
+    start_spix(now, GYRO, BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf); 
+}
+
+// Other events go to another message queue, which the mainloop copies into the output stream.
+static struct MsgQueue evq = {0, 0, {}};
+static volatile uint64_t dropped_evq = 0;  // queue full, msqq_head returned NULL
+
+extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1, defined in .ld file
+
+// Timer 6: 8Hz BME read, periodic messages, status report
+static volatile uint32_t tim6_tick = 0;
+void TIM6_DACUNDER_Handler(void) {
+    uint64_t now = cycleCount();
+
+    if ((TIM6.SR & TIM1_SR_UIF) == 0)
+        return;
+    TIM6.SR &= ~TIM1_SR_UIF;
+
+    struct Msg* msg = msgq_head(&evq);
+
+    switch (tim6_tick++ & 7) {
+    case 0: {
+            uint64_t us = now / C_US; // microseconds
+            //printf("\nuptime %llu.%06llu  spiq %ld %ld %ld (%lld) %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail,  dropped_spi1, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
+            //printf("\nuptime %llu.%06llu  usart1 %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, usart1txdmaerr_cnt);
+            printf("\nuptime %llu.%06llu\n", us / 1000000, us % 1000000);
+            return;
+        }
+
+    case 1:
+        start_spix(now, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
+        return;
+    
+    case 2:
+        if (!msg) {
+            ++dropped_evq;
+            return;
+        }
+        output_periodic(msg, EVENTID_ID0, now, __REVISION__, UNIQUE_DEVICE_ID[2]);
+        msgq_push_head(&evq);
+        return;
+
+    case 3:
+        if (!msg) {
+            ++dropped_evq;
+            return;
+        }
+        output_periodic(msg, EVENTID_ID1, now, UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
+        msgq_push_head(&evq);
+        return;
+    case 4:
+    case 5:
+    case 6:
+    case 7: 
+        return;
+    }
+
+ }
+
+
+static volatile uint64_t shutter_count = 0;  //
 // Timer 2 channel 1 has the shutter time sync input
 void TIM2_Handler(void) {
     uint16_t cnt = TIM2.CNT;
     uint64_t now = cycleCount();
     uint16_t sr = TIM2.SR;
+    TIM2.SR &= ~sr;
 
-    // shutter open: even event
-    if ((sr & TIM2_SR_CC1IF )) {
+    // these could have happened in any order
+    uint64_t open_ts = 0;
+    uint64_t close_ts = 0;
+
+    if ((sr & TIM2_SR_CC1IF)) {
         uint16_t latency = (cnt - TIM2.CCR1);  // * (TIM2.PSC+1)
-        evq_push_head(&shutterq, EVENTID_SHUTTER_OPEN, now - latency);
+        open_ts = now - latency;
     }
 
-    // shutter close: odd event
     if ((sr & TIM2_SR_CC2IF)) {
         uint16_t latency = (cnt - TIM2.CCR2);  // * (TIM2.PSC+1)
-      evq_push_head(&shutterq, EVENTID_SHUTTER_CLOSE, now - latency);
+        close_ts = now - latency;
     }
 
-    TIM2.SR &= ~sr;
+    struct Msg* msg = msgq_head(&evq);
+
+    if ((open_ts && close_ts) && (open_ts <= close_ts)) {
+        shutter_count = (shutter_count + 1) | 1; // next odd number.
+        if (!msg) {
+            ++dropped_evq;
+        } else {
+            output_shutter(msg, EVENTID_SHUTTER_OPEN, open_ts, shutter_count);
+            msgq_push_head(&evq);
+            msg = msgq_head(&evq);
+        }
+        open_ts = 0; // mark as not happened, or already sent
+    }
+
+    if (close_ts) {
+        shutter_count = (shutter_count | 1) + 1; // next even number.
+        if (!msg) {
+            ++dropped_evq;
+        } else {
+            output_shutter(msg, EVENTID_SHUTTER_CLOSE, close_ts, shutter_count);
+            msgq_push_head(&evq);
+            msg = msgq_head(&evq);
+        }
+    }
+    // if we didnt already send it before
+    if (open_ts) {
+        shutter_count = (shutter_count + 1) | 1; // next odd number.
+        if (!msg) {
+            ++dropped_evq;
+        } else {
+            output_shutter(msg, EVENTID_SHUTTER_OPEN, open_ts, shutter_count);
+            msgq_push_head(&evq);
+        }
+    }
 }
-#endif
 
 // USART1 is the output datastream and command input
 
@@ -326,27 +448,6 @@ void DMA2_CH7_Handler(void) {
 }
 
 
-// Timer 6: 1Hz status
-void TIM6_DACUNDER_Handler(void) {
-    uint64_t now = cycleCount();
-
-    if ((TIM6.SR & TIM1_SR_UIF) == 0)
-        return;
-    TIM6.SR &= ~TIM1_SR_UIF;
-
-    exti_handler(now, 0, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
-
-    now /= C_US; // microseconds
-    uint64_t sec = now / 1000000;
-    now %= 1000000;
-
-//  printf("\nuptime %llu.%06llu  spiq %ld %ld %ld (%lld) %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr, spiq.tail,  dropped_spi1, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
-  printf("\nuptime %llu.%06llu  usart1 %ld-%ld (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1, USART1.CR1, USART1.ISR, DMA2.CNDTR6, usart1txdmaerr_cnt);
-//   printf("\nuptime %llu.%06llu\n", sec, now);
- }
-
-extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 47.1, defined in .ld file
-
 static const char* pplsrcstr[] = { "NONE", "MSI", "HSI16", "HSE" };
 
 void main(void) {
@@ -372,16 +473,14 @@ void main(void) {
 	gpioLock(PBAll);
 
     // deselect all (active low) chip select signals
-    digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN);
+    spi1_ss(NONE, 0);
 
     // prepare USART2 for console and debug messages
 	ringbuffer_clear(&usart2tx);
 	usart_init(&USART2, 115200);
 	NVIC_EnableIRQ(USART2_IRQn);
 
-#ifdef __REVISION__
-	printf("SWREV:%s\n", __REVISION__);
-#endif
+	printf("SWREV:%x\n", __REVISION__);
 	printf("CPUID:%08lx\n",  SCB.CPUID);
 	printf("IDCODE:%08lx\n",  DBGMCU.IDCODE);
 	printf("DEVID:%08lx:%08lx:%08lx\n", UNIQUE_DEVICE_ID[2], UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
@@ -393,7 +492,7 @@ void main(void) {
 	usart_wait(&USART2);
 
     // Set up SPI1 for talking to all the connected chips.
-	spiq_init(&spiq, &SPI1, 3, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss); // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 
     if (bmi_accel_poweron(&spiq) == 0) {
         printf("BMI088 Accel enabled.\n");
@@ -501,11 +600,11 @@ void main(void) {
     TIM2.CR1 |= TIM2_CR1_CEN;
     NVIC_EnableIRQ(TIM2_IRQn);
 
-    // set up TIM6 for a 1Hz hearbeat
+    // set up TIM6 for a 8Hz hearbeat for various periodic things
     // note: it pushes spiq messages so do not start this before the BMI/BME are configured.
 	TIM6.DIER |= TIM6_DIER_UIE;
     TIM6.PSC = (CLOCKSPEED_HZ/10000) - 1;
-    TIM6.ARR = 10000 - 1; // 10KHz/10000 = 1Hz
+    TIM6.ARR = 1250 - 1; // 10KHz/1250 = 8Hz
     TIM6.CR1 |= TIM6_CR1_CEN;
     NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
 
@@ -517,109 +616,81 @@ void main(void) {
     IWDG.KR = 0x5555;  // enable watchdog config
     IWDG.PR = 0;       // prescaler /4 -> 10khz
     IWDG.RLR = 3200;   // count to 3200 -> 320ms timeout
-//    IWDG.KR = 0xcccc;  // start watchdog countdown
+    IWDG.KR = 0xcccc;  // start watchdog countdown
 
     size_t packetsize = 960; // 48 messages of 20 bytes
     size_t packetlen = 0;
     size_t packetchk = 0;
 
-
     for(;;) {
     	__WFI();
 
+        // dequeue from spi and event queues, send on out queue
+        // insert packet header and footer along the way
         for (;;) {
             struct SPIXmit *x = spiq_tail(&spiq);
-            if (x == NULL)
-                break;
-        
-            struct Msg *msg = msgq_head(&outq);
-            if (!msg) {
+            struct Msg *ev = msgq_tail(&evq);
+            struct Msg *out = msgq_head(&outq);
+            if ((x || ev) && !out) {
                 ++dropped_usart1;
                 break;
             } 
-            
-            if (output(msg, x)) {
-                packetlen += msg->len;
-                for (size_t i = 0; i < msg->len; ++i)
-                    packetchk += msg->buf[i];
 
+            int ok = 0;
+            if (x) {
+                ok = output_bmx(out, x);
+                spiq_deq_tail(&spiq);
+            }
+            if (!ok && ev) {
+                out->len = ev->len;
+                memmove(out->buf, ev->buf, ev->len);
+                msgq_pop_tail(&evq);
+            }
+
+            if (!ok) // nothing to send
+                break;
+
+            packetlen += out->len;
+            for (size_t i = 0; i < out->len; ++i)
+                packetchk += out->buf[i];
+
+            msgq_push_head(&outq);
+            USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
+                
+            // not enough space for next message, pad with zeros
+            if ((packetsize != packetlen) && (packetsize < packetlen + sizeof out->buf)) { 
+                while (msgq_head(&outq) == NULL)
+                    __NOP();
+                out = msgq_head(&outq);
+                out->len = packetsize - packetlen;
+                bzero(out->buf, out->len);               
                 msgq_push_head(&outq);
                 USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
 
-                if ((packetsize != packetlen) && (packetsize < packetlen + 20)) { // not enough space for next message
-                    while (msgq_head(&outq) == NULL)
-                        __NOP();
-                    msg = msgq_head(&outq);
-                    msg->len = packetsize - packetlen;
-                    bzero(msg->buf, msg->len);               
-                    msgq_push_head(&outq);
-                    USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
-                }
-
-                if (packetsize == packetlen) { 
-                    while (msgq_head(&outq) == NULL)
-                        __NOP();
-                    msg = msgq_head(&outq);
-                    msg_reset(msg);
-                    msg_append16(msg, packetchk);
-                    msg_append32(msg, 0x49524F4E); // 'IRON'
-                    msg_append16(msg, packetsize);
-                    msgq_push_head(&outq);
-                    USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
-
-                    packetchk = 0;
-                    packetlen = 0;
-
-                    // check here if there's a command response packet to send
-                }
-
-
-
-                IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
+                packetlen = packetsize;
             }
 
-            spiq_deq_tail(&spiq);
+            if (packetsize == packetlen) { 
+                while (msgq_head(&outq) == NULL)
+                    __NOP();
+                out = msgq_head(&outq);
+                msg_reset(out);
+                msg_append16(out, packetchk);
+                msg_append32(out, 0x49524F4E); // 'IRON'
+                msg_append16(out, packetsize);
+                msgq_push_head(&outq);
+                USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
+
+                packetchk = 0;
+                packetlen = 0;
+
+                // check here if there's a command response packet to send
+            }
+            
+            IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
+
         } 
-
-
-
 
 
     }
 }
-
-#if 0
-        uint64_t ts = 0;
-        if ((ts = unlatch(&shutter_open_ts)) != 0) {
-            if (!msg) {
-                ++dropped_usart1;
-            } else {
-                msg_reset(msg);
-                msg_append16(msg, 0);  // len
-                msg_append16(msg, EVENTID_SHUTTER_OPEN);  // header
-                msg_append64(msg, ts);
-                msg_append64(msg, shutter_open_cnt);         
-                msg->buf[1] = msg->len;
-            }
-        } else if ((ts = unlatch(&shutter_close_ts)) != 0) {
-            if (!msg) {
-                ++dropped_usart1;
-            } else {
-                msg_reset(msg);
-                msg_append16(msg, 0);  // len
-                msg_append16(msg, EVENTID_SHUTTER_CLOSE);
-                msg_append64(msg, ts);
-                msg_append64(msg, shutter_close_cnt);
-                msg->buf[1] = msg->len;
-            }
-        }
-
-        if((msg != NULL) && (ts != 0)) {
-            msgq_push_head(&outq);
-            USART1.CR1 |= USART1_CR1_TCIE; // start USART1 if neccesary
-        }
-        // if we received a command, 
-
-
-    }
-#endif

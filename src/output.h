@@ -11,8 +11,8 @@ enum {
     EVENTID_BARO = 0x8020,  // [2]uint32 temperature[milliK] pressure[milliPa] bme280
     EVENTID_HUMID = 0x8021,  // humidity bme280 [TODO]
     EVENTID_TEMP = 0x8022,  // [2]uint32 temperature[milliK] (bmi085 accellerometer, stm32 microcontroller)
-    EVENTID_SHUTTER_OPEN = 0x8023,  // uint64 prev ts
-    EVENTID_SHUTTER_CLOSE = 0x8025,  // uint64 prev ts
+    EVENTID_SHUTTER_OPEN = 0x8023,  // uint64 counter
+    EVENTID_SHUTTER_CLOSE = 0x8025,  // uint64 counter
 
     // [4]int16 xyz_ (i.e. padded to 8 bytes)
     EVENTID_ACCEL_2G = 0x8032,  // RANGE_2G  = 0x00,  bmi088: 3g
@@ -30,4 +30,10 @@ extern uint32_t gyro_hdr;
 extern uint32_t accel_hdr;
 extern struct LinearisationParameters bmeParam;
 
-int output(struct Msg *msg, struct SPIXmit *x);
+// convert the SPI xmit messages from communicating with the BMI and BME
+// to our output format.  Return 1 if a valid message was constructed.
+int output_bmx(struct Msg *msg, struct SPIXmit *x);
+
+int output_shutter(struct Msg *msg, uint16_t hdr, uint64_t ts, uint64_t counter);
+
+int output_periodic(struct Msg *msg, uint16_t hdr, uint64_t ts, uint32_t v1, uint32_t v2);
