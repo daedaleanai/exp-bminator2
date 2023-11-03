@@ -508,6 +508,71 @@ inline void adc_calfact_set_calfact_s(struct ADC_Type* p, uint32_t val) { p->CAL
 inline uint32_t adc_calfact_get_calfact_d(struct ADC_Type* p) { return (p->CALFACT & ADC_CALFACT_CALFACT_D) >> 16 ; }
 inline uint32_t adc_calfact_get_calfact_s(struct ADC_Type* p) { return (p->CALFACT & ADC_CALFACT_CALFACT_S) >> 0 ; }
 
+/* Analog-to-Digital Converter */
+struct ADC12_Common_Type {
+	__I uint32_t CSR; // @0 ADC Common status register
+	 uint8_t RESERVED0[4]; // @4 
+	__IO uint32_t CCR; // @8 ADC common control register
+	__I uint32_t CDR; // @12 ADC common regular data register for dual and triple modes
+};
+
+// ADC12_Common->CSR ADC Common status register
+enum {
+	ADC12_COMMON_CSR_JQOVF_SLV = 1UL<<26, // Injected Context Queue Overflow flag of the slave ADC
+	ADC12_COMMON_CSR_AWD3_SLV = 1UL<<25, // Analog watchdog 3 flag of the slave ADC
+	ADC12_COMMON_CSR_AWD2_SLV = 1UL<<24, // Analog watchdog 2 flag of the slave ADC
+	ADC12_COMMON_CSR_AWD1_SLV = 1UL<<23, // Analog watchdog 1 flag of the slave ADC
+	ADC12_COMMON_CSR_JEOS_SLV = 1UL<<22, // End of injected sequence flag of the slave ADC
+	ADC12_COMMON_CSR_JEOC_SLV = 1UL<<21, // End of injected conversion flag of the slave ADC
+	ADC12_COMMON_CSR_OVR_SLV = 1UL<<20, // Overrun flag of the slave ADC
+	ADC12_COMMON_CSR_EOS_SLV = 1UL<<19, // End of regular sequence flag of the slave ADC
+	ADC12_COMMON_CSR_EOC_SLV = 1UL<<18, // End of regular conversion of the slave ADC
+	ADC12_COMMON_CSR_EOSMP_SLV = 1UL<<17, // EOSMP_SLV
+	ADC12_COMMON_CSR_ADRDY_SLV = 1UL<<16, // ADRDY_SLV
+	ADC12_COMMON_CSR_JQOVF_MST = 1UL<<10, // JQOVF_MST
+	ADC12_COMMON_CSR_AWD3_MST = 1UL<<9, // AWD3_MST
+	ADC12_COMMON_CSR_AWD2_MST = 1UL<<8, // AWD2_MST
+	ADC12_COMMON_CSR_AWD1_MST = 1UL<<7, // AWD1_MST
+	ADC12_COMMON_CSR_JEOS_MST = 1UL<<6, // JEOS_MST
+	ADC12_COMMON_CSR_JEOC_MST = 1UL<<5, // JEOC_MST
+	ADC12_COMMON_CSR_OVR_MST = 1UL<<4, // OVR_MST
+	ADC12_COMMON_CSR_EOS_MST = 1UL<<3, // EOS_MST
+	ADC12_COMMON_CSR_EOC_MST = 1UL<<2, // EOC_MST
+	ADC12_COMMON_CSR_EOSMP_MST = 1UL<<1, // EOSMP_MST
+	ADC12_COMMON_CSR_ADDRDY_MST = 1UL<<0, // ADDRDY_MST		
+};
+
+// ADC12_Common->CCR ADC common control register
+enum {
+	ADC12_COMMON_CCR_VBATSEL = 1UL<<24, // VBAT selection
+	ADC12_COMMON_CCR_VSENSESEL = 1UL<<23, // VTS selection
+	ADC12_COMMON_CCR_VREFEN = 1UL<<22, // VREFINT enable
+	ADC12_COMMON_CCR_PRESC = ((1UL<<4)-1) << 18, // ADC prescaler
+	ADC12_COMMON_CCR_CKMODE = ((1UL<<2)-1) << 16, // ADC clock mode
+	ADC12_COMMON_CCR_MDMA = ((1UL<<2)-1) << 14, // Direct memory access mode for multi ADC mode
+	ADC12_COMMON_CCR_DMACFG = 1UL<<13, // DMA configuration (for multi-ADC mode)
+	ADC12_COMMON_CCR_DELAY = ((1UL<<4)-1) << 8, // Delay between 2 sampling phases
+	ADC12_COMMON_CCR_DUAL = ((1UL<<5)-1) << 0, // Dual ADC mode selection		
+};
+inline void adc12_common_ccr_set_presc(struct ADC12_Common_Type* p, uint32_t val) { p->CCR = (p->CCR & ~ADC12_COMMON_CCR_PRESC) | ((val<<18) & ADC12_COMMON_CCR_PRESC); }
+inline void adc12_common_ccr_set_ckmode(struct ADC12_Common_Type* p, uint32_t val) { p->CCR = (p->CCR & ~ADC12_COMMON_CCR_CKMODE) | ((val<<16) & ADC12_COMMON_CCR_CKMODE); }
+inline void adc12_common_ccr_set_mdma(struct ADC12_Common_Type* p, uint32_t val) { p->CCR = (p->CCR & ~ADC12_COMMON_CCR_MDMA) | ((val<<14) & ADC12_COMMON_CCR_MDMA); }
+inline void adc12_common_ccr_set_delay(struct ADC12_Common_Type* p, uint32_t val) { p->CCR = (p->CCR & ~ADC12_COMMON_CCR_DELAY) | ((val<<8) & ADC12_COMMON_CCR_DELAY); }
+inline void adc12_common_ccr_set_dual(struct ADC12_Common_Type* p, uint32_t val) { p->CCR = (p->CCR & ~ADC12_COMMON_CCR_DUAL) | ((val<<0) & ADC12_COMMON_CCR_DUAL); }
+inline uint32_t adc12_common_ccr_get_presc(struct ADC12_Common_Type* p) { return (p->CCR & ADC12_COMMON_CCR_PRESC) >> 18 ; }
+inline uint32_t adc12_common_ccr_get_ckmode(struct ADC12_Common_Type* p) { return (p->CCR & ADC12_COMMON_CCR_CKMODE) >> 16 ; }
+inline uint32_t adc12_common_ccr_get_mdma(struct ADC12_Common_Type* p) { return (p->CCR & ADC12_COMMON_CCR_MDMA) >> 14 ; }
+inline uint32_t adc12_common_ccr_get_delay(struct ADC12_Common_Type* p) { return (p->CCR & ADC12_COMMON_CCR_DELAY) >> 8 ; }
+inline uint32_t adc12_common_ccr_get_dual(struct ADC12_Common_Type* p) { return (p->CCR & ADC12_COMMON_CCR_DUAL) >> 0 ; }
+
+// ADC12_Common->CDR ADC common regular data register for dual and triple modes
+enum {
+	ADC12_COMMON_CDR_RDATA_SLV = ((1UL<<16)-1) << 16, // Regular data of the slave ADC
+	ADC12_COMMON_CDR_RDATA_MST = ((1UL<<16)-1) << 0, // Regular data of the master ADC		
+};
+inline uint32_t adc12_common_cdr_get_rdata_slv(struct ADC12_Common_Type* p) { return (p->CDR & ADC12_COMMON_CDR_RDATA_SLV) >> 16 ; }
+inline uint32_t adc12_common_cdr_get_rdata_mst(struct ADC12_Common_Type* p) { return (p->CDR & ADC12_COMMON_CDR_RDATA_MST) >> 0 ; }
+
 /* Advanced encryption standard hardware accelerator */
 struct AES_Type {
 	__IO uint16_t CR; // @0 control register
@@ -2721,37 +2786,37 @@ struct DMA1_Type {
 	__IO uint32_t CNDTR1; // @12 channel x number of data register
 	__IO uint32_t CPAR1; // @16 channel x peripheral address register
 	__IO uint32_t CMAR1; // @20 channel x memory address register
-	 uint8_t RESERVED2[4]; // @24 
+	 uint8_t RESERVED0[4]; // @24 
 	__IO uint32_t CCR2; // @28 channel x configuration register
 	__IO uint32_t CNDTR2; // @32 channel x number of data register
 	__IO uint32_t CPAR2; // @36 channel x peripheral address register
 	__IO uint32_t CMAR2; // @40 channel x memory address register
-	 uint8_t RESERVED5[4]; // @44 
+	 uint8_t RESERVED1[4]; // @44 
 	__IO uint32_t CCR3; // @48 channel x configuration register
 	__IO uint32_t CNDTR3; // @52 channel x number of data register
 	__IO uint32_t CPAR3; // @56 channel x peripheral address register
 	__IO uint32_t CMAR3; // @60 channel x memory address register
-	 uint8_t RESERVED8[4]; // @64 
+	 uint8_t RESERVED2[4]; // @64 
 	__IO uint32_t CCR4; // @68 channel x configuration register
 	__IO uint32_t CNDTR4; // @72 channel x number of data register
 	__IO uint32_t CPAR4; // @76 channel x peripheral address register
 	__IO uint32_t CMAR4; // @80 channel x memory address register
-	 uint8_t RESERVED11[4]; // @84 
+	 uint8_t RESERVED3[4]; // @84 
 	__IO uint32_t CCR5; // @88 channel x configuration register
 	__IO uint32_t CNDTR5; // @92 channel x number of data register
 	__IO uint32_t CPAR5; // @96 channel x peripheral address register
 	__IO uint32_t CMAR5; // @100 channel x memory address register
-	 uint8_t RESERVED14[4]; // @104 
+	 uint8_t RESERVED4[4]; // @104 
 	__IO uint32_t CCR6; // @108 channel x configuration register
 	__IO uint32_t CNDTR6; // @112 channel x number of data register
 	__IO uint32_t CPAR6; // @116 channel x peripheral address register
 	__IO uint32_t CMAR6; // @120 channel x memory address register
-	 uint8_t RESERVED17[4]; // @124 
+	 uint8_t RESERVED5[4]; // @124 
 	__IO uint32_t CCR7; // @128 channel x configuration register
 	__IO uint32_t CNDTR7; // @132 channel x number of data register
 	__IO uint32_t CPAR7; // @136 channel x peripheral address register
 	__IO uint32_t CMAR7; // @140 channel x memory address register
-	 uint8_t RESERVED20[24]; // @144 
+	 uint8_t RESERVED6[24]; // @144 
 	__IO uint32_t CSELR; // @168 channel selection register
 };
 
@@ -2821,6 +2886,7 @@ enum {
 
 // DMA1->CCR1 channel x configuration register
 enum {
+	DMA1_CCR1_DUMMY = 1UL<<31, // force this to be a 32 bit register
 	DMA1_CCR1_MEM2MEM = 1UL<<14, // Memory to memory mode
 	DMA1_CCR1_PL = ((1UL<<2)-1) << 12, // Channel priority level
 	DMA1_CCR1_MSIZE = ((1UL<<2)-1) << 10, // Memory size
@@ -2843,6 +2909,7 @@ inline uint32_t dma1_ccr1_get_psize(struct DMA1_Type* p) { return (p->CCR1 & DMA
 
 // DMA1->CCR2 channel x configuration register
 enum {
+	DMA1_CCR2_DUMMY = 1UL<<31, // force this to be a 32 bit register
 	DMA1_CCR2_MEM2MEM = 1UL<<14, // Memory to memory mode
 	DMA1_CCR2_PL = ((1UL<<2)-1) << 12, // Channel priority level
 	DMA1_CCR2_MSIZE = ((1UL<<2)-1) << 10, // Memory size
@@ -2865,6 +2932,7 @@ inline uint32_t dma1_ccr2_get_psize(struct DMA1_Type* p) { return (p->CCR2 & DMA
 
 // DMA1->CCR3 channel x configuration register
 enum {
+	DMA1_CCR3_DUMMY = 1UL<<31, // force this to be a 32 bit register
 	DMA1_CCR3_MEM2MEM = 1UL<<14, // Memory to memory mode
 	DMA1_CCR3_PL = ((1UL<<2)-1) << 12, // Channel priority level
 	DMA1_CCR3_MSIZE = ((1UL<<2)-1) << 10, // Memory size
@@ -2887,6 +2955,7 @@ inline uint32_t dma1_ccr3_get_psize(struct DMA1_Type* p) { return (p->CCR3 & DMA
 
 // DMA1->CCR4 channel x configuration register
 enum {
+	DMA1_CCR4_DUMMY = 1UL<<31, // force this to be a 32 bit register
 	DMA1_CCR4_MEM2MEM = 1UL<<14, // Memory to memory mode
 	DMA1_CCR4_PL = ((1UL<<2)-1) << 12, // Channel priority level
 	DMA1_CCR4_MSIZE = ((1UL<<2)-1) << 10, // Memory size
@@ -2909,6 +2978,7 @@ inline uint32_t dma1_ccr4_get_psize(struct DMA1_Type* p) { return (p->CCR4 & DMA
 
 // DMA1->CCR5 channel x configuration register
 enum {
+	DMA1_CCR5_DUMMY = 1UL<<31, // force this to be a 32 bit register
 	DMA1_CCR5_MEM2MEM = 1UL<<14, // Memory to memory mode
 	DMA1_CCR5_PL = ((1UL<<2)-1) << 12, // Channel priority level
 	DMA1_CCR5_MSIZE = ((1UL<<2)-1) << 10, // Memory size
@@ -2931,6 +3001,7 @@ inline uint32_t dma1_ccr5_get_psize(struct DMA1_Type* p) { return (p->CCR5 & DMA
 
 // DMA1->CCR6 channel x configuration register
 enum {
+	DMA1_CCR6_DUMMY = 1UL<<31, // force this to be a 32 bit register
 	DMA1_CCR6_MEM2MEM = 1UL<<14, // Memory to memory mode
 	DMA1_CCR6_PL = ((1UL<<2)-1) << 12, // Channel priority level
 	DMA1_CCR6_MSIZE = ((1UL<<2)-1) << 10, // Memory size
@@ -2953,6 +3024,7 @@ inline uint32_t dma1_ccr6_get_psize(struct DMA1_Type* p) { return (p->CCR6 & DMA
 
 // DMA1->CCR7 channel x configuration register
 enum {
+	DMA1_CCR7_DUMMY = 1UL<<31, // force this to be a 32 bit register
 	DMA1_CCR7_MEM2MEM = 1UL<<14, // Memory to memory mode
 	DMA1_CCR7_PL = ((1UL<<2)-1) << 12, // Channel priority level
 	DMA1_CCR7_MSIZE = ((1UL<<2)-1) << 10, // Memory size
@@ -8508,6 +8580,7 @@ enum {
 
 
 extern struct ADC_Type	ADC;	// @0x50040000 
+extern struct ADC12_Common_Type	ADC12_Common;	// @0x50000300 
 extern struct AES_Type	AES;	// @0x50060000 
 extern struct CAN_Type	CAN1;	// @0x40006400 
 extern struct COMP_Type	COMP;	// @0x40010200 
