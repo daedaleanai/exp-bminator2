@@ -14,8 +14,8 @@ MEMORY
  * use of a missing one will trigger a link error.
  */
 
-	ADC	= 0x50040000;
-	ADC12_Common	= 0x50000300;
+	ADC	            = 0x50040000;
+	ADC12_Common	= 0x50040300;
 	CAN1	= 0x40006400;
 	COMP	= 0x40010200;
 	CRC	= 0x40023000;

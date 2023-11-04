@@ -34,9 +34,9 @@ enum {
 	BMI_INT1A_PIN	  = PA1,
 	USART2_TX_PIN	  = PA2,
 	BMI_INT3G_PIN	  = PA3,
-	THERMISTOR_PIN	  = PA4,
+	THERMISTOR_PIN	  = PA4,  // ADC1_IN9
 	HEATER_EN_PIN	  = PA5,
-	CURRENT_SENSE_PIN = PA6,
+	CURRENT_SENSE_PIN = PA6,  // ADC1_IN11
 	USART1_TX_PIN	  = PA9,
 	USARTR_TX_PIN	  = PA10,
 	TIMEPULSE_PIN	  = PA15,
@@ -58,7 +58,8 @@ static struct gpio_config_t {
 		{SPI1_MOSI_PIN | SPI1_SCK_PIN | SPI1_MISO_PIN, GPIO_AF5_SPI12 | GPIO_HIGH},
 		{BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_IPU},
 		{BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN, GPIO_OUTPUT | GPIO_FAST},
-		{TIMEPULSE_PIN, GPIO_AF2_TIM12},
+		{TIMEPULSE_PIN, GPIO_INPUT },
+        {THERMISTOR_PIN|CURRENT_SENSE_PIN, GPIO_ANALOG},
 		{0, 0},	 // sentinel
 };
 
@@ -73,13 +74,14 @@ static struct {
 } const irqprios[] = {
 		{SysTick_IRQn, PRIO(0, 0)},
 		{DMA1_CH2_IRQn, PRIO(1, 0)},	   // SPI RX done DMA
+		{TIM6_DACUNDER_IRQn, PRIO(1, 0)},  // 8Hz periodic read BME shedules SPI xmit and push evq
 		{EXTI1_IRQn, PRIO(1, 1)},		   // BMI088 Accel IRQ schedules SPI xmit
 		{EXTI3_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
 		{TIM2_IRQn, PRIO(1, 2)},		   // Shutter open/close timer, push evq
-		{TIM6_DACUNDER_IRQn, PRIO(1, 3)},  // 8Hz periodic read BME shedules SPI xmit and push evq
 		{DMA2_CH7_IRQn, PRIO(2, 0)},	   // USART1 RX DMA
 		{DMA2_CH6_IRQn, PRIO(2, 1)},	   // USART1 TX DMA done
 		{USART1_IRQn, PRIO(2, 2)},		   // USART1 TX schedule next DMA
+        {ADC1_IRQn, PRIO(3,0)},            // ADC conversions
 		{USART2_IRQn, PRIO(3, 1)},		   // USART2 TX
 		{None_IRQn, 0xff},				   // sentinel
 };
@@ -153,7 +155,7 @@ void hexdump(size_t len, const uint8_t *ptr) {
 // The gyro and accel irq and periodically TIM6 trigger a SPI transaction on the accel, gyro or humid
 // sensor. The result of that transaction becomes available in the main loop.
 static struct SPIQ spiq;
-static uint64_t	   dropped_spi1 = 0;  // how often we tried to submit a spi1 xmit but the queue was full
+static volatile uint64_t dropped_spi1 = 0;  // how often we tried to submit a spi1 xmit but the queue was full
 
 static void spi1_ss(uint16_t addr, int on) {
 	switch ((enum BMXFunction)addr) {
@@ -194,7 +196,10 @@ static void start_spix(uint64_t now, uint16_t addr, uint8_t firstreg, uint8_t *b
 	}
 
 	buf[0] = firstreg | 0x80;  // set the read flag on the register address.
-
+    for (size_t i = 1; i < len; i++) {
+        buf[i] = 0;
+    }
+    
 	x->ts	= now;
 	x->tag	= firstreg;
 	x->addr = addr;
@@ -232,8 +237,8 @@ static volatile uint64_t dropped_evq = 0;  // queue full, msqq_head returned NUL
 
 extern uint32_t UNIQUE_DEVICE_ID[3];  // Section 47.1, defined in .ld file
 
+static volatile int report = 0; // time to dump status in main loop
 static volatile uint32_t tim6_tick = 0;
-
 // Timer 6: 8Hz BME read, periodic messages, status report
 void TIM6_DACUNDER_Handler(void) {
 	uint64_t now = cycleCount();
@@ -245,16 +250,10 @@ void TIM6_DACUNDER_Handler(void) {
 	struct Msg *msg = msgq_head(&evq);
 
 	switch (tim6_tick++ & 7) {
-	case 0: {
-		uint64_t us = now / C_US;  // microseconds
-		// printf("\nuptime %llu.%06llu  spiq %ld %ld %ld (%lld) %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr,
-		// spiq.tail,  dropped_spi1, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
-		// printf("\nuptime %llu.%06llu  usart1 %ld-%ld
-		// (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1,
-		// USART1.CR1, USART1.ISR, DMA2.CNDTR6, usart1txdmaerr_cnt);
-		printf("\nuptime %llu.%06llu\n", us / 1000000, us % 1000000);
+	case 0:
+        printf("ping\n");
+        report = 1; 
 		return;
-	}
 
 	case 1:
 		start_spix(now, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
@@ -308,6 +307,8 @@ void TIM2_Handler(void) {
 		close_ts		 = now - latency;
 	}
 
+    printf("open %lld close %lld\n", open_ts, close_ts);
+
 	struct Msg *msg = msgq_head(&evq);
 
 	if ((open_ts && close_ts) && (open_ts <= close_ts)) {
@@ -343,6 +344,24 @@ void TIM2_Handler(void) {
 		}
 	}
 }
+
+static volatile int adc_chan = 0;
+static volatile uint16_t adc_val[5] = {0,0,0,0,0};
+static volatile uint64_t adc_ts[5] = {0,0,0,0,0};
+
+void ADC1_Handler(void) {
+    uint64_t now = cycleCount();
+    uint16_t isr = ADC.ISR;
+    if (isr & ADC_ISR_EOC) {
+        adc_val[adc_chan] = ADC.DR;
+        adc_ts[adc_chan] = now;
+        ++adc_chan;
+    }
+    if (isr & ADC_ISR_EOS) {
+        adc_chan = 0;
+    }
+}
+
 
 // USART1 is the output datastream and command input
 
@@ -476,8 +495,8 @@ void main(void) {
 
 	// Enable all the devices we are going to need
 	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
-	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN;
-	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN;
+	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN | RCC_AHB2ENR_ADCEN;
+	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN | RCC_APB1ENR1_TIM2EN;
 	RCC.APB2ENR |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART1EN;
 
 	for (const struct gpio_config_t *p = pin_cfgs; p->pins; ++p) {
@@ -506,7 +525,7 @@ void main(void) {
 	usart_wait(&USART2);
 
 	// Set up SPI1 for talking to all the connected chips.
-	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss);  // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+	spiq_init(&spiq, &SPI1, 3, SPI1_DMA1_CH23, spi1_ss);  // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 
 	if (bmi_accel_poweron(&spiq) == 0) {
 		printf("BMI088 Accel enabled.\n");
@@ -613,13 +632,51 @@ void main(void) {
 	TIM2.CR1 |= TIM2_CR1_CEN;
 	NVIC_EnableIRQ(TIM2_IRQn);
 
-	// set up TIM6 for a 8Hz hearbeat for various periodic things
+
+    // ADC
+    adc12_common_ccr_set_ckmode(&ADC12_Common, 3); // 80Mhz / 4
+    ADC12_Common.CCR |= ADC12_COMMON_CCR_VBATSEL | ADC12_COMMON_CCR_VSENSESEL | ADC12_COMMON_CCR_VREFEN;
+    ADC.CR = 0;  // end deep power down
+    ADC.CR = ADC_CR_ADVREGEN;
+    delay(25); // DS11453 table 66
+    ADC.CR |= ADC_CR_ADCAL; // start calibration
+    while (ADC.CR & ADC_CR_ADCAL)
+        __NOP();
+
+    // configure to sample channel 9, 11, 17, 18 and 0
+    adc_sqr1_set_l3(&ADC, 5);   // 5 samples
+    adc_sqr1_set_sq1(&ADC, 9);  // channel 9, pin PA4 thermistor
+    adc_sqr1_set_sq2(&ADC, 11); // channel 11, pin PA6 current sense
+    adc_sqr1_set_sq3(&ADC, 17); // channel 17, internal temperature
+    adc_sqr1_set_sq4(&ADC, 11); // channel 18, Vbat (should be = Vcc)
+    adc_sqr2_set_sq5(&ADC, 0);  // channel 0   Vrefint
+    adc_smpr1_set_smp1(&ADC, 3); // 24.5 adc clock cycles 
+    adc_smpr1_set_smp2(&ADC, 3); // 24.5 adc clock cycles 
+    adc_smpr1_set_smp3(&ADC, 3); // 24.5 adc clock cycles 
+    adc_smpr1_set_smp4(&ADC, 3); // 24.5 adc clock cycles 
+    adc_smpr1_set_smp5(&ADC, 3); // 24.5 adc clock cycles 
+
+    adc_cfgr_set_exten(&ADC, 1); // trigger on rising edge
+    adc_cfgr_set_extsel(&ADC, 13); // ext 13 is TIM6 TRGO (see below)
+    ADC.CFGR|= ADC_CFGR_CONT; // 
+
+    ADC.IER |= ADC_IER_EOCIE | ADC_IER_EOSIE; // irq at end of conversion and end of sequence
+    ADC.ISR |= ADC_ISR_ADRDY; // clear ready flag
+    ADC.CR |= ADC_CR_ADEN;  // enable
+    while (ADC.ISR & ADC_ISR_ADRDY)  // wait until ready
+        __NOP();
+    ADC.CR |= ADC_CR_ADSTART;  // start as soon as the triggers come in
+    NVIC_EnableIRQ(ADC1_IRQn);
+
+	// set up TIM6 for a 8Hz hearbeat for various periodic things, including triggering the ADC
 	// note: it pushes spiq messages so do not start this before the BMI/BME are configured.
 	TIM6.DIER |= TIM6_DIER_UIE;
 	TIM6.PSC = (CLOCKSPEED_HZ / 10000) - 1;
 	TIM6.ARR = 1250 - 1;  // 10KHz/1250 = 8Hz
 	TIM6.CR1 |= TIM6_CR1_CEN;
+    tim6_cr2_set_mms(&TIM6, 2); // TRGO = update event 
 	NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
+
 
 	// headers used in output message vary by accel/gyro configuration
 	gyro_hdr  = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
@@ -629,11 +686,13 @@ void main(void) {
 	IWDG.KR	 = 0x5555;	// enable watchdog config
 	IWDG.PR	 = 0;		// prescaler /4 -> 10khz
 	IWDG.RLR = 3200;	// count to 3200 -> 320ms timeout
-	IWDG.KR	 = 0xcccc;	// start watchdog countdown
+	//IWDG.KR	 = 0xcccc;	// start watchdog countdown
 
 	size_t packetsize = 960;  // 48 messages of 20 bytes
 	size_t packetlen  = 0;
 	size_t packetchk  = 0;
+
+    printf("Mainloop start...\n");
 
 	for (;;) {
 		__WFI();
@@ -702,5 +761,23 @@ void main(void) {
 
 			IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
 		}
+
+        if (!report) 
+            continue;
+
+        report = 0;
+
+   		uint64_t us = cycleCount() / C_US;  // microseconds
+		// printf("\nuptime %llu.%06llu  spiq %ld %ld %ld (%lld) %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr,
+		// spiq.tail,  dropped_spi1, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
+		// printf("\nuptime %llu.%06llu  usart1 %ld-%ld
+		// (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1,
+		// USART1.CR1, USART1.ISR, DMA2.CNDTR6, usart1txdmaerr_cnt);
+		printf("\nuptime %llu.%06llu\n", us / 1000000, us % 1000000);
+        printf("enqueued spi1: %8lu evq:%8lu usart1: %8lu\n", spiq.head, evq.head, outq.head);
+        printf("dropped  spi1: %8llu evq:%8llu usart1: %8llu\n", dropped_spi1, dropped_evq, dropped_usart1);
+
+
+
 	}
 }

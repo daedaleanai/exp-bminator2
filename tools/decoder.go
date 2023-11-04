@@ -81,7 +81,7 @@ type GYRO_2000DEG_SMsg Pld4Uint16
 
 func scalexyz(v [4]uint16, s float64) [3]float64 {
 	s /= (1 << 15)
-	return [3]float64{float64(v[0]) * s, float64(v[1]) * s, float64(v[2]) * s}
+	return [3]float64{float64(int16(v[0])) * s, float64(int16(v[1])) * s, float64(int16(v[2])) * s}
 }
 
 func (m *ID0Msg) String() string {
@@ -111,7 +111,7 @@ func (m *ACCEL_2GMsg) String() string {
 	return fmt.Sprintf("%.6f ACCEL_2G       %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 3))
 }
 func (m *ACCEL_4GMsg) String() string {
-	return fmt.Sprintf("%.6f %.6f ACCEL_4G       %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 6))
+	return fmt.Sprintf("%.6f ACCEL_4G       %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 6))
 }
 func (m *ACCEL_8GMsg) String() string {
 	return fmt.Sprintf("%.6f ACCEL_8G       %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 8))
@@ -321,7 +321,7 @@ func main() {
 
 			for _, v := range ids {
 				id := MsgID(v)
-				fmt.Println(id, seen[id].T, seen[id].Count, seen[id].Msg, CLREOL)
+				fmt.Printf("%v %12v %4d %v%v\n", id, seen[id].T, seen[id].Count, seen[id].Msg, CLREOL)
 			}
 			fmt.Println(CLRBOS)
 
