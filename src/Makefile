@@ -22,6 +22,7 @@ OBJS = \
 	gpio2.o \
 	ringbuffer.o \
 	tprintf.o \
+	runtimer.o \
 	spi.o \
 	bmxspi.o \
 	bme280.o \

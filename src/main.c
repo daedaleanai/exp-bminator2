@@ -24,6 +24,7 @@
 #include "msgq.h"
 #include "nvic.h"
 #include "output.h"
+#include "runtimer.h"
 #include "spi.h"
 #include "tprintf.h"
 #include "usart.h"
@@ -63,30 +64,6 @@ static struct gpio_config_t {
 		{0, 0},	 // sentinel
 };
 
-// prio[7:6] : 4 groups,  prio[5:4] : 4 subgroups
-enum { IRQ_PRIORITY_GROUPING_2_2 = 5 };
-#define PRIO(grp, sub) (((grp) << 6) | ((sub) << 4))
-
-// irq handlers that push into the same queue must run at the same priority group
-static struct {
-	enum IRQn_Type irq;
-	uint8_t		   prio;
-} const irqprios[] = {
-		{SysTick_IRQn, PRIO(0, 0)},
-		{DMA1_CH2_IRQn, PRIO(1, 0)},	   // SPI RX done DMA
-		{TIM6_DACUNDER_IRQn, PRIO(1, 0)},  // 8Hz periodic read BME shedules SPI xmit and push evq
-		{EXTI1_IRQn, PRIO(1, 1)},		   // BMI088 Accel IRQ schedules SPI xmit
-		{EXTI3_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
-		{TIM2_IRQn, PRIO(1, 2)},		   // Shutter open/close timer, push evq
-		{DMA2_CH7_IRQn, PRIO(2, 0)},	   // USART1 RX DMA
-		{DMA2_CH6_IRQn, PRIO(2, 1)},	   // USART1 TX DMA done
-		{USART1_IRQn, PRIO(2, 2)},		   // USART1 TX schedule next DMA
-        {ADC1_IRQn, PRIO(3,0)},            // ADC conversions
-		{USART2_IRQn, PRIO(3, 1)},		   // USART2 TX
-		{None_IRQn, 0xff},				   // sentinel
-};
-#undef PRIO
-
 /*
  Configuration of the BMI and BMP sensors.
  See their respective datasheets.
@@ -121,6 +98,43 @@ static struct bmx_config_t const humid_cfg[] = {
 		{BME280_REG_CTRLMEAS, BME280_CTRLMEAS_P16 | BME280_CTRLMEAS_T16 | BME280_CTRLMEAS_NORMAL},
 		{0xFF, 0},	// sentinel
 };
+
+
+// prio[7:6] : 4 groups,  prio[5:4] : 4 subgroups
+enum { IRQ_PRIORITY_GROUPING_2_2 = 5 };
+#define PRIO(grp, sub) (((grp) << 6) | ((sub) << 4))
+
+// irq handlers that push into the same queue must run at the same priority group
+static struct {
+	enum IRQn_Type irq;
+	uint8_t		   prio;
+} const irqprios[] = {
+		{SysTick_IRQn, PRIO(0, 0)},
+		{DMA1_CH2_IRQn, PRIO(1, 0)},	   // SPI RX done DMA
+		{TIM6_DACUNDER_IRQn, PRIO(1, 0)},  // 8Hz periodic read BME shedules SPI xmit and push evq
+		{EXTI1_IRQn, PRIO(1, 1)},		   // BMI088 Accel IRQ schedules SPI xmit
+		{EXTI3_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
+		{TIM2_IRQn, PRIO(1, 2)},		   // Shutter open/close timer, push evq
+		{DMA2_CH7_IRQn, PRIO(2, 0)},	   // USART1 RX DMA
+		{DMA2_CH6_IRQn, PRIO(2, 1)},	   // USART1 TX DMA done
+		{USART1_IRQn, PRIO(2, 2)},		   // USART1 TX schedule next DMA
+        {ADC1_IRQn, PRIO(3,0)},            // ADC conversions
+		{USART2_IRQn, PRIO(3, 1)},		   // USART2 TX
+		{None_IRQn, 0xff},				   // sentinel
+};
+#undef PRIO
+
+static struct RunTimer spirxdma_rt    = { "SPIRXDMA", 0, 0, 0, 0, NULL};
+static struct RunTimer periodic8hz_rt = { "8HZTICK", 0, 0, 0, 0, &spirxdma_rt};
+static struct RunTimer accelirq_rt    = { "ACCELIRQ", 0,0,0,0, &periodic8hz_rt};
+static struct RunTimer gyroirq_rt     = { "GYROIRQ", 0,0,0,0, &accelirq_rt};
+static struct RunTimer shutterirq_rt  = { "SHUTTER", 0,0,0,0, &gyroirq_rt};
+static struct RunTimer usart1rxdma_rt = { "USART1RXDMA", 0,0,0,0, &shutterirq_rt};
+static struct RunTimer usart1txdma_rt = { "USART1TXDMA", 0,0,0,0, &usart1rxdma_rt};
+static struct RunTimer usart1irq_rt   = { "USART1IRQ", 0,0,0,0, &usart1txdma_rt};
+static struct RunTimer adcirq_rt      = { "ADCIRQ", 0,0,0,0, &usart1irq_rt};
+static struct RunTimer mainloop_rt    = { "MAIN", 0,0,0,0, &adcirq_rt};
+uint64_t lastreport = 0;
 
 // USART2 is the console, for debug messages, it runs IRQ driven.
 static struct Ringbuffer usart2tx;
@@ -184,8 +198,10 @@ static void spi1_ss(uint16_t addr, int on) {
 }
 
 void DMA1_CH2_Handler(void) {
+    rt_start(&spirxdma_rt, cycleCount());
 	DMA1.IFCR = DMA1.ISR & 0x00000f0;  // clear pending flag
 	spi_rx_dma_handler(&spiq);		   // see spi.c
+    rt_stop(&spirxdma_rt, cycleCount());
 }
 
 static void start_spix(uint64_t now, uint16_t addr, uint8_t firstreg, uint8_t *buf, size_t len) {
@@ -221,6 +237,8 @@ void EXTI1_Handler(void) {
 		return;
 	EXTI.PR1 = Pin_1;
 	start_spix(now, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf);
+    rt_start(&accelirq_rt, now);
+    rt_stop(&spirxdma_rt, cycleCount());
 }
 
 void EXTI3_Handler(void) {
@@ -229,6 +247,8 @@ void EXTI3_Handler(void) {
 		return;
 	EXTI.PR1 = Pin_3;
 	start_spix(now, GYRO, BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf);
+    rt_start(&accelirq_rt, now);
+    rt_stop(&accelirq_rt, cycleCount());
 }
 
 // Other events go to another message queue, which the mainloop copies into the output stream.
@@ -246,6 +266,7 @@ void TIM6_DACUNDER_Handler(void) {
 	if ((TIM6.SR & TIM1_SR_UIF) == 0)
 		return;
 	TIM6.SR &= ~TIM1_SR_UIF;
+    rt_start(&periodic8hz_rt, now);
 
 	struct Msg *msg = msgq_head(&evq);
 
@@ -253,11 +274,11 @@ void TIM6_DACUNDER_Handler(void) {
 	case 0:
         printf("ping\n");
         report = 1; 
-		return;
+		break;
 
 	case 1:
 		start_spix(now, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
-		return;
+		break;
 
 	case 2:
 		if (!msg) {
@@ -266,23 +287,25 @@ void TIM6_DACUNDER_Handler(void) {
 		}
 		output_periodic(msg, EVENTID_ID0, now, __REVISION__, UNIQUE_DEVICE_ID[2]);
 		msgq_push_head(&evq);
-		return;
+		break;
 
 	case 3:
 		if (!msg) {
 			++dropped_evq;
-			return;
+			break;
 		}
 		output_periodic(msg, EVENTID_ID1, now, UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
 		msgq_push_head(&evq);
-		return;
+		break;
 
 	case 4:
 	case 5:
 	case 6:
 	case 7:
-		return;
+		break;
 	}
+    rt_start(&periodic8hz_rt, now);
+    rt_stop(&periodic8hz_rt, cycleCount());
 }
 
 static volatile uint64_t shutter_count = 0;	 //
@@ -292,6 +315,8 @@ void TIM2_Handler(void) {
 	uint64_t now = cycleCount();
 	uint16_t sr	 = TIM2.SR;
 	TIM2.SR &= ~sr;
+
+    rt_start(&shutterirq_rt, now);
 
 	// these could have happened in any order
 	uint64_t open_ts  = 0;
@@ -343,6 +368,8 @@ void TIM2_Handler(void) {
 			msgq_push_head(&evq);
 		}
 	}
+
+    rt_stop(&shutterirq_rt, cycleCount());
 }
 
 static volatile int adc_chan = 0;
@@ -360,6 +387,8 @@ void ADC1_Handler(void) {
     if (isr & ADC_ISR_EOS) {
         adc_chan = 0;
     }
+    rt_start(&adcirq_rt, now);
+    rt_stop(&adcirq_rt, cycleCount());
 }
 
 
@@ -372,6 +401,7 @@ static volatile uint32_t usart1rxdmaerr_cnt = 0;
 
 // USART1 TX: irq on dma error or complete
 void DMA2_CH6_Handler(void) {
+    rt_start(&usart1txdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
 	DMA2.IFCR	 = isr & 0x00f00000;
 	if (isr & DMA1_ISR_TEIF6)
@@ -381,29 +411,34 @@ void DMA2_CH6_Handler(void) {
 		if (msgq_tail(&outq))
 			msgq_pop_tail(&outq);
 	}
+    rt_stop(&usart1txdma_rt, cycleCount());
 }
 
 void USART1_Handler(void) {
+	// Transmission Complete
 	if ((USART1.ISR & USART1_ISR_TC) == 0)
 		return;
 
-	// Transmission Complete
+    rt_start(&usart1irq_rt, cycleCount());
+
 	struct Msg *msg = msgq_tail(&outq);
 	if (msg == NULL) {
 		// queue empty, clear IRQ Enable
 		USART1.CR1 &= ~USART1_CR1_TCIE;
-		return;
-	}
 
-	// queue not empty, start a new transfer
-	USART1.ICR |= USART1_ICR_TCCF;	// clear irq flag
+	} else {
 
-	DMA2.CCR6 = 0;
-	dma1_cselr_set_c6s(&DMA2, 2);  // select usart1 for dma2 ch6
-	DMA2.CPAR6	= (uintptr_t)&USART1.TDR;
-	DMA2.CMAR6	= (uintptr_t)msg->buf;
-	DMA2.CNDTR6 = msg->len;
-	DMA2.CCR6	= DMA1_CCR6_DIR | DMA1_CCR6_TEIE | DMA1_CCR6_TCIE | DMA1_CCR6_EN | DMA1_CCR6_MINC;
+        // queue not empty, start a new transfer
+        USART1.ICR |= USART1_ICR_TCCF;	// clear irq flag
+
+        DMA2.CCR6 = 0;
+        dma1_cselr_set_c6s(&DMA2, 2);  // select usart1 for dma2 ch6
+        DMA2.CPAR6	= (uintptr_t)&USART1.TDR;
+        DMA2.CMAR6	= (uintptr_t)msg->buf;
+        DMA2.CNDTR6 = msg->len;
+        DMA2.CCR6	= DMA1_CCR6_DIR | DMA1_CCR6_TEIE | DMA1_CCR6_TCIE | DMA1_CCR6_EN | DMA1_CCR6_MINC;
+    }
+      rt_stop(&usart1irq_rt, cycleCount());
 }
 
 static uint8_t		   cmdbuf[1024];
@@ -440,46 +475,53 @@ static inline int haspfx(uint8_t *buf, size_t buflen, uint8_t *pfx, size_t pfxle
 	return 1;
 }
 
+static inline void handlerx() {
+    switch (cmdbuf_state) {
+    case RESYNC:
+        while (!haspfx(cmdbuf, cmdbuf_head, "IRON", 4)) {
+            size_t start = 1 + findbyte(cmdbuf + 1, cmdbuf_head - 1, 'I');
+            memmove(cmdbuf, cmdbuf + start, cmdbuf_head - start);
+            cmdbuf_head -= start;
+            if (cmdbuf_head < 8) {
+                usart1_start_rx(8 - cmdbuf_head);
+                return;
+            }
+
+            // we have at least 8 bytes starting with 'IRON', next two bytes are packet size
+            cmdpacket_size = decode_be_uint16(cmdbuf + 4);
+            memmove(cmdbuf, cmdbuf + 6, cmdbuf_head - 6);
+            cmdbuf_head -= 6;
+            if (cmdpacket_size <= 1022)
+                break;
+        }
+
+        cmdbuf_state = MORE;
+        // fallthrough
+    case MORE:
+        if (cmdbuf_head < cmdpacket_size + 2) {
+            usart1_start_rx(2 + cmdpacket_size - cmdbuf_head);
+            return;
+        }
+        // now we have cmdpacket_size + 2 bytes in the buffer
+        cmdbuf_state = COMPLETE;
+
+    case COMPLETE:
+    }
+    return;
+}
+
 // USART1 RX: irq on dma error or complete
 void DMA2_CH7_Handler(void) {
+    rt_start(&usart1rxdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
 	DMA2.IFCR	 = isr & 0x0f000000;
 	if (isr & DMA1_ISR_TEIF7)
 		++usart1rxdmaerr_cnt;
 
 	if (isr & DMA1_ISR_TCIF7) {
-		switch (cmdbuf_state) {
-		case RESYNC:
-			while (!haspfx(cmdbuf, cmdbuf_head, "IRON", 4)) {
-				size_t start = 1 + findbyte(cmdbuf + 1, cmdbuf_head - 1, 'I');
-				memmove(cmdbuf, cmdbuf + start, cmdbuf_head - start);
-				cmdbuf_head -= start;
-				if (cmdbuf_head < 8) {
-					usart1_start_rx(8 - cmdbuf_head);
-					return;
-				}
-
-				// we have at least 8 bytes starting with 'IRON', next two bytes are packet size
-				cmdpacket_size = decode_be_uint16(cmdbuf + 4);
-				memmove(cmdbuf, cmdbuf + 6, cmdbuf_head - 6);
-				cmdbuf_head -= 6;
-				if (cmdpacket_size <= 1022)
-					break;
-			}
-
-			cmdbuf_state = MORE;
-			// fallthrough
-		case MORE:
-			if (cmdbuf_head < cmdpacket_size + 2) {
-				usart1_start_rx(2 + cmdpacket_size - cmdbuf_head);
-				return;
-			}
-			// now we have cmdpacket_size + 2 bytes in the buffer
-			cmdbuf_state = COMPLETE;
-
-		case COMPLETE:
-		}
+        handlerx();
 	}
+    rt_stop(&usart1rxdma_rt, cycleCount());
 }
 
 static const char *pplsrcstr[] = {"NONE", "MSI", "HSI16", "HSE"};
@@ -666,7 +708,7 @@ void main(void) {
     while (ADC.ISR & ADC_ISR_ADRDY)  // wait until ready
         __NOP();
     ADC.CR |= ADC_CR_ADSTART;  // start as soon as the triggers come in
-    NVIC_EnableIRQ(ADC1_IRQn);
+//    NVIC_EnableIRQ(ADC1_IRQn);
 
 	// set up TIM6 for a 8Hz hearbeat for various periodic things, including triggering the ADC
 	// note: it pushes spiq messages so do not start this before the BMI/BME are configured.
@@ -674,7 +716,7 @@ void main(void) {
 	TIM6.PSC = (CLOCKSPEED_HZ / 10000) - 1;
 	TIM6.ARR = 1250 - 1;  // 10KHz/1250 = 8Hz
 	TIM6.CR1 |= TIM6_CR1_CEN;
-    tim6_cr2_set_mms(&TIM6, 2); // TRGO = update event 
+//    tim6_cr2_set_mms(&TIM6, 2); // TRGO = update event 
 	NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
 
 
@@ -699,6 +741,7 @@ void main(void) {
 
 		// dequeue from spi and event queues, send on out queue
 		// insert packet header and footer along the way
+        rt_start(&mainloop_rt, cycleCount());
 		for (;;) {
 			struct SPIXmit *x	= spiq_tail(&spiq);
 			struct Msg	   *ev	= msgq_tail(&evq);
@@ -761,6 +804,8 @@ void main(void) {
 
 			IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
 		}
+        rt_stop(&mainloop_rt, cycleCount());
+
 
         if (!report) 
             continue;
@@ -776,7 +821,7 @@ void main(void) {
 		printf("\nuptime %llu.%06llu\n", us / 1000000, us % 1000000);
         printf("enqueued spi1: %8lu evq:%8lu usart1: %8lu\n", spiq.head, evq.head, outq.head);
         printf("dropped  spi1: %8llu evq:%8llu usart1: %8llu\n", dropped_spi1, dropped_evq, dropped_usart1);
-
+        rt_report(&mainloop_rt, &lastreport);
 
 
 	}

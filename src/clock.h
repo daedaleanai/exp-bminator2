@@ -2,6 +2,8 @@
 // This firmware uses the Cortex M4 builtin 'Systick' as a timer that counts in clock cycles.
 // See PM0214 Section 4.5
 #include <stdint.h>
+#include "stm32l4xx.h"
+
 
 enum { CLOCKSPEED_HZ = 80000000, C_US = CLOCKSPEED_HZ / 1000000 };
 
