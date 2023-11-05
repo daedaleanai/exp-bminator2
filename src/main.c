@@ -238,7 +238,7 @@ void EXTI1_Handler(void) {
 	EXTI.PR1 = Pin_1;
 	start_spix(now, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf);
     rt_start(&accelirq_rt, now);
-    rt_stop(&spirxdma_rt, cycleCount());
+    rt_stop(&accelirq_rt, cycleCount());
 }
 
 void EXTI3_Handler(void) {
@@ -247,8 +247,8 @@ void EXTI3_Handler(void) {
 		return;
 	EXTI.PR1 = Pin_3;
 	start_spix(now, GYRO, BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf);
-    rt_start(&accelirq_rt, now);
-    rt_stop(&accelirq_rt, cycleCount());
+    rt_start(&gyroirq_rt, now);
+    rt_stop(&gyroirq_rt, cycleCount());
 }
 
 // Other events go to another message queue, which the mainloop copies into the output stream.
@@ -657,7 +657,7 @@ void main(void) {
 	// BMI interrupt signals
 	EXTI.IMR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN) & Pin_All;
 	EXTI.FTSR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN) & Pin_All;
-	NVIC_EnableIRQ(EXTI1_IRQn);	 // Accelerometer ready interrupt
+//	NVIC_EnableIRQ(EXTI1_IRQn);	 // Accelerometer ready interrupt
 	NVIC_EnableIRQ(EXTI3_IRQn);	 // Gyroscope ready interrupt
 
 	// TIM2 CH1 measures shutter open/close

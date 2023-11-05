@@ -19,9 +19,10 @@ void rt_report(struct RunTimer* rt, uint64_t* lastreport) {
             printf("%12s inactive\n", rt->name);
         } else {
             uint64_t period = dt / (C_US * cnt);
+//            uint64_t frequency  = 80000000ULL * cnt / dt;
             uint64_t duty = cum / (C_US * cnt);
-
-            printf("%12s #%ld p:%lld us avg:%lld us max %ld us\n", rt->name, cnt, period, duty, max/C_US);
+        (void)max;
+            printf("%12s #%ld p:%lld av:%lld m:%ld\n", rt->name, cnt, period, duty, max/C_US);
         }
         rt = rt->next;
     }
