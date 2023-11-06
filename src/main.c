@@ -54,13 +54,13 @@ static struct gpio_config_t {
 	enum GPIO_Pin  pins;
 	enum GPIO_Conf mode;
 } const pin_cfgs[] = {
-		{USART1_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
-		{USART2_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
-		{SPI1_MOSI_PIN | SPI1_SCK_PIN | SPI1_MISO_PIN, GPIO_AF5_SPI12 | GPIO_HIGH},
-		{BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_IPU},
-		{BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN, GPIO_OUTPUT | GPIO_FAST},
-		{TIMEPULSE_PIN, GPIO_INPUT },
-        {THERMISTOR_PIN|CURRENT_SENSE_PIN, GPIO_ANALOG},
+		{ USART1_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
+		{ USART2_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
+		{ SPI1_MOSI_PIN | SPI1_SCK_PIN | SPI1_MISO_PIN, GPIO_AF5_SPI12 | GPIO_HIGH},
+		{ BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_INPUT},
+		{ BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN, GPIO_OUTPUT | GPIO_FAST},
+		{ TIMEPULSE_PIN, GPIO_INPUT },
+        { THERMISTOR_PIN|CURRENT_SENSE_PIN, GPIO_ANALOG},
 		{0, 0},	 // sentinel
 };
 
@@ -78,7 +78,7 @@ static struct gpio_config_t {
 static struct bmx_config_t const accel_cfg[] = {
 		{BMI08x_ACC_RANGE, BMI088_ACC_RANGE_3G},  // SEE NOTE ABOVE
 		{BMI08x_ACC_CONF, BMI08x_ACC_CONF_1600HZ_OSR4},
-		{BMI08x_INT1_IO_CONF, 0x0C},		// INT1 enable output, Active low, open drain
+		{BMI08x_INT1_IO_CONF, 0x08},		// INT1 enable output, Active low, push-pull
 		{BMI08x_INT1_INT2_MAP_DATA, 0x04},	// Map int to int1
 		{0xFF, 0},							// sentinel
 };
@@ -86,7 +86,7 @@ static struct bmx_config_t const accel_cfg[] = {
 static struct bmx_config_t const gyro_cfg[] = {
 		{BMI08x_GYRO_RANGE, BMI08x_GYRO_RANGE_250DEG_S},  // SEE NOTE ABOVE
 		{BMI08x_GYRO_BANDWIDTH, BMI08x_GYRO_BANDWIDTH_2000_532HZ},
-		{BMI08x_INT3_INT4_IO_CONF, 0x02},  // INT3 Active low, open drain
+		{BMI08x_INT3_INT4_IO_CONF, 0x00},  // INT3 Active low, push-pull
 		{BMI08x_INT3_INT4_IO_MAP, 0x01},   // INT mapped to INT3
 		{BMI08x_GYRO_INT_CTRL, 0x80},	   // Enable INT generation
 		{0xFF, 0},						   // sentinel
@@ -657,7 +657,7 @@ void main(void) {
 	// BMI interrupt signals
 	EXTI.IMR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN) & Pin_All;
 	EXTI.FTSR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN) & Pin_All;
-//	NVIC_EnableIRQ(EXTI1_IRQn);	 // Accelerometer ready interrupt
+	NVIC_EnableIRQ(EXTI1_IRQn);	 // Accelerometer ready interrupt
 	NVIC_EnableIRQ(EXTI3_IRQn);	 // Gyroscope ready interrupt
 
 	// TIM2 CH1 measures shutter open/close
@@ -807,7 +807,6 @@ void main(void) {
 		}
         rt_stop(&mainloop_rt, cycleCount());
 
-
         if (!report) 
             continue;
 
@@ -815,11 +814,7 @@ void main(void) {
 
         uint64_t now = cycleCount();
    		uint64_t us = now / C_US;  // microseconds
-		// printf("\nuptime %llu.%06llu  spiq %ld %ld %ld (%lld) %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr,
-		// spiq.tail,  dropped_spi1, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
-		// printf("\nuptime %llu.%06llu  usart1 %ld-%ld
-		// (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1,
-		// USART1.CR1, USART1.ISR, DMA2.CNDTR6, usart1txdmaerr_cnt);
+
 		printf("\nuptime %llu.%06llu\n", us / 1000000, us % 1000000);
         printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\n", spiq.head, evq.head, outq.head);
         printf("dropped  spiq: %8llu evq:%8llu outq: %8llu\n", dropped_spi1, dropped_evq, dropped_usart1);
