@@ -5,7 +5,10 @@
 
 enum {
     // Accelerometer registers
-    BMI08x_ACC_CHIP_ID = 0x0,
+    BMI08x_ACC_CHIP_ID = 0x0,  
+    BMI08x_ACC_CHIP_ID_BMI085 = 0x1F,  // only difference is the accel range 2,4,8,16g
+    BMI08x_ACC_CHIP_ID_BMI088 = 0x1E,  // vs 3,6,12,24g
+
     BMI08x_ACC_ERR_REG = 0x2,
     BMI08x_ACC_STATUS = 0x3,
     BMI08x_ACC_X_LSB = 0x12,
@@ -62,7 +65,7 @@ enum {
     BMI08x_ACC_CONF_12_5HZ_OSR4 = 0x85,
 
     // These ranges are the only difference between the BMI085 and the BMI08x
-    BMI088_ACC_RANGE_24G = 0x03,
+    BMI088_ACC_RANGE_24G = 0x03, 
     BMI088_ACC_RANGE_12G = 0x02,
     BMI088_ACC_RANGE_6G = 0x01,
     BMI088_ACC_RANGE_3G = 0x00,

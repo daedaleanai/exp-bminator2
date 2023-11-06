@@ -51,11 +51,11 @@ int output_bmx(struct Msg *msg, struct SPIXmit *x) {
 	case MSGTYPE(HUMID, BME280_DATA_REG):
 		if (1) {  // TODO: look for valid flag
 			int32_t t_mdegc, p_mpa;
-			bme_decode(&bmeParam, x->buf, &t_mdegc, &p_mpa, &bme_hume6);
+			bme_decode(&bmeParam, x->buf+1, &t_mdegc, &p_mpa, &bme_hume6);
 			msg_append16(msg, 0);			  // len
 			msg_append16(msg, EVENTID_BARO);  // header
 			msg_append64(msg, x->ts);
-			msg_append32(msg, t_mdegc + 273150);  // convert to milliKelvin
+			msg_append32(msg, t_mdegc );  // + 273150 convert to milliKelvin
 			msg_append32(msg, p_mpa);
 			msg->buf[1] = msg->len;
 			return 1;

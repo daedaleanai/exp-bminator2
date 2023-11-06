@@ -120,7 +120,7 @@ static struct {
 		{USART1_IRQn, PRIO(2, 2)},		   // USART1 TX schedule next DMA
         {ADC1_IRQn, PRIO(3,0)},            // ADC conversions
 		{USART2_IRQn, PRIO(3, 1)},		   // USART2 TX
-        {TIM1_UP_TIM16_IRQn, PRIO(3,3)},   // periodic report
+        {TIM1_UP_TIM16_IRQn, PRIO(3,3)},   // TIM16 1Hz periodic debug report
 		{None_IRQn, 0xff},				   // sentinel
 };
 #undef PRIO
@@ -136,7 +136,7 @@ static struct RunTimer usart1irq_rt   = { "USART1IRQ", 0,0,0,0, &usart1txdma_rt}
 static struct RunTimer adcirq_rt      = { "ADCIRQ", 0,0,0,0, &usart1irq_rt};
 static struct RunTimer report_rt      = { "REPORT", 0,0,0,0, &adcirq_rt};
 static struct RunTimer mainloop_rt    = { "MAIN", 0,0,0,0, &report_rt};
-static struct RunTimer idle_rt    = { "IDLE", 0,0,0,0, &mainloop_rt};
+static struct RunTimer idle_rt        = { "IDLE", 0,0,0,0, &mainloop_rt};
 uint64_t lastreport = 0;
 
 // USART2 is the console, for debug messages, it runs IRQ driven.
@@ -526,7 +526,6 @@ void DMA2_CH7_Handler(void) {
     rt_stop(&usart1rxdma_rt, cycleCount());
 }
 
-
 void TIM1_UP_TIM16_Handler(void) {
     uint64_t now = cycleCount();
     uint16_t sr	 = TIM16.SR;
@@ -534,7 +533,7 @@ void TIM1_UP_TIM16_Handler(void) {
 
     uint64_t us = now / C_US;  // microseconds
 
-    printf("\nuptime %llu.%06llu\n", us / 1000000, us % 1000000);
+    printf("uptime %llu.%06llu\n", us / 1000000, us % 1000000);
     printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\n", spiq.head, evq.head, outq.head);
     printf("dropped  spiq: %8llu evq:%8llu outq: %8llu\n", dropped_spi1, dropped_evq, dropped_usart1);
     printf("usart1 error tx: %ld rx:%ld\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
@@ -570,7 +569,9 @@ void main(void) {
 	gpioLock(PBAll);
 
 	// deselect all (active low) chip select signals
-	spi1_ss(NONE, 0);
+    digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN);
+    spi1_ss(HUMID, 1); delay(5); spi1_ss(HUMID, 0); // force BME into SPI mode
+    spi1_ss(ACCEL, 1); delay(5); spi1_ss(ACCEL, 0); // force BMI accel part into SPI mode
 
 	// prepare USART2 for console and debug messages
 	ringbuffer_clear(&usart2tx);
@@ -588,53 +589,11 @@ void main(void) {
 	usart_wait(&USART2);
 
 	// Set up SPI1 for talking to all the connected chips.
-	spiq_init(&spiq, &SPI1, 3, SPI1_DMA1_CH23, spi1_ss);  // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss);  // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 
-	if (bmi_accel_poweron(&spiq) == 0) {
-		printf("BMI088 Accel enabled.\n");
-	} else {
-		printf("BMI088 not found.\n");
-	}
+    // test and config BME280
 
-	int bmi_ok = (bmi088_self_test(&spiq) == 0);
-	usart_wait(&USART2);
-
-	if (bmi_accel_poweron(&spiq)) {
-		printf("BMI088 Accel failed to reset.\n");
-		bmi_ok = 0;
-	}
-
-	usart_wait(&USART2);
-
-	if (bmx_config(&spiq, ACCEL, accel_cfg) != 0) {
-		printf("error configuring BMI Accel.\n");
-		bmi_ok = 0;
-	}
-
-	usart_wait(&USART2);
-	if (bmx_check_config(&spiq, ACCEL, accel_cfg) != 0) {
-		printf("BMI Accel not properly configured\n");
-		bmi_ok = 0;
-	}
-	usart_wait(&USART2);
-	if (bmx_config(&spiq, GYRO, gyro_cfg) != 0) {
-		printf("error configuring BMI Gyro\n");
-		bmi_ok = 0;
-	}
-
-	usart_wait(&USART2);
-	if (bmx_check_config(&spiq, GYRO, gyro_cfg) != 0) {
-		printf("BMI Gyro not properly configured\n");
-		bmi_ok = 0;
-	}
-	if (bmi_ok) {
-		printf("BMI Enabled\n");
-	}
-
-	usart_wait(&USART2);
-
-	int bme_ok = (bme280_self_test(&spiq, &bmeParam) == 0);
-	if (bme_ok) {
+    if (bme280_self_test(&spiq, &bmeParam) == 0) {
 		printf("T:");
 		for (size_t i = 1; i < 4; ++i)
 			printf(" %ld", bmeParam.T[i]);
@@ -654,32 +613,59 @@ void main(void) {
 
 	if (bmx_config(&spiq, HUMID, humid_cfg) != 0) {
 		printf("error configuring BME humidity sensor\n");
-		bme_ok = 0;
 	}
+	usart_wait(&USART2);
+
+
+    // test and config BMI088
+
+	if (bmi_accel_poweron(&spiq) == 0) {
+		printf("BMI088 Accel enabled.\n");
+	} else {
+		printf("BMI088 not found.\n");
+	}
+
+	bmi088_self_test(&spiq);
+	usart_wait(&USART2);
+
+	if (bmi_accel_poweron(&spiq)) {
+		printf("BMI088 Accel failed to reset.\n");
+	}
+
+	if (bmx_config(&spiq, ACCEL, accel_cfg) != 0) {
+		printf("BMI088 error configuring Accel.\n");
+	}
+
+	if (bmx_config(&spiq, GYRO, gyro_cfg) != 0) {
+		printf("BMI088 error configuring Gyro\n");
+	}
+    usart_wait(&USART2);
+
+
+    int accel_ok = (bmx_check_config(&spiq, ACCEL, accel_cfg) == 0);
+	if (!accel_ok) {
+		printf("BMI Accel not properly configured\n");
+	}
+	usart_wait(&USART2);
+    int gyro_ok  = (bmx_check_config(&spiq, GYRO, gyro_cfg) == 0);
+	if (!gyro_ok) {
+		printf("BMI Gyro not properly configured\n");
+    }
 
 	usart_wait(&USART2);
-	if (bmx_check_config(&spiq, HUMID, humid_cfg) != 0) {
+    int humid_ok = (bmx_check_config(&spiq, HUMID, humid_cfg) == 0);
+	if (!humid_ok) {
 		printf("BME humidity sensor not properly configured.\n");
-		bme_ok = 0;
 	}
-
-	if (!(bmi_ok && bme_ok)) {
-		printf("BMI or BME not functional, watchdog will reboot....\n");
-	}
+	usart_wait(&USART2);
 
 	// Prepare USART1 for high speed DMA driven output of the measurement data
 	usart_init(&USART1, 921600);
 	USART1.CR3 |= USART1_CR3_DMAT | USART1_CR3_DMAR;  // enable DMA output and input
-	usart1_start_rx(8);
+	usart1_start_rx(8);  // ask rx for the first 8 bytes
 	NVIC_EnableIRQ(DMA2_CH6_IRQn);
 	NVIC_EnableIRQ(DMA2_CH7_IRQn);
 	NVIC_EnableIRQ(USART1_IRQn);
-
-	// BMI interrupt signals
-	EXTI.IMR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN) & Pin_All;
-	EXTI.FTSR1 |= (BMI_INT1A_PIN | BMI_INT3G_PIN) & Pin_All;
-	NVIC_EnableIRQ(EXTI1_IRQn);	 // Accelerometer ready interrupt
-	NVIC_EnableIRQ(EXTI3_IRQn);	 // Gyroscope ready interrupt
 
 	// TIM2 CH1 measures shutter open/close
 	// See RM0394 section 27.3.5
@@ -740,7 +726,6 @@ void main(void) {
 //    tim6_cr2_set_mms(&TIM6, 2); // TRGO = update event 
 	NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
 
-
 	// set up TIM16 for a 1Hz report 
 	TIM16.DIER |= TIM16_DIER_UIE;
 	TIM16.PSC = (CLOCKSPEED_HZ / 10000) - 1;
@@ -749,10 +734,21 @@ void main(void) {
 	TIM16.CR1 |= TIM16_CR1_CEN;
 	NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);
 
-
 	// headers used in output message vary by accel/gyro configuration
 	gyro_hdr  = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
 	accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
+
+	// BMI interrupt signals
+    if (accel_ok) {
+	    EXTI.IMR1  |= BMI_INT1A_PIN & Pin_All;
+    	EXTI.FTSR1 |= BMI_INT1A_PIN & Pin_All;
+    	NVIC_EnableIRQ(EXTI1_IRQn);	 // Accelerometer ready interrupt
+    }
+    if (gyro_ok) {
+    	EXTI.IMR1  |= BMI_INT3G_PIN & Pin_All;
+	    EXTI.FTSR1 |= BMI_INT3G_PIN & Pin_All;
+    	NVIC_EnableIRQ(EXTI3_IRQn);	 // Gyroscope ready interrupt
+    }
 
 	// Initialize the independent watchdog
 	IWDG.KR	 = 0x5555;	// enable watchdog config
@@ -823,6 +819,7 @@ void main(void) {
 				packetlen = packetsize;
 			}
 
+            // end of packet; send checksum trailer + header for the next
 			if (packetsize == packetlen) {
 				while (msgq_head(&outq) == NULL)
 					__NOP();
