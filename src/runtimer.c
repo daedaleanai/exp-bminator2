@@ -22,10 +22,10 @@ void rt_report(struct RunTimer* rt, uint64_t* lastreport) {
         __enable_irq();
 
         if (cnt == 0) {
-            printf("%12s\n", rt->name);
+            printf("%12s\e[K\n", rt->name);
         } else {
             uint64_t period = dt / (C_US * cnt);
-            printf("%12s % 5ld % 8lld % 5ld % 3ld\n", rt->name, cnt, period, cum/C_US, max/C_US);
+            printf("%12s % 5ld % 8lld % 5ld % 3ld\e[K\n", rt->name, cnt, period, cum/C_US, max/C_US);
         }
         rt = rt->next;
     }

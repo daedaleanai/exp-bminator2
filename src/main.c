@@ -533,12 +533,12 @@ void TIM1_UP_TIM16_Handler(void) {
 
     uint64_t us = now / C_US;  // microseconds
 
-    printf("uptime %llu.%06llu\n", us / 1000000, us % 1000000);
-    printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\n", spiq.head, evq.head, outq.head);
-    printf("dropped  spiq: %8llu evq:%8llu outq: %8llu\n", dropped_spi1, dropped_evq, dropped_usart1);
-    printf("usart1 error tx: %ld rx:%ld\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
+    printf("\e[Huptime %llu.%06llu\e[K\n", us / 1000000, us % 1000000);
+    printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\e[K\n", spiq.head, evq.head, outq.head);
+    printf("dropped  spiq: %8llu evq:%8llu outq: %8llu\e[K\n", dropped_spi1, dropped_evq, dropped_usart1);
+    printf("usart1 error tx: %ld rx:%ld\e[K\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
     rt_report(&idle_rt, &lastreport);
-
+    printf("\e[K\n");
     // account for reporting time outside of rt_report call
     rt_start(&report_rt, now);
     rt_stop(&report_rt, cycleCount());
