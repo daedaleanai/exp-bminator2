@@ -9,20 +9,23 @@
 void rt_report(struct RunTimer* rt, uint64_t* lastreport) {
     uint64_t now = cycleCount();
     uint32_t dt = now - *lastreport;
+//  printf("elapsed %ld us\n", dt/C_US);
+    printf("-------------  cnt - period - cum - max\n");
     while (rt) {
         __disable_irq();
-        uint32_t cum = rt->cum; rt->cum = 0;// accumulated runtime
-        uint32_t cnt = rt->cnt; rt->cnt = 0; // number of times stopped
-        uint32_t max = rt->max; rt->max = 0; // max time
+        uint32_t cum = rt->cum;// accumulated runtime
+        uint32_t cnt = rt->cnt; // number of times stopped
+        uint32_t max = rt->max; // max time
+        rt->cum = 0;
+        rt->cnt = 0;
+        rt->max = 0;
         __enable_irq();
+
         if (cnt == 0) {
-            printf("%12s inactive\n", rt->name);
+            printf("%12s\n", rt->name);
         } else {
             uint64_t period = dt / (C_US * cnt);
-//            uint64_t frequency  = 80000000ULL * cnt / dt;
-            uint64_t duty = cum / (C_US * cnt);
-        (void)max;
-            printf("%12s #%ld p:%lld av:%lld m:%ld\n", rt->name, cnt, period, duty, max/C_US);
+            printf("%12s % 5ld % 8lld % 5ld % 3ld\n", rt->name, cnt, period, cum/C_US, max/C_US);
         }
         rt = rt->next;
     }

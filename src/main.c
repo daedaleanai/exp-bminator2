@@ -133,7 +133,8 @@ static struct RunTimer usart1rxdma_rt = { "USART1RXDMA", 0,0,0,0, &shutterirq_rt
 static struct RunTimer usart1txdma_rt = { "USART1TXDMA", 0,0,0,0, &usart1rxdma_rt};
 static struct RunTimer usart1irq_rt   = { "USART1IRQ", 0,0,0,0, &usart1txdma_rt};
 static struct RunTimer adcirq_rt      = { "ADCIRQ", 0,0,0,0, &usart1irq_rt};
-static struct RunTimer mainloop_rt    = { "MAIN", 0,0,0,0, &adcirq_rt};
+static struct RunTimer report_rt      = { "REPORT", 0,0,0,0, &usart1irq_rt};
+static struct RunTimer mainloop_rt    = { "MAIN", 0,0,0,0, &report_rt};
 uint64_t lastreport = 0;
 
 // USART2 is the console, for debug messages, it runs IRQ driven.
@@ -272,7 +273,6 @@ void TIM6_DACUNDER_Handler(void) {
 
 	switch (tim6_tick++ & 7) {
 	case 0:
-        printf("ping\n");
         report = 1; 
 		break;
 
@@ -283,7 +283,7 @@ void TIM6_DACUNDER_Handler(void) {
 	case 2:
 		if (!msg) {
 			++dropped_evq;
-			return;
+			break;
 		}
 		output_periodic(msg, EVENTID_ID0, now, __REVISION__, UNIQUE_DEVICE_ID[2]);
 		msgq_push_head(&evq);
@@ -752,14 +752,15 @@ void main(void) {
 			}
 
 			int ok = 0;
-			if (x) {
-				ok = output_bmx(out, x);
-				spiq_deq_tail(&spiq);
-			}
-			if (!ok && ev) {
+			if (ev) {
 				out->len = ev->len;
 				memmove(out->buf, ev->buf, ev->len);
 				msgq_pop_tail(&evq);
+                ok = 1;
+			}
+			if (!ok && x) {
+				ok = output_bmx(out, x);
+				spiq_deq_tail(&spiq);
 			}
 
 			if (!ok)  // nothing to send
@@ -812,17 +813,22 @@ void main(void) {
 
         report = 0;
 
-   		uint64_t us = cycleCount() / C_US;  // microseconds
+        uint64_t now = cycleCount();
+   		uint64_t us = now / C_US;  // microseconds
 		// printf("\nuptime %llu.%06llu  spiq %ld %ld %ld (%lld) %04x %04x 0x%08lx\n", sec, now, spiq.head, spiq.curr,
 		// spiq.tail,  dropped_spi1, SPI1.CR1, SPI1.SR, DMA2.CNDTR3);
 		// printf("\nuptime %llu.%06llu  usart1 %ld-%ld
 		// (dropped %lld) cr:%04lx isr:%04lx dma len:0x%08lx e:%ld\n", sec, now, outq.head, outq.tail, dropped_usart1,
 		// USART1.CR1, USART1.ISR, DMA2.CNDTR6, usart1txdmaerr_cnt);
 		printf("\nuptime %llu.%06llu\n", us / 1000000, us % 1000000);
-        printf("enqueued spi1: %8lu evq:%8lu usart1: %8lu\n", spiq.head, evq.head, outq.head);
-        printf("dropped  spi1: %8llu evq:%8llu usart1: %8llu\n", dropped_spi1, dropped_evq, dropped_usart1);
+        printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\n", spiq.head, evq.head, outq.head);
+        printf("dropped  spiq: %8llu evq:%8llu outq: %8llu\n", dropped_spi1, dropped_evq, dropped_usart1);
+        printf("usart1 error tx: %ld rx:%ld\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
         rt_report(&mainloop_rt, &lastreport);
 
+        // account for reporting time
+        rt_start(&report_rt, now);
+        rt_stop(&report_rt, cycleCount());
 
 	}
 }
