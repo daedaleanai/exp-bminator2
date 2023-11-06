@@ -120,6 +120,7 @@ static struct {
 		{USART1_IRQn, PRIO(2, 2)},		   // USART1 TX schedule next DMA
         {ADC1_IRQn, PRIO(3,0)},            // ADC conversions
 		{USART2_IRQn, PRIO(3, 1)},		   // USART2 TX
+        {TIM1_UP_TIM16_IRQn, PRIO(3,3)},   // periodic report
 		{None_IRQn, 0xff},				   // sentinel
 };
 #undef PRIO
@@ -133,8 +134,9 @@ static struct RunTimer usart1rxdma_rt = { "USART1RXDMA", 0,0,0,0, &shutterirq_rt
 static struct RunTimer usart1txdma_rt = { "USART1TXDMA", 0,0,0,0, &usart1rxdma_rt};
 static struct RunTimer usart1irq_rt   = { "USART1IRQ", 0,0,0,0, &usart1txdma_rt};
 static struct RunTimer adcirq_rt      = { "ADCIRQ", 0,0,0,0, &usart1irq_rt};
-static struct RunTimer report_rt      = { "REPORT", 0,0,0,0, &usart1irq_rt};
+static struct RunTimer report_rt      = { "REPORT", 0,0,0,0, &adcirq_rt};
 static struct RunTimer mainloop_rt    = { "MAIN", 0,0,0,0, &report_rt};
+static struct RunTimer idle_rt    = { "IDLE", 0,0,0,0, &mainloop_rt};
 uint64_t lastreport = 0;
 
 // USART2 is the console, for debug messages, it runs IRQ driven.
@@ -524,6 +526,25 @@ void DMA2_CH7_Handler(void) {
     rt_stop(&usart1rxdma_rt, cycleCount());
 }
 
+
+void TIM1_UP_TIM16_Handler(void) {
+    uint64_t now = cycleCount();
+    uint16_t sr	 = TIM16.SR;
+	TIM16.SR &= ~sr;
+
+    uint64_t us = now / C_US;  // microseconds
+
+    printf("\nuptime %llu.%06llu\n", us / 1000000, us % 1000000);
+    printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\n", spiq.head, evq.head, outq.head);
+    printf("dropped  spiq: %8llu evq:%8llu outq: %8llu\n", dropped_spi1, dropped_evq, dropped_usart1);
+    printf("usart1 error tx: %ld rx:%ld\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
+    rt_report(&idle_rt, &lastreport);
+
+    // account for reporting time outside of rt_report call
+    rt_start(&report_rt, now);
+    rt_stop(&report_rt, cycleCount());
+}
+
 static const char *pplsrcstr[] = {"NONE", "MSI", "HSI16", "HSE"};
 
 void main(void) {
@@ -538,8 +559,8 @@ void main(void) {
 	// Enable all the devices we are going to need
 	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
 	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN | RCC_AHB2ENR_ADCEN;
-	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN | RCC_APB1ENR1_TIM2EN;
-	RCC.APB2ENR |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART1EN;
+	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN | RCC_APB1ENR1_TIM2EN ;
+	RCC.APB2ENR |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART1EN | RCC_APB2ENR_TIM16EN;
 
 	for (const struct gpio_config_t *p = pin_cfgs; p->pins; ++p) {
 		gpioConfig(p->pins, p->mode);
@@ -720,6 +741,15 @@ void main(void) {
 	NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
 
 
+	// set up TIM16 for a 1Hz report 
+	TIM16.DIER |= TIM16_DIER_UIE;
+	TIM16.PSC = (CLOCKSPEED_HZ / 10000) - 1;
+	TIM16.ARR = 10000 - 1;  // 10KHz/10000 = 1Hz
+    TIM16.CNT = 3333;       // offset by a third of a second
+	TIM16.CR1 |= TIM16_CR1_CEN;
+	NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);
+
+
 	// headers used in output message vary by accel/gyro configuration
 	gyro_hdr  = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
 	accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
@@ -734,37 +764,44 @@ void main(void) {
 	size_t packetlen  = 0;
 	size_t packetchk  = 0;
 
-    printf("Mainloop start...\n");
+    printf("%lld mainloop start\n", cycleCount()/C_US);
 
 	for (;;) {
+        rt_start(&idle_rt, cycleCount());
+
 		__WFI();
+
+		struct SPIXmit *x	= spiq_tail(&spiq);
+		struct Msg	   *ev	= msgq_tail(&evq);
+        uint64_t        now = cycleCount();
+
+        rt_stop(&idle_rt, now);
+
+        if (!x && !ev)
+            continue;
 
 		// dequeue from spi and event queues, send on out queue
 		// insert packet header and footer along the way
-        rt_start(&mainloop_rt, cycleCount());
-		for (;;) {
-			struct SPIXmit *x	= spiq_tail(&spiq);
-			struct Msg	   *ev	= msgq_tail(&evq);
-			struct Msg	   *out = msgq_head(&outq);
-			if ((x || ev) && !out) {
+        rt_start(&mainloop_rt, now);
+		while (x || ev) {
+			struct Msg *out = msgq_head(&outq);
+			if (!out) {
 				++dropped_usart1;
 				break;
 			}
 
-			int ok = 0;
 			if (ev) {
 				out->len = ev->len;
 				memmove(out->buf, ev->buf, ev->len);
 				msgq_pop_tail(&evq);
-                ok = 1;
-			}
-			if (!ok && x) {
-				ok = output_bmx(out, x);
+                ev = msgq_tail(&evq);
+			} else if (x) {
+				int ok = output_bmx(out, x);
 				spiq_deq_tail(&spiq);
+                x = spiq_tail(&spiq);
+    			if (!ok)  // nothing to send
+	    			continue;
 			}
-
-			if (!ok)  // nothing to send
-				break;
 
 			packetlen += out->len;
 			for (size_t i = 0; i < out->len; ++i)
@@ -804,26 +841,10 @@ void main(void) {
 			}
 
 			IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
+
 		}
         rt_stop(&mainloop_rt, cycleCount());
 
-        if (!report) 
-            continue;
+	} // forever
 
-        report = 0;
-
-        uint64_t now = cycleCount();
-   		uint64_t us = now / C_US;  // microseconds
-
-		printf("\nuptime %llu.%06llu\n", us / 1000000, us % 1000000);
-        printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\n", spiq.head, evq.head, outq.head);
-        printf("dropped  spiq: %8llu evq:%8llu outq: %8llu\n", dropped_spi1, dropped_evq, dropped_usart1);
-        printf("usart1 error tx: %ld rx:%ld\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
-        rt_report(&mainloop_rt, &lastreport);
-
-        // account for reporting time
-        rt_start(&report_rt, now);
-        rt_stop(&report_rt, cycleCount());
-
-	}
-}
+} // main()
