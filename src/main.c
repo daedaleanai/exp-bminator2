@@ -111,6 +111,7 @@ static struct {
 } const irqprios[] = {
 		{SysTick_IRQn, PRIO(0, 0)},
 		{DMA1_CH2_IRQn, PRIO(1, 0)},	   // SPI RX done DMA
+		{DMA1_CH3_IRQn, PRIO(1, 0)},	   // SPI TX done DMA
 		{TIM6_DACUNDER_IRQn, PRIO(1, 0)},  // 8Hz periodic read BME shedules SPI xmit and push evq
 		{EXTI1_IRQn, PRIO(1, 1)},		   // BMI088 Accel IRQ schedules SPI xmit
 		{EXTI3_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
@@ -172,7 +173,9 @@ void hexdump(size_t len, const uint8_t *ptr) {
 // The gyro and accel irq and periodically TIM6 trigger a SPI transaction on the accel, gyro or humid
 // sensor. The result of that transaction becomes available in the main loop.
 static struct SPIQ spiq;
-static volatile uint64_t dropped_spi1 = 0;  // how often we tried to submit a spi1 xmit but the queue was full
+static volatile uint32_t dropped_spi1 = 0;  // how often we tried to submit a spi1 xmit but the queue was full
+static volatile uint32_t spi1rxdmaerr_cnt = 0;
+static volatile uint32_t spi1txdmaerr_cnt = 0;
 
 static void spi1_ss(uint16_t addr, int on) {
 	switch ((enum BMXFunction)addr) {
@@ -202,10 +205,24 @@ static void spi1_ss(uint16_t addr, int on) {
 
 void DMA1_CH2_Handler(void) {
     rt_start(&spirxdma_rt, cycleCount());
-	DMA1.IFCR = DMA1.ISR & 0x00000f0;  // clear pending flag
+    uint32_t isr = DMA1.ISR;
+    if (isr & DMA1_ISR_TEIF2) {
+        ++spi1rxdmaerr_cnt;
+    }
+	DMA1.IFCR = isr & 0x00000f0;  // clear pending flags
 	spi_rx_dma_handler(&spiq);		   // see spi.c
     rt_stop(&spirxdma_rt, cycleCount());
 }
+
+// only used to count errors
+void DMA1_CH3_Handler(void) {
+    uint32_t isr = DMA1.ISR;
+    if (isr & DMA1_ISR_TEIF3) {
+        ++spi1txdmaerr_cnt;
+    }
+	DMA1.IFCR = isr & 0x0000f00;  // clear pending flags
+}
+
 
 static void start_spix(uint64_t now, uint16_t addr, uint8_t firstreg, uint8_t *buf, size_t len) {
 	struct SPIXmit *x = spiq_head(&spiq);
@@ -256,11 +273,10 @@ void EXTI3_Handler(void) {
 
 // Other events go to another message queue, which the mainloop copies into the output stream.
 static struct MsgQueue	 evq		 = {0, 0, {}};
-static volatile uint64_t dropped_evq = 0;  // queue full, msqq_head returned NULL
+static volatile uint32_t dropped_evq = 0;  // queue full, msqq_head returned NULL
 
 extern uint32_t UNIQUE_DEVICE_ID[3];  // Section 47.1, defined in .ld file
 
-static volatile int report = 0; // time to dump status in main loop
 static volatile uint32_t tim6_tick = 0;
 // Timer 6: 8Hz BME read, periodic messages, status report
 void TIM6_DACUNDER_Handler(void) {
@@ -275,7 +291,6 @@ void TIM6_DACUNDER_Handler(void) {
 
 	switch (tim6_tick++ & 7) {
 	case 0:
-        report = 1; 
 		break;
 
 	case 1:
@@ -397,7 +412,7 @@ void ADC1_Handler(void) {
 // USART1 is the output datastream and command input
 
 static struct MsgQueue	 outq				= {0, 0, {}};
-static volatile uint64_t dropped_usart1		= 0;  // queue full, msqq_head returned NULL
+static volatile uint32_t dropped_usart1		= 0;  // queue full, msqq_head returned NULL
 static volatile uint32_t usart1txdmaerr_cnt = 0;
 static volatile uint32_t usart1rxdmaerr_cnt = 0;
 
@@ -535,8 +550,9 @@ void TIM1_UP_TIM16_Handler(void) {
 
     printf("\e[Huptime %llu.%06llu\e[K\n", us / 1000000, us % 1000000);
     printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\e[K\n", spiq.head, evq.head, outq.head);
-    printf("dropped  spiq: %8llu evq:%8llu outq: %8llu\e[K\n", dropped_spi1, dropped_evq, dropped_usart1);
-    printf("usart1 error tx: %ld rx:%ld\e[K\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
+    printf("dropped  spiq: %8lu evq:%8lu outq: %8lu\e[K\n", dropped_spi1, dropped_evq, dropped_usart1);
+    printf("spi1   err tx: %8lu  rx:%8lu\e[K\n", spi1txdmaerr_cnt, spi1rxdmaerr_cnt);
+    printf("usart1 err tx: %8lu  rx:%8lu\e[K\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
     rt_report(&idle_rt, &lastreport);
     printf("\e[K\n");
     // account for reporting time outside of rt_report call
@@ -590,6 +606,8 @@ void main(void) {
 
 	// Set up SPI1 for talking to all the connected chips.
 	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss);  // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+    NVIC_EnableIRQ(DMA1_CH3_IRQn); // only used to count tx errors
+
 
     // test and config BME280
 
