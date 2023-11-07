@@ -628,7 +628,7 @@ void main(void) {
 	bmi088_self_test(&spiq);
 	usart_wait(&USART2);
 
-	if (bmi_accel_poweron(&spiq)) {
+	if (bmi_accel_poweron(&spiq) != 0) {
 		printf("BMI088 Accel failed to reset.\n");
 	}
 
