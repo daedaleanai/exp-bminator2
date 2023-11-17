@@ -47,7 +47,8 @@ enum {
 	SPI1_SCK_PIN  = PB3,
 	SPI1_MISO_PIN = PB4,
 	SPI1_MOSI_PIN = PB5,
-	BME_CSB_PIN	  = PB7,  // TODO for some reason PB6 doesnt work on the nucleo prototype
+	BME_CSB_PIN	  = PB6,  // TODO for some reason PB6 doesnt work on the nucleo prototype, there i use PB7
+//	BME_CSB_PIN	  = PB7,  // TODO for some reason PB6 doesnt work on the nucleo prototype, there i use PB7
 };
 
 static struct gpio_config_t {
@@ -584,10 +585,12 @@ void main(void) {
 	gpioLock(PAAll);
 	gpioLock(PBAll);
 
-	// deselect all (active low) chip select signals
-    digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN);
-    spi1_ss(HUMID, 1); delay(5); spi1_ss(HUMID, 0); // force BME into SPI mode
-    spi1_ss(ACCEL, 1); delay(5); spi1_ss(ACCEL, 0); // force BMI accel part into SPI mode
+	// deselect all (active low) chip select signals, then wiggle them
+    // to force them from I2C into SPI mode
+    digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN); delay(15);
+    spi1_ss(HUMID, 1); delay(15); spi1_ss(HUMID, 0);
+    spi1_ss(ACCEL, 1); delay(15); spi1_ss(ACCEL, 0);
+    spi1_ss(GYRO, 1); delay(15); spi1_ss(GYRO, 0);
 
 	// prepare USART2 for console and debug messages
 	ringbuffer_clear(&usart2tx);
@@ -607,32 +610,6 @@ void main(void) {
 	// Set up SPI1 for talking to all the connected chips.
 	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss);  // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
     NVIC_EnableIRQ(DMA1_CH3_IRQn); // only used to count tx errors
-
-
-    // test and config BME280
-
-    if (bme280_self_test(&spiq, &bmeParam) == 0) {
-		printf("T:");
-		for (size_t i = 1; i < 4; ++i)
-			printf(" %ld", bmeParam.T[i]);
-		printf("\n");
-
-		printf("P:");
-		for (size_t i = 1; i < 10; ++i)
-			printf(" %ld", bmeParam.P[i]);
-		printf("\n");
-
-		printf("H:");
-		for (size_t i = 1; i < 7; ++i)
-			printf(" %ld", bmeParam.H[i]);
-		printf("\n");
-	}
-	usart_wait(&USART2);
-
-	if (bmx_config(&spiq, HUMID, humid_cfg) != 0) {
-		printf("error configuring BME humidity sensor\n");
-	}
-	usart_wait(&USART2);
 
 
     // test and config BMI088
@@ -669,8 +646,34 @@ void main(void) {
 	if (!gyro_ok) {
 		printf("BMI Gyro not properly configured\n");
     }
-
 	usart_wait(&USART2);
+
+    // test and config BME280
+    
+    if (bme280_self_test(&spiq, &bmeParam) == 0) {
+		printf("T:");
+		for (size_t i = 1; i < 4; ++i)
+			printf(" %ld", bmeParam.T[i]);
+		printf("\n");
+
+		printf("P:");
+		for (size_t i = 1; i < 10; ++i)
+			printf(" %ld", bmeParam.P[i]);
+		printf("\n");
+
+		printf("H:");
+		for (size_t i = 1; i < 7; ++i)
+			printf(" %ld", bmeParam.H[i]);
+		printf("\n");
+	}
+	usart_wait(&USART2);
+
+	if (bmx_config(&spiq, HUMID, humid_cfg) != 0) {
+		printf("error configuring BME humidity sensor\n");
+	}
+	usart_wait(&USART2);
+
+
     int humid_ok = (bmx_check_config(&spiq, HUMID, humid_cfg) == 0);
 	if (!humid_ok) {
 		printf("BME humidity sensor not properly configured.\n");
