@@ -46,6 +46,12 @@ $(OBJS): Makefile
 flash: main.hex
 	st-flash --connect-under-reset --format ihex write $<
 	
+flash2: main.elf
+	openocd \
+		-f /opt/local/share/openocd/scripts/interface/stlink.cfg \
+		-f /opt/local/share/openocd/scripts/target/stm32l4x.cfg \
+		-f openocd.cfg
+
 clean:
 	rm -f *~ *.o *.hex *.bin *.elf *.map
 
