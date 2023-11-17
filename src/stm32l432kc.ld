@@ -1,4 +1,4 @@
-/* stm32l4xxCxx have 256k flash and 48+16k ram. */
+/* stm32l43xxCxx have 256k flash and 48+16k ram. */
 MEMORY
 {
   FLASHROM (rx)  : ORIGIN = 0x08000000, LENGTH = 256K  

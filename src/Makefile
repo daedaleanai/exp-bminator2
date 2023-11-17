@@ -48,8 +48,8 @@ flash: main.hex
 	
 flash2: main.elf
 	openocd \
-		-f /opt/local/share/openocd/scripts/interface/stlink.cfg \
-		-f /opt/local/share/openocd/scripts/target/stm32l4x.cfg \
+		-f interface/stlink.cfg \
+		-f target/stm32l4x.cfg \
 		-f openocd.cfg
 
 clean:
