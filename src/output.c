@@ -12,6 +12,7 @@ struct LinearisationParameters bmeParam;	   // needed to decode humidity sensor 
 // these are decoded in one message, but sent on in others.
 static int32_t accel_temp_mk = -1;	// last observed value from BMI088 accelerator temperature
 static int32_t bme_hume6	 = -1;	// last observed value of BME280 humidity
+static uint64_t bme_ts = 0; 		// timestamp of bme_hume6
 
 int output_bmx(struct Msg *msg, struct SPIXmit *x) {
 	msg_reset(msg);
@@ -52,10 +53,12 @@ int output_bmx(struct Msg *msg, struct SPIXmit *x) {
 		if (1) {  // TODO: look for valid flag
 			int32_t t_mdegc, p_mpa;
 			bme_decode(&bmeParam, x->buf+1, &t_mdegc, &p_mpa, &bme_hume6);
+			bme_ts = x->ts;
+
 			msg_append16(msg, 0);			  // len
 			msg_append16(msg, EVENTID_BARO);  // header
 			msg_append64(msg, x->ts);
-			msg_append32(msg, t_mdegc );  // + 273150 convert to milliKelvin
+			msg_append32(msg, t_mdegc );  // + 273150 to convert to milliKelvin
 			msg_append32(msg, p_mpa);
 			msg->buf[1] = msg->len;
 			return 1;
@@ -65,6 +68,19 @@ int output_bmx(struct Msg *msg, struct SPIXmit *x) {
 
 	return 0;
 }
+
+// call every now and then to send the humidity message
+int output_humid(struct Msg *msg) {
+	msg_reset(msg);
+	msg_append16(msg, 0);			  // len
+	msg_append16(msg, EVENTID_HUMID);  // header
+	msg_append64(msg, bme_ts);
+	msg_append32(msg, bme_hume6);  
+	msg_append32(msg, 0);  // pad
+	msg->buf[1] = msg->len;
+	return 1;
+}
+
 
 int output_shutter(struct Msg *msg, uint16_t hdr, uint64_t ts, uint64_t counter) {
 	msg_reset(msg);

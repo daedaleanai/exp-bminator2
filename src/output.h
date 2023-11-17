@@ -32,6 +32,8 @@ extern struct LinearisationParameters bmeParam;
 // to our output format.  Return 1 if a valid message was constructed.
 int output_bmx(struct Msg *msg, struct SPIXmit *x);
 
+int output_humid(struct Msg *msg);
+
 int output_shutter(struct Msg *msg, uint16_t hdr, uint64_t ts, uint64_t counter);
 
 int output_periodic(struct Msg *msg, uint16_t hdr, uint64_t ts, uint32_t v1, uint32_t v2);

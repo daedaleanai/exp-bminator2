@@ -8,7 +8,7 @@
   - the accel and gyro irqs push SPI transactions on the spiq, which are handled by DMA
   - the other irqs push messages on the event queue evq
   - the mainloop empties both these queues and pushes output messages on the USART1 outq, which is also handled by DMA
-  - incoming packets on USART1 are parsed by the USART1 irq and then handled in the main loop
+  - incoming packets on USART1 are parsed by the USART1 irq and then handled in the main loop in between packets.
 
 */
 #include "cortex_m4.h"
@@ -289,39 +289,41 @@ void TIM6_DACUNDER_Handler(void) {
     rt_start(&periodic8hz_rt, now);
 
 	struct Msg *msg = msgq_head(&evq);
+	if (!msg) {
+		++dropped_evq;
+	} else {
 
-	switch (tim6_tick++ & 7) {
-	case 0:
-		break;
+        switch (tim6_tick++ & 7) {
+        case 0:
+            break;
 
-	case 1:
-		start_spix(now, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
-		break;
+        case 1:
+            start_spix(now, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
+            break;
 
-	case 2:
-		if (!msg) {
-			++dropped_evq;
-			break;
-		}
-		output_periodic(msg, EVENTID_ID0, now, __REVISION__, UNIQUE_DEVICE_ID[2]);
-		msgq_push_head(&evq);
-		break;
+        case 2:
+            output_periodic(msg, EVENTID_ID0, now, __REVISION__, UNIQUE_DEVICE_ID[2]);
+            msgq_push_head(&evq);
+            break;
 
-	case 3:
-		if (!msg) {
-			++dropped_evq;
-			break;
-		}
-		output_periodic(msg, EVENTID_ID1, now, UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
-		msgq_push_head(&evq);
-		break;
+        case 3:
+            output_periodic(msg, EVENTID_ID1, now, UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
+            msgq_push_head(&evq);
+            break;
 
-	case 4:
-	case 5:
-	case 6:
-	case 7:
-		break;
-	}
+        case 4:
+            output_humid(msg);
+            msgq_push_head(&evq);
+            break;
+
+        case 5:
+        case 6:
+        case 7:
+            break;
+        }
+
+    }
+
     rt_start(&periodic8hz_rt, now);
     rt_stop(&periodic8hz_rt, cycleCount());
 }
