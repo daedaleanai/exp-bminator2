@@ -29,8 +29,8 @@ const (
 	EVENTID_BARO          MsgID = 0x8020 // [2]uint32 temperature[milliK] pressure[milliPa] bme280
 	EVENTID_HUMID         MsgID = 0x8021 // humidity bme280 [TODO]
 	EVENTID_TEMP          MsgID = 0x8022 // [2]uint32 temperature[milliK] (bmi085 accellerometer, stm32 microcontroller)
-	EVENTID_SHUTTER_OPEN  MsgID = 0x8023 // uint64 prev ts
-	EVENTID_SHUTTER_CLOSE MsgID = 0x8025 // uint64 prev ts
+	EVENTID_SHUTTER_OPEN  MsgID = 0x8023 // uint64 counter
+	EVENTID_SHUTTER_CLOSE MsgID = 0x8025 // uint64 counter
 
 	// [4]int16 xyz_ (i.e. padded to 8 bytes)
 	EVENTID_ACCEL_2G       MsgID = 0x8032 // RANGE_2G  = 0x00,
@@ -85,54 +85,54 @@ func scalexyz(v [4]uint16, s float64) [3]float64 {
 }
 
 func (m *ID0Msg) String() string {
-	return fmt.Sprintf("%.6f ID0: %v", float64(m.Ts)/float64(time.Second), m.Val)
+	return fmt.Sprintf("%.6f ID0: %v", float64(m.Ts)/80000000, m.Val)
 }
 func (m *ID1Msg) String() string {
-	return fmt.Sprintf("%.6f ID1: %v", float64(m.Ts)/float64(time.Second), m.Val)
+	return fmt.Sprintf("%.6f ID1: %v", float64(m.Ts)/80000000, m.Val)
 }
 func (m *BAROMsg) String() string {
-	return fmt.Sprintf("%.6f BARO: %v", float64(m.Ts)/float64(time.Second), m.Val)
+	return fmt.Sprintf("%.6f BARO: %v", float64(m.Ts)/80000000, m.Val)
 }
 func (m *HUMIDMsg) String() string {
-	return fmt.Sprintf("%.6f HUMID: %v", float64(m.Ts)/float64(time.Second), m.Val)
+	return fmt.Sprintf("%.6f HUMID: %v", float64(m.Ts)/80000000, m.Val)
 }
 func (m *TEMPMsg) String() string {
-	return fmt.Sprintf("%.6f TEMP: %v", float64(m.Ts)/float64(time.Second), m.Val)
+	return fmt.Sprintf("%.6f TEMP: %v", float64(m.Ts)/80000000, m.Val)
 }
 func (m *SHUTTER_OPENMsg) String() string {
-	return fmt.Sprintf("%.6f SHUTTER_OPEN: %v", float64(m.Ts)/float64(time.Second), m.Val)
+	return fmt.Sprintf("%.6f SHUTTER_OPEN: %v", float64(m.Ts)/80000000, m.Val)
 }
 func (m *SHUTTER_CLOSEMsg) String() string {
-	return fmt.Sprintf("%.6f SHUTTER_CLOSE: %v", float64(m.Ts)/float64(time.Second), m.Val)
+	return fmt.Sprintf("%.6f SHUTTER_CLOSE: %v", float64(m.Ts)/80000000, m.Val)
 }
 
 // note: BMI088 is 3,6,12,24G instead of 2,4,8,16
 func (m *ACCEL_2GMsg) String() string {
-	return fmt.Sprintf("%.6f ACCEL_2G       %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 3))
+	return fmt.Sprintf("%.6f ACCEL_2G       %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 3))
 }
 func (m *ACCEL_4GMsg) String() string {
-	return fmt.Sprintf("%.6f ACCEL_4G       %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 6))
+	return fmt.Sprintf("%.6f ACCEL_4G       %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 6))
 }
 func (m *ACCEL_8GMsg) String() string {
-	return fmt.Sprintf("%.6f ACCEL_8G       %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 8))
+	return fmt.Sprintf("%.6f ACCEL_8G       %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 8))
 }
 func (m *ACCEL_16GMsg) String() string {
-	return fmt.Sprintf("%.6f ACCEL_16G      %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 24))
+	return fmt.Sprintf("%.6f ACCEL_16G      %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 24))
 }
 func (m *GYRO_125DEG_SMsg) String() string {
-	return fmt.Sprintf("%.6f GYRO_125DEG_S  %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 125))
+	return fmt.Sprintf("%.6f GYRO_125DEG_S  %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 125))
 }
 func (m *GYRO_250DEG_SMsg) String() string {
-	return fmt.Sprintf("%.6f GYRO_250DEG_S  %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 250))
+	return fmt.Sprintf("%.6f GYRO_250DEG_S  %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 250))
 }
 func (m *GYRO_500DEG_SMsg) String() string {
-	return fmt.Sprintf("%.6f GYRO_500DEG_S  %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 500))
+	return fmt.Sprintf("%.6f GYRO_500DEG_S  %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 500))
 }
 func (m *GYRO_1000DEG_SMsg) String() string {
-	return fmt.Sprintf("%.6f GYRO_1000DEG_S %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 1000))
+	return fmt.Sprintf("%.6f GYRO_1000DEG_S %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 1000))
 }
 func (m *GYRO_2000DEG_SMsg) String() string {
-	return fmt.Sprintf("%.6f GYRO_2000DEG_S %.3f ", float64(m.Ts)/float64(time.Second), scalexyz(m.Val, 2000))
+	return fmt.Sprintf("%.6f GYRO_2000DEG_S %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 2000))
 }
 
 func newMsg(word0 uint32) interface{} {
