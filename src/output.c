@@ -89,9 +89,17 @@ int output_temperature(struct Msg *msg, uint64_t ts, uint16_t vref_adc_val, uint
 	msg_append16(msg, 0);			  // len
 	msg_append16(msg, EVENTID_TEMP);  // header
 	msg_append64(msg, ts);
-	(void)vref_adc_val;
-//	int64_t temp = TODO properly convert using TS_CALx and VREFINT
-	msg_append32(msg, ts_adc_val);  
+	if ((vref_adc_val > 0) && (TS_CAL2 != TS_CAL1)) {
+		// TODO(lvd) this appears to be wrong, either with or without correcting for Vdd
+		int64_t x = ts_adc_val;
+		x *= VREFINT;
+		x /= vref_adc_val;
+//		int64_t temp = ((x - TS_CAL1) * (130000+273150) - (x - TS_CAL2) * (30000+273150) ) / (TS_CAL2 - TS_CAL1);
+		int64_t temp = ((x - TS_CAL1) * (130000) - (x - TS_CAL2) * (30000) ) / (TS_CAL2 - TS_CAL1);
+		msg_append32(msg, temp);  
+	} else {
+		msg_append32(msg, -1);  
+	}
 	msg_append32(msg, accel_temp_mk);  // old one but who cares
 	msg->buf[1] = msg->len;
 	return 1;

@@ -81,6 +81,8 @@ debug tools:
 - [X] decoder
 - [] commander
 
+TODO(lvd) 
+- []convert temperatures to correct units, fix stm temperature conversion
 
 ## Debugging
 

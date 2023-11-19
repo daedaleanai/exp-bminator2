@@ -48,7 +48,7 @@ enum {
 	SPI1_MISO_PIN = PB4,
 	SPI1_MOSI_PIN = PB5,
 	BME_CSB_PIN	  = PB6,  // TODO for some reason PB6 doesnt work on the nucleo prototype, there i use PB7
-	//	BME_CSB_PIN	  = PB7,  // TODO for some reason PB6 doesnt work on the nucleo prototype, there i use PB7
+						  //	BME_CSB_PIN	  = PB7,  // TODO for some reason PB6 doesnt work on the nucleo prototype, there i use PB7
 };
 
 static struct gpio_config_t {
@@ -279,6 +279,8 @@ static volatile int		 adc_chan	= 0;
 static volatile uint32_t adc_ovfl	= 0;
 static volatile uint16_t adc_val[4] = {0, 0, 0, 0};
 static volatile uint64_t adc_ts[4]	= {0, 0, 0, 0};
+
+extern uint16_t TS_CAL1, TS_CAL2, VREFINT;	// defined in .ld file
 
 void ADC1_Handler(void) {
 	uint64_t now = cycleCount();
@@ -577,13 +579,16 @@ void TIM1_UP_TIM16_Handler(void) {
 
 	uint64_t us = now / C_US;  // microseconds
 
-	printf("\e[Huptime %llu.%06llu\e[K\n", us / 1000000, us % 1000000);
+	uint64_t vdd = adc_val[0] ? ((3000ULL * VREFINT) / adc_val[0]) :  0;
+
+	printf("\e[Huptime %llu.%06llu  Vdd %lld mV\e[K\n", us / 1000000, us % 1000000, vdd);
 	printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\e[K\n", spiq.head, evq.head, outq.head);
 	printf("dropped  spiq: %8lu evq:%8lu outq: %8lu\e[K\n", dropped_spi1, dropped_evq, dropped_usart1);
 	printf("spi1   err tx: %8lu  rx:%8lu\e[K\n", spi1txdmaerr_cnt, spi1rxdmaerr_cnt);
 	printf("usart1 err tx: %8lu  rx:%8lu\e[K\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
-	if (adc_ovfl)
+	if (adc_ovfl) {
 		printf("adc ovfl %lu\e[K\n", adc_ovfl);
+	}
 	rt_report(&idle_rt, &lastreport);
 	printf("\e[K\n");
 	// account for reporting time outside of rt_report call
@@ -592,7 +597,6 @@ void TIM1_UP_TIM16_Handler(void) {
 }
 
 static const char *pplsrcstr[] = {"NONE", "MSI", "HSI16", "HSE"};
-extern uint16_t	   TS_CAL1, TS_CAL2, VREFINT;  // defined in .ld file
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
