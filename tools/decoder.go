@@ -18,6 +18,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -84,55 +85,59 @@ func scalexyz(v [4]uint16, s float64) [3]float64 {
 	return [3]float64{float64(int16(v[0])) * s, float64(int16(v[1])) * s, float64(int16(v[2])) * s}
 }
 
+func label(v interface{}) string {
+	return strings.TrimPrefix(strings.TrimSuffix(fmt.Sprintf("%T", v), "Msg"), "*main.")
+}
+
 func (m *ID0Msg) String() string {
-	return fmt.Sprintf("%.6f ID0: %v", float64(m.Ts)/80000000, m.Val)
+	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 func (m *ID1Msg) String() string {
-	return fmt.Sprintf("%.6f ID1: %v", float64(m.Ts)/80000000, m.Val)
+	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 func (m *BAROMsg) String() string {
-	return fmt.Sprintf("%.6f BARO: %v", float64(m.Ts)/80000000, m.Val)
+	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 func (m *HUMIDMsg) String() string {
-	return fmt.Sprintf("%.6f HUMID: %v", float64(m.Ts)/80000000, m.Val)
+	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 func (m *TEMPMsg) String() string {
-	return fmt.Sprintf("%.6f TEMP: %v", float64(m.Ts)/80000000, m.Val)
+	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 func (m *SHUTTER_OPENMsg) String() string {
-	return fmt.Sprintf("%.6f SHUTTER_OPEN: %v", float64(m.Ts)/80000000, m.Val)
+	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 func (m *SHUTTER_CLOSEMsg) String() string {
-	return fmt.Sprintf("%.6f SHUTTER_CLOSE: %v", float64(m.Ts)/80000000, m.Val)
+	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 
 // note: BMI088 is 3,6,12,24G instead of 2,4,8,16
 func (m *ACCEL_2GMsg) String() string {
-	return fmt.Sprintf("%.6f ACCEL_2G       %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 3))
+	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 3))
 }
 func (m *ACCEL_4GMsg) String() string {
-	return fmt.Sprintf("%.6f ACCEL_4G       %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 6))
+	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 6))
 }
 func (m *ACCEL_8GMsg) String() string {
-	return fmt.Sprintf("%.6f ACCEL_8G       %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 8))
+	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 8))
 }
 func (m *ACCEL_16GMsg) String() string {
-	return fmt.Sprintf("%.6f ACCEL_16G      %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 24))
+	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 24))
 }
 func (m *GYRO_125DEG_SMsg) String() string {
-	return fmt.Sprintf("%.6f GYRO_125DEG_S  %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 125))
+	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 125))
 }
 func (m *GYRO_250DEG_SMsg) String() string {
-	return fmt.Sprintf("%.6f GYRO_250DEG_S  %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 250))
+	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 250))
 }
 func (m *GYRO_500DEG_SMsg) String() string {
-	return fmt.Sprintf("%.6f GYRO_500DEG_S  %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 500))
+	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 500))
 }
 func (m *GYRO_1000DEG_SMsg) String() string {
-	return fmt.Sprintf("%.6f GYRO_1000DEG_S %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 1000))
+	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 1000))
 }
 func (m *GYRO_2000DEG_SMsg) String() string {
-	return fmt.Sprintf("%.6f GYRO_2000DEG_S %.3f ", float64(m.Ts)/80000000, scalexyz(m.Val, 2000))
+	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 2000))
 }
 
 func newMsg(word0 uint32) interface{} {
@@ -321,7 +326,8 @@ func main() {
 
 			for _, v := range ids {
 				id := MsgID(v)
-				fmt.Printf("%v %12v %4d %v%v\n", id, seen[id].T, seen[id].Count, seen[id].Msg, CLREOL)
+				//				fmt.Printf("%v %12v %4d %v%v\n", id, seen[id].T, seen[id].Count, seen[id].Msg, CLREOL)
+				fmt.Printf("%v %4d %v%v\n", id, seen[id].Count, seen[id].Msg, CLREOL)
 			}
 			fmt.Println(CLRBOS)
 
