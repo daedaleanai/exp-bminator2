@@ -257,6 +257,8 @@ enum {
 	ADC_SMPR1_SMP3 = ((1UL<<3)-1) << 9, // SMP3
 	ADC_SMPR1_SMP2 = ((1UL<<3)-1) << 6, // SMP2
 	ADC_SMPR1_SMP1 = ((1UL<<3)-1) << 3, // SMP1		
+	ADC_SMPR1_SMP0 = ((1UL<<3)-1) << 0, // SMP0		
+
 };
 inline void adc_smpr1_set_smp9(struct ADC_Type* p, uint32_t val) { p->SMPR1 = (p->SMPR1 & ~ADC_SMPR1_SMP9) | ((val<<27) & ADC_SMPR1_SMP9); }
 inline void adc_smpr1_set_smp8(struct ADC_Type* p, uint32_t val) { p->SMPR1 = (p->SMPR1 & ~ADC_SMPR1_SMP8) | ((val<<24) & ADC_SMPR1_SMP8); }
@@ -267,6 +269,7 @@ inline void adc_smpr1_set_smp4(struct ADC_Type* p, uint32_t val) { p->SMPR1 = (p
 inline void adc_smpr1_set_smp3(struct ADC_Type* p, uint32_t val) { p->SMPR1 = (p->SMPR1 & ~ADC_SMPR1_SMP3) | ((val<<9) & ADC_SMPR1_SMP3); }
 inline void adc_smpr1_set_smp2(struct ADC_Type* p, uint32_t val) { p->SMPR1 = (p->SMPR1 & ~ADC_SMPR1_SMP2) | ((val<<6) & ADC_SMPR1_SMP2); }
 inline void adc_smpr1_set_smp1(struct ADC_Type* p, uint32_t val) { p->SMPR1 = (p->SMPR1 & ~ADC_SMPR1_SMP1) | ((val<<3) & ADC_SMPR1_SMP1); }
+inline void adc_smpr1_set_smp0(struct ADC_Type* p, uint32_t val) { p->SMPR1 = (p->SMPR1 & ~ADC_SMPR1_SMP0) | ((val<<3) & ADC_SMPR1_SMP0); }
 inline uint32_t adc_smpr1_get_smp9(struct ADC_Type* p) { return (p->SMPR1 & ADC_SMPR1_SMP9) >> 27 ; }
 inline uint32_t adc_smpr1_get_smp8(struct ADC_Type* p) { return (p->SMPR1 & ADC_SMPR1_SMP8) >> 24 ; }
 inline uint32_t adc_smpr1_get_smp7(struct ADC_Type* p) { return (p->SMPR1 & ADC_SMPR1_SMP7) >> 21 ; }
@@ -276,6 +279,7 @@ inline uint32_t adc_smpr1_get_smp4(struct ADC_Type* p) { return (p->SMPR1 & ADC_
 inline uint32_t adc_smpr1_get_smp3(struct ADC_Type* p) { return (p->SMPR1 & ADC_SMPR1_SMP3) >> 9 ; }
 inline uint32_t adc_smpr1_get_smp2(struct ADC_Type* p) { return (p->SMPR1 & ADC_SMPR1_SMP2) >> 6 ; }
 inline uint32_t adc_smpr1_get_smp1(struct ADC_Type* p) { return (p->SMPR1 & ADC_SMPR1_SMP1) >> 3 ; }
+inline uint32_t adc_smpr1_get_smp0(struct ADC_Type* p) { return (p->SMPR1 & ADC_SMPR1_SMP0) >> 3 ; }
 
 // ADC->SMPR2 sample time register 2
 enum {

@@ -34,6 +34,9 @@ int output_bmx(struct Msg *msg, struct SPIXmit *x);
 
 int output_humid(struct Msg *msg);
 
+// internal temperatures: stm32 and accel (from last accel call)
+int output_temperature(struct Msg *msg, uint64_t ts, uint16_t vref_adc_val, uint16_t ts_adc_val);
+
 int output_shutter(struct Msg *msg, uint16_t hdr, uint64_t ts, uint64_t counter);
 
 int output_periodic(struct Msg *msg, uint16_t hdr, uint64_t ts, uint32_t v1, uint32_t v2);

@@ -36,7 +36,7 @@ int output_bmx(struct Msg *msg, struct SPIXmit *x) {
 	case MSGTYPE(ACCEL, BMI08x_ACC_X_LSB):
 		if (x->buf[13] & 0x80) {
 			// uint32_t ts = decode_le_uint24(x->buf + 8);  innner timestamp of accelerator, not used
-			accel_temp_mk = bmi08x_decode_temp_mdegc(x->buf + 18) + 273150;	 // sent separately at 1Hz
+			accel_temp_mk = bmi08x_decode_temp_mdegc(x->buf + 18) /*+ 273150*/;	 // sent separately at 1Hz
 			msg_append16(msg, 0);											 // len
 			msg_append16(msg, accel_hdr);									 // header
 			msg_append64(msg, x->ts);
@@ -58,7 +58,7 @@ int output_bmx(struct Msg *msg, struct SPIXmit *x) {
 			msg_append16(msg, 0);			  // len
 			msg_append16(msg, EVENTID_BARO);  // header
 			msg_append64(msg, x->ts);
-			msg_append32(msg, t_mdegc );  // + 273150 to convert to milliKelvin
+			msg_append32(msg, t_mdegc);  // + 273150 to convert to milliKelvin
 			msg_append32(msg, p_mpa);
 			msg->buf[1] = msg->len;
 			return 1;
@@ -77,6 +77,22 @@ int output_humid(struct Msg *msg) {
 	msg_append64(msg, bme_ts);
 	msg_append32(msg, bme_hume6);  
 	msg_append32(msg, 0);  // pad
+	msg->buf[1] = msg->len;
+	return 1;
+}
+
+extern uint16_t TS_CAL1, TS_CAL2, VREFINT; // defined in .ld file
+
+
+int output_temperature(struct Msg *msg, uint64_t ts, uint16_t vref_adc_val, uint16_t ts_adc_val) {
+	msg_reset(msg);
+	msg_append16(msg, 0);			  // len
+	msg_append16(msg, EVENTID_TEMP);  // header
+	msg_append64(msg, ts);
+	(void)vref_adc_val;
+//	int64_t temp = 
+	msg_append32(msg, ts_adc_val);  
+	msg_append32(msg, accel_temp_mk);  // old one but who cares
 	msg->buf[1] = msg->len;
 	return 1;
 }

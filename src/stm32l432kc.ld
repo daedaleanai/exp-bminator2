@@ -73,7 +73,11 @@ MEMORY
 	VREFBUF	= 0x40010030;
 	WWDG	= 0x40002C00;
 
-GPIO_ALL = GPIOA;               /* require for gpio2.[ch] */
+GPIO_ALL = GPIOA;               /* required for gpio2.[ch] */
 UNIQUE_DEVICE_ID = 0x1FFF7590;  /* ref manual 47.1 */
+
+TS_CAL1 = 0x1FFF75A8;  /* ref man 16.4.32, datasheet 3.15.1 */
+TS_CAL2 = 0x1FFF75CA;  
+VREFINT = 0x1FFF75AA; /* ref man 16.4.33, datasheet 3.15.2 */
 
 INCLUDE sections.ld

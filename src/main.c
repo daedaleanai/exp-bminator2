@@ -120,7 +120,7 @@ static struct {
 		{DMA2_CH7_IRQn, PRIO(2, 0)},	   // USART1 RX DMA
 		{DMA2_CH6_IRQn, PRIO(2, 1)},	   // USART1 TX DMA done
 		{USART1_IRQn, PRIO(2, 2)},		   // USART1 TX schedule next DMA
-        {ADC1_IRQn, PRIO(3,0)},            // ADC conversions
+        {ADC1_IRQn, PRIO(1,2)},            // ADC conversions
 		{USART2_IRQn, PRIO(3, 1)},		   // USART2 TX
         {TIM1_UP_TIM16_IRQn, PRIO(3,3)},   // TIM16 1Hz periodic debug report
 		{None_IRQn, 0xff},				   // sentinel
@@ -272,7 +272,53 @@ void EXTI3_Handler(void) {
     rt_stop(&gyroirq_rt, cycleCount());
 }
 
-// Other events go to another message queue, which the mainloop copies into the output stream.
+// The 4 sampled channels are, in order
+//     0  Vrefint
+//     9  pin PA4 thermistor
+//    11  pin PA6 current sense
+//    17  internal temperature
+static volatile int adc_chan = 0;
+static volatile uint32_t adc_ovfl = 0;
+static volatile uint16_t adc_val[4] = {0,0,0,0};
+static volatile uint64_t adc_ts[4] = {0,0,0,0};
+
+void ADC1_Handler(void) {
+    uint64_t now = cycleCount();
+    uint16_t isr = ADC.ISR;
+
+    // printf("%lld c%d%s%s%s\n", now, adc_chan, 
+    //     (isr & ADC_ISR_EOC) ? " EOC" : "",  
+    //     (isr & ADC_ISR_EOS) ? " EOS" : "",  
+    //     (isr & ADC_ISR_OVR) ? " OVR" : ""
+    // );
+
+    if (isr & ADC_ISR_EOC) {
+        adc_val[adc_chan] = ADC.DR;
+        adc_ts[adc_chan] = now;
+        ++adc_chan;
+    }
+    if (isr & ADC_ISR_EOS) {
+        adc_chan = 0;
+        ADC.ISR |= ADC_ISR_EOS;
+        //  printf("adc %u %u %u %u\n", adc_val[0], adc_val[1], adc_val[2], adc_val[3]);
+    }
+
+    if (isr & ADC_ISR_OVR) {
+        ADC.ISR |= ADC_ISR_OVR;
+        ++adc_ovfl;
+    }
+
+    if (adc_chan >= 4){
+        adc_chan = 0;
+        ++adc_ovfl;
+    }
+
+    rt_start(&adcirq_rt, now);
+    rt_stop(&adcirq_rt, cycleCount());
+}
+
+// Other events than the high speed/low latency accel/gyro reads go to another message queue, 
+// which the mainloop copies into the output stream.
 static struct MsgQueue	 evq		 = {0, 0, {}};
 static volatile uint32_t dropped_evq = 0;  // queue full, msqq_head returned NULL
 
@@ -286,6 +332,7 @@ void TIM6_DACUNDER_Handler(void) {
 	if ((TIM6.SR & TIM1_SR_UIF) == 0)
 		return;
 	TIM6.SR &= ~TIM1_SR_UIF;
+    // printf("%lld TRIGGER\n", now); 
     rt_start(&periodic8hz_rt, now);
 
 	struct Msg *msg = msgq_head(&evq);
@@ -317,6 +364,10 @@ void TIM6_DACUNDER_Handler(void) {
             break;
 
         case 5:
+            output_temperature(msg, adc_ts[0], adc_val[0], adc_val[3]);
+            msgq_push_head(&evq);
+            break;
+
         case 6:
         case 7:
             break;
@@ -391,26 +442,6 @@ void TIM2_Handler(void) {
 
     rt_stop(&shutterirq_rt, cycleCount());
 }
-
-static volatile int adc_chan = 0;
-static volatile uint16_t adc_val[5] = {0,0,0,0,0};
-static volatile uint64_t adc_ts[5] = {0,0,0,0,0};
-
-void ADC1_Handler(void) {
-    uint64_t now = cycleCount();
-    uint16_t isr = ADC.ISR;
-    if (isr & ADC_ISR_EOC) {
-        adc_val[adc_chan] = ADC.DR;
-        adc_ts[adc_chan] = now;
-        ++adc_chan;
-    }
-    if (isr & ADC_ISR_EOS) {
-        adc_chan = 0;
-    }
-    rt_start(&adcirq_rt, now);
-    rt_stop(&adcirq_rt, cycleCount());
-}
-
 
 // USART1 is the output datastream and command input
 
@@ -556,6 +587,7 @@ void TIM1_UP_TIM16_Handler(void) {
     printf("dropped  spiq: %8lu evq:%8lu outq: %8lu\e[K\n", dropped_spi1, dropped_evq, dropped_usart1);
     printf("spi1   err tx: %8lu  rx:%8lu\e[K\n", spi1txdmaerr_cnt, spi1rxdmaerr_cnt);
     printf("usart1 err tx: %8lu  rx:%8lu\e[K\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
+    if (adc_ovfl) printf("adc ovfl %lu\e[K\n", adc_ovfl);
     rt_report(&idle_rt, &lastreport);
     printf("\e[K\n");
     // account for reporting time outside of rt_report call
@@ -564,6 +596,7 @@ void TIM1_UP_TIM16_Handler(void) {
 }
 
 static const char *pplsrcstr[] = {"NONE", "MSI", "HSI16", "HSE"};
+extern uint16_t TS_CAL1, TS_CAL2, VREFINT; // defined in .ld file
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
@@ -607,6 +640,7 @@ void main(void) {
 		   rf & 0x10 ? " SFT" : "", rf & 0x08 ? " POR" : "", rf & 0x04 ? " PIN" : "");
 	printf("PPLSRC: %s%s\n", pplsrcstr[rcc_pllcfgr_get_pllsrc(&RCC)],
 		   (RCC.CR & RCC_CR_HSEBYP) && (rcc_pllcfgr_get_pllsrc(&RCC) == 3) ? " (CK_IN)" : "");
+    printf("cal ts %u %u vref %u\n", TS_CAL1, TS_CAL2, VREFINT);
 	usart_wait(&USART2);
 
 	// Set up SPI1 for talking to all the connected chips.
@@ -704,49 +738,52 @@ void main(void) {
 	TIM2.CR1 |= TIM2_CR1_CEN;
 	NVIC_EnableIRQ(TIM2_IRQn);
 
-
     // ADC
-    adc12_common_ccr_set_ckmode(&ADC12_Common, 3); // 80Mhz / 4
-    ADC12_Common.CCR |= ADC12_COMMON_CCR_VBATSEL | ADC12_COMMON_CCR_VSENSESEL | ADC12_COMMON_CCR_VREFEN;
-    ADC.CR = 0;  // end deep power down
-    ADC.CR = ADC_CR_ADVREGEN;
+    rcc_ccipr_set_adcsel(&RCC, 3); // System clock selected as ADCs clock  6.4.27
+    adc12_common_ccr_set_ckmode(&ADC12_Common, 1); // HCLK, 80MHz
+
+    ADC.CR &= ~ADC_CR_DEEPPWD;  // end deep power down
+    ADC.CR |= ADC_CR_ADVREGEN;  // enable voltage regulator
     delay(25); // DS11453 table 66
     ADC.CR |= ADC_CR_ADCAL; // start calibration
     while (ADC.CR & ADC_CR_ADCAL)
         __NOP();
 
-    // configure to sample channel 9, 11, 17, 18 and 0
-    adc_sqr1_set_l3(&ADC, 5);   // 5 samples
-    adc_sqr1_set_sq1(&ADC, 9);  // channel 9, pin PA4 thermistor
-    adc_sqr1_set_sq2(&ADC, 11); // channel 11, pin PA6 current sense
-    adc_sqr1_set_sq3(&ADC, 17); // channel 17, internal temperature
-    adc_sqr1_set_sq4(&ADC, 11); // channel 18, Vbat (should be = Vcc)
-    adc_sqr2_set_sq5(&ADC, 0);  // channel 0   Vrefint
-    adc_smpr1_set_smp1(&ADC, 3); // 24.5 adc clock cycles 
-    adc_smpr1_set_smp2(&ADC, 3); // 24.5 adc clock cycles 
-    adc_smpr1_set_smp3(&ADC, 3); // 24.5 adc clock cycles 
-    adc_smpr1_set_smp4(&ADC, 3); // 24.5 adc clock cycles 
-    adc_smpr1_set_smp5(&ADC, 3); // 24.5 adc clock cycles 
-
-    adc_cfgr_set_exten(&ADC, 1); // trigger on rising edge
-    adc_cfgr_set_extsel(&ADC, 13); // ext 13 is TIM6 TRGO (see below)
-    ADC.CFGR|= ADC_CFGR_CONT; // 
-
-    ADC.IER |= ADC_IER_EOCIE | ADC_IER_EOSIE; // irq at end of conversion and end of sequence
     ADC.ISR |= ADC_ISR_ADRDY; // clear ready flag
     ADC.CR |= ADC_CR_ADEN;  // enable
     while (ADC.ISR & ADC_ISR_ADRDY)  // wait until ready
         __NOP();
-    ADC.CR |= ADC_CR_ADSTART;  // start as soon as the triggers come in
-//    NVIC_EnableIRQ(ADC1_IRQn);
+
+    // Enable VRef on chan 0 and Temp Sens on chan 17
+    ADC12_Common.CCR |= ADC12_COMMON_CCR_VSENSESEL | ADC12_COMMON_CCR_VREFEN;
+
+    // configure to sample channels 0,9,11,17
+    adc_sqr1_set_l3(&ADC, 4-1); // 4 samples
+    adc_sqr1_set_sq1(&ADC, 0);  // channel 17, internal temperature
+    adc_sqr1_set_sq2(&ADC, 9);  // channel 0   Vrefint
+    adc_sqr1_set_sq3(&ADC, 11); // channel 9, pin PA4 thermistor
+    adc_sqr1_set_sq4(&ADC, 17); // channel 11, pin PA6 current sense
+
+    adc_smpr1_set_smp0(&ADC, 7);  // 640.5 adc clock cycles 8us
+    adc_smpr1_set_smp9(&ADC, 5);  //  92.5 adc clock cycles 1.2us
+    adc_smpr2_set_smp11(&ADC, 5); //  92.5 adc clock cycles 1.2us
+    adc_smpr2_set_smp17(&ADC, 7); // 640.5 adc clock cycles 8us
+
+    adc_cfgr_set_exten(&ADC, 1); // trigger on rising edge
+    adc_cfgr_set_extsel(&ADC, 13); // ext 13 is TIM6 TRGO (see below)
+
+    ADC.CFGR |= ADC_CFGR_AUTDLY;
+    ADC.IER = ADC_IER_EOCIE; // irq at end of conversion and end of sequence
+    ADC.CR |= ADC_CR_ADSTART;  // start as soon as the triggers come in from TIM6
+    NVIC_EnableIRQ(ADC1_IRQn);
 
 	// set up TIM6 for a 8Hz hearbeat for various periodic things, including triggering the ADC
 	// note: it pushes spiq messages so do not start this before the BMI/BME are configured.
 	TIM6.DIER |= TIM6_DIER_UIE;
 	TIM6.PSC = (CLOCKSPEED_HZ / 10000) - 1;
 	TIM6.ARR = 1250 - 1;  // 10KHz/1250 = 8Hz
+    tim6_cr2_set_mms(&TIM6, 2); // TRGO = update event 
 	TIM6.CR1 |= TIM6_CR1_CEN;
-//    tim6_cr2_set_mms(&TIM6, 2); // TRGO = update event 
 	NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
 
 	// set up TIM16 for a 1Hz report 
@@ -777,7 +814,7 @@ void main(void) {
 	IWDG.KR	 = 0x5555;	// enable watchdog config
 	IWDG.PR	 = 0;		// prescaler /4 -> 10khz
 	IWDG.RLR = 3200;	// count to 3200 -> 320ms timeout
-	//IWDG.KR	 = 0xcccc;	// start watchdog countdown
+//	IWDG.KR	 = 0xcccc;	// start watchdog countdown
 
 	size_t packetsize = 960;  // 48 messages of 20 bytes
 	size_t packetlen  = 0;

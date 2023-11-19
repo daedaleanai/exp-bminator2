@@ -45,6 +45,7 @@ separate CSB (active low).
 
 | Device    | DMA | Ch  | Function          |
 | --------- | --- | --- | ----------------- |
+| ADC       | 1   | 1   | Read ADC samples  |
 | SPI1 RX   | 1   | 2   | Read spi devices  |
 | SPI1 TX   | 1   | 3   | Write spi devices |
 | USART1 TX | 2   | 6   | Serial Output     |
