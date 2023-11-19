@@ -814,7 +814,7 @@ void main(void) {
 	IWDG.KR	 = 0x5555;	// enable watchdog config
 	IWDG.PR	 = 0;		// prescaler /4 -> 10khz
 	IWDG.RLR = 3200;	// count to 3200 -> 320ms timeout
-//	IWDG.KR	 = 0xcccc;	// start watchdog countdown
+	IWDG.KR	 = 0xcccc;	// start watchdog countdown
 
 	size_t packetsize = 960;  // 48 messages of 20 bytes
 	size_t packetlen  = 0;
@@ -894,10 +894,10 @@ void main(void) {
 				packetchk = 0;
 				packetlen = 0;
 
+			    IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
+
 				// check here if there's a command response packet to send
 			}
-
-			IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
 
 		}
         rt_stop(&mainloop_rt, cycleCount());

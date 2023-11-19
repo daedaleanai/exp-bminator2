@@ -63,8 +63,8 @@ Heater:  Thermistor, GND, Heater10W+, Heater10W-
 - [X] BMI088 Sample Accelerometer at 1600Hz, 3G full scale
 - [X] BMI088 Sample internal temperature at 1Hz
 - [X] BME280 Sample environmental temperature, pressure, humidity at 1Hz
-- [] Watchdog monitors gyro, accel and env t/p/h are being sampled
-- [o] Timepulse Sampled
+- [x] Watchdog monitors packets streaming regularily
+- [X] Timepulse Sampled
 - [] Heater power supply, control algorithm based on thermistor input and current sense.
 - [] Heater state sampled at 1Hz
 - [X] Samples reported over serial port cf ICD
