@@ -90,7 +90,7 @@ int output_temperature(struct Msg *msg, uint64_t ts, uint16_t vref_adc_val, uint
 	msg_append16(msg, EVENTID_TEMP);  // header
 	msg_append64(msg, ts);
 	(void)vref_adc_val;
-//	int64_t temp = 
+//	int64_t temp = TODO properly convert using TS_CALx and VREFINT
 	msg_append32(msg, ts_adc_val);  
 	msg_append32(msg, accel_temp_mk);  // old one but who cares
 	msg->buf[1] = msg->len;

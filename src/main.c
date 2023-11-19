@@ -48,20 +48,20 @@ enum {
 	SPI1_MISO_PIN = PB4,
 	SPI1_MOSI_PIN = PB5,
 	BME_CSB_PIN	  = PB6,  // TODO for some reason PB6 doesnt work on the nucleo prototype, there i use PB7
-//	BME_CSB_PIN	  = PB7,  // TODO for some reason PB6 doesnt work on the nucleo prototype, there i use PB7
+	//	BME_CSB_PIN	  = PB7,  // TODO for some reason PB6 doesnt work on the nucleo prototype, there i use PB7
 };
 
 static struct gpio_config_t {
 	enum GPIO_Pin  pins;
 	enum GPIO_Conf mode;
 } const pin_cfgs[] = {
-		{ USART1_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
-		{ USART2_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
-		{ SPI1_MOSI_PIN | SPI1_SCK_PIN | SPI1_MISO_PIN, GPIO_AF5_SPI12 | GPIO_HIGH},
-		{ BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_INPUT},
-		{ BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN, GPIO_OUTPUT | GPIO_FAST},
-		{ TIMEPULSE_PIN, GPIO_INPUT },
-        { THERMISTOR_PIN|CURRENT_SENSE_PIN, GPIO_ANALOG},
+		{USART1_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
+		{USART2_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
+		{SPI1_MOSI_PIN | SPI1_SCK_PIN | SPI1_MISO_PIN, GPIO_AF5_SPI12 | GPIO_HIGH},
+		{BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_INPUT},
+		{BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN, GPIO_OUTPUT | GPIO_FAST},
+		{TIMEPULSE_PIN, GPIO_INPUT},
+		{THERMISTOR_PIN | CURRENT_SENSE_PIN, GPIO_ANALOG},
 		{0, 0},	 // sentinel
 };
 
@@ -100,7 +100,6 @@ static struct bmx_config_t const humid_cfg[] = {
 		{0xFF, 0},	// sentinel
 };
 
-
 // prio[7:6] : 4 groups,  prio[5:4] : 4 subgroups
 enum { IRQ_PRIORITY_GROUPING_2_2 = 5 };
 #define PRIO(grp, sub) (((grp) << 6) | ((sub) << 4))
@@ -117,29 +116,29 @@ static struct {
 		{EXTI1_IRQn, PRIO(1, 1)},		   // BMI088 Accel IRQ schedules SPI xmit
 		{EXTI3_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
 		{TIM2_IRQn, PRIO(1, 2)},		   // Shutter open/close timer, push evq
+		{ADC1_IRQn, PRIO(1, 2)},		   // ADC conversions
 		{DMA2_CH7_IRQn, PRIO(2, 0)},	   // USART1 RX DMA
 		{DMA2_CH6_IRQn, PRIO(2, 1)},	   // USART1 TX DMA done
 		{USART1_IRQn, PRIO(2, 2)},		   // USART1 TX schedule next DMA
-        {ADC1_IRQn, PRIO(1,2)},            // ADC conversions
 		{USART2_IRQn, PRIO(3, 1)},		   // USART2 TX
-        {TIM1_UP_TIM16_IRQn, PRIO(3,3)},   // TIM16 1Hz periodic debug report
+		{TIM1_UP_TIM16_IRQn, PRIO(3, 3)},  // TIM16 1Hz periodic debug report
 		{None_IRQn, 0xff},				   // sentinel
 };
 #undef PRIO
 
-static struct RunTimer spirxdma_rt    = { "SPIRXDMA", 0, 0, 0, 0, NULL};
-static struct RunTimer periodic8hz_rt = { "8HZTICK", 0, 0, 0, 0, &spirxdma_rt};
-static struct RunTimer accelirq_rt    = { "ACCELIRQ", 0,0,0,0, &periodic8hz_rt};
-static struct RunTimer gyroirq_rt     = { "GYROIRQ", 0,0,0,0, &accelirq_rt};
-static struct RunTimer shutterirq_rt  = { "SHUTTER", 0,0,0,0, &gyroirq_rt};
-static struct RunTimer usart1rxdma_rt = { "USART1RXDMA", 0,0,0,0, &shutterirq_rt};
-static struct RunTimer usart1txdma_rt = { "USART1TXDMA", 0,0,0,0, &usart1rxdma_rt};
-static struct RunTimer usart1irq_rt   = { "USART1IRQ", 0,0,0,0, &usart1txdma_rt};
-static struct RunTimer adcirq_rt      = { "ADCIRQ", 0,0,0,0, &usart1irq_rt};
-static struct RunTimer report_rt      = { "REPORT", 0,0,0,0, &adcirq_rt};
-static struct RunTimer mainloop_rt    = { "MAIN", 0,0,0,0, &report_rt};
-static struct RunTimer idle_rt        = { "IDLE", 0,0,0,0, &mainloop_rt};
-uint64_t lastreport = 0;
+static struct RunTimer spirxdma_rt	  = {"SPIRXDMA", 0, 0, 0, 0, NULL};
+static struct RunTimer periodic8hz_rt = {"8HZTICK", 0, 0, 0, 0, &spirxdma_rt};
+static struct RunTimer accelirq_rt	  = {"ACCELIRQ", 0, 0, 0, 0, &periodic8hz_rt};
+static struct RunTimer gyroirq_rt	  = {"GYROIRQ", 0, 0, 0, 0, &accelirq_rt};
+static struct RunTimer shutterirq_rt  = {"SHUTTER", 0, 0, 0, 0, &gyroirq_rt};
+static struct RunTimer usart1rxdma_rt = {"USART1RXDMA", 0, 0, 0, 0, &shutterirq_rt};
+static struct RunTimer usart1txdma_rt = {"USART1TXDMA", 0, 0, 0, 0, &usart1rxdma_rt};
+static struct RunTimer usart1irq_rt	  = {"USART1IRQ", 0, 0, 0, 0, &usart1txdma_rt};
+static struct RunTimer adcirq_rt	  = {"ADCIRQ", 0, 0, 0, 0, &usart1irq_rt};
+static struct RunTimer report_rt	  = {"REPORT", 0, 0, 0, 0, &adcirq_rt};
+static struct RunTimer mainloop_rt	  = {"MAIN", 0, 0, 0, 0, &report_rt};
+static struct RunTimer idle_rt		  = {"IDLE", 0, 0, 0, 0, &mainloop_rt};
+uint64_t			   lastreport	  = 0;
 
 // USART2 is the console, for debug messages, it runs IRQ driven.
 static struct Ringbuffer usart2tx;
@@ -173,8 +172,8 @@ void hexdump(size_t len, const uint8_t *ptr) {
 // SPI1 has the BMI088, BME280 ... connected to it.
 // The gyro and accel irq and periodically TIM6 trigger a SPI transaction on the accel, gyro or humid
 // sensor. The result of that transaction becomes available in the main loop.
-static struct SPIQ spiq;
-static volatile uint32_t dropped_spi1 = 0;  // how often we tried to submit a spi1 xmit but the queue was full
+static struct SPIQ		 spiq;
+static volatile uint32_t dropped_spi1	  = 0;	// how often we tried to submit a spi1 xmit but the queue was full
 static volatile uint32_t spi1rxdmaerr_cnt = 0;
 static volatile uint32_t spi1txdmaerr_cnt = 0;
 
@@ -205,25 +204,24 @@ static void spi1_ss(uint16_t addr, int on) {
 }
 
 void DMA1_CH2_Handler(void) {
-    rt_start(&spirxdma_rt, cycleCount());
-    uint32_t isr = DMA1.ISR;
-    if (isr & DMA1_ISR_TEIF2) {
-        ++spi1rxdmaerr_cnt;
-    }
+	rt_start(&spirxdma_rt, cycleCount());
+	uint32_t isr = DMA1.ISR;
+	if (isr & DMA1_ISR_TEIF2) {
+		++spi1rxdmaerr_cnt;
+	}
 	DMA1.IFCR = isr & 0x00000f0;  // clear pending flags
-	spi_rx_dma_handler(&spiq);		   // see spi.c
-    rt_stop(&spirxdma_rt, cycleCount());
+	spi_rx_dma_handler(&spiq);	  // see spi.c
+	rt_stop(&spirxdma_rt, cycleCount());
 }
 
 // only used to count errors
 void DMA1_CH3_Handler(void) {
-    uint32_t isr = DMA1.ISR;
-    if (isr & DMA1_ISR_TEIF3) {
-        ++spi1txdmaerr_cnt;
-    }
+	uint32_t isr = DMA1.ISR;
+	if (isr & DMA1_ISR_TEIF3) {
+		++spi1txdmaerr_cnt;
+	}
 	DMA1.IFCR = isr & 0x0000f00;  // clear pending flags
 }
-
 
 static void start_spix(uint64_t now, uint16_t addr, uint8_t firstreg, uint8_t *buf, size_t len) {
 	struct SPIXmit *x = spiq_head(&spiq);
@@ -233,10 +231,10 @@ static void start_spix(uint64_t now, uint16_t addr, uint8_t firstreg, uint8_t *b
 	}
 
 	buf[0] = firstreg | 0x80;  // set the read flag on the register address.
-    for (size_t i = 1; i < len; i++) {
-        buf[i] = 0;
-    }
-    
+	for (size_t i = 1; i < len; i++) {
+		buf[i] = 0;
+	}
+
 	x->ts	= now;
 	x->tag	= firstreg;
 	x->addr = addr;
@@ -258,8 +256,8 @@ void EXTI1_Handler(void) {
 		return;
 	EXTI.PR1 = Pin_1;
 	start_spix(now, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf);
-    rt_start(&accelirq_rt, now);
-    rt_stop(&accelirq_rt, cycleCount());
+	rt_start(&accelirq_rt, now);
+	rt_stop(&accelirq_rt, cycleCount());
 }
 
 void EXTI3_Handler(void) {
@@ -268,8 +266,8 @@ void EXTI3_Handler(void) {
 		return;
 	EXTI.PR1 = Pin_3;
 	start_spix(now, GYRO, BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf);
-    rt_start(&gyroirq_rt, now);
-    rt_stop(&gyroirq_rt, cycleCount());
+	rt_start(&gyroirq_rt, now);
+	rt_stop(&gyroirq_rt, cycleCount());
 }
 
 // The 4 sampled channels are, in order
@@ -277,47 +275,47 @@ void EXTI3_Handler(void) {
 //     9  pin PA4 thermistor
 //    11  pin PA6 current sense
 //    17  internal temperature
-static volatile int adc_chan = 0;
-static volatile uint32_t adc_ovfl = 0;
-static volatile uint16_t adc_val[4] = {0,0,0,0};
-static volatile uint64_t adc_ts[4] = {0,0,0,0};
+static volatile int		 adc_chan	= 0;
+static volatile uint32_t adc_ovfl	= 0;
+static volatile uint16_t adc_val[4] = {0, 0, 0, 0};
+static volatile uint64_t adc_ts[4]	= {0, 0, 0, 0};
 
 void ADC1_Handler(void) {
-    uint64_t now = cycleCount();
-    uint16_t isr = ADC.ISR;
+	uint64_t now = cycleCount();
+	uint16_t isr = ADC.ISR;
 
-    // printf("%lld c%d%s%s%s\n", now, adc_chan, 
-    //     (isr & ADC_ISR_EOC) ? " EOC" : "",  
-    //     (isr & ADC_ISR_EOS) ? " EOS" : "",  
-    //     (isr & ADC_ISR_OVR) ? " OVR" : ""
-    // );
+	// printf("%lld c%d%s%s%s\n", now, adc_chan,
+	//     (isr & ADC_ISR_EOC) ? " EOC" : "",
+	//     (isr & ADC_ISR_EOS) ? " EOS" : "",
+	//     (isr & ADC_ISR_OVR) ? " OVR" : ""
+	// );
 
-    if (isr & ADC_ISR_EOC) {
-        adc_val[adc_chan] = ADC.DR;
-        adc_ts[adc_chan] = now;
-        ++adc_chan;
-    }
-    if (isr & ADC_ISR_EOS) {
-        adc_chan = 0;
-        ADC.ISR |= ADC_ISR_EOS;
-        //  printf("adc %u %u %u %u\n", adc_val[0], adc_val[1], adc_val[2], adc_val[3]);
-    }
+	if (isr & ADC_ISR_EOC) {
+		adc_val[adc_chan] = ADC.DR;
+		adc_ts[adc_chan]  = now;
+		++adc_chan;
+	}
+	if (isr & ADC_ISR_EOS) {
+		adc_chan = 0;
+		ADC.ISR |= ADC_ISR_EOS;
+		//  printf("adc %u %u %u %u\n", adc_val[0], adc_val[1], adc_val[2], adc_val[3]);
+	}
 
-    if (isr & ADC_ISR_OVR) {
-        ADC.ISR |= ADC_ISR_OVR;
-        ++adc_ovfl;
-    }
+	if (isr & ADC_ISR_OVR) {
+		ADC.ISR |= ADC_ISR_OVR;
+		++adc_ovfl;
+	}
 
-    if (adc_chan >= 4){
-        adc_chan = 0;
-        ++adc_ovfl;
-    }
+	if (adc_chan >= 4) {
+		adc_chan = 0;
+		++adc_ovfl;
+	}
 
-    rt_start(&adcirq_rt, now);
-    rt_stop(&adcirq_rt, cycleCount());
+	rt_start(&adcirq_rt, now);
+	rt_stop(&adcirq_rt, cycleCount());
 }
 
-// Other events than the high speed/low latency accel/gyro reads go to another message queue, 
+// Other events than the high speed/low latency accel/gyro reads go to another message queue,
 // which the mainloop copies into the output stream.
 static struct MsgQueue	 evq		 = {0, 0, {}};
 static volatile uint32_t dropped_evq = 0;  // queue full, msqq_head returned NULL
@@ -332,51 +330,49 @@ void TIM6_DACUNDER_Handler(void) {
 	if ((TIM6.SR & TIM1_SR_UIF) == 0)
 		return;
 	TIM6.SR &= ~TIM1_SR_UIF;
-    // printf("%lld TRIGGER\n", now); 
-    rt_start(&periodic8hz_rt, now);
+	// printf("%lld TRIGGER\n", now);
+	rt_start(&periodic8hz_rt, now);
 
 	struct Msg *msg = msgq_head(&evq);
 	if (!msg) {
 		++dropped_evq;
 	} else {
+		switch (tim6_tick++ & 7) {
+		case 0:
+			break;
 
-        switch (tim6_tick++ & 7) {
-        case 0:
-            break;
+		case 1:
+			start_spix(now, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
+			break;
 
-        case 1:
-            start_spix(now, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
-            break;
+		case 2:
+			output_periodic(msg, EVENTID_ID0, now, __REVISION__, UNIQUE_DEVICE_ID[2]);
+			msgq_push_head(&evq);
+			break;
 
-        case 2:
-            output_periodic(msg, EVENTID_ID0, now, __REVISION__, UNIQUE_DEVICE_ID[2]);
-            msgq_push_head(&evq);
-            break;
+		case 3:
+			output_periodic(msg, EVENTID_ID1, now, UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
+			msgq_push_head(&evq);
+			break;
 
-        case 3:
-            output_periodic(msg, EVENTID_ID1, now, UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
-            msgq_push_head(&evq);
-            break;
+		case 4:
+			output_humid(msg);
+			msgq_push_head(&evq);
+			break;
 
-        case 4:
-            output_humid(msg);
-            msgq_push_head(&evq);
-            break;
+		case 5:
+			output_temperature(msg, adc_ts[0], adc_val[0], adc_val[3]);
+			msgq_push_head(&evq);
+			break;
 
-        case 5:
-            output_temperature(msg, adc_ts[0], adc_val[0], adc_val[3]);
-            msgq_push_head(&evq);
-            break;
+		case 6:
+		case 7:
+			break;
+		}
+	}
 
-        case 6:
-        case 7:
-            break;
-        }
-
-    }
-
-    rt_start(&periodic8hz_rt, now);
-    rt_stop(&periodic8hz_rt, cycleCount());
+	rt_start(&periodic8hz_rt, now);
+	rt_stop(&periodic8hz_rt, cycleCount());
 }
 
 static volatile uint64_t shutter_count = 0;	 //
@@ -387,7 +383,7 @@ void TIM2_Handler(void) {
 	uint16_t sr	 = TIM2.SR;
 	TIM2.SR &= ~sr;
 
-    rt_start(&shutterirq_rt, now);
+	rt_start(&shutterirq_rt, now);
 
 	// these could have happened in any order
 	uint64_t open_ts  = 0;
@@ -403,7 +399,7 @@ void TIM2_Handler(void) {
 		close_ts		 = now - latency;
 	}
 
-    printf("open %lld close %lld\n", open_ts, close_ts);
+	printf("open %lld close %lld\n", open_ts, close_ts);
 
 	struct Msg *msg = msgq_head(&evq);
 
@@ -440,7 +436,7 @@ void TIM2_Handler(void) {
 		}
 	}
 
-    rt_stop(&shutterirq_rt, cycleCount());
+	rt_stop(&shutterirq_rt, cycleCount());
 }
 
 // USART1 is the output datastream and command input
@@ -452,7 +448,7 @@ static volatile uint32_t usart1rxdmaerr_cnt = 0;
 
 // USART1 TX: irq on dma error or complete
 void DMA2_CH6_Handler(void) {
-    rt_start(&usart1txdma_rt, cycleCount());
+	rt_start(&usart1txdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
 	DMA2.IFCR	 = isr & 0x00f00000;
 	if (isr & DMA1_ISR_TEIF6)
@@ -462,7 +458,7 @@ void DMA2_CH6_Handler(void) {
 		if (msgq_tail(&outq))
 			msgq_pop_tail(&outq);
 	}
-    rt_stop(&usart1txdma_rt, cycleCount());
+	rt_stop(&usart1txdma_rt, cycleCount());
 }
 
 void USART1_Handler(void) {
@@ -470,7 +466,7 @@ void USART1_Handler(void) {
 	if ((USART1.ISR & USART1_ISR_TC) == 0)
 		return;
 
-    rt_start(&usart1irq_rt, cycleCount());
+	rt_start(&usart1irq_rt, cycleCount());
 
 	struct Msg *msg = msgq_tail(&outq);
 	if (msg == NULL) {
@@ -478,18 +474,17 @@ void USART1_Handler(void) {
 		USART1.CR1 &= ~USART1_CR1_TCIE;
 
 	} else {
+		// queue not empty, start a new transfer
+		USART1.ICR |= USART1_ICR_TCCF;	// clear irq flag
 
-        // queue not empty, start a new transfer
-        USART1.ICR |= USART1_ICR_TCCF;	// clear irq flag
-
-        DMA2.CCR6 = 0;
-        dma1_cselr_set_c6s(&DMA2, 2);  // select usart1 for dma2 ch6
-        DMA2.CPAR6	= (uintptr_t)&USART1.TDR;
-        DMA2.CMAR6	= (uintptr_t)msg->buf;
-        DMA2.CNDTR6 = msg->len;
-        DMA2.CCR6	= DMA1_CCR6_DIR | DMA1_CCR6_TEIE | DMA1_CCR6_TCIE | DMA1_CCR6_EN | DMA1_CCR6_MINC;
-    }
-      rt_stop(&usart1irq_rt, cycleCount());
+		DMA2.CCR6 = 0;
+		dma1_cselr_set_c6s(&DMA2, 2);  // select usart1 for dma2 ch6
+		DMA2.CPAR6	= (uintptr_t)&USART1.TDR;
+		DMA2.CMAR6	= (uintptr_t)msg->buf;
+		DMA2.CNDTR6 = msg->len;
+		DMA2.CCR6	= DMA1_CCR6_DIR | DMA1_CCR6_TEIE | DMA1_CCR6_TCIE | DMA1_CCR6_EN | DMA1_CCR6_MINC;
+	}
+	rt_stop(&usart1irq_rt, cycleCount());
 }
 
 static uint8_t		   cmdbuf[1024];
@@ -527,76 +522,77 @@ static inline int haspfx(uint8_t *buf, size_t buflen, uint8_t *pfx, size_t pfxle
 }
 
 static inline void handlerx() {
-    switch (cmdbuf_state) {
-    case RESYNC:
-        while (!haspfx(cmdbuf, cmdbuf_head, "IRON", 4)) {
-            size_t start = 1 + findbyte(cmdbuf + 1, cmdbuf_head - 1, 'I');
-            memmove(cmdbuf, cmdbuf + start, cmdbuf_head - start);
-            cmdbuf_head -= start;
-            if (cmdbuf_head < 8) {
-                usart1_start_rx(8 - cmdbuf_head);
-                return;
-            }
+	switch (cmdbuf_state) {
+	case RESYNC:
+		while (!haspfx(cmdbuf, cmdbuf_head, "IRON", 4)) {
+			size_t start = 1 + findbyte(cmdbuf + 1, cmdbuf_head - 1, 'I');
+			memmove(cmdbuf, cmdbuf + start, cmdbuf_head - start);
+			cmdbuf_head -= start;
+			if (cmdbuf_head < 8) {
+				usart1_start_rx(8 - cmdbuf_head);
+				return;
+			}
 
-            // we have at least 8 bytes starting with 'IRON', next two bytes are packet size
-            cmdpacket_size = decode_be_uint16(cmdbuf + 4);
-            memmove(cmdbuf, cmdbuf + 6, cmdbuf_head - 6);
-            cmdbuf_head -= 6;
-            if (cmdpacket_size <= 1022)
-                break;
-        }
+			// we have at least 8 bytes starting with 'IRON', next two bytes are packet size
+			cmdpacket_size = decode_be_uint16(cmdbuf + 4);
+			memmove(cmdbuf, cmdbuf + 6, cmdbuf_head - 6);
+			cmdbuf_head -= 6;
+			if (cmdpacket_size <= 1022)
+				break;
+		}
 
-        cmdbuf_state = MORE;
-        // fallthrough
-    case MORE:
-        if (cmdbuf_head < cmdpacket_size + 2) {
-            usart1_start_rx(2 + cmdpacket_size - cmdbuf_head);
-            return;
-        }
-        // now we have cmdpacket_size + 2 bytes in the buffer
-        cmdbuf_state = COMPLETE;
+		cmdbuf_state = MORE;
+		// fallthrough
+	case MORE:
+		if (cmdbuf_head < cmdpacket_size + 2) {
+			usart1_start_rx(2 + cmdpacket_size - cmdbuf_head);
+			return;
+		}
+		// now we have cmdpacket_size + 2 bytes in the buffer
+		cmdbuf_state = COMPLETE;
 
-    case COMPLETE:
-    }
-    return;
+	case COMPLETE:
+	}
+	return;
 }
 
 // USART1 RX: irq on dma error or complete
 void DMA2_CH7_Handler(void) {
-    rt_start(&usart1rxdma_rt, cycleCount());
+	rt_start(&usart1rxdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
 	DMA2.IFCR	 = isr & 0x0f000000;
 	if (isr & DMA1_ISR_TEIF7)
 		++usart1rxdmaerr_cnt;
 
 	if (isr & DMA1_ISR_TCIF7) {
-        handlerx();
+		handlerx();
 	}
-    rt_stop(&usart1rxdma_rt, cycleCount());
+	rt_stop(&usart1rxdma_rt, cycleCount());
 }
 
 void TIM1_UP_TIM16_Handler(void) {
-    uint64_t now = cycleCount();
-    uint16_t sr	 = TIM16.SR;
+	uint64_t now = cycleCount();
+	uint16_t sr	 = TIM16.SR;
 	TIM16.SR &= ~sr;
 
-    uint64_t us = now / C_US;  // microseconds
+	uint64_t us = now / C_US;  // microseconds
 
-    printf("\e[Huptime %llu.%06llu\e[K\n", us / 1000000, us % 1000000);
-    printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\e[K\n", spiq.head, evq.head, outq.head);
-    printf("dropped  spiq: %8lu evq:%8lu outq: %8lu\e[K\n", dropped_spi1, dropped_evq, dropped_usart1);
-    printf("spi1   err tx: %8lu  rx:%8lu\e[K\n", spi1txdmaerr_cnt, spi1rxdmaerr_cnt);
-    printf("usart1 err tx: %8lu  rx:%8lu\e[K\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
-    if (adc_ovfl) printf("adc ovfl %lu\e[K\n", adc_ovfl);
-    rt_report(&idle_rt, &lastreport);
-    printf("\e[K\n");
-    // account for reporting time outside of rt_report call
-    rt_start(&report_rt, now);
-    rt_stop(&report_rt, cycleCount());
+	printf("\e[Huptime %llu.%06llu\e[K\n", us / 1000000, us % 1000000);
+	printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\e[K\n", spiq.head, evq.head, outq.head);
+	printf("dropped  spiq: %8lu evq:%8lu outq: %8lu\e[K\n", dropped_spi1, dropped_evq, dropped_usart1);
+	printf("spi1   err tx: %8lu  rx:%8lu\e[K\n", spi1txdmaerr_cnt, spi1rxdmaerr_cnt);
+	printf("usart1 err tx: %8lu  rx:%8lu\e[K\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
+	if (adc_ovfl)
+		printf("adc ovfl %lu\e[K\n", adc_ovfl);
+	rt_report(&idle_rt, &lastreport);
+	printf("\e[K\n");
+	// account for reporting time outside of rt_report call
+	rt_start(&report_rt, now);
+	rt_stop(&report_rt, cycleCount());
 }
 
 static const char *pplsrcstr[] = {"NONE", "MSI", "HSI16", "HSE"};
-extern uint16_t TS_CAL1, TS_CAL2, VREFINT; // defined in .ld file
+extern uint16_t	   TS_CAL1, TS_CAL2, VREFINT;  // defined in .ld file
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
@@ -610,7 +606,7 @@ void main(void) {
 	// Enable all the devices we are going to need
 	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
 	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN | RCC_AHB2ENR_ADCEN;
-	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN | RCC_APB1ENR1_TIM2EN ;
+	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN | RCC_APB1ENR1_TIM2EN;
 	RCC.APB2ENR |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART1EN | RCC_APB2ENR_TIM16EN;
 
 	for (const struct gpio_config_t *p = pin_cfgs; p->pins; ++p) {
@@ -621,11 +617,18 @@ void main(void) {
 	gpioLock(PBAll);
 
 	// deselect all (active low) chip select signals, then wiggle them
-    // to force them from I2C into SPI mode
-    digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN); delay(15);
-    spi1_ss(HUMID, 1); delay(15); spi1_ss(HUMID, 0);
-    spi1_ss(ACCEL, 1); delay(15); spi1_ss(ACCEL, 0);
-    spi1_ss(GYRO, 1); delay(15); spi1_ss(GYRO, 0);
+	// to force them from I2C into SPI mode
+	digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN);
+	delay(15);
+	spi1_ss(HUMID, 1);
+	delay(15);
+	spi1_ss(HUMID, 0);
+	spi1_ss(ACCEL, 1);
+	delay(15);
+	spi1_ss(ACCEL, 0);
+	spi1_ss(GYRO, 1);
+	delay(15);
+	spi1_ss(GYRO, 0);
 
 	// prepare USART2 for console and debug messages
 	ringbuffer_clear(&usart2tx);
@@ -640,15 +643,14 @@ void main(void) {
 		   rf & 0x10 ? " SFT" : "", rf & 0x08 ? " POR" : "", rf & 0x04 ? " PIN" : "");
 	printf("PPLSRC: %s%s\n", pplsrcstr[rcc_pllcfgr_get_pllsrc(&RCC)],
 		   (RCC.CR & RCC_CR_HSEBYP) && (rcc_pllcfgr_get_pllsrc(&RCC) == 3) ? " (CK_IN)" : "");
-    printf("cal ts %u %u vref %u\n", TS_CAL1, TS_CAL2, VREFINT);
+	printf("cal ts %u %u vref %u\n", TS_CAL1, TS_CAL2, VREFINT);
 	usart_wait(&USART2);
 
 	// Set up SPI1 for talking to all the connected chips.
 	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss);  // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
-    NVIC_EnableIRQ(DMA1_CH3_IRQn); // only used to count tx errors
+	NVIC_EnableIRQ(DMA1_CH3_IRQn);						  // only used to count tx errors
 
-
-    // test and config BMI088
+	// test and config BMI088
 
 	if (bmi_accel_poweron(&spiq) == 0) {
 		printf("BMI088 Accel enabled.\n");
@@ -670,23 +672,22 @@ void main(void) {
 	if (bmx_config(&spiq, GYRO, gyro_cfg) != 0) {
 		printf("BMI088 error configuring Gyro\n");
 	}
-    usart_wait(&USART2);
+	usart_wait(&USART2);
 
-
-    int accel_ok = (bmx_check_config(&spiq, ACCEL, accel_cfg) == 0);
+	int accel_ok = (bmx_check_config(&spiq, ACCEL, accel_cfg) == 0);
 	if (!accel_ok) {
 		printf("BMI Accel not properly configured\n");
 	}
 	usart_wait(&USART2);
-    int gyro_ok  = (bmx_check_config(&spiq, GYRO, gyro_cfg) == 0);
+	int gyro_ok = (bmx_check_config(&spiq, GYRO, gyro_cfg) == 0);
 	if (!gyro_ok) {
 		printf("BMI Gyro not properly configured\n");
-    }
+	}
 	usart_wait(&USART2);
 
-    // test and config BME280
-    
-    if (bme280_self_test(&spiq, &bmeParam) == 0) {
+	// test and config BME280
+
+	if (bme280_self_test(&spiq, &bmeParam) == 0) {
 		printf("T:");
 		for (size_t i = 1; i < 4; ++i)
 			printf(" %ld", bmeParam.T[i]);
@@ -709,8 +710,7 @@ void main(void) {
 	}
 	usart_wait(&USART2);
 
-
-    int humid_ok = (bmx_check_config(&spiq, HUMID, humid_cfg) == 0);
+	int humid_ok = (bmx_check_config(&spiq, HUMID, humid_cfg) == 0);
 	if (!humid_ok) {
 		printf("BME humidity sensor not properly configured.\n");
 	}
@@ -719,7 +719,7 @@ void main(void) {
 	// Prepare USART1 for high speed DMA driven output of the measurement data
 	usart_init(&USART1, 921600);
 	USART1.CR3 |= USART1_CR3_DMAT | USART1_CR3_DMAR;  // enable DMA output and input
-	usart1_start_rx(8);  // ask rx for the first 8 bytes
+	usart1_start_rx(8);								  // ask rx for the first 8 bytes
 	NVIC_EnableIRQ(DMA2_CH6_IRQn);
 	NVIC_EnableIRQ(DMA2_CH7_IRQn);
 	NVIC_EnableIRQ(USART1_IRQn);
@@ -738,59 +738,59 @@ void main(void) {
 	TIM2.CR1 |= TIM2_CR1_CEN;
 	NVIC_EnableIRQ(TIM2_IRQn);
 
-    // ADC
-    rcc_ccipr_set_adcsel(&RCC, 3); // System clock selected as ADCs clock  6.4.27
-    adc12_common_ccr_set_ckmode(&ADC12_Common, 1); // HCLK, 80MHz
+	// ADC
+	rcc_ccipr_set_adcsel(&RCC, 3);					// System clock selected as ADCs clock  6.4.27
+	adc12_common_ccr_set_ckmode(&ADC12_Common, 1);	// HCLK, 80MHz
 
-    ADC.CR &= ~ADC_CR_DEEPPWD;  // end deep power down
-    ADC.CR |= ADC_CR_ADVREGEN;  // enable voltage regulator
-    delay(25); // DS11453 table 66
-    ADC.CR |= ADC_CR_ADCAL; // start calibration
-    while (ADC.CR & ADC_CR_ADCAL)
-        __NOP();
+	ADC.CR &= ~ADC_CR_DEEPPWD;	// end deep power down
+	ADC.CR |= ADC_CR_ADVREGEN;	// enable voltage regulator
+	delay(25);					// DS11453 table 66
+	ADC.CR |= ADC_CR_ADCAL;		// start calibration
+	while (ADC.CR & ADC_CR_ADCAL)
+		__NOP();
 
-    ADC.ISR |= ADC_ISR_ADRDY; // clear ready flag
-    ADC.CR |= ADC_CR_ADEN;  // enable
-    while (ADC.ISR & ADC_ISR_ADRDY)  // wait until ready
-        __NOP();
+	ADC.ISR |= ADC_ISR_ADRDY;		 // clear ready flag
+	ADC.CR |= ADC_CR_ADEN;			 // enable
+	while (ADC.ISR & ADC_ISR_ADRDY)	 // wait until ready
+		__NOP();
 
-    // Enable VRef on chan 0 and Temp Sens on chan 17
-    ADC12_Common.CCR |= ADC12_COMMON_CCR_VSENSESEL | ADC12_COMMON_CCR_VREFEN;
+	// Enable VRef on chan 0 and Temp Sens on chan 17
+	ADC12_Common.CCR |= ADC12_COMMON_CCR_VSENSESEL | ADC12_COMMON_CCR_VREFEN;
 
-    // configure to sample channels 0,9,11,17
-    adc_sqr1_set_l3(&ADC, 4-1); // 4 samples
-    adc_sqr1_set_sq1(&ADC, 0);  // channel 17, internal temperature
-    adc_sqr1_set_sq2(&ADC, 9);  // channel 0   Vrefint
-    adc_sqr1_set_sq3(&ADC, 11); // channel 9, pin PA4 thermistor
-    adc_sqr1_set_sq4(&ADC, 17); // channel 11, pin PA6 current sense
+	// configure to sample channels 0,9,11,17
+	adc_sqr1_set_l3(&ADC, 4 - 1);  // 4 samples
+	adc_sqr1_set_sq1(&ADC, 0);	   // channel 17, internal temperature
+	adc_sqr1_set_sq2(&ADC, 9);	   // channel 0   Vrefint
+	adc_sqr1_set_sq3(&ADC, 11);	   // channel 9, pin PA4 thermistor
+	adc_sqr1_set_sq4(&ADC, 17);	   // channel 11, pin PA6 current sense
 
-    adc_smpr1_set_smp0(&ADC, 7);  // 640.5 adc clock cycles 8us
-    adc_smpr1_set_smp9(&ADC, 5);  //  92.5 adc clock cycles 1.2us
-    adc_smpr2_set_smp11(&ADC, 5); //  92.5 adc clock cycles 1.2us
-    adc_smpr2_set_smp17(&ADC, 7); // 640.5 adc clock cycles 8us
+	adc_smpr1_set_smp0(&ADC, 7);   // 640.5 adc clock cycles 8us
+	adc_smpr1_set_smp9(&ADC, 5);   //  92.5 adc clock cycles 1.2us
+	adc_smpr2_set_smp11(&ADC, 5);  //  92.5 adc clock cycles 1.2us
+	adc_smpr2_set_smp17(&ADC, 7);  // 640.5 adc clock cycles 8us
 
-    adc_cfgr_set_exten(&ADC, 1); // trigger on rising edge
-    adc_cfgr_set_extsel(&ADC, 13); // ext 13 is TIM6 TRGO (see below)
+	adc_cfgr_set_exten(&ADC, 1);	// trigger on rising edge
+	adc_cfgr_set_extsel(&ADC, 13);	// ext 13 is TIM6 TRGO (see below)
 
-    ADC.CFGR |= ADC_CFGR_AUTDLY;
-    ADC.IER = ADC_IER_EOCIE; // irq at end of conversion and end of sequence
-    ADC.CR |= ADC_CR_ADSTART;  // start as soon as the triggers come in from TIM6
-    NVIC_EnableIRQ(ADC1_IRQn);
+	ADC.CFGR |= ADC_CFGR_AUTDLY;  // without this, more than 3 samples trigger an overflow error
+	ADC.IER = ADC_IER_EOCIE;	  // irq at end of conversion and end of sequence
+	ADC.CR |= ADC_CR_ADSTART;	  // start as soon as the triggers come in from TIM6
+	NVIC_EnableIRQ(ADC1_IRQn);
 
 	// set up TIM6 for a 8Hz hearbeat for various periodic things, including triggering the ADC
 	// note: it pushes spiq messages so do not start this before the BMI/BME are configured.
 	TIM6.DIER |= TIM6_DIER_UIE;
 	TIM6.PSC = (CLOCKSPEED_HZ / 10000) - 1;
-	TIM6.ARR = 1250 - 1;  // 10KHz/1250 = 8Hz
-    tim6_cr2_set_mms(&TIM6, 2); // TRGO = update event 
+	TIM6.ARR = 1250 - 1;		 // 10KHz/1250 = 8Hz
+	tim6_cr2_set_mms(&TIM6, 2);	 // TRGO = update event
 	TIM6.CR1 |= TIM6_CR1_CEN;
 	NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
 
-	// set up TIM16 for a 1Hz report 
+	// set up TIM16 for a 1Hz report
 	TIM16.DIER |= TIM16_DIER_UIE;
 	TIM16.PSC = (CLOCKSPEED_HZ / 10000) - 1;
-	TIM16.ARR = 10000 - 1;  // 10KHz/10000 = 1Hz
-    TIM16.CNT = 3333;       // offset by a third of a second
+	TIM16.ARR = 10000 - 1;	// 10KHz/10000 = 1Hz
+	TIM16.CNT = 3333;		// offset by a third of a second
 	TIM16.CR1 |= TIM16_CR1_CEN;
 	NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);
 
@@ -799,16 +799,16 @@ void main(void) {
 	accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
 
 	// BMI interrupt signals
-    if (accel_ok) {
-	    EXTI.IMR1  |= BMI_INT1A_PIN & Pin_All;
-    	EXTI.FTSR1 |= BMI_INT1A_PIN & Pin_All;
-    	NVIC_EnableIRQ(EXTI1_IRQn);	 // Accelerometer ready interrupt
-    }
-    if (gyro_ok) {
-    	EXTI.IMR1  |= BMI_INT3G_PIN & Pin_All;
-	    EXTI.FTSR1 |= BMI_INT3G_PIN & Pin_All;
-    	NVIC_EnableIRQ(EXTI3_IRQn);	 // Gyroscope ready interrupt
-    }
+	if (accel_ok) {
+		EXTI.IMR1 |= BMI_INT1A_PIN & Pin_All;
+		EXTI.FTSR1 |= BMI_INT1A_PIN & Pin_All;
+		NVIC_EnableIRQ(EXTI1_IRQn);	 // Accelerometer ready interrupt
+	}
+	if (gyro_ok) {
+		EXTI.IMR1 |= BMI_INT3G_PIN & Pin_All;
+		EXTI.FTSR1 |= BMI_INT3G_PIN & Pin_All;
+		NVIC_EnableIRQ(EXTI3_IRQn);	 // Gyroscope ready interrupt
+	}
 
 	// Initialize the independent watchdog
 	IWDG.KR	 = 0x5555;	// enable watchdog config
@@ -820,25 +820,25 @@ void main(void) {
 	size_t packetlen  = 0;
 	size_t packetchk  = 0;
 
-    printf("%lld mainloop start\n", cycleCount()/C_US);
+	printf("%lld mainloop start\n", cycleCount() / C_US);
 
 	for (;;) {
-        rt_start(&idle_rt, cycleCount());
+		rt_start(&idle_rt, cycleCount());
 
 		__WFI();
 
 		struct SPIXmit *x	= spiq_tail(&spiq);
 		struct Msg	   *ev	= msgq_tail(&evq);
-        uint64_t        now = cycleCount();
+		uint64_t		now = cycleCount();
 
-        rt_stop(&idle_rt, now);
+		rt_stop(&idle_rt, now);
 
-        if (!x && !ev)
-            continue;
+		if (!x && !ev)
+			continue;
 
 		// dequeue from spi and event queues, send on out queue
 		// insert packet header and footer along the way
-        rt_start(&mainloop_rt, now);
+		rt_start(&mainloop_rt, now);
 		while (x || ev) {
 			struct Msg *out = msgq_head(&outq);
 			if (!out) {
@@ -850,13 +850,13 @@ void main(void) {
 				out->len = ev->len;
 				memmove(out->buf, ev->buf, ev->len);
 				msgq_pop_tail(&evq);
-                ev = msgq_tail(&evq);
+				ev = msgq_tail(&evq);
 			} else if (x) {
 				int ok = output_bmx(out, x);
 				spiq_deq_tail(&spiq);
-                x = spiq_tail(&spiq);
-    			if (!ok)  // nothing to send
-	    			continue;
+				x = spiq_tail(&spiq);
+				if (!ok)  // nothing to send
+					continue;
 			}
 
 			packetlen += out->len;
@@ -879,7 +879,7 @@ void main(void) {
 				packetlen = packetsize;
 			}
 
-            // end of packet; send checksum trailer + header for the next
+			// end of packet; send checksum trailer + header for the next
 			if (packetsize == packetlen) {
 				while (msgq_head(&outq) == NULL)
 					__NOP();
@@ -894,14 +894,13 @@ void main(void) {
 				packetchk = 0;
 				packetlen = 0;
 
-			    IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
+				IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
 
 				// check here if there's a command response packet to send
 			}
-
 		}
-        rt_stop(&mainloop_rt, cycleCount());
+		rt_stop(&mainloop_rt, cycleCount());
 
-	} // forever
+	}  // forever
 
-} // main()
+}  // main()
