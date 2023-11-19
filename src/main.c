@@ -572,16 +572,16 @@ void DMA2_CH7_Handler(void) {
 	rt_stop(&usart1rxdma_rt, cycleCount());
 }
 
+// A 1Hz report on the queues and all the handlers
 void TIM1_UP_TIM16_Handler(void) {
 	uint64_t now = cycleCount();
 	uint16_t sr	 = TIM16.SR;
 	TIM16.SR &= ~sr;
 
 	uint64_t us = now / C_US;  // microseconds
+	uint32_t vdd = adc_val[0] ? ((3000UL * VREFINT) / adc_val[0]) :  0;
 
-	uint64_t vdd = adc_val[0] ? ((3000ULL * VREFINT) / adc_val[0]) :  0;
-
-	printf("\e[Huptime %llu.%06llu  Vdd %lld mV\e[K\n", us / 1000000, us % 1000000, vdd);
+	printf("\e[Huptime %llu.%06llu  Vdd %lu mV\e[K\n", us / 1000000, us % 1000000, vdd);
 	printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\e[K\n", spiq.head, evq.head, outq.head);
 	printf("dropped  spiq: %8lu evq:%8lu outq: %8lu\e[K\n", dropped_spi1, dropped_evq, dropped_usart1);
 	printf("spi1   err tx: %8lu  rx:%8lu\e[K\n", spi1txdmaerr_cnt, spi1rxdmaerr_cnt);
@@ -623,16 +623,12 @@ void main(void) {
 	// deselect all (active low) chip select signals, then wiggle them
 	// to force them from I2C into SPI mode
 	digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN);
-	delay(15);
-	spi1_ss(HUMID, 1);
-	delay(15);
-	spi1_ss(HUMID, 0);
-	spi1_ss(ACCEL, 1);
-	delay(15);
-	spi1_ss(ACCEL, 0);
-	spi1_ss(GYRO, 1);
-	delay(15);
-	spi1_ss(GYRO, 0);
+    for (int i = 1; i <=3; ++i) {
+    	delay(15);
+	    spi1_ss(i, 1);
+    	delay(15);
+    	spi1_ss(i, 0);
+    }
 
 	// prepare USART2 for console and debug messages
 	ringbuffer_clear(&usart2tx);
@@ -651,7 +647,7 @@ void main(void) {
 	usart_wait(&USART2);
 
 	// Set up SPI1 for talking to all the connected chips.
-	spiq_init(&spiq, &SPI1, 4, SPI1_DMA1_CH23, spi1_ss);  // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+	spiq_init(&spiq, &SPI1, 3, SPI1_DMA1_CH23, spi1_ss);  // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
 	NVIC_EnableIRQ(DMA1_CH3_IRQn);						  // only used to count tx errors
 
 	// test and config BMI088
