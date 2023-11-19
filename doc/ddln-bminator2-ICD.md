@@ -106,12 +106,12 @@ TODO(ph) update with pinout of the actual implementation
 
 | Pin | Name      | Function      | Direction | Electrical        | Connected to debugger |
 | --: | :-------- | :------------ | :-------- | :---------------- | :-------------------- |
-|   1 | GND       |               |           |                   | ground                |
-|   2 | +3.3V     |               | B <- D    | power supply 3.3V | +3.3V supply          |
-|   3 | Serial TX | PA2 USART2 TX | B -> D    | AF_PP 10MHz 3.3V  | serial RX             |
-|   4 | SWDIO     | PA13 SWDIO    | B <-> D   |                   | debug data            |
+|   1 | Serial TX | PA2 USART2 TX | B -> D    | AF_PP 10MHz 3.3V  | serial RX             |
+|   2 | nRST      | nRST          | B <- D    |                   | reset                 |
+|   3 | SWDIO     | PA13 SWDIO    | B <-> D   |                   | debug data            |
+|   4 | GND       |               |           |                   | ground                |
 |   5 | SWCLK     | PA14 SWCLK    | B <- D    |                   | debug clock           |
-|   6 | nRST      | nRST          | B <- D    |                   | reset                 |
+|   6 | +3.3V     |               | B <- D    | power supply 3.3V | +3.3V supply          |
 
 BMInator Connector Jx(DEBUG) pinout.
 
@@ -325,5 +325,4 @@ The BMInator defines the following address layout, within a prefix meant to deco
 | prefix 0475        | rw  | BME280 config register 0x75       |
 | prefix 1xxx        | ro  | TODO uC internal variables        |
 | prefix 2000        | rw  | TODO Heater Temperature control   |
-| prefix 8000 - 8800 | rw  | 2KB flash rom                     |
 
