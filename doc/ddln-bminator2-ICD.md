@@ -324,5 +324,5 @@ The BMInator defines the following address layout, within a prefix meant to deco
 | prefix 0474        | rw  | BME280 ctrl meas register 0x74    |
 | prefix 0475        | rw  | BME280 config register 0x75       |
 | prefix 1xxx        | ro  | TODO uC internal variables        |
-| prefix 2000        | rw  | TODO Heater Temperature control   |
+| prefix 2xxx        | rw  | TODO Heater Temperature control   |
 

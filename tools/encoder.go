@@ -18,7 +18,7 @@ func main() {
 	packet := []uint32{
 		0x05050505, // tagged command
 		tag,        // random tag
-		0x00000080, // read 128 bytes
+		0x00000010, // read 16 bytes
 		0x23000100, // from gyro address space
 	}
 

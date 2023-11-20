@@ -490,7 +490,7 @@ void USART1_Handler(void) {
 	rt_stop(&usart1irq_rt, cycleCount());
 }
 
-static uint8_t		   cmdbuf[1024];
+static uint8_t		   cmdbuf[128];
 static volatile size_t cmdbuf_head							 = 0;
 static volatile enum { RESYNC, MORE, COMPLETE } cmdbuf_state = RESYNC;
 static volatile size_t cmdpacket_size						 = 0;
@@ -524,7 +524,69 @@ static inline int haspfx(uint8_t *buf, size_t buflen, uint8_t *pfx, size_t pfxle
 	return 1;
 }
 
-static inline void handlerx() {
+static inline uint16_t checksum16(uint8_t *buf, size_t len) {
+    uint16_t chk = 0;
+    for (size_t i = 0; i < len; ++i) {
+        chk += buf[i];
+    }
+    return chk;
+}
+
+static int checkcmdpacket() {
+    if (cmdbuf_head != cmdpacket_size + 2) {
+        printf("CMDRX: internal error %u != %u + 2\n", cmdbuf_head, cmdpacket_size);
+        return 0;
+    }
+
+    uint16_t chk = checksum16(cmdbuf, cmdbuf_head - 2);
+    uint16_t chk2 = decode_be_uint16(cmdbuf + cmdbuf_head - 2);
+    if (chk != chk2) {
+        printf("CMDRX: invalid packet checksum %u, expected %u\n", chk2, chk);
+        return 0;
+    }
+    if (cmdpacket_size < 20) {
+        printf("CMDRX: short packet %d bytes\n", cmdpacket_size);
+        return 0;
+    }
+
+    uint32_t pt = decode_be_uint32(cmdbuf);
+    if (pt != 0x05050505) {
+        printf("CMDRX: invalid packet type %lx\n", pt);
+        return 0;
+    }
+
+    // todo: crc32 over whole packet
+
+    // tag:cmdbuf[4:8] should be 4x same byte
+
+    // must be 0 (read) or 1 (write)
+    if (cmdbuf[8] & ~1) {
+        printf("CMDRX: invalid command %x\n", cmdbuf[8]);
+        return 0;
+    }
+
+    uint32_t len = decode_be_uint24(cmdbuf + 9);
+    if (len > 32) {
+        printf("CMDRX: cannot read or write more than 32 bytes, got %lu\n", len);
+        return 0;
+    }
+
+    // read
+    if ((cmdbuf[8] == 0) &&  (cmdpacket_size > 20)) {
+        printf("CMDRX: read packet has %d bytes trailing garbage\n", cmdpacket_size - 20);
+        return 0;
+    }
+
+    // write
+    if ((cmdbuf[8] == 1) &&  (cmdpacket_size != 20 + 4*((len + 3)/4))) {
+        printf("CMDRX: write packet for %ld bytes has wrong length %d\n", len, cmdpacket_size - 20);
+        return 0;
+    }
+
+    return 1;
+}
+
+static inline void handlecmdrx() {
 	switch (cmdbuf_state) {
 	case RESYNC:
 		while (!haspfx(cmdbuf, cmdbuf_head, "IRON", 4)) {
@@ -535,17 +597,23 @@ static inline void handlerx() {
 				usart1_start_rx(8 - cmdbuf_head);
 				return;
 			}
+        }
 
-			// we have at least 8 bytes starting with 'IRON', next two bytes are packet size
-			cmdpacket_size = decode_be_uint16(cmdbuf + 4);
-			memmove(cmdbuf, cmdbuf + 6, cmdbuf_head - 6);
-			cmdbuf_head -= 6;
-			if (cmdpacket_size <= 1022)
-				break;
+		// we have at least 8 bytes starting with 'IRON', next two bytes are packet size
+		cmdpacket_size = decode_be_uint16(cmdbuf + 4);
+		memmove(cmdbuf, cmdbuf + 6, cmdbuf_head - 6);
+		cmdbuf_head -= 6;
+
+		if (cmdpacket_size + 2 > sizeof cmdbuf) {
+            printf("CMDRX: invalid packet size %u, ignoring %d bytes\n", cmdpacket_size, cmdbuf_head);
+            cmdbuf_head = 0;
+			usart1_start_rx(8);
+			return;
 		}
 
 		cmdbuf_state = MORE;
 		// fallthrough
+
 	case MORE:
 		if (cmdbuf_head < cmdpacket_size + 2) {
 			usart1_start_rx(2 + cmdpacket_size - cmdbuf_head);
@@ -553,9 +621,28 @@ static inline void handlerx() {
 		}
 		// now we have cmdpacket_size + 2 bytes in the buffer
 		cmdbuf_state = COMPLETE;
+		// fallthrough
 
 	case COMPLETE:
+        break;
 	}
+
+    // we have a complete packet
+    printf("cmdbuf[%d]", cmdbuf_head);
+    hexdump(cmdbuf_head, cmdbuf);
+    printf("\n");
+
+    if (!checkcmdpacket()) {
+        printf("CMDRX: ignoring %d bytes\n", cmdbuf_head);
+        cmdbuf_head = 0;
+        cmdbuf_state = RESYNC;
+  		usart1_start_rx(8);
+        return; 
+    }
+
+    printf("CMDRX %s %ld bytes at address %lx", cmdbuf[8] ? "write":"read", decode_be_uint24(cmdbuf + 9), decode_be_uint32(cmdbuf + 12));
+    // schedule the read or write on the SPI queue
+
 	return;
 }
 
@@ -564,16 +651,14 @@ void DMA2_CH7_Handler(void) {
 	rt_start(&usart1rxdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
 	DMA2.IFCR	 = isr & 0x0f000000;
-	if (isr & DMA1_ISR_TEIF7)
+	if (isr & DMA1_ISR_TEIF7) {
 		++usart1rxdmaerr_cnt;
-
-	printf("cmdbuf[%d]", cmdbuf_head);
-	hexdump(cmdbuf_head, cmdbuf);
-	printf("\n");
+    }
 
 	if (isr & DMA1_ISR_TCIF7) {
-		handlerx();
+		handlecmdrx();
 	}
+
 	rt_stop(&usart1rxdma_rt, cycleCount());
 }
 
@@ -888,15 +973,18 @@ void main(void) {
 				packetlen = packetsize;
 			}
 
+			// check here if there's a command response packet to send
+
+
 			// end of packet; send checksum trailer + header for the next
 			if (packetsize == packetlen) {
 				while (msgq_head(&outq) == NULL)
 					__NOP();
 				out = msgq_head(&outq);
 				msg_reset(out);
-				msg_append16(out, packetchk);
+				msg_append16(out, packetchk);   // of the previous packet
 				msg_append32(out, 0x49524F4E);	// 'IRON'
-				msg_append16(out, packetsize);
+				msg_append16(out, packetsize);  // of the next one
 				msgq_push_head(&outq);
 				USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
 
@@ -904,8 +992,6 @@ void main(void) {
 				packetlen = 0;
 
 				IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
-
-				// check here if there's a command response packet to send
 			}
 		}
 		rt_stop(&mainloop_rt, cycleCount());
