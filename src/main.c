@@ -39,7 +39,7 @@ enum {
 	HEATER_EN_PIN	  = PA5,
 	CURRENT_SENSE_PIN = PA6,  // ADC1_IN11
 	USART1_TX_PIN	  = PA9,
-	USARTR_TX_PIN	  = PA10,
+	USART1_RX_PIN	  = PA10,
 	TIMEPULSE_PIN	  = PA15,
 
 	BMI_CSB2G_PIN = PB0,
@@ -56,6 +56,7 @@ static struct gpio_config_t {
 	enum GPIO_Conf mode;
 } const pin_cfgs[] = {
 		{USART1_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
+		{USART1_RX_PIN, GPIO_AF7_USART123},
 		{USART2_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
 		{SPI1_MOSI_PIN | SPI1_SCK_PIN | SPI1_MISO_PIN, GPIO_AF5_SPI12 | GPIO_HIGH},
 		{BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_INPUT},
@@ -161,7 +162,7 @@ void USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
 
 // helper for debugging
 void hexdump(size_t len, const uint8_t *ptr) {
-	static const char *hexchar = "01234567890abcdef";
+	static const char *hexchar = "0123456789abcdef";
 	for (size_t i = 0; i < len; ++i) {
 		_putchar(' ');
 		_putchar(hexchar[ptr[i] >> 4]);
@@ -566,6 +567,10 @@ void DMA2_CH7_Handler(void) {
 	if (isr & DMA1_ISR_TEIF7)
 		++usart1rxdmaerr_cnt;
 
+	printf("cmdbuf[%d]", cmdbuf_head);
+	hexdump(cmdbuf_head, cmdbuf);
+	printf("\n");
+
 	if (isr & DMA1_ISR_TCIF7) {
 		handlerx();
 	}
@@ -578,8 +583,8 @@ void TIM1_UP_TIM16_Handler(void) {
 	uint16_t sr	 = TIM16.SR;
 	TIM16.SR &= ~sr;
 
-	uint64_t us = now / C_US;  // microseconds
-	uint32_t vdd = adc_val[0] ? ((3000UL * VREFINT) / adc_val[0]) :  0;
+	uint64_t us	 = now / C_US;	// microseconds
+	uint32_t vdd = adc_val[0] ? ((3000UL * VREFINT) / adc_val[0]) : 0;
 
 	printf("\e[Huptime %llu.%06llu  Vdd %lu mV\e[K\n", us / 1000000, us % 1000000, vdd);
 	printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\e[K\n", spiq.head, evq.head, outq.head);
@@ -623,12 +628,12 @@ void main(void) {
 	// deselect all (active low) chip select signals, then wiggle them
 	// to force them from I2C into SPI mode
 	digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN);
-    for (int i = 1; i <=3; ++i) {
-    	delay(15);
-	    spi1_ss(i, 1);
-    	delay(15);
-    	spi1_ss(i, 0);
-    }
+	for (int i = 1; i <= 3; ++i) {
+		delay(15);
+		spi1_ss(i, 1);
+		delay(15);
+		spi1_ss(i, 0);
+	}
 
 	// prepare USART2 for console and debug messages
 	ringbuffer_clear(&usart2tx);
@@ -717,9 +722,13 @@ void main(void) {
 	usart_wait(&USART2);
 
 	// Prepare USART1 for high speed DMA driven output of the measurement data
-	usart_init(&USART1, 921600);
-	USART1.CR3 |= USART1_CR3_DMAT | USART1_CR3_DMAR;  // enable DMA output and input
-	usart1_start_rx(8);								  // ask rx for the first 8 bytes
+	USART1.CR1 = 0;
+	USART1.CR2 = 0;
+	USART1.CR3 = 0;
+	USART1.BRR = ((80000000 + 921600 / 2) / 921600);
+	USART1.CR3 = USART1_CR3_DMAT | USART1_CR3_DMAR;	 // enable DMA output and input
+	usart1_start_rx(8);								 // ask rx for the first 8 bytes
+	USART1.CR1 = USART1_CR1_UE | USART1_CR1_TE | USART1_CR1_RE;
 	NVIC_EnableIRQ(DMA2_CH6_IRQn);
 	NVIC_EnableIRQ(DMA2_CH7_IRQn);
 	NVIC_EnableIRQ(USART1_IRQn);
