@@ -109,8 +109,8 @@ static struct {
 	enum IRQn_Type irq;
 	uint8_t		   prio;
 } const irqprios[] = {
-		{SysTick_IRQn, PRIO(0, 0)},
-		{DMA1_CH2_IRQn, PRIO(1, 0)},	   // SPI RX done DMA
+		{SysTick_IRQn, PRIO(0, 0)},        // cycleCount 24 bit overflow
+		{DMA1_CH2_IRQn, PRIO(1, 0)},	   // SPI RX done DMA pushes evq
 		{DMA1_CH3_IRQn, PRIO(1, 0)},	   // SPI TX done DMA
 		{TIM6_DACUNDER_IRQn, PRIO(1, 0)},  // 8Hz periodic read BME shedules SPI xmit and push evq
 		{EXTI1_IRQn, PRIO(1, 1)},		   // BMI088 Accel IRQ schedules SPI xmit
@@ -121,7 +121,7 @@ static struct {
 		{DMA2_CH6_IRQn, PRIO(2, 1)},	   // USART1 TX DMA done
 		{USART1_IRQn, PRIO(2, 2)},		   // USART1 TX schedule next DMA
 		{USART2_IRQn, PRIO(3, 1)},		   // USART2 TX send next character
-		{TIM1_UP_TIM16_IRQn, PRIO(3, 3)},  // TIM16 1Hz periodic debug report
+		{TIM1_UP_TIM16_IRQn, PRIO(3, 3)},  // TIM16 1Hz periodic debug report on usart2
 		{None_IRQn, 0xff},				   // sentinel
 };
 #undef PRIO
@@ -172,6 +172,12 @@ void hexdump(size_t len, const uint8_t *ptr) {
 	}
 }
 
+// USART1 is the output datastream and command input
+static struct MsgQueue	 outq				= {0, 0, {}};
+static volatile uint32_t dropped_usart1		= 0;  // queue full, msqq_head returned NULL
+static volatile uint32_t usart1txdmaerr_cnt = 0;
+static volatile uint32_t usart1rxdmaerr_cnt = 0;
+
 // All events go to the event message queue, which the mainloop copies into the output stream.
 static struct MsgQueue	 evq		 = {0, 0, {}};
 static volatile uint32_t dropped_evq = 0;  // queue full, msqq_head returned NULL
@@ -184,7 +190,15 @@ static volatile uint32_t dropped_spi1	  = 0;	// how often we tried to submit a s
 static volatile uint32_t spi1rxdmaerr_cnt = 0;
 static volatile uint32_t spi1txdmaerr_cnt = 0;
 
-// this is the callback that maps spi addresses to signals on the CSBx pins.
+// Spi transaction buffers 
+// ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
+// GYRO: cmd, 6 registers, 2dum, stat
+// TEMP: cmd, dum, 2 registers. big endian for some reason
+static uint8_t accel_buf[20];					// ACCEL BMI085_ACC_X_LSB
+static uint8_t gyro_buf[10];					// GYRO  BMI085_RATE_X_LSB
+static uint8_t humid_buf[1 + BME280_DATA_LEN];	// HUMID BME280_DATA_REG
+
+// spi1_ss is the callback that maps spi addresses to signals on the CSBx pins.
 // GYRO, ACCEL, HUMID
 static const enum GPIO_Pin spiaddr2pin[NUM_BMX_FUNCTIONS] = { 0, BMI_CSB2G_PIN, BMI_CSB1A_PIN, BME_CSB_PIN };
 static void spi1_ss(uint16_t addr, int on) {
@@ -209,15 +223,20 @@ void DMA1_CH2_Handler(void) {
 	DMA1.IFCR = isr & 0x00000f0;  // clear pending flags
 	spi_rx_dma_handler(&spiq);	  // see spi.c
 
-	struct SPIXmit *x	= spiq_tail(&spiq);
+    // read all completed spi transactions and push them on
+    // the evq for processing by the mainloop
+	struct SPIXmit *x  = spiq_tail(&spiq);
+    struct Msg *msg    = msgq_head(&evq);
     while (x != NULL) {
-        struct Msg *msg = msgq_head(&evq);
 	    if (!msg) {
 		    ++dropped_evq;
+        } else if (output_bmx(msg, x)) {
+            msgq_push_head(&evq);
+            msg = msgq_head(&evq);
         }
-        x = spiq_tail(&spiq);
+		spiq_deq_tail(&spiq);
+		x = spiq_tail(&spiq);
     }
-
 
 	rt_stop(&spirxdma_rt, cycleCount());
 }
@@ -231,32 +250,26 @@ void DMA1_CH3_Handler(void) {
 	DMA1.IFCR = isr & 0x0000f00;  // clear pending flags
 }
 
-static void start_spix(uint64_t now, uint16_t addr, uint8_t firstreg, uint8_t *buf, size_t len) {
+// only lower 7 bits of reg are the address, but the rest goes into tag
+static void start_spix(uint64_t now, uint16_t addr, uint16_t tagreg, uint8_t *buf, size_t len) {
 	struct SPIXmit *x = spiq_head(&spiq);
 	if (!x) {
 		++dropped_spi1;
 		return;
 	}
 
-	buf[0] = firstreg | 0x80;  // set the read flag on the register address.
+	buf[0] = (tagreg & 0x7f) | 0x80;  // add the read flag on the register address.
 	for (size_t i = 1; i < len; i++) {
 		buf[i] = 0;
 	}
 
 	x->ts	= now;
-	x->tag	= firstreg;
+	x->tag	= tagreg;
 	x->addr = addr;
 	x->len	= len;
 	x->buf	= buf;
 	spiq_enq_head(&spiq);
 }
-
-// ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
-// GYRO: cmd, 6 registers, 2dum, stat
-// TEMP: cmd, dum, 2 registers. big endian for some reason
-static uint8_t accel_buf[20];					// ACCEL BMI085_ACC_X_LSB
-static uint8_t gyro_buf[10];					// GYRO  BMI085_RATE_X_LSB
-static uint8_t humid_buf[1 + BME280_DATA_LEN];	// HUMID BME280_DATA_REG
 
 void EXTI1_Handler(void) {
 	uint64_t now = cycleCount();
@@ -384,7 +397,7 @@ void TIM6_DACUNDER_Handler(void) {
 	rt_stop(&periodic8hz_rt, cycleCount());
 }
 
-static volatile uint64_t shutter_count = 0;	 //
+static volatile uint64_t shutter_count = 0;	 // open on odd counts, close on even.
 // Timer 2 channel 1 has the shutter time sync input
 void TIM2_Handler(void) {
 	uint16_t cnt = TIM2.CNT;
@@ -448,14 +461,8 @@ void TIM2_Handler(void) {
 	rt_stop(&shutterirq_rt, cycleCount());
 }
 
-// USART1 is the output datastream and command input
 
-static struct MsgQueue	 outq				= {0, 0, {}};
-static volatile uint32_t dropped_usart1		= 0;  // queue full, msqq_head returned NULL
-static volatile uint32_t usart1txdmaerr_cnt = 0;
-static volatile uint32_t usart1rxdmaerr_cnt = 0;
-
-// USART1 TX: irq on dma error or complete
+// USART1 TX: irq on dma error or transmission complete
 void DMA2_CH6_Handler(void) {
 	rt_start(&usart1txdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
@@ -505,10 +512,6 @@ static volatile size_t cmdbuf_head							 = 0;
 static volatile enum { RESYNC, MORE, COMPLETE } cmdbuf_state = RESYNC;
 static volatile size_t cmdpacket_size						 = 0;
 
-// the queue for the error responses
-static struct MsgQueue cmdrspq = {0, 0, {}};
-static volatile uint32_t dropped_cmdrspq = 0;
-
 // set up usart1 rx dma for reception of len characters to be appended to cmdbuf
 // set CC7 to run at higher priority level compared to ch6 (CCR PL bits)
 static void usart1_start_rx(size_t len) {
@@ -523,9 +526,9 @@ static void usart1_start_rx(size_t len) {
 
 // reset the command rx state machine
 static void cmdbuf_resync() {
-    cmdbuf_head	 = 0;
     cmdbuf_state = RESYNC;
-    usart1_start_rx(8);
+    cmdbuf_head	 = 0;
+    usart1_start_rx(20); // minimum size of a valid command
 }
 
 static inline size_t findbyte(uint8_t *buf, size_t buflen, uint8_t b) {
@@ -626,8 +629,8 @@ static void handlecmdrx() {
 			size_t start = 1 + findbyte(cmdbuf + 1, cmdbuf_head - 1, 'I');
 			memmove(cmdbuf, cmdbuf + start, cmdbuf_head - start);
 			cmdbuf_head -= start;
-			if (cmdbuf_head < 8) {
-				usart1_start_rx(8 - cmdbuf_head);
+			if (cmdbuf_head < 20) {
+				usart1_start_rx(20 - cmdbuf_head);
 				return;
 			}
 		}
@@ -639,8 +642,7 @@ static void handlecmdrx() {
 
 		if (cmdpacket_size + 2 > sizeof cmdbuf) {
 			printf("CMDRX: invalid packet size %u, ignoring %d bytes\n", cmdpacket_size, cmdbuf_head);
-			cmdbuf_head = 0;
-			usart1_start_rx(8);
+            cmdbuf_resync();
 			return;
 		}
 
@@ -672,22 +674,12 @@ static void handlecmdrx() {
         break;
 
     default:
-		// reply an error message: {06060606, tagtagtagtag, sts sts sts sts}
-        struct Msg* rsp = msgq_head(&cmdrspq);
-        if (!rsp) {
-            ++dropped_cmdrspq;
-        } else {
-				msg_reset(rsp);
-				msg_append16(rsp, 0);	// placeholder for chksum of the previous packet
-				msg_append32(rsp, 0x49524F4E);	// 'IRON'
-				msg_append16(rsp, 0);	// place holder for the size of this packet
-				msgq_push_head(&cmdrspq);
-        }
-
+        // queue response packet on evq
         // fallthrough
     case 0xff:        
 		// packet too messed up to reply
 		printf("CMDRX: ignoring %d bytes\n", cmdbuf_head);
+        cmdbuf_resync(0);
 	}
 
 
@@ -695,16 +687,16 @@ static void handlecmdrx() {
 		   decode_be_uint32(cmdbuf + 12));
 	// check address: 0x40
 	// check write to r/o: 0x44
-	// schedule the read or write on the SPI queue
+	// schedule the read or write on the spiq
 
 	return;
 }
 
-// USART1 RX: irq on dma error or complete
+// USART1 RX: irq on dma error or reception complete
 void DMA2_CH7_Handler(void) {
 	rt_start(&usart1rxdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
-	DMA2.IFCR	 = isr & 0x0f000000;
+	DMA2.IFCR	 = isr & 0x0f000000; // clear all pending
 	if (isr & DMA1_ISR_TEIF7) {
 		++usart1rxdmaerr_cnt;
 	}
@@ -980,39 +972,29 @@ void main(void) {
 
 		__WFI();
 
-		struct SPIXmit *x	= spiq_tail(&spiq);
 		struct Msg	   *ev	= msgq_tail(&evq);
 		uint64_t		now = cycleCount();
 
 		rt_stop(&idle_rt, now);
 
-		if (!x && !ev) {
+		if (ev == NULL) {
 			continue;
 		}
 
-		// dequeue from spi and event queues, send on out queue
+		// dequeue event queue, send on out queue
 		// insert packet header and footer along the way
 		rt_start(&mainloop_rt, now);
-		while (x || ev) {
+		while (ev) {
 			struct Msg *out = msgq_head(&outq);
 			if (!out) {
 				++dropped_usart1;
 				break;
 			}
 
-			if (ev) {
-				out->len = ev->len;
-				memmove(out->buf, ev->buf, ev->len);
-				msgq_pop_tail(&evq);
-				ev = msgq_tail(&evq);
-			} else if (x) {
-				int ok = output_bmx(out, x);
-				spiq_deq_tail(&spiq);
-				x = spiq_tail(&spiq);
-				if (!ok) {	// nothing to send
-					continue;
-				}
-			}
+			out->len = ev->len;
+			memmove(out->buf, ev->buf, ev->len);
+			msgq_pop_tail(&evq);
+			ev = msgq_tail(&evq);
 
 			packetlen += out->len;
 			for (size_t i = 0; i < out->len; ++i) {
