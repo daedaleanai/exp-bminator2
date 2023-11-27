@@ -67,7 +67,7 @@ bmxspi.o: stm32l4xx.h bmxspi.h bme280.h spi.h binary.h bmi08x.h clock.h tprintf.
 boot.o: cortex_m4.h stm32l4xx.h clock.h
 fault.o: cortex_m4.h stm32l4xx.h
 gpio2.o: gpio2.h stm32l4xx.h
-input.o: input.h msgq.h binary.h
+input.o: input.h msgq.h binary.h spi.h stm32l4xx.h tprintf.h
 main.o: cortex_m4.h stm32l4xx.h binary.h bmi08x.h bmxspi.h bme280.h spi.h clock.h gpio2.h input.h msgq.h nvic.h output.h runtimer.h tprintf.h usart.h
 main.o: ringbuffer.h
 output.o: output.h msgq.h binary.h spi.h stm32l4xx.h bme280.h bmi08x.h bmxspi.h
