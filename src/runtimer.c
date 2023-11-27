@@ -10,7 +10,7 @@ void rt_report(struct RunTimer* rt, uint64_t* lastreport) {
     uint64_t now = cycleCount();
     uint32_t dt = now - *lastreport;
 //  printf("elapsed %ld us\n", dt/C_US);
-    printf("--------------- cnt - period --- cum - max\e[K\n");
+    printf("------------- count - period - cumul - max\e[K\n");
     while (rt) {
         __disable_irq();
         uint32_t cum = rt->cum;// accumulated runtime

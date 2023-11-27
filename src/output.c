@@ -10,7 +10,7 @@ uint32_t					   accel_hdr = 0;  // same for accel
 struct LinearisationParameters bmeParam;	   // needed to decode humidity sensor values
 
 // these are decoded in one message, but sent on in others.
-static int32_t accel_temp_mk = -1;	// last observed value from BMI088 accelerator temperature
+static int32_t accel_temp_mk = 0;	// last observed value from BMI088 accelerator temperature
 
 
 int output_cmd(struct MsgQueue *msgq, struct SPIXmit *x) {

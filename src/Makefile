@@ -27,6 +27,7 @@ OBJS = \
 	bmxspi.o \
 	bme280.o \
 	output.o \
+	input.o \
 	main.o \
 
 $(OBJS): Makefile 
@@ -62,13 +63,16 @@ depend:
 # DO NOT DELETE
 
 bme280.o: bme280.h
-bmxspi.o: stm32l4xx.h bmxspi.h bme280.h spi.h binary.h bmi08x.h clock.h cortex_m4.h tprintf.h
+bmxspi.o: stm32l4xx.h bmxspi.h bme280.h spi.h binary.h bmi08x.h clock.h tprintf.h
 boot.o: cortex_m4.h stm32l4xx.h clock.h
 fault.o: cortex_m4.h stm32l4xx.h
 gpio2.o: gpio2.h stm32l4xx.h
-main.o: cortex_m4.h stm32l4xx.h binary.h clock.h gpio2.h nvic.h tprintf.h usart.h ringbuffer.h spi.h bmxspi.h bme280.h bmi08x.h msgq.h output.h
-output.o: output.h msgq.h spi.h stm32l4xx.h binary.h bmxspi.h bme280.h bmi08x.h
+input.o: input.h msgq.h binary.h
+main.o: cortex_m4.h stm32l4xx.h binary.h bmi08x.h bmxspi.h bme280.h spi.h clock.h gpio2.h input.h msgq.h nvic.h output.h runtimer.h tprintf.h usart.h
+main.o: ringbuffer.h
+output.o: output.h msgq.h binary.h spi.h stm32l4xx.h bme280.h bmi08x.h bmxspi.h
 ringbuffer.o: ringbuffer.h
+runtimer.o: runtimer.h cortex_m4.h tprintf.h clock.h stm32l4xx.h
 spi.o: spi.h stm32l4xx.h cortex_m4.h nvic.h
 tprintf.o: tprintf.h
 vectors.o: cortex_m4.h stm32l4xx.h
