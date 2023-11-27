@@ -4,7 +4,7 @@
 #include "bme280.h"
 #include "spi.h"
 
-enum BMXFunction { NONE = 0, GYRO, ACCEL, HUMID };
+enum BMXFunction { NONE = 0, GYRO, ACCEL, HUMID, NUM_BMX_FUNCTIONS };
 
 struct bmx_config_t {
     uint8_t reg, val;

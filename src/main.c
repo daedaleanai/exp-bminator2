@@ -6,12 +6,11 @@
   - initialize and self-test BMI088 and BME380
   - set up irq handlers for accel, gyro, shutter, and periodic events
   - the accel and gyro irqs push SPI transactions on the spiq, which are handled by DMA
-  - the other irqs push messages on the event queue evq
-  - the mainloop empties both these queues and pushes output messages on the USART1 outq, which is also handled by DMA
+  - spiq dma-ready and the the other irqs push messages on the event queue evq
   - incoming packets on USART1 are parsed by the USART1 irq
-  - because the command responses have to go into their own packets, they are kept in a separate queue, and spi
-	transactions for command read/writes are handled out of order as well
-
+  - the mainloop copies evq to the USART1 outq, which is also handled by DMA,
+    but it has some logic to send the command-response events in separate packets.
+  
 */
 #include "cortex_m4.h"
 #include "stm32l4xx.h"
@@ -173,6 +172,10 @@ void hexdump(size_t len, const uint8_t *ptr) {
 	}
 }
 
+// All events go to the event message queue, which the mainloop copies into the output stream.
+static struct MsgQueue	 evq		 = {0, 0, {}};
+static volatile uint32_t dropped_evq = 0;  // queue full, msqq_head returned NULL
+
 // SPI1 has the BMI088, BME280 ... connected to it.
 // The gyro and accel irq and periodically TIM6 trigger a SPI transaction on the accel, gyro or humid
 // sensor. The result of that transaction becomes available in the main loop.
@@ -181,35 +184,22 @@ static volatile uint32_t dropped_spi1	  = 0;	// how often we tried to submit a s
 static volatile uint32_t spi1rxdmaerr_cnt = 0;
 static volatile uint32_t spi1txdmaerr_cnt = 0;
 
+// this is the callback that maps spi addresses to signals on the CSBx pins.
+// GYRO, ACCEL, HUMID
+static const enum GPIO_Pin spiaddr2pin[NUM_BMX_FUNCTIONS] = { 0, BMI_CSB2G_PIN, BMI_CSB1A_PIN, BME_CSB_PIN };
 static void spi1_ss(uint16_t addr, int on) {
-	switch ((enum BMXFunction)addr) {
-	case NONE:
-		digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN);
-		break;
-	case GYRO:
-		if (on) {
-			digitalLo(BMI_CSB2G_PIN);
-		} else {
-			digitalHi(BMI_CSB2G_PIN);
-		}
-		break;
-	case ACCEL:
-		if (on) {
-			digitalLo(BMI_CSB1A_PIN);
-		} else {
-			digitalHi(BMI_CSB1A_PIN);
-		}
-		break;
-	case HUMID:
-		if (on) {
-			digitalLo(BME_CSB_PIN);
-		} else {
-			digitalHi(BME_CSB_PIN);
-		}
-		break;
-	}
+    if (addr >= NUM_BMX_FUNCTIONS) {
+        return; 
+    }
+    enum GPIO_Pin pin = spiaddr2pin[addr];
+    if (on) {
+        digitalLo(pin);
+    } else {
+        digitalHi(pin);
+    }
 }
 
+// SPI1 RX DMA
 void DMA1_CH2_Handler(void) {
 	rt_start(&spirxdma_rt, cycleCount());
 	uint32_t isr = DMA1.ISR;
@@ -218,10 +208,21 @@ void DMA1_CH2_Handler(void) {
 	}
 	DMA1.IFCR = isr & 0x00000f0;  // clear pending flags
 	spi_rx_dma_handler(&spiq);	  // see spi.c
+
+	struct SPIXmit *x	= spiq_tail(&spiq);
+    while (x != NULL) {
+        struct Msg *msg = msgq_head(&evq);
+	    if (!msg) {
+		    ++dropped_evq;
+        }
+        x = spiq_tail(&spiq);
+    }
+
+
 	rt_stop(&spirxdma_rt, cycleCount());
 }
 
-// only used to count errors
+// SPI1 TX DMA only used to count errors
 void DMA1_CH3_Handler(void) {
 	uint32_t isr = DMA1.ISR;
 	if (isr & DMA1_ISR_TEIF3) {
@@ -326,10 +327,6 @@ void ADC1_Handler(void) {
 	rt_stop(&adcirq_rt, cycleCount());
 }
 
-// Other events than the high speed/low latency accel/gyro reads go to another message queue,
-// which the mainloop copies into the output stream.
-static struct MsgQueue	 evq		 = {0, 0, {}};
-static volatile uint32_t dropped_evq = 0;  // queue full, msqq_head returned NULL
 
 extern uint32_t UNIQUE_DEVICE_ID[3];  // Section 47.1, defined in .ld file
 
@@ -770,7 +767,7 @@ void main(void) {
 	// deselect all (active low) chip select signals, then wiggle them
 	// to force them from I2C into SPI mode
 	digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN);
-	for (int i = 1; i <= 3; ++i) {
+	for (enum BMXFunction i= NONE+1; i < NUM_BMX_FUNCTIONS; ++i) {
 		delay(15);
 		spi1_ss(i, 1);
 		delay(15);
