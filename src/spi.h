@@ -5,12 +5,12 @@
 
 // A SPIXmit represents a transaction on a SPI device.
 struct SPIXmit {
-    uint64_t ts; // timestamp
-    int tag;  // tag to remember what this was for after xmit is done
+    uint64_t ts;   // timestamp
+    uint32_t tag;  // tag to remember what this was for after xmit is done
     uint16_t addr;
-    size_t len;
-    uint8_t *buf;
     uint16_t status;
+    uint8_t *buf;
+    size_t len;
 };
 
 // The following SPI/DMA (rx/tx chan) combinations are available:

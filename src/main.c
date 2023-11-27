@@ -115,6 +115,7 @@ static struct {
 		{TIM6_DACUNDER_IRQn, PRIO(1, 0)},  // 8Hz periodic read BME shedules SPI xmit and push evq
 		{EXTI1_IRQn, PRIO(1, 1)},		   // BMI088 Accel IRQ schedules SPI xmit
 		{EXTI3_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
+		{TIM7_IRQn, PRIO(1, 1)},		   // Shutter open/close timer, push evq
 		{TIM2_IRQn, PRIO(1, 2)},		   // Shutter open/close timer, push evq
 		{ADC1_IRQn, PRIO(1, 2)},		   // ADC conversions
 		{DMA2_CH7_IRQn, PRIO(2, 0)},	   // USART1 RX DMA
@@ -178,9 +179,13 @@ static volatile uint32_t dropped_usart1		= 0;  // queue full, msqq_head returned
 static volatile uint32_t usart1txdmaerr_cnt = 0;
 static volatile uint32_t usart1rxdmaerr_cnt = 0;
 
-// All events go to the event message queue, which the mainloop copies into the output stream.
+// Most events go to the event message queue, which the mainloop copies into the output stream.
 static struct MsgQueue	 evq		 = {0, 0, {}};
 static volatile uint32_t dropped_evq = 0;  // queue full, msqq_head returned NULL
+
+// Command responses, errors and read/write spi results go to the cmdq
+static struct MsgQueue	 cmdq		 = {0, 0, {}};
+static volatile uint32_t dropped_cmdq = 0;  // queue full, msqq_head returned NULL
 
 // SPI1 has the BMI088, BME280 ... connected to it.
 // The gyro and accel irq and periodically TIM6 trigger a SPI transaction on the accel, gyro or humid
@@ -224,15 +229,13 @@ void DMA1_CH2_Handler(void) {
 	spi_rx_dma_handler(&spiq);	  // see spi.c
 
     // read all completed spi transactions and push them on
-    // the evq for processing by the mainloop
+    // the evq or the cmdq for processing by the mainloop
 	struct SPIXmit *x  = spiq_tail(&spiq);
-    struct Msg *msg    = msgq_head(&evq);
     while (x != NULL) {
-	    if (!msg) {
-		    ++dropped_evq;
-        } else if (output_bmx(msg, x)) {
-            msgq_push_head(&evq);
-            msg = msgq_head(&evq);
+        if (x->tag & 0xffffff00) {
+    		dropped_cmdq += output_cmd(&cmdq, x);
+        } else {
+    		dropped_evq += output_bmx(&evq, x);
         }
 		spiq_deq_tail(&spiq);
 		x = spiq_tail(&spiq);
@@ -251,23 +254,24 @@ void DMA1_CH3_Handler(void) {
 }
 
 // only lower 7 bits of reg are the address, but the rest goes into tag
-static void start_spix(uint64_t now, uint16_t addr, uint16_t tagreg, uint8_t *buf, size_t len) {
+static void start_spix(uint64_t now, uint16_t addr, uint32_t tag, uint8_t reg, uint8_t *buf, size_t len) {
 	struct SPIXmit *x = spiq_head(&spiq);
 	if (!x) {
 		++dropped_spi1;
 		return;
 	}
 
-	buf[0] = (tagreg & 0x7f) | 0x80;  // add the read flag on the register address.
+	buf[0] = 0x80 | reg;  // add the read flag on the register address.
 	for (size_t i = 1; i < len; i++) {
 		buf[i] = 0;
 	}
 
-	x->ts	= now;
-	x->tag	= tagreg;
-	x->addr = addr;
-	x->len	= len;
-	x->buf	= buf;
+	x->ts	  = now;
+	x->tag	  = tag;
+	x->addr   = addr;
+    x->status = -1;
+	x->buf	  = buf;
+	x->len	  = len;
 	spiq_enq_head(&spiq);
 }
 
@@ -277,7 +281,7 @@ void EXTI1_Handler(void) {
 		return;
 	}
 	EXTI.PR1 = Pin_1;
-	start_spix(now, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf);
+	start_spix(now, ACCEL, BMI08x_ACC_X_LSB, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf);
 	rt_start(&accelirq_rt, now);
 	rt_stop(&accelirq_rt, cycleCount());
 }
@@ -288,10 +292,21 @@ void EXTI3_Handler(void) {
 		return;
 	}
 	EXTI.PR1 = Pin_3;
-	start_spix(now, GYRO, BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf);
+	start_spix(now, GYRO, BMI08x_RATE_X_LSB, BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf);
 	rt_start(&gyroirq_rt, now);
 	rt_stop(&gyroirq_rt, cycleCount());
 }
+
+// the BME280 doesn't have an IRQ pin, we just kick it once a second
+// we don't bother timing this one
+void TIM7_Handler(void) {
+	if ((TIM7.SR & TIM6_SR_UIF) == 0) {
+		return;
+	}
+	TIM7.SR &= ~TIM6_SR_UIF;
+	start_spix(cycleCount(), HUMID, BME280_DATA_REG, BME280_DATA_REG, humid_buf, sizeof humid_buf);
+}
+
 
 // The 4 sampled channels are, in order
 //     0  Vrefint
@@ -302,7 +317,7 @@ static volatile int		 adc_chan	= 0;
 static volatile uint32_t adc_ovfl	= 0;
 static volatile uint16_t adc_val[4] = {0, 0, 0, 0};
 static volatile uint64_t adc_ts[4]	= {0, 0, 0, 0};
-
+static volatile uint32_t adc_trig   = 0;
 extern uint16_t TS_CAL1, TS_CAL2, VREFINT;	// defined in .ld file
 
 void ADC1_Handler(void) {
@@ -324,6 +339,9 @@ void ADC1_Handler(void) {
 		adc_chan = 0;
 		ADC.ISR |= ADC_ISR_EOS;
 		//  printf("adc %u %u %u %u\n", adc_val[0], adc_val[1], adc_val[2], adc_val[3]);
+        if (adc_trig++ % 8 == 0) {
+            dropped_evq += output_temperature(&evq, adc_ts[0], adc_val[0], adc_val[3]);
+        }
 	}
 
 	if (isr & ADC_ISR_OVR) {
@@ -344,54 +362,23 @@ void ADC1_Handler(void) {
 extern uint32_t UNIQUE_DEVICE_ID[3];  // Section 47.1, defined in .ld file
 
 static volatile uint32_t tim6_tick = 0;
-// Timer 6: 8Hz BME read, periodic messages, status report
+// Timer 6: 8Hz: emit periodic messages.  (also triggers ADC conversions through TRGO)
 void TIM6_DACUNDER_Handler(void) {
 	uint64_t now = cycleCount();
-
-	if ((TIM6.SR & TIM1_SR_UIF) == 0) {
+	if ((TIM6.SR & TIM6_SR_UIF) == 0) {
 		return;
 	}
-	TIM6.SR &= ~TIM1_SR_UIF;
+	TIM6.SR &= ~TIM6_SR_UIF;
 	// printf("%lld TRIGGER\n", now);
-	rt_start(&periodic8hz_rt, now);
+    switch (tim6_tick++ & 7) {
+    case 2:
+        dropped_evq += output_periodic(&evq, EVENTID_ID0, now, __REVISION__, UNIQUE_DEVICE_ID[2]);
+        break;
 
-	struct Msg *msg = msgq_head(&evq);
-	if (!msg) {
-		++dropped_evq;
-	} else {
-		switch (tim6_tick++ & 7) {
-		case 0:
-			break;
-
-		case 1:
-			start_spix(now, HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
-			break;
-
-		case 2:
-			output_periodic(msg, EVENTID_ID0, now, __REVISION__, UNIQUE_DEVICE_ID[2]);
-			msgq_push_head(&evq);
-			break;
-
-		case 3:
-			output_periodic(msg, EVENTID_ID1, now, UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
-			msgq_push_head(&evq);
-			break;
-
-		case 4:
-			output_humid(msg);
-			msgq_push_head(&evq);
-			break;
-
-		case 5:
-			output_temperature(msg, adc_ts[0], adc_val[0], adc_val[3]);
-			msgq_push_head(&evq);
-			break;
-
-		case 6:
-		case 7:
-			break;
-		}
-	}
+    case 3:
+        dropped_evq += output_periodic(&evq, EVENTID_ID1, now, UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
+        break;
+    }
 
 	rt_start(&periodic8hz_rt, now);
 	rt_stop(&periodic8hz_rt, cycleCount());
@@ -423,39 +410,20 @@ void TIM2_Handler(void) {
 
 	printf("open %lld close %lld\n", open_ts, close_ts);
 
-	struct Msg *msg = msgq_head(&evq);
-
 	if ((open_ts && close_ts) && (open_ts <= close_ts)) {
 		shutter_count = (shutter_count + 1) | 1;  // next odd number.
-		if (!msg) {
-			++dropped_evq;
-		} else {
-			output_shutter(msg, EVENTID_SHUTTER_OPEN, open_ts, shutter_count);
-			msgq_push_head(&evq);
-			msg = msgq_head(&evq);
-		}
+		dropped_evq += output_shutter(&evq, EVENTID_SHUTTER_OPEN, open_ts, shutter_count);
 		open_ts = 0;  // mark as not happened, or already sent
 	}
 
 	if (close_ts) {
 		shutter_count = (shutter_count | 1) + 1;  // next even number.
-		if (!msg) {
-			++dropped_evq;
-		} else {
-			output_shutter(msg, EVENTID_SHUTTER_CLOSE, close_ts, shutter_count);
-			msgq_push_head(&evq);
-			msg = msgq_head(&evq);
-		}
+		dropped_evq += output_shutter(&evq, EVENTID_SHUTTER_CLOSE, open_ts, shutter_count);
 	}
-	// if we didnt already send it before
+	// if it was detected and we didn't already send it before
 	if (open_ts) {
 		shutter_count = (shutter_count + 1) | 1;  // next odd number.
-		if (!msg) {
-			++dropped_evq;
-		} else {
-			output_shutter(msg, EVENTID_SHUTTER_OPEN, open_ts, shutter_count);
-			msgq_push_head(&evq);
-		}
+		dropped_evq += output_shutter(&evq, EVENTID_SHUTTER_OPEN, open_ts, shutter_count);
 	}
 
 	rt_stop(&shutterirq_rt, cycleCount());
@@ -503,6 +471,7 @@ void USART1_Handler(void) {
 		DMA2.CNDTR6 = msg->len;
 		DMA2.CCR6	= DMA1_CCR6_DIR | DMA1_CCR6_TEIE | DMA1_CCR6_TCIE | DMA1_CCR6_EN | DMA1_CCR6_MINC;
 	}
+
 	rt_stop(&usart1irq_rt, cycleCount());
 }
 
@@ -744,10 +713,10 @@ void main(void) {
 	}
 
 	// Enable all the devices we are going to need
-	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
-	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN | RCC_AHB2ENR_ADCEN;
-	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN | RCC_APB1ENR1_TIM2EN;
-	RCC.APB2ENR |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART1EN | RCC_APB2ENR_TIM16EN;
+	RCC.AHB1ENR  |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
+	RCC.AHB2ENR  |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN | RCC_AHB2ENR_ADCEN;
+	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN | RCC_APB1ENR1_TIM7EN | RCC_APB1ENR1_TIM2EN;
+	RCC.APB2ENR  |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART1EN | RCC_APB2ENR_TIM16EN;
 
 	for (const struct gpio_config_t *p = pin_cfgs; p->pins; ++p) {
 		gpioConfig(p->pins, p->mode);
@@ -931,6 +900,13 @@ void main(void) {
 	TIM6.CR1 |= TIM6_CR1_CEN;
 	NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
 
+	TIM7.DIER |= TIM6_DIER_UIE;
+	TIM7.PSC = (CLOCKSPEED_HZ / 10000) - 1;
+	TIM7.ARR = 10000 - 1;		 // 10KHz/10000 = 1Hz
+    TIM16.CNT = 2*3333;		// offset by two thirds of a second
+	TIM7.CR1 |= TIM6_CR1_CEN;
+	NVIC_EnableIRQ(TIM7_IRQn);
+
 	// set up TIM16 for a 1Hz report
 	TIM16.DIER |= TIM16_DIER_UIE;
 	TIM16.PSC = (CLOCKSPEED_HZ / 10000) - 1;
@@ -941,7 +917,7 @@ void main(void) {
 
 	// headers used in output message vary by accel/gyro configuration
 	gyro_hdr  = EVENTID_GYRO_2000DEG_S - gyro_cfg[0].val;  // minus is not a mistake
-	accel_hdr = EVENTID_ACCEL_2G + accel_cfg[0].val;
+	accel_hdr = EVENTID_ACCEL_3G + accel_cfg[0].val;
 
 	// BMI interrupt signals
 	if (accel_ok) {

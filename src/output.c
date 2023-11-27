@@ -11,13 +11,29 @@ struct LinearisationParameters bmeParam;	   // needed to decode humidity sensor 
 
 // these are decoded in one message, but sent on in others.
 static int32_t accel_temp_mk = -1;	// last observed value from BMI088 accelerator temperature
-static int32_t bme_hume6	 = -1;	// last observed value of BME280 humidity
-static uint64_t bme_ts = 0; 		// timestamp of bme_hume6
 
-int output_bmx(struct Msg *msg, struct SPIXmit *x) {
+
+int output_cmd(struct MsgQueue *msgq, struct SPIXmit *x) {
+	struct Msg* msg = msgq_head(msgq);
+	if (!msg) {
+		return 1;
+	}
+	(void)x;
+	// render x as a cmd response, using tag, addr, reg and len
+	return 0;
+}
+
+
+
+#define MSGTYPE(addr, tag) (((uint16_t)(addr)&0xf) << 8) | ((uint8_t)(tag)&0xff)
+
+int output_bmx(struct MsgQueue *msgq, struct SPIXmit *x) {
+	struct Msg* msg = msgq_head(msgq);
+	if (!msg) {
+		return 1;
+	}
 	msg_reset(msg);
 
-#define MSGTYPE(addr, tag) (((uint16_t)(addr)&0xf) << 8) | ((uint8_t)(tag)&0x7f)
 	switch (MSGTYPE(x->addr, x->tag)) {
 	case MSGTYPE(GYRO, BMI08x_RATE_X_LSB):
 		if (x->buf[9] & 0x80) {
@@ -29,31 +45,32 @@ int output_bmx(struct Msg *msg, struct SPIXmit *x) {
 			msg_append16(msg, decode_le_uint16(x->buf + 5));
 			msg_append16(msg, 0);  // pad
 			msg->buf[1] = msg->len;
-			return 1;
+			msgq_push_head(msgq);
 		}
-		return 0;
+		break;
 
 	case MSGTYPE(ACCEL, BMI08x_ACC_X_LSB):
 		if (x->buf[13] & 0x80) {
 			// uint32_t ts = decode_le_uint24(x->buf + 8);  innner timestamp of accelerator, not used
-			accel_temp_mk = bmi08x_decode_temp_mdegc(x->buf + 18) /*+ 273150*/;	 // sent separately at 1Hz
-			msg_append16(msg, 0);											 // len
-			msg_append16(msg, accel_hdr);									 // header
+			// accel_temp is sent separately along with the ADC temperature
+			accel_temp_mk = bmi08x_decode_temp_mdegc(x->buf + 18) /*+ 273150*/;	 
+
+			msg_append16(msg, 0);		  // len
+			msg_append16(msg, accel_hdr); // header
 			msg_append64(msg, x->ts);
 			msg_append16(msg, decode_le_uint16(x->buf + 2));
 			msg_append16(msg, decode_le_uint16(x->buf + 4));
 			msg_append16(msg, decode_le_uint16(x->buf + 6));
 			msg_append16(msg, 0);  // pad
 			msg->buf[1] = msg->len;
-			return 1;
+			msgq_push_head(msgq);
 		}
-		return 0;
+		break;
 
 	case MSGTYPE(HUMID, BME280_DATA_REG):
 		if (1) {  // TODO: look for valid flag
-			int32_t t_mdegc, p_mpa;
+			int32_t t_mdegc, p_mpa, bme_hume6;
 			bme_decode(&bmeParam, x->buf+1, &t_mdegc, &p_mpa, &bme_hume6);
-			bme_ts = x->ts;
 
 			msg_append16(msg, 0);			  // len
 			msg_append16(msg, EVENTID_BARO);  // header
@@ -61,30 +78,36 @@ int output_bmx(struct Msg *msg, struct SPIXmit *x) {
 			msg_append32(msg, t_mdegc);  // + 273150 to convert to milliKelvin
 			msg_append32(msg, p_mpa);
 			msg->buf[1] = msg->len;
-			return 1;
+			msgq_push_head(msgq);
+
+			struct Msg* msg = msgq_head(msgq);
+			if (!msg) {
+				return 1;
+			}
+			msg_reset(msg);
+			msg_append16(msg, 0);			  // len
+			msg_append16(msg, EVENTID_HUMID);  // header
+			msg_append64(msg, x->ts);
+			msg_append32(msg, bme_hume6);  
+			msg_append32(msg, 0);  // pad
+			msg->buf[1] = msg->len;
+			msgq_push_head(msgq);
 		}
+		break;
 	}
-#undef MSGTYPE
 
 	return 0;
 }
 
-// call every now and then to send the humidity message
-int output_humid(struct Msg *msg) {
-	msg_reset(msg);
-	msg_append16(msg, 0);			  // len
-	msg_append16(msg, EVENTID_HUMID);  // header
-	msg_append64(msg, bme_ts);
-	msg_append32(msg, bme_hume6);  
-	msg_append32(msg, 0);  // pad
-	msg->buf[1] = msg->len;
-	return 1;
-}
+// calibration parameters defined in .ld file
+extern uint16_t TS_CAL1, TS_CAL2, VREFINT;
 
-extern uint16_t TS_CAL1, TS_CAL2, VREFINT; // defined in .ld file
+int output_temperature(struct MsgQueue *msgq, uint64_t ts, uint16_t vref_adc_val, uint16_t ts_adc_val) {
+	struct Msg* msg = msgq_head(msgq);
+	if (!msg) {
+		return 1;
+	}
 
-
-int output_temperature(struct Msg *msg, uint64_t ts, uint16_t vref_adc_val, uint16_t ts_adc_val) {
 	msg_reset(msg);
 	msg_append16(msg, 0);			  // len
 	msg_append16(msg, EVENTID_TEMP);  // header
@@ -102,21 +125,32 @@ int output_temperature(struct Msg *msg, uint64_t ts, uint16_t vref_adc_val, uint
 	}
 	msg_append32(msg, accel_temp_mk);  // old one but who cares
 	msg->buf[1] = msg->len;
-	return 1;
+	msgq_push_head(msgq);
+	return 0;
 }
 
 
-int output_shutter(struct Msg *msg, uint16_t hdr, uint64_t ts, uint64_t counter) {
+int output_shutter(struct MsgQueue *msgq, uint16_t hdr, uint64_t ts, uint64_t counter) {
+	struct Msg *msg = msgq_head(msgq);
+	if (msg == NULL) {
+		return 1;
+	}
+
 	msg_reset(msg);
 	msg_append16(msg, 0);	 // len
 	msg_append16(msg, hdr);	 // header
 	msg_append64(msg, ts);
 	msg_append64(msg, counter);
 	msg->buf[1] = msg->len;
-	return 1;
+	msgq_push_head(msgq);
+	return 0;
 }
 
-int output_periodic(struct Msg *msg, uint16_t hdr, uint64_t ts, uint32_t v1, uint32_t v2) {
+int output_periodic(struct MsgQueue *msgq, uint16_t hdr, uint64_t ts, uint32_t v1, uint32_t v2) {
+	struct Msg *msg = msgq_head(msgq);
+	if (msg == NULL) {
+		return 1;
+	}
 	msg_reset(msg);
 	msg_append16(msg, 0);	 // len
 	msg_append16(msg, hdr);	 // header
@@ -124,5 +158,6 @@ int output_periodic(struct Msg *msg, uint16_t hdr, uint64_t ts, uint32_t v1, uin
 	msg_append32(msg, v1);
 	msg_append32(msg, v2);
 	msg->buf[1] = msg->len;
-	return 1;
+	msgq_push_head(msgq);
+	return 0;
 }

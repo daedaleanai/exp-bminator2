@@ -16,7 +16,7 @@ struct DMA_Channel {
 static struct {
     struct DMA_Channel* rx;
     struct DMA_Channel* tx;
-} dmach[4] = {
+} const dmach[4] = {
    { (struct DMA_Channel*)&DMA1.CCR2, (struct DMA_Channel*)&DMA1.CCR3 },
    { (struct DMA_Channel*)&DMA1.CCR4, (struct DMA_Channel*)&DMA1.CCR5 },
    { (struct DMA_Channel*)&DMA2.CCR1, (struct DMA_Channel*)&DMA2.CCR2 },
@@ -24,7 +24,7 @@ static struct {
 };
 
 // indexed by enum SPIQ_DMA dma
-static enum IRQn_Type irqn[4] = { DMA1_CH2_IRQn, DMA1_CH4_IRQn, DMA2_CH1_IRQn, DMA2_CH3_IRQn };
+static const enum IRQn_Type irqn[4] = { DMA1_CH2_IRQn, DMA1_CH4_IRQn, DMA2_CH1_IRQn, DMA2_CH3_IRQn };
 
 #define NELEM(x) (sizeof(x) / sizeof(x[0]))
 

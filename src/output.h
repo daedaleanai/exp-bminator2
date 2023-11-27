@@ -13,10 +13,10 @@ enum {
 	EVENTID_SHUTTER_CLOSE = 0x8025,	 // uint64 counter
 
 	// [4]int16 xyz_ (i.e. padded to 8 bytes)
-	EVENTID_ACCEL_2G	   = 0x8032,  // RANGE_2G  = 0x00,  bmi088: 3g
-	EVENTID_ACCEL_4G	   = 0x8033,  // RANGE_4G  = 0x01,  bmi088: 6g
-	EVENTID_ACCEL_8G	   = 0x8034,  // RANGE_8G  = 0x02,          12g
-	EVENTID_ACCEL_16G	   = 0x8035,  // RANGE_16G = 0x03,         24g
+	EVENTID_ACCEL_3G	   = 0x8032,  // RANGE_2G  = 0x00,  bmi088: 3g
+	EVENTID_ACCEL_6G	   = 0x8033,  // RANGE_4G  = 0x01,  bmi088: 6g
+	EVENTID_ACCEL_9G	   = 0x8034,  // RANGE_8G  = 0x02,          12g
+	EVENTID_ACCEL_24G	   = 0x8035,  // RANGE_16G = 0x03,         24g
 	EVENTID_GYRO_125DEG_S  = 0x8038,  // BMI085_GYRO_RANGE_125DEG_S  = 0x04,
 	EVENTID_GYRO_250DEG_S  = 0x8039,  // BMI085_GYRO_RANGE_250DEG_S  = 0x03,
 	EVENTID_GYRO_500DEG_S  = 0x803a,  // BMI085_GYRO_RANGE_500DEG_S  = 0x02,
@@ -24,19 +24,17 @@ enum {
 	EVENTID_GYRO_2000DEG_S = 0x803c,  // BMI085_GYRO_RANGE_2000DEG_S = 0x00,
 };
 
-extern uint32_t						  gyro_hdr;
-extern uint32_t						  accel_hdr;
+// these are set in main
+extern uint32_t						  gyro_hdr;  // which EVENTID_GYRO_xxxDEG_S currently active
+extern uint32_t						  accel_hdr; // which EVENTID_EVENTID_ACCEL_2G currently active
 extern struct LinearisationParameters bmeParam;
 
 // convert the SPI xmit messages from communicating with the BMI and BME
-// to our output format.  Return 1 if a valid message was constructed.
-int output_bmx(struct Msg *msg, struct SPIXmit *x);
+// to our output format.  returns the number of messages dropped because msgq was full.
+int output_bmx(struct MsgQueue *msgq, struct SPIXmit *x);
+int output_cmd(struct MsgQueue *msgq, struct SPIXmit *x);
 
-int output_humid(struct Msg *msg);
-
-// internal temperatures: stm32 and accel (from last accel call)
-int output_temperature(struct Msg *msg, uint64_t ts, uint16_t vref_adc_val, uint16_t ts_adc_val);
-
-int output_shutter(struct Msg *msg, uint16_t hdr, uint64_t ts, uint64_t counter);
-
-int output_periodic(struct Msg *msg, uint16_t hdr, uint64_t ts, uint32_t v1, uint32_t v2);
+// this one sends along the last accel_temp as well
+int output_temperature(struct MsgQueue *msgq, uint64_t ts, uint16_t vref_adc_val, uint16_t ts_adc_val);
+int output_shutter(struct MsgQueue *msgq, uint16_t hdr, uint64_t ts, uint64_t counter);
+int output_periodic(struct MsgQueue *msgq, uint16_t hdr, uint64_t ts, uint32_t v1, uint32_t v2);
