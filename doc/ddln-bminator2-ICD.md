@@ -310,7 +310,7 @@ The streaming event messages are all exactly 20 bytes in length to ease the fram
 The Command/Acknowledge packets allow the host unit to control the bminator by reading and writing registers.
 The BMInator defines the following address layout, within a prefix meant to deconflict the host unit's own address space.
 
-| Address range      | r/w | Semantic                          |
+| Address range      | r/w | Semantics                         |
 | ------------------ | --- | --------------------------------- |
 | 0x2300 xxxx        |     | Prefix defining a 64kb space      |
 | prefix 0100 - 017f | r/o | BMI088 Gyro Register map          |
@@ -319,7 +319,7 @@ The BMInator defines the following address layout, within a prefix meant to deco
 | prefix 0200 - 027f | r/o | BMI088 Accel Register map         |
 | prefix 020F        | rw  | BMI088 Accel config register 0x0F |
 | prefix 0210        | rw  | BMI088 Accel range register 0x10  |
-| prefix 0400 - 047f | r/o | BME280  Register map              |
+| prefix 0400 - 047f | r/o | BME280 Register map               |
 | prefix 0472        | rw  | BME280 ctrl hum register 0x72     |
 | prefix 0474        | rw  | BME280 ctrl meas register 0x74    |
 | prefix 0475        | rw  | BME280 config register 0x75       |

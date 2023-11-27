@@ -11,7 +11,7 @@ extern char _sidata, _sdata, _edata, _sbss, _ebss;	// provided by linker script
 enum { HSE_RDY_TIMEOUT = 40000 };
 
 // This is the first thing that runs after the CPU comes out of reset.
-// It loads the data segment, clears the Blank Stuff segment,
+// It loads the data segment, clears the Blank Stuff Segment,
 // sets up the interrupt vector table to load from flash,
 // initializes fault handling and FPU access,
 // sets up the system clock to run at 80MHz, starts the system
