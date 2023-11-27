@@ -974,7 +974,7 @@ void main(void) {
 
 	size_t packetsize = 960;  // 48 messages of 20 bytes
 	size_t packetlen  = 0;
-	size_t packetchk  = 0;
+	uint16_t packetchk  = 0;
 
 	printf("%lld mainloop start\n", cycleCount() / C_US);
 
