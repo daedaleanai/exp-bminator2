@@ -158,7 +158,7 @@ uint16_t spiq_xmit(struct SPIQ *q, uint16_t addr, size_t len, uint8_t* buf) {
     spi_wait(q);
     if (x != spiq_tail(q)) {
         // someone else got our result, expect massive problems
-        return 0xffff;
+        return 0xfffe;
     }
     uint16_t r = x->status;
     spiq_deq_tail(q);

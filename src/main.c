@@ -116,7 +116,7 @@ static struct {
 		{TIM6_DACUNDER_IRQn, PRIO(1, 0)},  // 8Hz periodic read BME shedules SPI xmit and push evq
 		{EXTI1_IRQn, PRIO(1, 1)},		   // BMI088 Accel IRQ schedules SPI xmit
 		{EXTI3_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
-		{TIM7_IRQn, PRIO(1, 1)},		   // Shutter open/close timer, push evq
+		{TIM7_IRQn, PRIO(1, 1)},		   // BME280 schedule SPI xmit
 		{TIM2_IRQn, PRIO(1, 2)},		   // Shutter open/close timer, push evq
 		{ADC1_IRQn, PRIO(1, 2)},		   // ADC conversions
 		{DMA2_CH7_IRQn, PRIO(2, 0)},	   // USART1 RX DMA
@@ -720,7 +720,7 @@ void main(void) {
 	TIM7.DIER |= TIM6_DIER_UIE;
 	TIM7.PSC = (CLOCKSPEED_HZ / 10000) - 1;
 	TIM7.ARR = 10000 - 1;		 // 10KHz/10000 = 1Hz
-    TIM16.CNT = 2*3333;		// offset by two thirds of a second
+    TIM7.CNT = 2*3333;		// offset by two thirds of a second
 	TIM7.CR1 |= TIM6_CR1_CEN;
 	NVIC_EnableIRQ(TIM7_IRQn);
 
