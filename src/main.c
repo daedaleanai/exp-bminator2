@@ -196,12 +196,11 @@ static uint8_t humid_buf[1 + BME280_DATA_LEN];	// HUMID BME280_DATA_REG
 
 // spi1_ss is the callback that maps spi addresses to signals on the CSBx pins.
 // GYRO, ACCEL, HUMID
-static const enum GPIO_Pin spiaddr2pin[NUM_BMX_FUNCTIONS] = { 0, BMI_CSB2G_PIN, BMI_CSB1A_PIN, BME_CSB_PIN };
+static const enum GPIO_Pin spiaddr2pin[4] = { BMI_CSB2G_PIN, BMI_CSB1A_PIN, BME_CSB_PIN };
 static void spi1_ss(uint16_t addr, int on) {
-    if (addr >= NUM_BMX_FUNCTIONS) {
-        return; 
-    }
-    enum GPIO_Pin pin = spiaddr2pin[addr];
+    if ((addr < GYRO) || (addr > HUMID))
+        return; // TODO should assert and crash
+    enum GPIO_Pin pin = spiaddr2pin[addr - GYRO];
     if (on) {
         digitalLo(pin);
     } else {
@@ -547,7 +546,7 @@ void main(void) {
 	// deselect all (active low) chip select signals, then wiggle them
 	// to force them from I2C into SPI mode
 	digitalHi(BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN);
-	for (enum BMXFunction i= NONE+1; i < NUM_BMX_FUNCTIONS; ++i) {
+	for (enum BMXFunction i = GYRO; i <= HUMID; ++i) {
 		delay(15);
 		spi1_ss(i, 1);
 		delay(15);
