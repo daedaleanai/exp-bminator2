@@ -151,6 +151,7 @@ uint16_t spiq_xmit(struct SPIQ *q, uint16_t addr, size_t len, uint8_t* buf) {
     if (!x) {
         return 0xffff;
     }
+    x->tag = 0xffffffff; // HACK flag to avoid dma routine from stuffing this in the evq in main.c:DMA1_CH2_Handler
     x->addr = addr;
     x->len = len;
     x->buf = buf;

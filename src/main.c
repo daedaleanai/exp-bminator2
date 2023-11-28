@@ -223,6 +223,8 @@ void DMA1_CH2_Handler(void) {
     // the evq or the cmdq for processing by the mainloop
 	struct SPIXmit *x  = spiq_tail(&spiq);
     while (x != NULL) {
+        if (x->tag == 0xffffffff) // HACK flag for the sync messages in spi.c:spiq_xmit
+            break;
         if (x->tag & 0xffffff00) {
     		dropped_cmdq += output_cmd(&cmdq, x);
         } else {
