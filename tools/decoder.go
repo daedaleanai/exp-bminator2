@@ -34,10 +34,10 @@ const (
 	EVENTID_SHUTTER_CLOSE MsgID = 0x8025 // uint64 counter
 
 	// [4]int16 xyz_ (i.e. padded to 8 bytes)
-	EVENTID_ACCEL_2G       MsgID = 0x8032 // RANGE_2G  = 0x00,
-	EVENTID_ACCEL_4G       MsgID = 0x8033 // RANGE_4G  = 0x01,
-	EVENTID_ACCEL_8G       MsgID = 0x8034 // RANGE_8G  = 0x02,
-	EVENTID_ACCEL_16G      MsgID = 0x8035 // RANGE_16G = 0x03,
+	EVENTID_ACCEL_3G       MsgID = 0x8032 // RANGE_3G  = 0x00,
+	EVENTID_ACCEL_6G       MsgID = 0x8033 // RANGE_6G  = 0x01,
+	EVENTID_ACCEL_12G      MsgID = 0x8034 // RANGE_12G  = 0x02,
+	EVENTID_ACCEL_24G      MsgID = 0x8035 // RANGE_24G = 0x03,
 	EVENTID_GYRO_125DEG_S  MsgID = 0x8038 // BMI085_GYRO_RANGE_125DEG_S  = 0x04,
 	EVENTID_GYRO_250DEG_S  MsgID = 0x8039 // BMI085_GYRO_RANGE_250DEG_S  = 0x03,
 	EVENTID_GYRO_500DEG_S  MsgID = 0x803a // BMI085_GYRO_RANGE_500DEG_S  = 0x02,
@@ -70,10 +70,10 @@ type TEMPMsg Pld2Uint32
 type SHUTTER_OPENMsg PldUint64
 type SHUTTER_CLOSEMsg PldUint64
 
-type ACCEL_2GMsg Pld4Uint16
-type ACCEL_4GMsg Pld4Uint16
-type ACCEL_8GMsg Pld4Uint16
-type ACCEL_16GMsg Pld4Uint16
+type ACCEL_3GMsg Pld4Uint16
+type ACCEL_6GMsg Pld4Uint16
+type ACCEL_12GMsg Pld4Uint16
+type ACCEL_24GMsg Pld4Uint16
 type GYRO_125DEG_SMsg Pld4Uint16
 type GYRO_250DEG_SMsg Pld4Uint16
 type GYRO_500DEG_SMsg Pld4Uint16
@@ -112,16 +112,16 @@ func (m *SHUTTER_CLOSEMsg) String() string {
 }
 
 // note: BMI088 is 3,6,12,24G instead of 2,4,8,16
-func (m *ACCEL_2GMsg) String() string {
+func (m *ACCEL_3GMsg) String() string {
 	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 3))
 }
-func (m *ACCEL_4GMsg) String() string {
+func (m *ACCEL_6GMsg) String() string {
 	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 6))
 }
-func (m *ACCEL_8GMsg) String() string {
+func (m *ACCEL_12GMsg) String() string {
 	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 8))
 }
-func (m *ACCEL_16GMsg) String() string {
+func (m *ACCEL_24GMsg) String() string {
 	return fmt.Sprintf("%.6f %14s: %.3f ", float64(m.Ts)/80000000, label(m), scalexyz(m.Val, 24))
 }
 func (m *GYRO_125DEG_SMsg) String() string {
@@ -159,14 +159,14 @@ func newMsg(word0 uint32) interface{} {
 		return &SHUTTER_OPENMsg{}
 	case EVENTID_SHUTTER_CLOSE:
 		return &SHUTTER_CLOSEMsg{}
-	case EVENTID_ACCEL_2G:
-		return &ACCEL_2GMsg{}
-	case EVENTID_ACCEL_4G:
-		return &ACCEL_4GMsg{}
-	case EVENTID_ACCEL_8G:
-		return &ACCEL_8GMsg{}
-	case EVENTID_ACCEL_16G:
-		return &ACCEL_16GMsg{}
+	case EVENTID_ACCEL_3G:
+		return &ACCEL_3GMsg{}
+	case EVENTID_ACCEL_6G:
+		return &ACCEL_6GMsg{}
+	case EVENTID_ACCEL_12G:
+		return &ACCEL_12GMsg{}
+	case EVENTID_ACCEL_24G:
+		return &ACCEL_24GMsg{}
 	case EVENTID_GYRO_125DEG_S:
 		return &GYRO_125DEG_SMsg{}
 	case EVENTID_GYRO_250DEG_S:
