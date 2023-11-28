@@ -161,29 +161,29 @@ size_t input_cmdrx(struct MsgQueue* cmdq,  struct SPIQ* spiq) {
     switch (sts) {
     case 0: // valid read command 
     case 1: // valid write command 
+		{
+		printf("CMDRX %s %ld bytes at address %lx", sts ? "write" : "read", decode_be_uint24(cmdbuf.buf + 9), decode_be_uint32(cmdbuf.buf + 12));
+		// check address: 0x40
+		// check write to r/o: 0x44
+		// schedule the read or write on the spiq
+    	(void)spiq;
+
+		}
         break;
+
+    case 0xff:        
+		// packet too messed up to reply
+		printf("CMDRX: ignoring %d bytes\n", cmdbuf.head);
+		break;
 
     default:
         // queue error response packet on cmdq
         (void)cmdq;
-        // fallthrough
-    case 0xff:        
-		// packet too messed up to reply
-		printf("CMDRX: ignoring %d bytes\n", cmdbuf.head);
-        cmdbuf_state = RESYNC;
-        cmdbuf.head	 = 0;
-        return CMDMINSIZE;
+
 	}
 
 
-	printf("CMDRX %s %ld bytes at address %lx", 
-        cmdbuf.buf[8] ? "write" : "read", 
-        decode_be_uint24(cmdbuf.buf + 9),
-		decode_be_uint32(cmdbuf.buf + 12));
-	// check address: 0x40
-	// check write to r/o: 0x44
-	// schedule the read or write on the spiq
-    (void)spiq;
-
+    cmdbuf_state = RESYNC;
+    cmdbuf.head	 = 0;
 	return CMDMINSIZE;
 }
