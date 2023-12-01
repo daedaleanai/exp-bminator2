@@ -804,14 +804,14 @@ void main(void) {
         USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
 
         // copy plain events to the output
-        while (packetlen + sizeof out->buf <= PACKETSIZE ) {
+        while (packetlen + sizeof out->buf <= PACKETSIZE) {
 
             out = wait_outq();
             msg_reset(out);
 
             struct Msg* ev = poll_evq(); 
 			out->len = ev->len;
-			memmove(out->buf, ev->buf, ev->len);
+			memmove(out->buf, ev->buf, ev->len);  // CRASHES ABOUT ONCE A MINUTE
 			msgq_pop_tail(&evq);
 
 			packetlen += out->len;
