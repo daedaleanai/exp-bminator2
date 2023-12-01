@@ -6,10 +6,11 @@
   - initialize and self-test BMI088 and BME380
   - set up irq handlers for accel, gyro, shutter, and periodic events
   - the accel and gyro irqs push SPI transactions on the spiq, which are handled by DMA
-  - spiq dma-ready and the the other irqs push messages on the event queue evq
-  - incoming packets on USART1 are parsed by the USART1 irq
-  - the mainloop copies evq to the USART1 outq, which is also handled by DMA,
-    but it has some logic to send the command-response events in separate packets.
+  - the other irqs push messages on the event queue evq
+  - incoming packets on USART1 are parsed by the USART1 irq.  valid requests are pushed
+    on the spiq, invalid ones on the cmdq.
+  - the mainloop copies spiq, evq and cmdq to the USART1 outq, which is also handled by DMA
+    separating out the normal measurements from the command responses.
   
 */
 #include "cortex_m4.h"
@@ -141,7 +142,7 @@ static struct RunTimer usart1txdma_rt = {"USART1TXDMA", 0, 0, 0, 0, &usart1rxdma
 static struct RunTimer usart1irq_rt	  = {"USART1IRQ", 0, 0, 0, 0, &usart1txdma_rt};
 static struct RunTimer adcirq_rt	  = {"ADCIRQ", 0, 0, 0, 0, &usart1irq_rt};
 static struct RunTimer report_rt	  = {"REPORT", 0, 0, 0, 0, &adcirq_rt};
-static struct RunTimer mainloop_rt	  = {"MAIN", 0, 0, 0, 0, &report_rt};
+static struct RunTimer mainloop_rt	  = {"MAIN", 0, 0, 0, 0, &report_rt};  // includes idle time
 static struct RunTimer idle_rt		  = {"IDLE", 0, 0, 0, 0, &mainloop_rt};
 uint64_t			   lastreport	  = 0;
 
@@ -166,7 +167,7 @@ void USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
 
 // USART1 is the output datastream and command input
 static struct MsgQueue	 outq				= {0, 0, {}};
-static volatile uint32_t dropped_usart1		= 0;  // queue full, msqq_head returned NULL
+static volatile uint32_t dropped_outq		= 0;  // queue full, msqq_head returned NULL
 static volatile uint32_t usart1txdmaerr_cnt = 0;
 static volatile uint32_t usart1rxdmaerr_cnt = 0;
 
@@ -185,14 +186,6 @@ static struct SPIQ		 spiq;
 static volatile uint32_t dropped_spi1	  = 0;	// how often we tried to submit a spi1 xmit but the queue was full
 static volatile uint32_t spi1rxdmaerr_cnt = 0;
 static volatile uint32_t spi1txdmaerr_cnt = 0;
-
-// Spi transaction buffers 
-// ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
-// GYRO: cmd, 6 registers, 2dum, stat
-// TEMP: cmd, dum, 2 registers. big endian for some reason
-static uint8_t accel_buf[20];					// ACCEL BMI085_ACC_X_LSB
-static uint8_t gyro_buf[10];					// GYRO  BMI085_RATE_X_LSB
-static uint8_t humid_buf[1 + BME280_DATA_LEN];	// HUMID BME280_DATA_REG
 
 // spi1_ss is the callback that maps spi addresses to signals on the CSBx pins.
 // GYRO, ACCEL, HUMID
@@ -217,22 +210,6 @@ void DMA1_CH2_Handler(void) {
 	}
 	DMA1.IFCR = isr & 0x00000f0;  // clear pending flags
 	spi_rx_dma_handler(&spiq);	  // see spi.c
-
-    // read all completed spi transactions and push them on
-    // the evq or the cmdq for processing by the mainloop
-	struct SPIXmit *x  = spiq_tail(&spiq);
-    while (x != NULL) {
-        if (x->tag == 0xffffffff) // HACK flag for the sync messages in spi.c:spiq_xmit
-            break;
-        if (x->tag & 0xffffff00) {
-    		dropped_cmdq += output_cmd(&cmdq, x);
-        } else {
-    		dropped_evq += output_bmx(&evq, x);
-        }
-		spiq_deq_tail(&spiq);
-		x = spiq_tail(&spiq);
-    }
-
 	rt_stop(&spirxdma_rt, cycleCount());
 }
 
@@ -245,20 +222,21 @@ void DMA1_CH3_Handler(void) {
 	DMA1.IFCR = isr & 0x0000f00;  // clear pending flags
 }
 
-static void start_spix(uint64_t now, uint16_t addr, uint32_t tag, uint8_t reg, uint8_t *buf, size_t len) {
+// lowest 7 bits of tagreg are the register we're reading
+static void start_spix(uint64_t now, uint16_t addr, uint32_t tagreg, uint8_t *buf, size_t len) {
 	struct SPIXmit *x = spiq_head(&spiq);
 	if (!x) {
 		++dropped_spi1;
 		return;
 	}
 
-	buf[0] = 0x80 | reg;  // add the read flag on the register address.
+	buf[0] = 0x80 | tagreg;  // set the read flag on the register address (lowest 7 bits).
 	for (size_t i = 1; i < len; i++) {
 		buf[i] = 0;
 	}
 
 	x->ts	  = now;
-	x->tag	  = tag;
+	x->tag	  = tagreg;
 	x->addr   = addr;
     x->status = -1;
 	x->buf	  = buf;
@@ -266,13 +244,21 @@ static void start_spix(uint64_t now, uint16_t addr, uint32_t tag, uint8_t reg, u
 	spiq_enq_head(&spiq);
 }
 
+// Spi transaction buffers 
+// ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
+// GYRO: cmd, 6 registers, 2dum, stat
+// TEMP: cmd, dum, 2 registers. big endian for some reason
+static uint8_t accel_buf[20];					// ACCEL BMI085_ACC_X_LSB
+static uint8_t gyro_buf[10];					// GYRO  BMI085_RATE_X_LSB
+static uint8_t humid_buf[1 + BME280_DATA_LEN];	// HUMID BME280_DATA_REG
+
 void EXTI1_Handler(void) {
 	uint64_t now = cycleCount();
 	if ((EXTI.PR1 & Pin_1) == 0) {
 		return;
 	}
 	EXTI.PR1 = Pin_1;
-	start_spix(now, ACCEL, BMI08x_ACC_X_LSB, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf);
+	start_spix(now, ACCEL, BMI08x_ACC_X_LSB, accel_buf, sizeof accel_buf);
 	rt_start(&accelirq_rt, now);
 	rt_stop(&accelirq_rt, cycleCount());
 }
@@ -283,7 +269,7 @@ void EXTI3_Handler(void) {
 		return;
 	}
 	EXTI.PR1 = Pin_3;
-	start_spix(now, GYRO, BMI08x_RATE_X_LSB, BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf);
+	start_spix(now, GYRO, BMI08x_RATE_X_LSB, gyro_buf, sizeof gyro_buf);
 	rt_start(&gyroirq_rt, now);
 	rt_stop(&gyroirq_rt, cycleCount());
 }
@@ -295,9 +281,8 @@ void TIM7_Handler(void) {
 		return;
 	}
 	TIM7.SR &= ~TIM6_SR_UIF;
-	start_spix(cycleCount(), HUMID, BME280_DATA_REG, BME280_DATA_REG, humid_buf, sizeof humid_buf);
+	start_spix(cycleCount(), HUMID, BME280_DATA_REG, humid_buf, sizeof humid_buf);
 }
-
 
 // The 4 sampled channels are, in order
 //     0  Vrefint
@@ -435,6 +420,7 @@ void DMA2_CH6_Handler(void) {
 			msgq_pop_tail(&outq);
 		}
 	}
+
 	rt_stop(&usart1txdma_rt, cycleCount());
 }
 
@@ -495,6 +481,45 @@ void DMA2_CH7_Handler(void) {
 	rt_stop(&usart1rxdma_rt, cycleCount());
 }
 
+// poll_spiq waits until we have something to poll from the high speed SpiQ,
+// which should be at least every 270 microseconds (3600 Hz)
+static inline struct SPIXmit *poll_spiq() {
+    struct SPIXmit *x;
+   	while((x = spiq_tail(&spiq)) == NULL) {
+        rt_start(&idle_rt, cycleCount());
+    	__WFI();
+    	rt_stop(&idle_rt, cycleCount());
+    }
+    return x;
+}
+
+// poll_evq polls spiq and renders the result into cmdq or evq
+// until we have an event in evq.  
+static inline struct Msg* poll_evq(void) {
+    struct Msg* ev;
+    while((ev = msgq_tail(&evq)) == NULL) {
+        struct SPIXmit *x = poll_spiq(); // counts towards idle time
+        if (x->tag & 0xffffff00) {
+            dropped_cmdq += output_cmd(&cmdq, x);
+        } else {
+            dropped_evq += output_bmx(&evq, x);
+        }
+        spiq_deq_tail(&spiq);
+    }
+    return ev;
+}
+
+// wait_outq loops until outq has room for a new message to enqueue
+static inline struct Msg* wait_outq(void) {
+    struct Msg* m;
+    while((m = msgq_head(&outq)) == NULL) {
+        rt_start(&idle_rt, cycleCount());
+    	__WFI();
+    	rt_stop(&idle_rt, cycleCount());
+    }
+    return m;
+}
+
 // A 1Hz report on the queues and all the handlers
 void TIM1_UP_TIM16_Handler(void) {
 	uint64_t now = cycleCount();
@@ -505,8 +530,8 @@ void TIM1_UP_TIM16_Handler(void) {
 	uint32_t vdd = adc_val[0] ? ((3000UL * VREFINT) / adc_val[0]) : 0;
 
 	printf("\e[Huptime %llu.%06llu  Vdd %lu mV\e[K\n", us / 1000000, us % 1000000, vdd);
-	printf("enqueued spiq: %8lu evq:%8lu outq: %8lu\e[K\n", spiq.head, evq.head, outq.head);
-	printf("dropped  spiq: %8lu evq:%8lu outq: %8lu\e[K\n", dropped_spi1, dropped_evq, dropped_usart1);
+	printf("enqueued spiq: %8lu evq:%8lu cmdq: %2lu outq: %8lu\e[K\n", spiq.head, evq.head, cmdq.head, outq.head);
+	printf("dropped  spiq: %8lu evq:%8lu cmdq: %2lu outq: %8lu\e[K\n", dropped_spi1, dropped_evq, dropped_cmdq, dropped_outq);
 	printf("spi1   err tx: %8lu  rx:%8lu\e[K\n", spi1txdmaerr_cnt, spi1rxdmaerr_cnt);
 	printf("usart1 err tx: %8lu  rx:%8lu\e[K\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
 	if (adc_ovfl) {
@@ -755,40 +780,39 @@ void main(void) {
 	IWDG.RLR = 3200;	// count to 3200 -> 320ms timeout
 	IWDG.KR	 = 0xcccc;	// start watchdog countdown
 
-	size_t packetsize = 960;  // 48 messages of 20 bytes.
-	size_t packetlen  = 0;
-	uint16_t packetchk  = 0;
-
 	printf("%lld mainloop start\n", cycleCount() / C_US);
 
+    // mainloop has 2 parts: send out the plain events in packets of 
+    // fixed size and in between those, send out cmd response packets
 	for (;;) {
-		rt_start(&idle_rt, cycleCount());
 
-		__WFI();
+        rt_start(&mainloop_rt, cycleCount());
 
-		struct Msg	   *ev	= msgq_tail(&evq);
-		uint64_t		now = cycleCount();
+        // at 3600 message per second, packets of 48 messages of 20 bytes each should happen at 75Hz
+		IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems 
 
-		rt_stop(&idle_rt, now);
+        enum { PACKETSIZE = 960 };  // 48 messages of 20 bytes.
+        size_t packetlen  = 0;
+        uint16_t packetchk  = 0;
 
-		if (ev == NULL) {
-			continue;
-		}
+        // send header
+        struct Msg* out = wait_outq();
+        msg_reset(out);
+        msg_append32(out, 0x49524F4E);	// 'IRON'
+        msg_append16(out, PACKETSIZE);	// of the next packet
+        msgq_push_head(&outq);
+        USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
 
-		// dequeue event queue, send on out queue
-		// insert packet header and footer along the way
-		rt_start(&mainloop_rt, now);
-		while (ev) {
-			struct Msg *out = msgq_head(&outq);
-			if (!out) {
-				++dropped_usart1;
-				break;
-			}
+        // copy plain events to the output
+        while (packetlen + sizeof out->buf <= PACKETSIZE ) {
 
+            out = wait_outq();
+            msg_reset(out);
+
+            struct Msg* ev = poll_evq(); 
 			out->len = ev->len;
 			memmove(out->buf, ev->buf, ev->len);
 			msgq_pop_tail(&evq);
-			ev = msgq_tail(&evq);
 
 			packetlen += out->len;
 			for (size_t i = 0; i < out->len; ++i) {
@@ -796,45 +820,59 @@ void main(void) {
 			}
 
 			msgq_push_head(&outq);
-			USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
+			USART1.CR1 |= USART1_CR1_TCIE;
 
-			// not enough space for next message, pad with zeros
-			if ((packetsize != packetlen) && (packetsize < packetlen + sizeof out->buf)) {
-				while (msgq_head(&outq) == NULL) {
-					__NOP();
-				}
-				out		 = msgq_head(&outq);
-				out->len = packetsize - packetlen;
-				bzero(out->buf, out->len);
-				msgq_push_head(&outq);
-				USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
+        }
 
-				packetlen = packetsize;
+        // not enough space for next message, pad with zeros
+        // (this shouldn't' happen as long as all normal messages are 20 bytes 
+        // long and packetsize is a multiple)
+        if (packetlen < PACKETSIZE) {
+            out		 = wait_outq();
+            out->len = PACKETSIZE - packetlen;
+            bzero(out->buf, out->len);
+            msgq_push_head(&outq);
+            USART1.CR1 |= USART1_CR1_TCIE;
+        }
+
+        // send footer
+        out = wait_outq();
+        msg_reset(out);
+        msg_append16(out, packetchk);
+        msgq_push_head(&outq);
+        USART1.CR1 |= USART1_CR1_TCIE;
+
+        struct Msg* rsp = msgq_tail(&cmdq); 
+        if (rsp != NULL) {
+            // send header
+            out = wait_outq();
+            msg_reset(out);
+            msg_append32(out, 0x49524F4E);	// 'IRON'
+            msg_append16(out, rsp->len);
+            msgq_push_head(&outq);
+            USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
+
+			out->len = rsp->len;
+			memmove(out->buf, rsp->buf, rsp->len);
+			msgq_pop_tail(&cmdq);
+
+			packetlen += out->len;
+            packetchk = 0;
+			for (size_t i = 0; i < out->len; ++i) {
+				packetchk += out->buf[i];
 			}
 
-			// check here if there's a command response packet to send
+			msgq_push_head(&outq);
+			USART1.CR1 |= USART1_CR1_TCIE;
 
-			// end of packet; send checksum trailer + header for the next
-			if (packetsize == packetlen) {
-				while (msgq_head(&outq) == NULL) {
-					__NOP();
-				}
-				out = msgq_head(&outq);
-				msg_reset(out);
-				msg_append16(out, packetchk);	// of the previous packet
-				msg_append32(out, 0x49524F4E);	// 'IRON'
-				msg_append16(out, packetsize);	// of the next one
-				msgq_push_head(&outq);
-				USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
+            out = wait_outq();
+            msg_reset(out);
+            msg_append16(out, packetchk);	
+            msgq_push_head(&outq);
+            USART1.CR1 |= USART1_CR1_TCIE;
+        }
 
-				packetchk = 0;
-				packetlen = 0;
-
-                // at 3600 message per second, packets of 48 messages should happen at75Hz
-				IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
-			}
-		}
-		rt_stop(&mainloop_rt, cycleCount());
+        rt_stop(&mainloop_rt, cycleCount());
 
 	}  // forever
 
