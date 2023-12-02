@@ -496,6 +496,12 @@ static inline struct Msg* wait_outq(void) {
     return m;
 }
 
+static inline void start_outq(void) {
+    __DMB();
+    msgq_push_head(&outq);
+    USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
+}
+
 // A 1Hz report on the queues and all the handlers
 void TIM1_UP_TIM16_Handler(void) {
 	uint64_t now = cycleCount();
@@ -786,7 +792,6 @@ void main(void) {
 
         rt_start(&mainloop_rt, now);
 
-#if 0
         // if the spi result is a cmd packet, set it aside in the cmdq
         while (x && (x->tag & 0xffffff00)) {
             struct Msg* msg = msgq_head(&cmdq);
@@ -805,7 +810,7 @@ void main(void) {
         	rt_stop(&mainloop_rt, now);
             continue;
         }
-#endif
+
         if (packetlen == 0) {
             // send header
             struct Msg* out = wait_outq();
@@ -813,10 +818,7 @@ void main(void) {
             msg_append16(out, packetchk);   // of previous packet
             msg_append32(out, 0x49524F4E);	// 'IRON'
             msg_append16(out, PACKETSIZE);	// of the next packet
-            __DMB();
-            msgq_push_head(&outq);
-
-            USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
+			start_outq();
 
             // at 3600 message per second, packets of 48 messages of 20 bytes each should happen at 75Hz
             IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems 
@@ -844,11 +846,7 @@ void main(void) {
 			packetchk += out->buf[i];
 		}
 
-        __DMB();
-		msgq_push_head(&outq);
-
-		USART1.CR1 |= USART1_CR1_TCIE;
-
+		start_outq();
 
         // not enough space for next message, pad with zeros
         // (this shouldn't' happen as long as all normal messages are 20 bytes 
@@ -858,9 +856,7 @@ void main(void) {
             out->len = PACKETSIZE - packetlen;
             bzero(out->buf, out->len);
         	packetlen += out->len;
-            __DMB();
-            msgq_push_head(&outq);
-            USART1.CR1 |= USART1_CR1_TCIE;
+			start_outq();
         }
 
         if (packetlen == PACKETSIZE) {
@@ -874,10 +870,7 @@ void main(void) {
                 msg_append16(out, packetchk);	
                 msg_append32(out, 0x49524F4E);	// 'IRON'
                 msg_append16(out, rsp->len);
-                __DMB();
-
-                msgq_push_head(&outq);
-                USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
+				start_outq();
 
                 out = wait_outq();
                 msg_reset(out);
@@ -890,9 +883,7 @@ void main(void) {
                     packetchk += out->buf[i];
                 }
 
-                __DMB();
-                msgq_push_head(&outq);
-                USART1.CR1 |= USART1_CR1_TCIE;
+				start_outq();
             }
         }
 
