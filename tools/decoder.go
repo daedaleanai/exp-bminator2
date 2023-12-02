@@ -210,6 +210,11 @@ func main() {
 	ticker := time.Tick(time.Second)
 	resyncing := false
 	frameno := 0
+
+	if *fMonitorMode {
+		fmt.Println(HOME, CLRBOS)
+	}
+
 	for {
 		// rescan to the "IRON" tag
 		const magic = "IRON"
@@ -274,9 +279,20 @@ func main() {
 				break
 			}
 			//log.Printf("word0: %08x\n", word0)
+			if word0 == 0 {
+				// padding
+				//todo: verify remainder is zero
+				break
+			}
+
+			if word0 == 0x06060606 {
+				log.Printf("Command response: % 02x", buf[:framelen])
+				break
+			}
+
 			sz := (word0 >> 16) - 4
 			if sz > 32 {
-				log.Printf("Invalid message length %d", sz)
+				log.Printf("Invalid message length %x", sz)
 				break
 			}
 			var pldbuf [32]byte
@@ -329,7 +345,7 @@ func main() {
 				//				fmt.Printf("%v %12v %4d %v%v\n", id, seen[id].T, seen[id].Count, seen[id].Msg, CLREOL)
 				fmt.Printf("%v %4d %v%v\n", id, seen[id].Count, seen[id].Msg, CLREOL)
 			}
-			fmt.Println(CLRBOS)
+			//fmt.Println(CLRBOS)
 
 			for k, v := range seen {
 				if now-v.T > 2*time.Second {
@@ -339,6 +355,7 @@ func main() {
 				}
 
 			}
-		}
-	}
+
+		} // messages in frame
+	} // forever
 }

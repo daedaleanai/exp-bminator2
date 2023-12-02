@@ -7,7 +7,7 @@
 
 struct Msg {
     size_t len;
-    uint8_t buf[20];
+    uint8_t buf[32];
 };
 
 inline void msg_reset(struct Msg *msg) {

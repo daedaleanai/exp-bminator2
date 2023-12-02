@@ -232,9 +232,7 @@ static void start_spix(uint64_t now, uint16_t addr, uint32_t tagreg, uint8_t *bu
 	}
 
 	buf[0] = tagreg;  // lowest 8 bits: read flag 0x80 + register address
-	for (size_t i = 1; i < len; i++) {
-		buf[i] = 0xff;
-	}
+	memset(buf + 1, 0xff, len - 1);
 
 	x->ts	  = now;
 	x->tag	  = tagreg;
@@ -351,7 +349,6 @@ void TIM6_DACUNDER_Handler(void) {
     case 2:
         dropped_evq += output_periodic(&evq, EVENTID_ID0, now, __REVISION__, UNIQUE_DEVICE_ID[2]);
         break;
-
     case 3:
         dropped_evq += output_periodic(&evq, EVENTID_ID1, now, UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
         break;
@@ -495,7 +492,7 @@ static inline struct Msg* wait_outq(void) {
     }
     return m;
 }
-
+// little helper for the main loop.
 static inline void start_outq(void) {
     __DMB();
     msgq_push_head(&outq);
@@ -657,8 +654,8 @@ void main(void) {
 	USART1.CR3 = USART1_CR3_DMAT | USART1_CR3_DMAR;	 // enable DMA output and input
     usart1_start_rx(CMDMINSIZE);
 	USART1.CR1 = USART1_CR1_UE | USART1_CR1_TE | USART1_CR1_RE;
-	NVIC_EnableIRQ(DMA2_CH6_IRQn);
-	NVIC_EnableIRQ(DMA2_CH7_IRQn);
+	NVIC_EnableIRQ(DMA2_CH6_IRQn); // reception
+	NVIC_EnableIRQ(DMA2_CH7_IRQn); // transmission
 	NVIC_EnableIRQ(USART1_IRQn);
 
 	// TIM2 CH1 measures shutter open/close
@@ -794,6 +791,8 @@ void main(void) {
 
         // if the spi result is a cmd packet, set it aside in the cmdq
         while (x && (x->tag & 0xffffff00)) {
+			// disable the reception irq so we have exclusive access to cmdq
+			NVIC_DisableIRQ(DMA2_CH6_IRQn); // reception
             struct Msg* msg = msgq_head(&cmdq);
         	if (!msg) {
         		++dropped_cmdq;
@@ -801,6 +800,8 @@ void main(void) {
                 output_bmx(msg, x);
                 msgq_push_head(&cmdq);
             }
+			NVIC_EnableIRQ(DMA2_CH6_IRQn); // reception
+
             spiq_deq_tail(&spiq);
             x = spiq_tail(&spiq);
         }
@@ -851,7 +852,7 @@ void main(void) {
         // not enough space for next message, pad with zeros
         // (this shouldn't' happen as long as all normal messages are 20 bytes 
         // long and packetsize is a multiple)
-        if ((packetlen != PACKETSIZE) && (packetlen + sizeof out->buf > PACKETSIZE)) {
+        if ((packetlen != PACKETSIZE) && (packetlen + 20 > PACKETSIZE)) {
             out		 = wait_outq();
             out->len = PACKETSIZE - packetlen;
             bzero(out->buf, out->len);
@@ -869,7 +870,9 @@ void main(void) {
                 msg_reset(out);
                 msg_append16(out, packetchk);	
                 msg_append32(out, 0x49524F4E);	// 'IRON'
-                msg_append16(out, rsp->len);
+                msg_append16(out, 4 + rsp->len);
+				msg_append32(out, 0x06060606); // tagged command response
+
 				start_outq();
 
                 out = wait_outq();
@@ -878,7 +881,8 @@ void main(void) {
                 memmove(out->buf, rsp->buf, rsp->len);
                 msgq_pop_tail(&cmdq);
 
-                packetchk = 0; // will be sent out with next footer/header
+				// the chk16 will be sent out with next footer/header
+                packetchk = 4*0x06; // 0x06060606 that was sent out above
                 for (size_t i = 0; i < out->len; ++i) {
                     packetchk += out->buf[i];
                 }

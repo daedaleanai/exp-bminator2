@@ -195,15 +195,15 @@ Example big-endian encoding of four 8-, two 16-, one 32- or 64-bit values in Wor
 ####  Command Messages (input)
 
 A packet may contain a single command message with the following layout:
-| Word   | Content (hex) | Description                                            |
-| :----- | :------------ | :----------------------------------------------------- |
-| 0      | 05 05 05 05   | Control command indication – with tag.                 |
-| 1      | 4x Tag        | To be repeated in reply (see below).                   |
-| 2      | Cmd           | Bit 31..24: 0x00 Memory read, 0x01 Memory write        |
-|        | Size          | Bit 23..0: Number of bytes N to read or write          |
-| 3      | Addr          | 32 bit address of data to read or write                |
-| 3..N+2 | Data          | for writes: payload data , zero padded to multiple of 4 |
-| N+3    | CRC32         | 32 bit CRC calculated over data words 1 to N+2.        |
+| Word       | Content (hex) | Description                                             |
+| :--------- | :------------ | :------------------------------------------------------ |
+| 0          | 05 05 05 05   | Control command indication – with tag.                  |
+| 1          | 4x Tag        | To be repeated in reply (see below).                    |
+| 2          | Cmd           | Bit 31..24: 0x00 Memory read, 0x01 Memory write         |
+|            | Size          | Bit 23..0: Number of bytes N to read or write           |
+| 3          | Addr          | 32 bit address of data to read or write                 |
+| 3..(N/4)+2 | Data          | for writes: payload data , zero padded to multiple of 4 |
+| (N/4)+3    | CRC32         | 32 bit CRC calculated over data words 1 to N+2.         |
 
 Control command message format  – with tag  -- cf CoaXPress Standard Version 2.1 p.61 Table 24.
 
@@ -216,14 +216,14 @@ The Address space for memory read/write commands is defined in the section 'Comm
 
 A packet may contain a single acknowledge message with the following layout:
 
-| Word   | Content (hex) | Description                                     |
-| :----- | :------------ | :---------------------------------------------- |
-| 0      | 06 06 06 06   | Control acknowledge indication – with tag.      |
-| 1      | 4x Tag        | Tag, matching the command being acknowledged.   |
-| 2      | 4x Code       | Acknowledgment code (repeated 4 times)          |
-| 3      | Size          | Number of bytes N in payload                    |
-| 4..N+3 | Data          | payload data , zero padded to multiple of 4      |
-| N+4    | CRC32         | 32 bit CRC calculated over data words 1 to N+3. |
+| Word       | Content (hex) | Description                                     |
+| :--------- | :------------ | :---------------------------------------------- |
+| 0          | 06 06 06 06   | Control acknowledge indication – with tag.      |
+| 1          | 4x Tag        | Tag, matching the command being acknowledged.   |
+| 2          | 4x Code       | Acknowledgment code (repeated 4 times)          |
+| 3          | Size          | Number of bytes N in payload                    |
+| 4..(N/4)+3 | Data          | payload data, zero padded to multiple of 4      |
+| (N/4)+4    | CRC32         | 32 bit CRC calculated over data words 1 to N+3. |
 
 Acknowledgment message format – with tag  -- cf CoaXPress Standard Version 2.1 p.63 Table 26.
 
@@ -319,10 +319,10 @@ The BMInator defines the following address layout, within a prefix meant to deco
 | prefix 0200 - 027f | r/o | BMI088 Accel Register map         |
 | prefix 020F        | rw  | BMI088 Accel config register 0x0F |
 | prefix 0210        | rw  | BMI088 Accel range register 0x10  |
-| prefix 0400 - 047f | r/o | BME280 Register map               |
-| prefix 0472        | rw  | BME280 ctrl hum register 0x72     |
-| prefix 0474        | rw  | BME280 ctrl meas register 0x74    |
-| prefix 0475        | rw  | BME280 config register 0x75       |
+| prefix 0300 - 047f | r/o | BME280 Register map               |
+| prefix 0372        | rw  | BME280 ctrl hum register 0x72     |
+| prefix 0374        | rw  | BME280 ctrl meas register 0x74    |
+| prefix 0375        | rw  | BME280 config register 0x75       |
 | prefix 1xxx        | ro  | TODO uC internal variables        |
 | prefix 2xxx        | rw  | TODO Heater Temperature control   |
 

@@ -14,11 +14,29 @@ static int32_t  accel_temp_mk = 0;	// last observed value from BMI088 accelerato
 static int32_t  bme_hume6     = 0;
 static uint64_t bme_ts        = 0;
 
+static uint8_t zeroes[4] = { 0,0,0,0 };
 
 #define MSGTYPE(addr, tag) (((uint16_t)(addr)&0xf) << 8) | ((uint8_t)(tag)&0xff)
 
 void output_bmx(struct Msg *msg, struct SPIXmit *x) {
 	msg_reset(msg);
+
+	if (x->tag & 0xff000000) {
+		msg_append32(msg, bytex4(x->tag >> 16)); // tagtagtagtag
+		uint8_t code = (x->tag & 0x80) ? 0 : 1; // read (0) or write (1)
+		if (x->status != 0) {
+			code += 0x48;  // read (48) or write (49) failed
+		}
+		msg_append32(msg, bytex4(code)); 
+		if (x->tag & 0x80) { // read
+			msg_append32(msg, x->len - 1); // number of bytes read 
+		}
+		msg_appendbuf(msg, x->buf, x->len - 1); 
+		msg_appendbuf(msg, zeroes, (4 - (x->len - 1)%4)%4 ); 
+		msg_append32(msg, 0x12345678); // crc32 
+		return;
+	}
+
 
 	switch (MSGTYPE(x->addr, x->tag)) {
 	case MSGTYPE(GYRO, 0x80 | BMI08x_RATE_X_LSB):
@@ -75,8 +93,6 @@ void output_bmx(struct Msg *msg, struct SPIXmit *x) {
 	msg_append16(msg, EVENTID_GENERICSPI+(x->tag & 0xff));  // header
 	msg_appendbuf(msg, x->buf, x->len);
 	msg->buf[1] = msg->len;
-
-	// TODO cmd responses
 
 	return;
 }

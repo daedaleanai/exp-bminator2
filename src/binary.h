@@ -97,3 +97,11 @@ inline void encode_be_uint64(uint8_t *buf, uint64_t val) {
     *buf++ = val >> 8;
     *buf++ = val;
 }
+
+// copy 0xAB to 0xABABABAB
+inline uint32_t bytex4(uint32_t x) {
+	x &= 0xff;
+	x |= x<<8;
+	x |= x<<16;
+	return x;
+}
