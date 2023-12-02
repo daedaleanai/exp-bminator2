@@ -22,6 +22,8 @@ enum {
 	EVENTID_GYRO_500DEG_S  = 0x803a,  // BMI085_GYRO_RANGE_500DEG_S  = 0x02,
 	EVENTID_GYRO_1000DEG_S = 0x803b,  // BMI085_GYRO_RANGE_1000DEG_S = 0x01,
 	EVENTID_GYRO_2000DEG_S = 0x803c,  // BMI085_GYRO_RANGE_2000DEG_S = 0x00,
+
+	EVENTID_GENERICSPI    = 0x8100,  // + read/writereg, up to 16 bytes of data
 };
 
 // these are set in main
@@ -30,11 +32,11 @@ extern uint32_t						  accel_hdr; // which EVENTID_EVENTID_ACCEL_2G currently ac
 extern struct LinearisationParameters bmeParam;
 
 // convert the SPI xmit messages from communicating with the BMI and BME
-// to our output format.  returns the number of messages dropped because msgq was full.
-int output_bmx(struct MsgQueue *msgq, struct SPIXmit *x);
-int output_cmd(struct MsgQueue *msgq, struct SPIXmit *x);
+// to our output format.
+void output_bmx(struct Msg *msg, struct SPIXmit *x);
 
+int output_humidity(struct MsgQueue *msgq);
 // this one sends along the last accel_temp as well
-int output_temperature(struct MsgQueue *msgq, uint64_t ts, uint16_t vref_adc_val, uint16_t ts_adc_val);
+int output_internaltemperature(struct MsgQueue *msgq, uint64_t ts, uint16_t vref_adc_val, uint16_t ts_adc_val);
 int output_shutter(struct MsgQueue *msgq, uint16_t hdr, uint64_t ts, uint64_t counter);
 int output_periodic(struct MsgQueue *msgq, uint16_t hdr, uint64_t ts, uint32_t v1, uint32_t v2);

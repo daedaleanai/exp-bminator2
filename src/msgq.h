@@ -1,6 +1,7 @@
 #pragma once 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "binary.h"
 
@@ -28,6 +29,15 @@ inline void msg_append64(struct Msg *msg, uint64_t val) {
     encode_be_uint64(msg->buf+msg->len, val);
     msg->len += 8;
 }
+
+inline void msg_appendbuf(struct Msg *msg, uint8_t* buf, size_t len) {
+    if (msg->len + len > sizeof msg->buf) {
+        len = sizeof msg->buf - msg->len;
+    }
+    memmove(msg->buf+msg->len, buf, len);
+    msg->len += len;
+}
+
 
 struct MsgQueue {
     volatile uint32_t head;
