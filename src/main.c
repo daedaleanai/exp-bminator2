@@ -143,7 +143,8 @@ static struct RunTimer usart1irq_rt	  = {"USART1IRQ", 0, 0, 0, 0, &usart1txdma_r
 static struct RunTimer adcirq_rt	  = {"ADCIRQ", 0, 0, 0, 0, &usart1irq_rt};
 static struct RunTimer report_rt	  = {"REPORT", 0, 0, 0, 0, &adcirq_rt};
 static struct RunTimer mainloop_rt	  = {"MAIN", 0, 0, 0, 0, &report_rt};  // includes idle time
-static struct RunTimer idle_rt		  = {"IDLE", 0, 0, 0, 0, &mainloop_rt};
+static struct RunTimer wait_rt		  = {"WAIT", 0, 0, 0, 0, &mainloop_rt};
+static struct RunTimer idle_rt		  = {"IDLE", 0, 0, 0, 0, &wait_rt};
 uint64_t			   lastreport	  = 0;
 
 // USART2 is the console, for debug messages, it runs IRQ driven.
@@ -513,9 +514,9 @@ static inline struct Msg* poll_evq(void) {
 static inline struct Msg* wait_outq(void) {
     struct Msg* m;
     while((m = msgq_head(&outq)) == NULL) {
-        rt_start(&idle_rt, cycleCount());
+        rt_start(&wait_rt, cycleCount());
     	__WFI();
-    	rt_stop(&idle_rt, cycleCount());
+    	rt_stop(&wait_rt, cycleCount());
     }
     return m;
 }
