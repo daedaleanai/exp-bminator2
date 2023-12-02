@@ -110,3 +110,5 @@ volatile uint64_t clockticks = STK_LOAD_RELOAD + 1;
 // clockticks holds the counts at the _end_ of the next systick,
 // so cyclecount can just subtract current VAL (which counts down)
 void SysTick_Handler(void) { clockticks += STK_LOAD_RELOAD + 1; }
+
+extern inline void delay(uint32_t usec);

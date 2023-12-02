@@ -142,7 +142,7 @@ static struct RunTimer usart1txdma_rt = {"USART1TXDMA", 0, 0, 0, 0, &usart1rxdma
 static struct RunTimer usart1irq_rt	  = {"USART1IRQ", 0, 0, 0, 0, &usart1txdma_rt};
 static struct RunTimer adcirq_rt	  = {"ADCIRQ", 0, 0, 0, 0, &usart1irq_rt};
 static struct RunTimer report_rt	  = {"REPORT", 0, 0, 0, 0, &adcirq_rt};
-static struct RunTimer mainloop_rt	  = {"MAIN", 0, 0, 0, 0, &report_rt};  // includes idle time
+static struct RunTimer mainloop_rt	  = {"MAIN", 0, 0, 0, 0, &report_rt};
 static struct RunTimer wait_rt		  = {"WAIT", 0, 0, 0, 0, &mainloop_rt};
 static struct RunTimer idle_rt		  = {"IDLE", 0, 0, 0, 0, &wait_rt};
 uint64_t			   lastreport	  = 0;
@@ -754,7 +754,7 @@ void main(void) {
 	IWDG.KR	 = 0x5555;	// enable watchdog config
 	IWDG.PR	 = 0;		// prescaler /4 -> 10khz
 	IWDG.RLR = 3200;	// count to 3200 -> 320ms timeout
-//	IWDG.KR	 = 0xcccc;	// start watchdog countdown
+	IWDG.KR	 = 0xcccc;	// start watchdog countdown
 
 
     enum { PACKETSIZE = 960 };  // 48 messages of 20 bytes.
@@ -808,20 +808,20 @@ void main(void) {
 #endif
         if (packetlen == 0) {
             // send header
-            printf("START OF PACKET\n");
-
             struct Msg* out = wait_outq();
             msg_reset(out);
             msg_append16(out, packetchk);   // of previous packet
             msg_append32(out, 0x49524F4E);	// 'IRON'
             msg_append16(out, PACKETSIZE);	// of the next packet
-            msgq_push_head(&outq);
             __DMB();
+            msgq_push_head(&outq);
 
             USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
 
             // at 3600 message per second, packets of 48 messages of 20 bytes each should happen at 75Hz
             IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems 
+
+            packetchk = 0;
         }
 
         struct Msg* out = wait_outq();
@@ -844,33 +844,29 @@ void main(void) {
 			packetchk += out->buf[i];
 		}
 
-		msgq_push_head(&outq);
         __DMB();
+		msgq_push_head(&outq);
 
 		USART1.CR1 |= USART1_CR1_TCIE;
+
 
         // not enough space for next message, pad with zeros
         // (this shouldn't' happen as long as all normal messages are 20 bytes 
         // long and packetsize is a multiple)
-        if (packetlen + sizeof out->buf > PACKETSIZE) {
+        if ((packetlen != PACKETSIZE) && (packetlen + sizeof out->buf > PACKETSIZE)) {
             out		 = wait_outq();
             out->len = PACKETSIZE - packetlen;
             bzero(out->buf, out->len);
         	packetlen += out->len;
-            msgq_push_head(&outq);
             __DMB();
+            msgq_push_head(&outq);
             USART1.CR1 |= USART1_CR1_TCIE;
         }
 
-
         if (packetlen == PACKETSIZE) {
-
             packetlen = 0; // cause footer & header to be sent next time round
 
-            printf("END OF PACKET\n");
-#if 0
-            struct Msg* rsp = msgq_tail(&cmdq); 
-
+            struct Msg* rsp = msgq_tail(&cmdq);
             if (rsp != NULL) {
                 // send header
                 out = wait_outq();
@@ -878,6 +874,8 @@ void main(void) {
                 msg_append16(out, packetchk);	
                 msg_append32(out, 0x49524F4E);	// 'IRON'
                 msg_append16(out, rsp->len);
+                __DMB();
+
                 msgq_push_head(&outq);
                 USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
 
@@ -892,10 +890,10 @@ void main(void) {
                     packetchk += out->buf[i];
                 }
 
+                __DMB();
                 msgq_push_head(&outq);
                 USART1.CR1 |= USART1_CR1_TCIE;
             }
-#endif
         }
 
         now = cycleCount();

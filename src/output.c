@@ -94,6 +94,8 @@ int output_humidity(struct MsgQueue *msgq) {
 	msg_append32(msg, bme_hume6);  
 	msg_append32(msg, 0);  // pad
 	msg->buf[1] = msg->len;
+	msgq_push_head(msgq);
+
 	return 0;
 }
 
