@@ -289,7 +289,7 @@ func main() {
 				log.Printf("Command response[%d]: tag:0x%02x status:0x%02x", framelen, buf[4], buf[8])
 				if framelen >= 20 {
 					log.Printf("    data[0x%02x]: % 02x", buf[12:16], buf[16:framelen-4])
-					log.Printf("              crc32: % 02x", buf[framelen-4:framelen])
+					log.Printf("               crc32: % 02x", buf[framelen-4:framelen])
 				}
 				break
 			}
