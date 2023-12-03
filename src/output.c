@@ -33,7 +33,7 @@ void output_bmx(struct Msg *msg, struct SPIXmit *x) {
 		}
 		msg_appendbuf(msg, x->buf, x->len - 1); 
 		msg_appendbuf(msg, zeroes, (4 - (x->len - 1)%4)%4 ); 
-		msg_append32(msg, 0x12345678); // crc32 
+		msg_append32(msg, 0x12345678); // TODO crc32 
 		return;
 	}
 

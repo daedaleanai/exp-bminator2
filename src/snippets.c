@@ -40,3 +40,14 @@ sample time 24.5
 11481705168 c4 EOC EOS
 adc 938 1368 1408 4095 77
 11491691228 TRIGGER
+
+
+#define CMP_SWAP(i, j) if (a[i] > a[j]) { uint32_t tmp = a[i]; a[i] = a[j]; a[j] = tmp; }
+
+void sort8u32(uint32_t a[8]) {
+    CMP_SWAP(0, 1); CMP_SWAP(2, 3); CMP_SWAP(4, 5); CMP_SWAP(6, 7);
+    CMP_SWAP(0, 2); CMP_SWAP(1, 3); CMP_SWAP(4, 6); CMP_SWAP(5, 7);
+    CMP_SWAP(1, 2); CMP_SWAP(5, 6); CMP_SWAP(0, 4); CMP_SWAP(1, 5);
+    CMP_SWAP(2, 6); CMP_SWAP(3, 7); CMP_SWAP(2, 4); CMP_SWAP(3, 5);
+    CMP_SWAP(1, 2); CMP_SWAP(3, 4); CMP_SWAP(5, 6);
+}
