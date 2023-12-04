@@ -120,11 +120,11 @@ Ideally the function will reach P = 0 W when moisture is deemed to be no longer 
 STM Reference documents:
 
 - PM0214 Programming manual STM32 Cortex®-M4 MCUs and MPUs programming manual
-- RM0394 Reference manual STM32L41xxx/42xxx/43xxx/44xxx/45xxx/46xxx advanced Arm®-based 32-bit MCUs
-- DS11451 STM32L432Kx Ultra-low-power Arm® Cortex®-M4 32-bit MCU+FPU, 100DMIPS, up to 256KB Flash, 64KB SRAM, USB FS, analog, audio
-- DS11453 STM32L431xx Ultra-low-power Arm® Cortex®-M4 32-bit MCU+FPU, 100DMIPS, up to 256KB Flash, 64KB SRAM, analog, audio
+- [RM0394](doc/rm0394-stm32l4xxxx.pdf) Reference manual STM32L41xxx/42xxx/43xxx/44xxx/45xxx/46xxx advanced Arm®-based 32-bit MCUs
+- [DS11451](doc/stm32l432xx.pdf) STM32L432Kx Ultra-low-power Arm® Cortex®-M4 32-bit MCU+FPU, 100DMIPS, up to 256KB Flash, 64KB SRAM, USB FS, analog, audio
+- [DS11453](doc/stm32l431xx.pdf) STM32L431xx Ultra-low-power Arm® Cortex®-M4 32-bit MCU+FPU, 100DMIPS, up to 256KB Flash, 64KB SRAM, analog, audio
 
 Bosch reference documents:
 
-- BST-BMI088-DS001-13 BMI088 6-axis Motion Tracking for High-performance Applications
-- BST-BME280-DS001-18 BME280 Combined humidity and pressure sensor
+- [BST-BMI088-DS001-13](doc/BMI088.pdf) BMI088 6-axis Motion Tracking for High-performance Applications
+- [BST-BME280-DS001-18](doc/BME280.pdf) BME280 Combined humidity and pressure sensor
