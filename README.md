@@ -4,8 +4,6 @@ Experimental code for the 2nd generation (simplified) BMInator: an stm32l43x rea
 
 The full interface description is documented in [the ICD](doc/ddln-bminator2-ICD.md)
 
-TODO(lvd) heater servo control logic
-
 ## STM32L431kx UFQFPN32 Pin Assignments:
 
 | Pin  | Function   | DIR | Electrical           | Connected to                              |
@@ -66,10 +64,10 @@ Heater:  Thermistor, GND, Heater10W+, Heater10W-
 - [x] Watchdog monitors packets streaming regularily
 - [X] Timepulse Sampled
 - [] Heater power supply, control algorithm based on thermistor input and current sense.
-- [] Heater state sampled at 1Hz
+- [] Heater state sampled at 8Hz
 - [X] Samples reported over serial port cf ICD
-- [] Accept commands over serial port
-- [] Get/set BMI088, BME280
+- [x] Accept commands over serial port
+- [X] Get/set BMI088, BME280
 
 implementation:
 - [X] boot, clock, gpio, debug console for STM32L43x
@@ -79,10 +77,20 @@ implementation:
 
 debug tools:
 - [X] decoder
-- [] commander
+- [X] commander
 
 TODO(lvd) 
-- []convert temperatures to correct units, fix stm temperature conversion
+- [] convert temperatures to correct units, fix stm temperature conversion
+- [] test command flow more
+- [] time queue latencies
+- [] implement stacktrace and assert for cortexm4
+
+## Implementation
+
+The code is based on a standalone bare metal environment with no dependencies on third party code. 
+The basic design is that of interrupt handlers pushing data into queues which are handled by the main loop.
+
+![Data Flow](doc/dataflow.png)
 
 ## Debugging
 
@@ -91,8 +99,20 @@ on stdin and prints a readable format on stdout, and one that can produce messag
 registers.  
 
 Sample usage:
-    (stty 921600 raw && cat) < /dev/ttyXXX | go run tool/decode.go  
+    (stty 921600 raw && cat) < /dev/ttyXXX | go run tools/decode.go -m
     go run tools/encode.go -- register [value] > /dev/ttyXXX
+
+
+## Heater logic
+
+Final tuning of the function will be done after tests, but the function to be implemented will have this format (Tth = temperature measured by the thermistor):
+
+    For Tth ≤ X° C → P = 10 W (maximum power)
+    For Tth > X° C → P(Tth) = -m*Tth + n (linear function where power decreases when Tth increases).
+
+X = temperature to be determined iaw the requirement of avoiding icing conditions
+m, n = parameters of the linear power function in relation to the measured temperature.
+Ideally the function will reach P = 0 W when moisture is deemed to be no longer present based on the measured temperature (some margins are to be considered). 
 
 
 ## References
@@ -101,7 +121,7 @@ STM Reference documents:
 
 - PM0214 Programming manual STM32 Cortex®-M4 MCUs and MPUs programming manual
 - RM0394 Reference manual STM32L41xxx/42xxx/43xxx/44xxx/45xxx/46xxx advanced Arm®-based 32-bit MCUs
-- DS11451 STM32L432KB STM32L432KC Ultra-low-power Arm® Cortex®-M4 32-bit MCU+FPU, 100DMIPS, up to 256KB Flash, 64KB SRAM, USB FS, analog, audio
+- DS11451 STM32L432Kx Ultra-low-power Arm® Cortex®-M4 32-bit MCU+FPU, 100DMIPS, up to 256KB Flash, 64KB SRAM, USB FS, analog, audio
 - DS11453 STM32L431xx Ultra-low-power Arm® Cortex®-M4 32-bit MCU+FPU, 100DMIPS, up to 256KB Flash, 64KB SRAM, analog, audio
 
 Bosch reference documents:
