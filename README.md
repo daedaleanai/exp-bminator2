@@ -125,12 +125,12 @@ the console can be displayed with
 
 and looks like:
 
-    SWREV:20629261 13242
-    CPUID:410fc241 -13282 -11662 -9326
-    IDCODE:10016435OK.
-    DEVID:20333937:48345016:003f00430 errors.
-    RESET:04 PIN02 50
-    PPLSRC: MSI0744 3024 7987 39 -7 9900 -10230 4285
+    SWREV:20629261
+    CPUID:410fc241
+    IDCODE:10016435.
+    DEVID:20333937:48345016:003f0043
+    RESET:04 PIN
+    PPLSRC: MSI
     cal ts 1037 1378 vref 1661
     BMI088 Accel enabled.
     Starting gyro self test.
