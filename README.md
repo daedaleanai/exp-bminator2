@@ -96,29 +96,6 @@ A guide to the source code is [here](doc/design.md).
 
 ## Debugging
 
-the tools/ subdirectory contains two self contained Go programs, one that can read a serial stream
-on stdin and prints a readable format on stdout, and one that can produce messages to set/get
-registers.  
-
-Sample usage:
-
-    (stty 921600 raw && cat) < /dev/ttyXXX | go run tools/decode.go -m
-    go run tools/encode.go -- register [value] > /dev/ttyXXX
-
-output:
-
-    4m20.000127625s
-    8003    1 451.646390            ID0: [33958182 540227895]
-    8004    1 451.771390            ID1: [1211387926 4128835]
-    8020    1 451.396417           BARO: [24968 97725634]
-    8021    1 451.396417          HUMID: [277121 0]
-    8022    1 451.396392           TEMP: [63431 23500]
-    8032 1625 452.116991       ACCEL_3G: [0.049 0.282 0.958]
-    8039 2018 452.117417  GYRO_250DEG_S: [0.519 -4.227 -2.136]
-    2023/12/09 14:14:29 Command response[36]: tag:0x17 status:0x00
-    2023/12/09 14:14:29     data[0x00000010]: 00 0f 22 4a ff e2 00 34 fe 08 00 80 00 00 00 81
-    2023/12/09 14:14:29                crc32: 12 34 56 78
-
 the console can be displayed with 
 
     reset; (stty $((115200)) raw && cat) < /dev/cu.usbmodem1103
@@ -173,6 +150,28 @@ after which a periodic report looks like:
 
 The period, cumulative and maximum times are in microseconds.
 
+The tools/ subdirectory contains two self contained Go programs, one that can read a serial stream
+on stdin and prints a readable format on stdout, and one that can produce messages to set/get
+registers.  
+
+Sample usage:
+
+    (stty 921600 raw && cat) < /dev/ttyXXX | go run tools/decode.go -m
+    go run tools/encode.go -- register [value] > /dev/ttyXXX
+
+output:
+
+    4m20.000127625s
+    8003    1 451.646390            ID0: [33958182 540227895]
+    8004    1 451.771390            ID1: [1211387926 4128835]
+    8020    1 451.396417           BARO: [24968 97725634]
+    8021    1 451.396417          HUMID: [277121 0]
+    8022    1 451.396392           TEMP: [63431 23500]
+    8032 1625 452.116991       ACCEL_3G: [0.049 0.282 0.958]
+    8039 2018 452.117417  GYRO_250DEG_S: [0.519 -4.227 -2.136]
+    2023/12/09 14:14:29 Command response[36]: tag:0x17 status:0x00
+    2023/12/09 14:14:29     data[0x00000010]: 00 0f 22 4a ff e2 00 34 fe 08 00 80 00 00 00 81
+    2023/12/09 14:14:29                crc32: 12 34 56 78
 
 
 
