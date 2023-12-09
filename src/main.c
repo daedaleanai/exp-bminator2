@@ -223,11 +223,26 @@ void DMA1_CH3_Handler(void) {
 	DMA1.IFCR = isr & 0x0000f00;  // clear pending flags
 }
 
+
+// Spi transaction buffers
+// ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
+// GYRO: cmd, 6 registers, 2dum, stat
+// TEMP: cmd, dum, 2 registers. big endian for some reason
+static uint8_t accel_buf[20] = {0, };					// ACCEL BMI085_ACC_X_LSB
+static uint8_t gyro_buf[10] = { 0, };					// GYRO  BMI085_RATE_X_LSB
+static uint8_t humid_buf[1 + BME280_DATA_LEN] = {0, };	// HUMID BME280_DATA_REG
+static uint32_t overrun_bmx_buf = 0;
+
 // lowest 7 bits of tagreg are the register we're reading or writing
 static void start_spix(uint64_t now, uint16_t addr, uint32_t tagreg, uint8_t *buf, size_t len) {
 	struct SPIXmit *x = spiq_head(&spiq);
 	if (!x) {
 		++dropped_spi1;
+		return;
+	}
+
+	if (x->buf[0] != 0) {
+		++overrun_bmx_buf;
 		return;
 	}
 
@@ -242,14 +257,6 @@ static void start_spix(uint64_t now, uint16_t addr, uint32_t tagreg, uint8_t *bu
 	x->len	  = len;
 	spiq_enq_head(&spiq);
 }
-
-// Spi transaction buffers
-// ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
-// GYRO: cmd, 6 registers, 2dum, stat
-// TEMP: cmd, dum, 2 registers. big endian for some reason
-static uint8_t accel_buf[20];					// ACCEL BMI085_ACC_X_LSB
-static uint8_t gyro_buf[10];					// GYRO  BMI085_RATE_X_LSB
-static uint8_t humid_buf[1 + BME280_DATA_LEN];	// HUMID BME280_DATA_REG
 
 void EXTI1_Handler(void) {
 	uint64_t now = cycleCount();
@@ -511,6 +518,9 @@ void TIM1_UP_TIM16_Handler(void) {
 	printf("dropped  spiq: %8lu evq:%8lu cmdq: %2lu outq: %8lu\e[K\n", dropped_spi1, dropped_evq, dropped_cmdq, dropped_outq);
 	printf("spi1   err tx: %8lu  rx:%8lu\e[K\n", spi1txdmaerr_cnt, spi1rxdmaerr_cnt);
 	printf("usart1 err tx: %8lu  rx:%8lu\e[K\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
+	if (overrun_bmx_buf) {
+		printf("bmxbuf ovfl %lu\e[K\n", overrun_bmx_buf);
+	}
 	if (adc_ovfl) {
 		printf("adc ovfl %lu\e[K\n", adc_ovfl);
 	}
@@ -798,6 +808,7 @@ void main(void) {
 			}
 			NVIC_EnableIRQ(DMA2_CH6_IRQn);	// reception
 
+			x->buf[0] = 0; // signal buffer free to re-use
 			spiq_deq_tail(&spiq);
 			x = spiq_tail(&spiq);
 		}
@@ -827,6 +838,7 @@ void main(void) {
 
 		if (x) {
 			output_bmx(out, x);
+			x->buf[0] = 0; // signal buffer free to re-use
 			spiq_deq_tail(&spiq);
 		} else if (ev) {
 			out->len = ev->len;
