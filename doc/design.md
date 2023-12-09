@@ -54,6 +54,7 @@ Low level device drivers:
     usart.h     a driver for an IRQ driven UART
 
 Device independent facilities:
+
     tprintf.[ch]     a third party printf facility
     binary.h         serializing and deserializing binary messages
     msgq.h           a queue of messages with a fixed maximum size
