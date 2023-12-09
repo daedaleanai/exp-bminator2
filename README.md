@@ -62,12 +62,12 @@ Heater:  Thermistor, GND, Heater10W+, Heater10W-
 - [X] BMI088 Sample Accelerometer at 1600Hz, 3G full scale
 - [X] BMI088 Sample internal temperature at 1Hz
 - [X] BME280 Sample environmental temperature, pressure, humidity at 1Hz
-- [x] Watchdog monitors packets streaming regularily
+- [X] Watchdog monitors packets streaming regularily
 - [X] Timepulse Sampled
 - [] Heater power supply, control algorithm based on thermistor input and current sense.
 - [] Heater state sampled at 8Hz
 - [X] Samples reported over serial port cf ICD
-- [x] Accept commands over serial port
+- [X] Accept commands over serial port
 - [X] Get/set BMI088, BME280
 
 implementation:
@@ -82,6 +82,7 @@ debug tools:
 
 TODO(lvd) 
 - [] convert temperatures to correct units, fix stm temperature conversion
+- [] fix command crc32, but i can't reproduce the coaxpress calculation
 - [] test command flow more
 - [] time queue latencies
 - [] implement stacktrace and assert for cortexm4
