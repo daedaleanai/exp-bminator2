@@ -241,7 +241,7 @@ static void start_spix(uint64_t now, uint16_t addr, uint32_t tagreg, uint8_t *bu
 		return;
 	}
 
-	if (x->buf[0] != 0) {
+	if (buf[0] != 0) { // currently in use
 		++overrun_bmx_buf;
 		return;
 	}

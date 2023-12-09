@@ -31,8 +31,9 @@ the interrupt vector table.
     cortex_m4.h     a trimmed version of the system file provided by ARM for the core used in the STM32L4xx family.
     vectors.c       the interrupt handler vector table, also generated from the SVD.
 
-When the device boots it first loads the stack value from the vector table and jumps to the ResetHandler, which is set up in boot.c.
-For convenience of debugging, simple handlers for all the system traps are defined in fault.c.
+The vector table defines the names of the interrupt handlers, which have a default implementation (weak linkage) that can be overriden
+by defining a function with the right magic name.   When the device boots it first loads the stack value from the vector table and jumps
+to the Reset_Handler, which is defined boot.c. For convenience of debugging, simple handlers for all the system traps are defined in fault.c.
 
     boot.c      the reset handler
     clock.h     definition of cycleCount(), which is our primary means of timekeeping.
