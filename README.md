@@ -92,8 +92,6 @@ TODO(lvd)
 The code is based on a standalone bare metal environment with no dependencies on third party code. 
 The basic design is that of interrupt handlers pushing data into queues which are handled by the main loop.
 
-![Data Flow](doc/dataflow.png)
-
 A guide to the source code is [here](doc/design.md).
 
 ## Debugging
@@ -106,6 +104,72 @@ Sample usage:
 
     (stty 921600 raw && cat) < /dev/ttyXXX | go run tools/decode.go -m
     go run tools/encode.go -- register [value] > /dev/ttyXXX
+
+output:
+    4m20.000127625s
+    8003    1 451.646390            ID0: [33958182 540227895]
+    8004    1 451.771390            ID1: [1211387926 4128835]
+    8020    1 451.396417           BARO: [24968 97725634]
+    8021    1 451.396417          HUMID: [277121 0]
+    8022    1 451.396392           TEMP: [63431 23500]
+    8032 1625 452.116991       ACCEL_3G: [0.049 0.282 0.958]
+    8039 2018 452.117417  GYRO_250DEG_S: [0.519 -4.227 -2.136]
+    2023/12/09 14:14:29 Command response[36]: tag:0x17 status:0x00
+    2023/12/09 14:14:29     data[0x00000010]: 00 0f 22 4a ff e2 00 34 fe 08 00 80 00 00 00 81
+    2023/12/09 14:14:29                crc32: 12 34 56 78
+
+the console can be displayed with 
+    reset; (stty $((115200)) raw && cat) < /dev/cu.usbmodem1103
+
+and looks like: 
+    SWREV:20629261 13242
+    CPUID:410fc241 -13282 -11662 -9326
+    IDCODE:10016435OK.
+    DEVID:20333937:48345016:003f00430 errors.
+    RESET:04 PIN02 50
+    PPLSRC: MSI0744 3024 7987 39 -7 9900 -10230 4285
+    cal ts 1037 1378 vref 1661
+    BMI088 Accel enabled.
+    Starting gyro self test.
+    Detected BMI088
+    Starting accel self test.
+    neutral xyz: 63 394 1278
+    positive xyz: 11621 12865 13250
+    negative xyz: -13285 -11659 -9329
+    Gyro self test OK.
+    BMI08x self test completed with 0 errors.
+    T: 28202 26302 50
+    P: 37156 -10744 3024 7987 39 -7 9900 -10230 4285
+    H: 75 369 0 302 50 30
+    395595 mainloop start
+
+after which a periodic report looks like:
+    uptime 113.395677  Vdd 3721 mV
+    enqueued spiq:   415796 evq:     453 cmdq:  0 outq:   424870
+    dropped  spiq:        0 evq:       0 cmdq:  0 outq:        0
+    spi1   err tx:        0  rx:       0
+    usart1 err tx:        0  rx:       0
+    ------------- count - period - cumul - max
+            IDLE  14938       66  972532   346
+            WAIT
+            MAIN   3683      271   27467  1088
+          REPORT      1   999991     970   970
+          ADCIRQ     32    31249      32     8
+       USART1IRQ   5888      169    3760     4
+     USART1TXDMA   3759      266    2534     4
+     USART1RXDMA
+         SHUTTER
+         GYROIRQ   2036      491    6284     4
+        ACCELIRQ   1641      609    5180     4
+         8HZTICK      8   124998      10     2
+        SPIRXDMA   3679      271    5076     2
+
+    cmdbuf[22] 05 05 05 05 fc fc fc fc 00 00 00 10 23 00 01 00 e9 00 d3 6d 06 61
+    CMDRX read 16 bytes at address 23000100
+
+The period, cumulative and maximum times are in microseconds.
+
+
 
 
 ## Heater logic
