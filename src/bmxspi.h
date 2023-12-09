@@ -7,7 +7,7 @@
 enum BMXFunction { NONE = 0, GYRO, ACCEL, HUMID };
 
 struct bmx_config_t {
-    uint8_t reg, val;
+	uint8_t reg, val;
 };
 
 uint16_t bmx_config(struct SPIQ *spiq, enum BMXFunction bf, const struct bmx_config_t *configs);
@@ -15,8 +15,8 @@ uint16_t bmx_check_config(struct SPIQ *spiq, enum BMXFunction bf, const struct b
 
 // Initialisation functions
 uint16_t bmi_accel_poweron(struct SPIQ *spiq);
-int bmi088_self_test(struct SPIQ *spiq);
-int bme280_self_test(struct SPIQ *spiq, struct LinearisationParameters *bmeParam);
+int		 bmi088_self_test(struct SPIQ *spiq);
+int		 bme280_self_test(struct SPIQ *spiq, struct LinearisationParameters *bmeParam);
 
 uint16_t bmx_readreg(struct SPIQ *q, enum BMXFunction bf, uint8_t reg, uint8_t *val);
 uint16_t bmx_writereg(struct SPIQ *q, enum BMXFunction bf, uint8_t reg, uint8_t val);

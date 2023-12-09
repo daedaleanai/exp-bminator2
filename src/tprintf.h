@@ -11,10 +11,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -48,7 +48,7 @@ void _putchar(char character);
  * \param format A string that specifies the format of the output
  * \return The number of characters that are written into the array, not counting the terminating null character
  */
-int tprintf(const char* format, ...) __attribute__((format(printf, 1, 2)));
+int tprintf(const char *format, ...) __attribute__((format(printf, 1, 2)));
 
 /**
  * Tiny snprintf/vsnprintf implementation
@@ -60,8 +60,8 @@ int tprintf(const char* format, ...) __attribute__((format(printf, 1, 2)));
  *         null character. A value equal or larger than count indicates truncation. Only when the returned value
  *         is non-negative and less than count, the string has been completely written.
  */
-int  sntprintf(char* buffer, size_t count, const char* format, ...) __attribute__((format(printf, 3, 4)));
-int vsntprintf(char* buffer, size_t count, const char* format, va_list va);
+int sntprintf(char *buffer, size_t count, const char *format, ...) __attribute__((format(printf, 3, 4)));
+int vsntprintf(char *buffer, size_t count, const char *format, va_list va);
 
 /**
  * printf with output function
@@ -71,4 +71,4 @@ int vsntprintf(char* buffer, size_t count, const char* format, va_list va);
  * \param format A string that specifies the format of the output
  * \return The number of characters that are sent to the output function, not counting the terminating null character
  */
-int fctprintf(void (*out)(char character, void* arg), void* arg, const char* format, ...) __attribute__((format(printf, 3, 4)));
+int fctprintf(void (*out)(char character, void *arg), void *arg, const char *format, ...) __attribute__((format(printf, 3, 4)));

@@ -1,4 +1,4 @@
-// Print a somewhat informative crash report. 
+// Print a somewhat informative crash report.
 // We assume USART1/2 is up and clocks are running.
 // See PM0214  Section 2.3 for reference on the exception handling of the Cortex M4.
 
@@ -15,12 +15,12 @@ static void putc_(char c) {
 }
 
 // dbg printf can ony handle %s and %x
-static void dbg_printf(const char* fmt, ...) {
+static void dbg_printf(const char *fmt, ...) {
 	va_list va;
 	va_start(va, fmt);
-	char        c;
-	const char* s;
-	uint32_t    x;
+	char		c;
+	const char *s;
+	uint32_t	x;
 	while ((c = *fmt++) != 0) {
 		if (c != '%') {
 			putc_(c);
@@ -31,7 +31,7 @@ static void dbg_printf(const char* fmt, ...) {
 		}
 		switch (c) {
 		case 's':
-			s = va_arg(va, const char*);
+			s = va_arg(va, const char *);
 			while (*s) {
 				putc_(*s++);
 			}
@@ -50,14 +50,14 @@ static void dbg_printf(const char* fmt, ...) {
 	va_end(va);
 }
 
-static const char* const regname[] = {"r0", "r1", "r2", "r3", "r12", "lr", "pc", "psr"};
-static void        dumpstack(uint32_t* stack) {
-    for (int i = 0; i < 8; ++i) {
-        dbg_printf(" %s = 0x%x\n", regname[i], stack[i]);
-    }
+static const char *const regname[] = {"r0", "r1", "r2", "r3", "r12", "lr", "pc", "psr"};
+static void				 dumpstack(uint32_t *stack) {
+				 for (int i = 0; i < 8; ++i) {
+					 dbg_printf(" %s = 0x%x\n", regname[i], stack[i]);
+	 }
 }
 
-static void printflags(uint32_t val, const char* const* flgs, const char* sep) {
+static void printflags(uint32_t val, const char *const *flgs, const char *sep) {
 	int n = 0;
 	while (*flgs && val) {
 		if ((val & 1) && **flgs) {
@@ -69,42 +69,42 @@ static void printflags(uint32_t val, const char* const* flgs, const char* sep) {
 }
 
 // PM0214 sec 4.4.10
-static const char* const cfsrflags[] = {
-    "Instruction access violation",
-    "Data access violation",
-    "",
-    "Memmgr fault on unstacking for a return from exception",
-    "Memmgr fault on stacking for exception entry",
-    "Memmgr fault on floating-point lazy state preservation",
-    "",
-    "Memmgr Fault Address Register valid",
-    "Instruction bus error",
-    "Precise data bus error",
-    "Imprecise data bus error",
-    "Bus fault on unstacking for a return from exception",
-    "Bus fault on stacking for exception entry",
-    "Bus fault on floating-point lazy state preservation",
-    "",
-    "Bus Fault Address Register valid",
-    "Undefined instruction",
-    "Invalid state",
-    "Invalid PC load",
-    "No coprocessor",
-    "",
-    "",
-    "",
-    "",
-    "Unaligned access",
-    "Divide by zero",
-    NULL,
+static const char *const cfsrflags[] = {
+		"Instruction access violation",
+		"Data access violation",
+		"",
+		"Memmgr fault on unstacking for a return from exception",
+		"Memmgr fault on stacking for exception entry",
+		"Memmgr fault on floating-point lazy state preservation",
+		"",
+		"Memmgr Fault Address Register valid",
+		"Instruction bus error",
+		"Precise data bus error",
+		"Imprecise data bus error",
+		"Bus fault on unstacking for a return from exception",
+		"Bus fault on stacking for exception entry",
+		"Bus fault on floating-point lazy state preservation",
+		"",
+		"Bus Fault Address Register valid",
+		"Undefined instruction",
+		"Invalid state",
+		"Invalid PC load",
+		"No coprocessor",
+		"",
+		"",
+		"",
+		"",
+		"Unaligned access",
+		"Divide by zero",
+		NULL,
 };
 
-static void handlefault(uint32_t stack, const char* lbl) __attribute__ ((noreturn));
+static void handlefault(uint32_t stack, const char *lbl) __attribute__((noreturn));
 
-static void handlefault(uint32_t stack, const char* lbl) {
+static void handlefault(uint32_t stack, const char *lbl) {
 	uint32_t cfsr = SCB.CFSR_UFSR_BFSR_MMFSR;
 	dbg_printf("%s FAULT CFSR: %x\n", lbl, cfsr);
-	dumpstack((uint32_t*)stack); 
+	dumpstack((uint32_t *)stack);
 	if (cfsr & SCB_CFSR_UFSR_BFSR_MMFSR_MMARVALID) {
 		dbg_printf("mem fault address = 0x%x\n", SCB.MMFAR);
 	}
@@ -124,10 +124,10 @@ static void handlefault(uint32_t stack, const char* lbl) {
 }
 
 // Declare core exception handlers to omit stack saving prologue
-void HardFault_Handler(void) __attribute__ ((naked));
-void MemoryManagement_Handler(void) __attribute__ ((naked));
-void BusFault_Handler(void) __attribute__ ((naked));
-void UsageFault_Handler(void) __attribute__ ((naked));
+void HardFault_Handler(void) __attribute__((naked));
+void MemoryManagement_Handler(void) __attribute__((naked));
+void BusFault_Handler(void) __attribute__((naked));
+void UsageFault_Handler(void) __attribute__((naked));
 
 // This firmware only uses the Main Stack Pointer.
 void HardFault_Handler(void) { handlefault(__get_MSP(), "HARD"); }

@@ -101,7 +101,6 @@ registers.
 Sample usage:
 
     (stty 921600 raw && cat) < /dev/ttyXXX | go run tools/decode.go -m
-
     go run tools/encode.go -- register [value] > /dev/ttyXXX
 
 

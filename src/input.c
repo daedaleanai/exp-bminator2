@@ -17,18 +17,17 @@ static void hexdump(size_t len, const uint8_t *ptr) {
 }
 
 // receiving command packets on usart1
-struct CommandBuffer cmdbuf = {{}, 0};
+struct CommandBuffer cmdbuf							= {{}, 0};
 static enum { RESYNC, MORE, COMPLETE } cmdbuf_state = RESYNC;
-static size_t cmdpacket_size						 = 0;
+static size_t  cmdpacket_size						= 0;
 static uint8_t cmdspibuf[17];
-
 
 static inline size_t findbyte(uint8_t *buf, size_t buflen, uint8_t b) {
 	size_t i = 0;
 	for (; i < buflen; ++i)
 		if (buf[i] == b)
 			break;
-		
+
 	return i;
 }
 
@@ -55,8 +54,7 @@ static inline uint16_t checksum16(uint8_t *buf, size_t len) {
 // and 0xff for when we can't even reply
 // see ICD table 'Acknowledgement codes'
 static uint8_t checkcmdpacket() {
-
-    uint8_t* buf = cmdbuf.buf;
+	uint8_t *buf = cmdbuf.buf;
 
 	if (cmdbuf.head != cmdpacket_size + 2) {
 		printf("CMDRX: internal error %u != %u + 2\n", cmdbuf.head, cmdpacket_size);
@@ -100,7 +98,7 @@ static uint8_t checkcmdpacket() {
 		return 0x45;
 	}
 
-	uint32_t addr =	decode_be_uint32(cmdbuf.buf + 12);
+	uint32_t addr = decode_be_uint32(cmdbuf.buf + 12);
 	if ((addr & 0xfffffc80) != 0x23000000) {
 		printf("CMDRX: invalid address 0x%08lx\n", addr);
 		return 0x40;
@@ -108,7 +106,7 @@ static uint8_t checkcmdpacket() {
 
 	// write
 	if (buf[8] == 1) {
-		switch(addr & 0xffff) {
+		switch (addr & 0xffff) {
 		case 0x0140:
 		case 0x0141:
 		case 0x02f0:
@@ -137,10 +135,10 @@ static uint8_t checkcmdpacket() {
 		return 0x46;
 	}
 
-	return buf[8] & ~1;	// 0: ok to read, 1: ok to write
+	return buf[8] & ~1;	 // 0: ok to read, 1: ok to write
 }
 
-size_t input_cmdrx(struct MsgQueue* cmdq,  struct SPIQ* spiq) {
+size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
 	switch (cmdbuf_state) {
 	case RESYNC:
 		while (!haspfx(cmdbuf.buf, cmdbuf.head, "IRON", 4)) {
@@ -148,7 +146,7 @@ size_t input_cmdrx(struct MsgQueue* cmdq,  struct SPIQ* spiq) {
 			memmove(cmdbuf.buf, cmdbuf.buf + start, cmdbuf.head - start);
 			cmdbuf.head -= start;
 			if (cmdbuf.head < CMDMINSIZE) {
-                // go get some more characters until we have 20 again
+				// go get some more characters until we have 20 again
 				return CMDMINSIZE - cmdbuf.head;
 			}
 		}
@@ -160,8 +158,8 @@ size_t input_cmdrx(struct MsgQueue* cmdq,  struct SPIQ* spiq) {
 
 		if (cmdpacket_size + 2 > sizeof cmdbuf.buf) {
 			printf("CMDRX: invalid packet size %u, ignoring %d bytes\n", cmdpacket_size, cmdbuf.head);
-            cmdbuf_state = RESYNC;
-            cmdbuf.head	 = 0;
+			cmdbuf_state = RESYNC;
+			cmdbuf.head	 = 0;
 			return CMDMINSIZE;
 		}
 
@@ -186,59 +184,57 @@ size_t input_cmdrx(struct MsgQueue* cmdq,  struct SPIQ* spiq) {
 	printf("\n");
 
 	uint8_t sts = checkcmdpacket();
-    switch (sts) {
-    case 0: // valid read command 
-    case 1: // valid write command 
-		{
-			uint32_t len  = decode_be_uint24(cmdbuf.buf + 9);
-			uint32_t addr =	decode_be_uint32(cmdbuf.buf + 12);
-			printf("CMDRX %s %ld bytes at address %lx", sts ? "write" : "read", len, addr);
+	switch (sts) {
+	case 0:	 // valid read command
+	case 1:	 // valid write command
+	{
+		uint32_t len  = decode_be_uint24(cmdbuf.buf + 9);
+		uint32_t addr = decode_be_uint32(cmdbuf.buf + 12);
+		printf("CMDRX %s %ld bytes at address %lx", sts ? "write" : "read", len, addr);
 
-			// schedule the read or write on the spiq
-			struct SPIXmit *x = spiq_head(spiq);
-			if (x == NULL) {
-				printf("CMDRX: spiq overflow\n");
-				break;
-			}
-
-			cmdspibuf[0] = (addr & 0x7f) | ((sts) ? 0 : 0x80);  // lowest 8 bits: read flag 0x80 + register address
-			if (sts) {
-				memmove(cmdspibuf + 1, cmdbuf.buf + 16, len);
-			} else {
-				memset(cmdspibuf + 1, 0xff, len);
-			}
-
-			x->ts	  = cycleCount();
-			x->tag	  = 0xff000000 | ((uint32_t)cmdbuf.buf[4] << 16) | cmdspibuf[0];
-			x->addr   = (addr >> 8) & 0x3; // bits 10:9 are the device 
-			x->status = -1;
-			x->buf	  = cmdspibuf;
-			x->len	  = 1+len;
-			spiq_enq_head(spiq);
-
+		// schedule the read or write on the spiq
+		struct SPIXmit *x = spiq_head(spiq);
+		if (x == NULL) {
+			printf("CMDRX: spiq overflow\n");
+			break;
 		}
-        break;
 
-    case 0xff:        
+		cmdspibuf[0] = (addr & 0x7f) | ((sts) ? 0 : 0x80);	// lowest 8 bits: read flag 0x80 + register address
+		if (sts) {
+			memmove(cmdspibuf + 1, cmdbuf.buf + 16, len);
+		} else {
+			memset(cmdspibuf + 1, 0xff, len);
+		}
+
+		x->ts	  = cycleCount();
+		x->tag	  = 0xff000000 | ((uint32_t)cmdbuf.buf[4] << 16) | cmdspibuf[0];
+		x->addr	  = (addr >> 8) & 0x3;	// bits 10:9 are the device
+		x->status = -1;
+		x->buf	  = cmdspibuf;
+		x->len	  = 1 + len;
+		spiq_enq_head(spiq);
+
+	} break;
+
+	case 0xff:
 		// packet too messed up to reply
 		printf("CMDRX: ignoring %d bytes\n", cmdbuf.head);
 		break;
 
-    default:
-        // queue error response packet on cmdq
-        struct Msg* msg = msgq_head(cmdq);
+	default:
+		// queue error response packet on cmdq
+		struct Msg *msg = msgq_head(cmdq);
 		if (msg == NULL) {
 			printf("CMDRX: cmdq overflow\n");
 			break;
 		}
 		msg_reset(msg);
-		msg_append32(msg, bytex4(cmdbuf.buf[4])); // the tag
-		msg_append32(msg, bytex4(sts)); // the status
-        msgq_push_head(cmdq);
-
+		msg_append32(msg, bytex4(cmdbuf.buf[4]));  // the tag
+		msg_append32(msg, bytex4(sts));			   // the status
+		msgq_push_head(cmdq);
 	}
 
-    cmdbuf_state = RESYNC;
-    cmdbuf.head	 = 0;
+	cmdbuf_state = RESYNC;
+	cmdbuf.head	 = 0;
 	return CMDMINSIZE;
 }

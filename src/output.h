@@ -23,12 +23,12 @@ enum {
 	EVENTID_GYRO_1000DEG_S = 0x803b,  // BMI085_GYRO_RANGE_1000DEG_S = 0x01,
 	EVENTID_GYRO_2000DEG_S = 0x803c,  // BMI085_GYRO_RANGE_2000DEG_S = 0x00,
 
-	EVENTID_GENERICSPI    = 0x8100,  // + read/writereg, up to 16 bytes of data
+	EVENTID_GENERICSPI = 0x8100,  // + read/writereg, up to 16 bytes of data
 };
 
 // these are set in main
-extern uint32_t						  gyro_hdr;  // which EVENTID_GYRO_xxxDEG_S currently active
-extern uint32_t						  accel_hdr; // which EVENTID_EVENTID_ACCEL_2G currently active
+extern uint32_t						  gyro_hdr;	  // which EVENTID_GYRO_xxxDEG_S currently active
+extern uint32_t						  accel_hdr;  // which EVENTID_EVENTID_ACCEL_2G currently active
 extern struct LinearisationParameters bmeParam;
 
 // convert the SPI xmit messages from communicating with the BMI and BME

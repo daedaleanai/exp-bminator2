@@ -4,12 +4,12 @@
 #include "spi.h"
 
 struct CommandBuffer {
-    uint8_t buf[128]; 
-    size_t head;         
+	uint8_t buf[128];
+	size_t	head;
 };
 
 extern struct CommandBuffer cmdbuf;
 
-enum { CMDMINSIZE = 20 }; // shortest command is 20 characters
+enum { CMDMINSIZE = 20 };  // shortest command is 20 characters
 
-size_t input_cmdrx(struct MsgQueue* cmdq,  struct SPIQ* spiq);
+size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq);
