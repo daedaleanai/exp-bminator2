@@ -106,6 +106,7 @@ Sample usage:
     go run tools/encode.go -- register [value] > /dev/ttyXXX
 
 output:
+
     4m20.000127625s
     8003    1 451.646390            ID0: [33958182 540227895]
     8004    1 451.771390            ID1: [1211387926 4128835]
@@ -119,6 +120,7 @@ output:
     2023/12/09 14:14:29                crc32: 12 34 56 78
 
 the console can be displayed with 
+
     reset; (stty $((115200)) raw && cat) < /dev/cu.usbmodem1103
 
 and looks like:
