@@ -49,8 +49,9 @@ separate CSB (active low).
 | USART1 RX | 2   | 7   | Serial Input      |
 
 ## Connectors
+
 Debug:  USART2TX, SWDIO, SWCLK, nRST, GND, 3V3
-Host: USART1TX, USART1RX, PA15_TIMEPULSE, (HSE Clock source), Power, GND
+Host: USART1TX, USART1RX, PA15_TIMEPULSE, Power, GND
 Heater:  Thermistor, GND, Heater10W+, Heater10W-
 
 
@@ -91,6 +92,8 @@ The code is based on a standalone bare metal environment with no dependencies on
 The basic design is that of interrupt handlers pushing data into queues which are handled by the main loop.
 
 ![Data Flow](doc/dataflow.png)
+
+A guide to the source code is [here](doc/design.md).
 
 ## Debugging
 
