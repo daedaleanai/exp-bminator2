@@ -20,7 +20,6 @@ static void hexdump(size_t len, const uint8_t *ptr) {
 struct CommandBuffer cmdbuf							= {{}, 0};
 static enum { RESYNC, MORE, COMPLETE } cmdbuf_state = RESYNC;
 static size_t  cmdpacket_size						= 0;
-static uint8_t cmdspibuf[17];
 
 static inline size_t findbyte(uint8_t *buf, size_t buflen, uint8_t b) {
 	size_t i = 0;
@@ -199,18 +198,17 @@ size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
 			break;
 		}
 
-		cmdspibuf[0] = (addr & 0x7f) | ((sts) ? 0 : 0x80);	// lowest 8 bits: read flag 0x80 + register address
+		x->buf[0] = (addr & 0x7f) | ((sts) ? 0 : 0x80);	// lowest 8 bits: read flag 0x80 + register address
 		if (sts) {
-			memmove(cmdspibuf + 1, cmdbuf.buf + 16, len);
+			memmove(x->buf + 1, cmdbuf.buf + 16, len);
 		} else {
-			memset(cmdspibuf + 1, 0xff, len);
+			memset(x->buf + 1, 0xff, len);
 		}
 
 		x->ts	  = cycleCount();
-		x->tag	  = 0xff000000 | ((uint32_t)cmdbuf.buf[4] << 16) | cmdspibuf[0];
+		x->tag	  = 0xff000000 | ((uint32_t)cmdbuf.buf[4] << 16) | x->buf[0];
 		x->addr	  = (addr >> 8) & 0x3;	// bits 10:9 are the device
 		x->status = -1;
-		x->buf	  = cmdspibuf;
 		x->len	  = 1 + len;
 		spiq_enq_head(spiq);
 

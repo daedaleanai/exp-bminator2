@@ -1,5 +1,6 @@
 #include "spi.h"
 
+#include <string.h>
 #include "cortex_m4.h"
 #include "nvic.h"
 
@@ -143,7 +144,7 @@ uint16_t spiq_xmit(struct SPIQ *q, uint16_t addr, size_t len, uint8_t *buf) {
 	}
 	x->addr = addr;
 	x->len	= len;
-	x->buf	= buf;
+	memmove(x->buf, buf, len);
 	spiq_enq_head(q);
 	spi_wait(q);
 	if (x != spiq_tail(q)) {
@@ -151,6 +152,7 @@ uint16_t spiq_xmit(struct SPIQ *q, uint16_t addr, size_t len, uint8_t *buf) {
 		return 0xfffe;
 	}
 	uint16_t r = x->status;
+	memmove(buf, x->buf, len);
 	spiq_deq_tail(q);
 	return r;
 }

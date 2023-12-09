@@ -111,11 +111,10 @@ the _head() and _tail() methods give pointers to the elements that will be pushe
 actually advance the head and tail pointers.  If the queue is full or empty head() and tail() return NULL, but for every non-null returned value
 push() and pop() must be called exactly once, similar to malloc/free pairs in standard C code. 
 
-The Ringbuffer and MesgQ come with their own statically allocated storage space.
-
 A third queue structure used is the SPIQ which has 3 pointers: head, current and tail to form two back-to-back queues:  When an element is pushed 
 in at the head, the SPI driver will start the DMA handler and advance the current pointer.  Once the transaction is done, the curr pointer is advanced and
-the result is available at the tail.  Unlike the Ringbuffer and the MesgQ, the SPIQ's elements contain pointers to buffers that have to be (statically)
-allocated elsewhere.  There is no built in protection against a buffer being reused before it has been processed from the tail.
+the result is available at the tail. 
+
+The Ringbuffer, MesgQ and SPIQ structures come with their own statically allocated storage space (sizeof elem->buf) for the elements, defined in their headers.
 
 When interrupt handlers are pushing into the same queue they must not pre-empt eachother, meaning they have to run at the same IRQ group priority. 

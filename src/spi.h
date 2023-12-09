@@ -9,8 +9,8 @@ struct SPIXmit {
 	uint32_t tag;  // tag to remember what this was for after xmit is done
 	uint16_t addr;
 	uint16_t status;
-	uint8_t *buf;
 	size_t	 len;
+	uint8_t  buf[32];
 };
 
 // The following SPI/DMA (rx/tx chan) combinations are available:

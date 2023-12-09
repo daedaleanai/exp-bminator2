@@ -16,6 +16,12 @@ static uint64_t bme_ts		  = 0;
 
 static uint8_t zeroes[4] = {0, 0, 0, 0};
 
+
+// Decoding BMX SPI transaction buffers
+// ACCEL: cmd, dum,  [0x12..0x24): 6 registers for xyz plus 3 for time + 2dum + stat + temp
+// GYRO: cmd, 6 registers, 2dum, stat
+// TEMP: cmd, dum, 2 registers. big endian for some reason
+
 #define MSGTYPE(addr, tag) (((uint16_t)(addr)&0xf) << 8) | ((uint8_t)(tag)&0xff)
 
 void output_bmx(struct Msg *msg, struct SPIXmit *x) {
