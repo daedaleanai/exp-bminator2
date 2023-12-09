@@ -121,7 +121,8 @@ output:
 the console can be displayed with 
     reset; (stty $((115200)) raw && cat) < /dev/cu.usbmodem1103
 
-and looks like: 
+and looks like:
+
     SWREV:20629261 13242
     CPUID:410fc241 -13282 -11662 -9326
     IDCODE:10016435OK.
@@ -144,6 +145,7 @@ and looks like:
     395595 mainloop start
 
 after which a periodic report looks like:
+
     uptime 113.395677  Vdd 3721 mV
     enqueued spiq:   415796 evq:     453 cmdq:  0 outq:   424870
     dropped  spiq:        0 evq:       0 cmdq:  0 outq:        0
