@@ -83,6 +83,7 @@ This document defines the physical, electrical and data interfaces carried over 
 4. The BMInator transmits a stream of event messages with IMU, health and timing information, over a serial port to the Host Unit.
 5. The BMInator transmits responses to commands over the same serial port. 
 6. The BMInator supplies up to 10W of power to a heater element to maintain a preset temperature of an external heating element.
+7. The BMInator's firmware can be updated in a fail-safe atomic way. 
 
 ## Physical interface
 
@@ -166,11 +167,11 @@ Packets may be zero padded to fill up a predefined total packet length, so that 
 | 0x49 0x52 0x4F 0x4E | a magic header consisting of the ASCII characters 'I','R','O','N' in that order |
 | uint16              | a big endian 16 bit byte count, up to 1024, of the following messages           |
 | messages            | a sequence of messages as defined below                                         |
-| uint16              | the sum over all message bytes as a big-endian 16 bit number                    |
+| uint16              | a crc16 all message bytes as defined below                                      |
 
 Packet Format
 
-(The checksum is a simple sum, which is not very resilient against common types of serial errors. consider replacing with a CRC16 in the future.)
+The CRC is computed with the following code: TODO
 
 #### Message Format
 
@@ -195,19 +196,18 @@ Example big-endian encoding of four 8-, two 16-, one 32- or 64-bit values in Wor
 ####  Command Messages (input)
 
 A packet may contain a single command message with the following layout:
-| Word       | Content (hex) | Description                                             |
-| :--------- | :------------ | :------------------------------------------------------ |
-| 0          | 05 05 05 05   | Control command indication – with tag.                  |
-| 1          | 4x Tag        | To be repeated in reply (see below).                    |
-| 2          | Cmd           | Bit 31..24: 0x00 Memory read, 0x01 Memory write         |
-|            | Size          | Bit 23..0: Number of bytes N to read or write           |
-| 3          | Addr          | 32 bit address of data to read or write                 |
-| 3..(N/4)+2 | Data          | for writes: payload data , zero padded to multiple of 4 |
-| (N/4)+3    | CRC32         | 32 bit CRC calculated over data words 1 to N+2.         |
+| Word           | Content (hex) | Description                                             |
+| :------------- | :------------ | :------------------------------------------------------ |
+| 0              | 05 05 05 05   | Control command indication – with tag.                  |
+| 1              | 4x Tag        | To be repeated in reply (see below).                    |
+| 2              | Cmd           | Bit 31..24: 0x00 Memory read, 0x01 Memory write         |
+|                | Size          | Bit 23..0: Number of bytes N to read or write           |
+| 3              | Addr          | 32 bit address of data to read or write                 |
+| 4..((N+3)/4)+3 | Data          | for writes: payload data , zero padded to multiple of 4 |
 
 Control command message format  – with tag  -- cf CoaXPress Standard Version 2.1 p.61 Table 24.
 
-The CRC is the one defined in CoaxPress Standard v 2.2 section 9.2.2.2. which is the Ethernet CRC with some additional byte and bit swapping (TODO).
+Note: The CRC32 defined in CoaxPress Standard v 2.2 section 9.2.2.2. is not appended here.
 
 The Address space for memory read/write commands is defined in the section 'Command Address Space' below
 
@@ -216,16 +216,17 @@ The Address space for memory read/write commands is defined in the section 'Comm
 
 A packet may contain a single acknowledge message with the following layout:
 
-| Word       | Content (hex) | Description                                     |
-| :--------- | :------------ | :---------------------------------------------- |
-| 0          | 06 06 06 06   | Control acknowledge indication – with tag.      |
-| 1          | 4x Tag        | Tag, matching the command being acknowledged.   |
-| 2          | 4x Code       | Acknowledgment code (repeated 4 times)          |
-| 3          | Size          | Number of bytes N in payload                    |
-| 4..(N/4)+3 | Data          | payload data, zero padded to multiple of 4      |
-| (N/4)+4    | CRC32         | 32 bit CRC calculated over data words 1 to N+3. |
+| Word           | Content (hex) | Description                                           |
+| :------------- | :------------ | :---------------------------------------------------- |
+| 0              | 06 06 06 06   | Control acknowledge indication – with tag.            |
+| 1              | 4x Tag        | Tag, matching the command being acknowledged.         |
+| 2              | 4x Code       | Acknowledgment code (repeated 4 times)                |
+| 3              | Size          | for reads: number of bytes N in payload               |
+| 4..((N+3)/4)+3 | Data          | for reads: payload data, zero padded to multiple of 4 |
 
 Acknowledgment message format – with tag  -- cf CoaXPress Standard Version 2.1 p.63 Table 26.
+
+Note: The CRC32 defined in CoaxPress Standard v 2.2 section 9.2.2.2. is not appended here.
 
 
 Acknowledgment codes:
@@ -243,7 +244,7 @@ Acknowledgment codes:
 | 0x47 | Malformed packet.                                                                                               |
 | 0x80 | Failed CRC test in last received command. Other values are reserved for future use.                             |
 
-For all acknowledgment codes other than 0x00 the Size, Data and CRC fields must be omitted.
+For all acknowledgment codes other than 0x00 the Size and Data fields must be omitted.
 
 Acknowledgment messages are sent in reply to a command.
 
@@ -325,4 +326,13 @@ The BMInator defines the following address layout, within a prefix meant to deco
 | prefix 0375        | rw  | BME280 config register 0x75       |
 | prefix 1xxx        | ro  | TODO uC internal variables        |
 | prefix 2xxx        | rw  | TODO Heater Temperature control   |
+| prefix 2xxx        | rw  | TODO Heater Temperature control   |
+| prefix 8xxx        | w   | TODO firmware image update        |
 
+### Firmware updates
+
+The firmware exists in 2 copies, selected by a small bootloader in flash.  The active copy of the firmware
+has a facility to update the alternate copy through the write command.  The bootloader checks the crc32
+of both images and boots the one with the highest serial number.
+
+TODO define crc32 and serial number. 
