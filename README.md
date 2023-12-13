@@ -64,11 +64,12 @@ Heater:  Thermistor, GND, Heater10W+, Heater10W-
 - [X] BME280 Sample environmental temperature, pressure, humidity at 1Hz
 - [X] Watchdog monitors packets streaming regularily
 - [X] Timepulse Sampled
-- [] Heater power supply, control algorithm based on thermistor input and current sense.
-- [] Heater state sampled at 8Hz
+- [ ] Heater power supply, control algorithm based on thermistor input and current sense.
+- [ ] Heater state sampled at 8Hz
 - [X] Samples reported over serial port cf ICD
 - [X] Accept commands over serial port
 - [X] Get/set BMI088, BME280
+- [ ] Firmware upgradeable atomically (through write command)
 
 implementation:
 - [X] boot, clock, gpio, debug console for STM32L43x
@@ -81,11 +82,11 @@ debug tools:
 - [X] commander
 
 TODO(lvd) 
-- [] convert temperatures to correct units, fix stm temperature conversion
-- [] fix command crc32, but i can't reproduce the coaxpress calculation
-- [] test command flow more
-- [] time queue latencies
-- [] implement stacktrace and assert for cortexm4
+- [ ] convert temperatures to correct units, fix stm temperature conversion
+- [ ] remove command crc32, update checksum16 to crc16
+- [ ] test command flow more
+- [ ] time queue latencies
+- [ ] implement stacktrace and assert for cortexm4
 
 ## Implementation
 
