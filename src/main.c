@@ -190,15 +190,15 @@ static volatile uint32_t spi1txdmaerr_cnt = 0;
 
 // spi1_ss is the callback that maps spi addresses to signals on the CSBx pins.
 // GYRO, ACCEL, HUMID
-static const enum GPIO_Pin spiaddr2pin[4] = {BMI_CSB2G_PIN, BMI_CSB1A_PIN, BME_CSB_PIN};
+static const enum GPIO_Pin spiaddr2pin[3] = {BMI_CSB2G_PIN, BMI_CSB1A_PIN, BME_CSB_PIN};
 static void				   spi1_ss(uint16_t addr, int on) {
-				   if ((addr < GYRO) || (addr > HUMID))
+		if ((addr < GYRO) || (addr > HUMID))
 		   return;	// TODO should assert and crash
 	   enum GPIO_Pin pin = spiaddr2pin[addr - GYRO];
-				   if (on) {
-					   digitalLo(pin);
+		if (on) {
+		   digitalLo(pin);
 	   } else {
-					   digitalHi(pin);
+		   digitalHi(pin);
 	   }
 }
 
@@ -222,7 +222,6 @@ void DMA1_CH3_Handler(void) {
 	}
 	DMA1.IFCR = isr & 0x0000f00;  // clear pending flags
 }
-
 
 // lowest 7 bits of tagreg are the register we're reading or writing
 static void start_spix(uint64_t now, uint16_t addr, uint32_t tagreg, size_t len) {
@@ -426,7 +425,7 @@ void USART1_Handler(void) {
 	struct Msg *msg = msgq_tail(&outq);
 	if (msg == NULL) {
 		// queue empty, clear IRQ Enable
-		USART1.CR1 &= ~USART1_CR1_TCIE;
+		USART1.CR1 &= ~USART1_CR1_TCIE;  // why not alwways?
 
 	} else {
 		// queue not empty, start a new transfer
@@ -685,10 +684,10 @@ void main(void) {
 
 	// configure to sample channels 0,9,11,17
 	adc_sqr1_set_l3(&ADC, 4 - 1);  // 4 samples
-	adc_sqr1_set_sq1(&ADC, 0);	   // channel 17, internal temperature
-	adc_sqr1_set_sq2(&ADC, 9);	   // channel 0   Vrefint
-	adc_sqr1_set_sq3(&ADC, 11);	   // channel 9, pin PA4 thermistor
-	adc_sqr1_set_sq4(&ADC, 17);	   // channel 11, pin PA6 current sense
+	adc_sqr1_set_sq1(&ADC, 0);	   // channel  0, Vrefint cf sec 16.4.34 p 448
+	adc_sqr1_set_sq2(&ADC, 9);	   // channel  9, pin PA4 thermistor
+	adc_sqr1_set_sq3(&ADC, 11);	   // channel 11, pin PA6 current sense
+	adc_sqr1_set_sq4(&ADC, 17);	   // channel 17, internal temperature cf 16.4.32 p 444
 
 	adc_smpr1_set_smp0(&ADC, 7);   // 640.5 adc clock cycles 8us
 	adc_smpr1_set_smp9(&ADC, 5);   //  92.5 adc clock cycles 1.2us
@@ -698,8 +697,8 @@ void main(void) {
 	adc_cfgr_set_exten(&ADC, 1);	// trigger on rising edge
 	adc_cfgr_set_extsel(&ADC, 13);	// ext 13 is TIM6 TRGO (see below)
 
-	ADC.CFGR |= ADC_CFGR_AUTDLY;  // without this, more than 3 samples trigger an overflow error
-	ADC.IER = ADC_IER_EOCIE;	  // irq at end of conversion and end of sequence
+	ADC.CFGR |= ADC_CFGR_AUTDLY;  // without this, more than 3 samples trigger an overflow error (this was hard to find)
+	ADC.IER = ADC_IER_EOCIE;	  // irq at end of conversion. the last one will also have EOS bit set, no need for extra IRQ
 	ADC.CR |= ADC_CR_ADSTART;	  // start as soon as the triggers come in from TIM6
 	NVIC_EnableIRQ(ADC1_IRQn);
 
