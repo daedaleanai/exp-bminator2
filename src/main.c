@@ -22,6 +22,7 @@
 #include "bmi08x.h"
 #include "bmxspi.h"
 #include "clock.h"
+#include "crc16.h"
 #include "gpio2.h"
 #include "input.h"
 #include "msgq.h"
@@ -188,18 +189,19 @@ static volatile uint32_t dropped_spi1	  = 0;	// how often we tried to submit a s
 static volatile uint32_t spi1rxdmaerr_cnt = 0;
 static volatile uint32_t spi1txdmaerr_cnt = 0;
 
-// spi1_ss is the callback that maps spi addresses to signals on the CSBx pins.
-// GYRO, ACCEL, HUMID
+// spi1_ss is the callback that maps spi addresses {GYRO, ACCEL, HUMID} to signals on the CSBx pins.
 static const enum GPIO_Pin spiaddr2pin[3] = {BMI_CSB2G_PIN, BMI_CSB1A_PIN, BME_CSB_PIN};
-static void				   spi1_ss(uint16_t addr, int on) {
-		if ((addr < GYRO) || (addr > HUMID))
-		   return;	// TODO should assert and crash
-	   enum GPIO_Pin pin = spiaddr2pin[addr - GYRO];
-		if (on) {
-		   digitalLo(pin);
-	   } else {
-		   digitalHi(pin);
-	   }
+
+static void spi1_ss(uint16_t addr, int on) {
+	if ((addr < GYRO) || (addr > HUMID)) {
+		return;	 // TODO should assert and crash
+	}
+	enum GPIO_Pin pin = spiaddr2pin[addr - GYRO];
+	if (on) {
+		digitalLo(pin);
+	} else {
+		digitalHi(pin);
+	}
 }
 
 // SPI1 RX DMA
@@ -231,7 +233,7 @@ static void start_spix(uint64_t now, uint16_t addr, uint32_t tagreg, size_t len)
 		return;
 	}
 
-	x->buf[0] = tagreg;  // lowest 8 bits: read flag 0x80 + register address
+	x->buf[0] = tagreg;	 // lowest 8 bits: read flag 0x80 + register address
 	memset(x->buf + 1, 0xff, len - 1);
 
 	x->ts	  = now;
@@ -425,7 +427,7 @@ void USART1_Handler(void) {
 	struct Msg *msg = msgq_tail(&outq);
 	if (msg == NULL) {
 		// queue empty, clear IRQ Enable
-		USART1.CR1 &= ~USART1_CR1_TCIE;  // why not alwways?
+		USART1.CR1 &= ~USART1_CR1_TCIE;	 // why not alwways?
 
 	} else {
 		// queue not empty, start a new transfer
@@ -481,11 +483,11 @@ static inline struct Msg *wait_outq(void) {
 	}
 	return m;
 }
-// little helper for the main loop.
+// little helper for the main loop
 static inline void start_outq(void) {
-	__DMB();
-	msgq_push_head(&outq);
-	USART1.CR1 |= USART1_CR1_TCIE;	// start USART1 if neccesary
+	__DMB();						// make sure all writes are committed
+	msgq_push_head(&outq);			// enqueue the message at the head
+	USART1.CR1 |= USART1_CR1_TCIE;	// if necessary start USART1
 }
 
 // A 1Hz report on the queues and all the handlers
@@ -524,7 +526,7 @@ void main(void) {
 	}
 
 	// Enable all the devices we are going to need
-	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN | RCC_AHB1ENR_CRCEN;
+	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
 	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN | RCC_AHB2ENR_ADCEN;
 	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN | RCC_APB1ENR1_TIM7EN | RCC_APB1ENR1_TIM2EN;
 	RCC.APB2ENR |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART1EN | RCC_APB2ENR_TIM16EN;
@@ -563,8 +565,8 @@ void main(void) {
 	usart_wait(&USART2);
 
 	// Set up SPI1 for talking to all the connected chips.
-	spiq_init(&spiq, &SPI1, SPI_5MHz, SPI1_DMA1_CH23, spi1_ss); 
-	NVIC_EnableIRQ(DMA1_CH3_IRQn);						  // only used to count tx errors
+	spiq_init(&spiq, &SPI1, SPI_5MHz, SPI1_DMA1_CH23, spi1_ss);
+	NVIC_EnableIRQ(DMA1_CH3_IRQn);	// only used to count tx errors
 
 	// test and config BMI088
 
@@ -749,9 +751,9 @@ void main(void) {
 	IWDG.KR	 = 0xcccc;	// start watchdog countdown
 
 	enum { PACKETSIZE = 960 };	// 48 messages of 20 bytes.
-	size_t	 packetlen = 0;
-	uint16_t packetchk = 0;
-	uint64_t now	   = cycleCount();
+	size_t	 packetlen   = 0;
+	uint16_t packetcrc16 = 0;
+	uint64_t now	     = cycleCount();
 
 	printf("%lld mainloop start\n", now / C_US);
 
@@ -803,15 +805,15 @@ void main(void) {
 			// send header
 			struct Msg *out = wait_outq();
 			msg_reset(out);
-			msg_append16(out, packetchk);	// of previous packet
+			msg_append16(out, packetcrc16);	// crc16 of previous packet as accumulated in CRC
 			msg_append32(out, 0x49524F4E);	// 'IRON'
 			msg_append16(out, PACKETSIZE);	// of the next packet
 			start_outq();
 
+			packetcrc16 = 0;
+
 			// at 3600 message per second, packets of 48 messages of 20 bytes each should happen at 75Hz
 			IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
-
-			packetchk = 0;
 		}
 
 		struct Msg *out = wait_outq();
@@ -830,9 +832,7 @@ void main(void) {
 		}
 
 		packetlen += out->len;
-		for (size_t i = 0; i < out->len; ++i) {
-			packetchk += out->buf[i];
-		}
+		packetcrc16 = crc_update(packetcrc16, out->buf, out->len);
 
 		start_outq();
 
@@ -844,6 +844,7 @@ void main(void) {
 			out->len = PACKETSIZE - packetlen;
 			bzero(out->buf, out->len);
 			packetlen += out->len;
+			// TODO check: adding zeros should not change crc16
 			start_outq();
 		}
 
@@ -855,10 +856,11 @@ void main(void) {
 				// send header
 				out = wait_outq();
 				msg_reset(out);
-				msg_append16(out, packetchk);
+				msg_append16(out, packetcrc16);
 				msg_append32(out, 0x49524F4E);	// 'IRON'
 				msg_append16(out, 4 + rsp->len);
 				msg_append32(out, 0x06060606);	// tagged command response
+				packetcrc16 = crc_update(0, out->buf + out->len - 4, 4);  // 0x06060606 that was sent out above
 
 				start_outq();
 
@@ -869,10 +871,7 @@ void main(void) {
 				msgq_pop_tail(&cmdq);
 
 				// the chk16 will be sent out with next footer/header
-				packetchk = 4 * 0x06;  // 0x06060606 that was sent out above
-				for (size_t i = 0; i < out->len; ++i) {
-					packetchk += out->buf[i];
-				}
+				packetcrc16 = crc_update(packetcrc16, out->buf, out->len);
 
 				start_outq();
 			}

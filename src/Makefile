@@ -28,7 +28,9 @@ OBJS = \
 	bme280.o \
 	output.o \
 	input.o \
+	crc16.o \
 	main.o \
+
 
 $(OBJS): Makefile 
 
