@@ -77,9 +77,6 @@ static uint8_t checkcmdpacket() {
 		return 0xff;
 	}
 
-	// todo: crc32 over whole packet
-	// if bad: return 0x80
-
 	// tag:cmdbuf[4:8] should be 4x same byte
 	if ((buf[4] != buf[5]) || (buf[4] != buf[6]) || (buf[4] != buf[7])) {
 		return 0x47;

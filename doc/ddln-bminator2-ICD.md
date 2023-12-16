@@ -171,7 +171,7 @@ Packets may be zero padded to fill up a predefined total packet length, so that 
 
 Packet Format
 
-The CRC is computed with the following code: TODO
+The CRC is computed with the xmodem polynomial 0x1021, initial value 0, no reflection or xoring.
 
 #### Message Format
 
@@ -206,6 +206,8 @@ A packet may contain a single command message with the following layout:
 | 4..((N+3)/4)+3 | Data          | for writes: payload data , zero padded to multiple of 4 |
 
 Control command message format  – with tag  -- cf CoaXPress Standard Version 2.1 p.61 Table 24.
+
+The maximum number supported of bytes to read or write in this is 16, making for a maximum message size of 8 32-bit words or 32 bytes.
 
 Note: The CRC32 defined in CoaxPress Standard v 2.2 section 9.2.2.2. is not appended here.
 
