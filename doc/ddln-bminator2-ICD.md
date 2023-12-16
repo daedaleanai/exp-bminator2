@@ -196,16 +196,16 @@ Example big-endian encoding of four 8-, two 16-, one 32- or 64-bit values in Wor
 ####  Command Messages (input)
 
 A packet may contain a single command message with the following layout:
-| Word           | Content (hex) | Description                                             |
-| :------------- | :------------ | :------------------------------------------------------ |
-| 0              | 05 05 05 05   | Control command indication – with tag.                  |
-| 1              | 4x Tag        | To be repeated in reply (see below).                    |
-| 2              | Cmd           | Bit 31..24: 0x00 Memory read, 0x01 Memory write         |
-|                | Size          | Bit 23..0: Number of bytes N to read or write           |
-| 3              | Addr          | 32 bit address of data to read or write                 |
-| 4..((N+3)/4)+3 | Data          | for writes: payload data , zero padded to multiple of 4 |
+| Word           | Content (hex) | Description                                            |
+| :------------- | :------------ | :----------------------------------------------------- |
+| 0              | 05 05 05 05   | Control command indication – with tag.                 |
+| 1              | 4x Tag        | To be repeated in reply (see below).                   |
+| 2              | Cmd           | Bit 31..24: 0x00 Memory read, 0x01 Memory write        |
+|                | Size          | Bit 23..0: Number of bytes N to read or write          |
+| 3              | Addr          | 32 bit address of data to read or write                |
+| 4..((N+3)/4)+3 | Data          | for writes: payload data, zero padded to multiple of 4 |
 
-Control command message format  – with tag  -- cf CoaXPress Standard Version 2.1 p.61 Table 24.
+Control command message format – with tag -- cf CoaXPress Standard Version 2.1 p.61 Table 24.
 
 The maximum number supported of bytes to read or write in this is 16, making for a maximum message size of 8 32-bit words or 32 bytes.
 

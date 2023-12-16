@@ -421,16 +421,16 @@ void USART1_Handler(void) {
 	if ((USART1.ISR & USART1_ISR_TC) == 0) {
 		return;
 	}
-
 	rt_start(&usart1irq_rt, cycleCount());
 
 	struct Msg *msg = msgq_tail(&outq);
 	if (msg == NULL) {
 		// queue empty, clear IRQ Enable
-		USART1.CR1 &= ~USART1_CR1_TCIE;	 // why not alwways?
+		USART1.CR1 &= ~USART1_CR1_TCIE;
 
 	} else {
 		// queue not empty, start a new transfer
+		// TODO(lvd) it's not entirely clear to me why we must only clear TC flag in this case
 		USART1.ICR |= USART1_ICR_TCCF;	// clear irq flag
 
 		DMA2.CCR6 = 0;
