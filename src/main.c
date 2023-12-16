@@ -133,8 +133,9 @@ static struct {
 // RunTimers keep track of how often and how long certain blocks of code run
 // There's typically one for each IRQ handler, for the main loop and for the idle
 // wait.  the TIM16 handler dumps a report every second.
-static struct RunTimer spiqlatency_rt = {"spiqlatency", 0, 0, 0, 0, NULL};
-static struct RunTimer spirxdma_rt	  = {"SPIRXDMA", 0, 0, 0, 0, &spiqlatency_rt};
+static struct RunTimer spixmit_rt     = {"spiq_xmit", 0, 0, 0, 0, NULL};        // latency between enq and xmit done
+static struct RunTimer spiqdeq_rt 	  = {"spiq_deq", 0, 0, 0, 0, &spixmit_rt};  // latency between enq and deq
+static struct RunTimer spirxdma_rt	  = {"SPIRXDMA", 0, 0, 0, 0, &spiqdeq_rt};
 static struct RunTimer periodic8hz_rt = {"8HZTICK", 0, 0, 0, 0, &spirxdma_rt};
 static struct RunTimer accelirq_rt	  = {"ACCELIRQ", 0, 0, 0, 0, &periodic8hz_rt};
 static struct RunTimer gyroirq_rt	  = {"GYROIRQ", 0, 0, 0, 0, &accelirq_rt};
@@ -207,13 +208,20 @@ static void spi1_ss(uint16_t addr, int on) {
 
 // SPI1 RX DMA
 void DMA1_CH2_Handler(void) {
-	rt_start(&spirxdma_rt, cycleCount());
+	uint64_t now = cycleCount();
 	uint32_t isr = DMA1.ISR;
 	if (isr & DMA1_ISR_TEIF2) {
 		++spi1rxdmaerr_cnt;
 	}
 	DMA1.IFCR = isr & 0x00000f0;  // clear pending flags
+
+	// account for spiq time spent between enq and deq 
+	rt_start(&spixmit_rt, spiq.elem[spiq.curr % 8].ts);
+	rt_stop(&spixmit_rt, now);
+
 	spi_rx_dma_handler(&spiq);	  // see spi.c
+
+	rt_start(&spirxdma_rt, now);
 	rt_stop(&spirxdma_rt, cycleCount());
 }
 
@@ -824,9 +832,9 @@ void main(void) {
 			output_bmx(out, x);
 			spiq_deq_tail(&spiq);
 
-			// account for spiq time spent in a run-timer
-			rt_start(&spiqlatency_rt, x->ts);
-			rt_stop(&spiqlatency_rt, cycleCount());
+			// account for spiq time spent between enq and deq 
+			rt_start(&spiqdeq_rt, x->ts);
+			rt_stop(&spiqdeq_rt, cycleCount());
 
 		} else if (ev) {
 			out->len = ev->len;

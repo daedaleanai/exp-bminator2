@@ -126,30 +126,34 @@ and looks like:
 
 after which a periodic report looks like:
 
-    uptime 113.395677  Vdd 3721 mV
-    enqueued spiq:   415796 evq:     453 cmdq:  0 outq:   424870
+    uptime 21.396482  Vdd 3729 mV
+    enqueued spiq:    77389 evq:      85 cmdq:  0 outq:    79036
     dropped  spiq:        0 evq:       0 cmdq:  0 outq:        0
     spi1   err tx:        0  rx:       0
     usart1 err tx:        0  rx:       0
     ------------- count - period - cumul - max
-            IDLE  14938       66  972532   346
+            IDLE  14986       66  960088   288
             WAIT
-            MAIN   3683      271   27467  1088
-          REPORT      1   999991     970   970
+            MAIN   3688      271   39894  1100
+          REPORT      1   999997    1088  1088
           ADCIRQ     32    31249      32     8
-       USART1IRQ   5888      169    3760     4
-     USART1TXDMA   3759      266    2534     4
+       USART1IRQ   5886      169    3798     4
+     USART1TXDMA   3764      265    2235     4
      USART1RXDMA
          SHUTTER
-         GYROIRQ   2036      491    6284     4
-        ACCELIRQ   1641      609    5180     4
-         8HZTICK      8   124998      10     2
-        SPIRXDMA   3679      271    5076     2
+         GYROIRQ   2038      490    6309     4
+        ACCELIRQ   1644      608    5185     4
+         8HZTICK      8   124999      10     2
+        SPIRXDMA   3684      271    6701     3
+        spiq_deq   3683      271  132143  1294
+       spiq_xmit   3684      271  100780    51
 
     cmdbuf[18] 05 05 05 05 fc fc fc fc 00 00 00 10 23 00 01 00 e9 00
     CMDRX read 16 bytes at address 23000100
 
 The period, cumulative and maximum times are in microseconds.
+The cumulative time must be divided by the count to get the average time spent.
+The spiq_xmit and spiq_deq timers measure the time spent between the enqueueing irq and the time the SPI transaction is done, resp dequeued in the main loop.
 
 The tools/ subdirectory contains two self contained Go programs, one that can read a serial stream
 on stdin and prints a readable format on stdout, and one that can produce messages to set/get
