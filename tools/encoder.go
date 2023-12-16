@@ -8,15 +8,11 @@ import (
 
 func main() {
 
-	tag := rand.Uint32() & 0xff
-	tag = tag<<8 | tag
-	tag = tag<<16 | tag
-
 	packet := []uint32{
-		0x05050505, // tagged command
-		tag,        // random tag
-		0x00000010, // read 16 bytes
-		0x23000100, // from gyro address space
+		bytex4(0x5),                 // tagged command
+		bytex4(byte(rand.Uint32())), // random tag
+		0x00000010,                  // read 16 bytes
+		0x23000100,                  // from gyro address space
 	}
 
 	os.Stdout.WriteString("IRON")
@@ -24,6 +20,13 @@ func main() {
 	binary.Write(os.Stdout, binary.BigEndian, packet)
 	binary.Write(os.Stdout, binary.BigEndian, crc_update(0, packet))
 
+}
+
+func bytex4(b uint8) (r uint32) {
+	r = uint32(b)
+	r |= r << 8
+	r |= r << 16
+	return r
 }
 
 var crc_table = [256]uint16{
