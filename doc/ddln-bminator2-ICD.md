@@ -171,7 +171,7 @@ Packets may be zero padded to fill up a predefined total packet length, so that 
 
 Packet Format
 
-The CRC is computed with the xmodem polynomial 0x1021, initial value 0, no reflection or xoring.
+The CRC is computed with the xmodem polynomial 0x1021, initial value 0, no reflection or xoring, and appended MSB first (big-endian).
 
 #### Message Format
 

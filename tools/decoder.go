@@ -294,7 +294,7 @@ func main() {
 
 			sz := (word0 >> 16) - 4
 			if sz > 32 {
-				log.Printf("Invalid message length %x", sz)
+				log.Printf("Invalid message length 0x%x (%d)", sz, sz)
 				break
 			}
 			var pldbuf [32]byte

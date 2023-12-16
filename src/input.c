@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "clock.h"
+#include "crc16.h"
 #include "input.h"
 #include "tprintf.h"
 
@@ -41,14 +42,6 @@ static inline int haspfx(uint8_t *buf, size_t buflen, uint8_t *pfx, size_t pfxle
 	return 1;
 }
 
-static inline uint16_t checksum16(uint8_t *buf, size_t len) {
-	uint16_t chk = 0;
-	for (size_t i = 0; i < len; ++i)
-		chk += buf[i];
-
-	return chk;
-}
-
 // return  0,1 for ok, other codes for not ok replies
 // and 0xff for when we can't even reply
 // see ICD table 'Acknowledgement codes'
@@ -60,7 +53,7 @@ static uint8_t checkcmdpacket() {
 		return 0xff;
 	}
 
-	uint16_t chk  = checksum16(buf, cmdbuf.head - 2);
+	uint16_t chk  = crc_update(0, buf, cmdbuf.head - 2);
 	uint16_t chk2 = decode_be_uint16(buf + cmdbuf.head - 2);
 	if (chk != chk2) {
 		printf("CMDRX: invalid packet checksum %u, expected %u\n", chk2, chk);

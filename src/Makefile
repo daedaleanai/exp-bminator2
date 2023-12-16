@@ -70,7 +70,7 @@ boot.o: cortex_m4.h stm32l4xx.h clock.h
 crc16.o: crc16.h
 fault.o: cortex_m4.h stm32l4xx.h
 gpio2.o: gpio2.h stm32l4xx.h
-input.o: clock.h stm32l4xx.h input.h msgq.h binary.h spi.h tprintf.h
+input.o: clock.h stm32l4xx.h crc16.h input.h msgq.h binary.h spi.h tprintf.h
 main.o: cortex_m4.h stm32l4xx.h binary.h bmi08x.h bmxspi.h bme280.h spi.h clock.h crc16.h gpio2.h input.h msgq.h nvic.h output.h runtimer.h tprintf.h
 main.o: usart.h ringbuffer.h
 output.o: output.h msgq.h binary.h spi.h stm32l4xx.h bme280.h bmi08x.h bmxspi.h
