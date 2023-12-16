@@ -82,7 +82,7 @@ debug tools:
 - [X] commander
 
 TODO(lvd) 
-- [ ] convert temperatures to correct units, fix stm temperature conversion
+- [ ] convert temperatures to correct units, check/fix stm temperature conversion
 - [ ] make BMx registers all read only, make special registers to set accel/gyro sample rate and range
 - [ ] test command flow more
 - [ ] time queue latencies

@@ -133,7 +133,8 @@ static struct {
 // RunTimers keep track of how often and how long certain blocks of code run
 // There's typically one for each IRQ handler, for the main loop and for the idle
 // wait.  the TIM16 handler dumps a report every second.
-static struct RunTimer spirxdma_rt	  = {"SPIRXDMA", 0, 0, 0, 0, NULL};
+static struct RunTimer spiqlatency_rt = {"spiqlatency", 0, 0, 0, 0, NULL};
+static struct RunTimer spirxdma_rt	  = {"SPIRXDMA", 0, 0, 0, 0, &spiqlatency_rt};
 static struct RunTimer periodic8hz_rt = {"8HZTICK", 0, 0, 0, 0, &spirxdma_rt};
 static struct RunTimer accelirq_rt	  = {"ACCELIRQ", 0, 0, 0, 0, &periodic8hz_rt};
 static struct RunTimer gyroirq_rt	  = {"GYROIRQ", 0, 0, 0, 0, &accelirq_rt};
@@ -822,6 +823,11 @@ void main(void) {
 		if (x) {
 			output_bmx(out, x);
 			spiq_deq_tail(&spiq);
+
+			// account for spiq time spent in a run-timer
+			rt_start(&spiqlatency_rt, x->ts);
+			rt_stop(&spiqlatency_rt, cycleCount());
+
 		} else if (ev) {
 			out->len = ev->len;
 			memmove(out->buf, ev->buf, ev->len);
