@@ -146,7 +146,7 @@ after which a periodic report looks like:
          8HZTICK      8   124998      10     2
         SPIRXDMA   3679      271    5076     2
 
-    cmdbuf[22] 05 05 05 05 fc fc fc fc 00 00 00 10 23 00 01 00 e9 00 d3 6d 06 61
+    cmdbuf[18] 05 05 05 05 fc fc fc fc 00 00 00 10 23 00 01 00 e9 00
     CMDRX read 16 bytes at address 23000100
 
 The period, cumulative and maximum times are in microseconds.
@@ -170,9 +170,8 @@ output:
     8022    1 451.396392           TEMP: [63431 23500]
     8032 1625 452.116991       ACCEL_3G: [0.049 0.282 0.958]
     8039 2018 452.117417  GYRO_250DEG_S: [0.519 -4.227 -2.136]
-    2023/12/09 14:14:29 Command response[36]: tag:0x17 status:0x00
+    2023/12/09 14:14:29 Command response[32]: tag:0x17 status:0x00
     2023/12/09 14:14:29     data[0x00000010]: 00 0f 22 4a ff e2 00 34 fe 08 00 80 00 00 00 81
-    2023/12/09 14:14:29                crc32: 12 34 56 78
 
 
 
