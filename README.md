@@ -83,7 +83,7 @@ debug tools:
 
 TODO(lvd) 
 - [ ] convert temperatures to correct units, fix stm temperature conversion
-- [ ] remove command crc32, update checksum16 to crc16
+- [X] remove command crc32, update checksum16 to crc16
 - [ ] test command flow more
 - [ ] time queue latencies
 - [ ] implement stacktrace and assert for cortexm4

@@ -485,7 +485,7 @@ static inline struct Msg *wait_outq(void) {
 }
 // little helper for the main loop
 static inline void start_outq(void) {
-	__DMB();						// make sure all writes are committed
+	__DMB();						// make sure all writes are committed so the DMA sees them
 	msgq_push_head(&outq);			// enqueue the message at the head
 	USART1.CR1 |= USART1_CR1_TCIE;	// if necessary start USART1
 }
