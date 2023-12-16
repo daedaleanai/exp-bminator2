@@ -746,8 +746,8 @@ void main(void) {
 
 	// Initialize the independent watchdog
 	IWDG.KR	 = 0x5555;	// enable watchdog config
-	IWDG.PR	 = 0;		// prescaler /4 -> 10khz
-	IWDG.RLR = 3200;	// count to 3200 -> 320ms timeout
+	IWDG.PR	 = 0;		// prescaler 32KHz/4 -> 8khz
+	IWDG.RLR = 128;		// count to 128 -> 1/(64Hz) timeout
 	IWDG.KR	 = 0xcccc;	// start watchdog countdown
 
 	enum { PACKETSIZE = 960 };	// 48 messages of 20 bytes.
@@ -813,7 +813,8 @@ void main(void) {
 			packetcrc16 = 0;
 
 			// at 3600 message per second, packets of 48 messages of 20 bytes each should happen at 75Hz
-			IWDG.KR = 0xAAAA;  // pet the watchdog TODO check all subsystems
+			// the watchdog will trigger if we drop below 64Hz, so we have time to insert a command response
+			IWDG.KR = 0xAAAA;  // pet the watchdog 
 		}
 
 		struct Msg *out = wait_outq();

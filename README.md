@@ -83,7 +83,7 @@ debug tools:
 
 TODO(lvd) 
 - [ ] convert temperatures to correct units, fix stm temperature conversion
-- [X] remove command crc32, update checksum16 to crc16
+- [ ] make BMx registers all read only, make special registers to set accel/gyro sample rate and range
 - [ ] test command flow more
 - [ ] time queue latencies
 - [ ] implement stacktrace and assert for cortexm4
