@@ -53,7 +53,7 @@ static uint8_t checkcmdpacket() {
 		return 0xff;
 	}
 
-	uint16_t chk  = crc_update(0, buf, cmdbuf.head - 2);
+	uint16_t chk  = crc16_update(0, buf, cmdbuf.head - 2);
 	uint16_t chk2 = decode_be_uint16(buf + cmdbuf.head - 2);
 	if (chk != chk2) {
 		printf("CMDRX: invalid packet checksum %u, expected %u\n", chk2, chk);

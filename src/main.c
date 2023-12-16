@@ -833,7 +833,7 @@ void main(void) {
 		}
 
 		packetlen += out->len;
-		packetcrc16 = crc_update(packetcrc16, out->buf, out->len);
+		packetcrc16 = crc16_update(packetcrc16, out->buf, out->len);
 
 		start_outq();
 
@@ -861,7 +861,7 @@ void main(void) {
 				msg_append32(out, 0x49524F4E);	// 'IRON'
 				msg_append16(out, 4 + rsp->len);
 				msg_append32(out, 0x06060606);	// tagged command response
-				packetcrc16 = crc_update(0, out->buf + out->len - 4, 4);  // 0x06060606 that was sent out above
+				packetcrc16 = crc16_update(0, out->buf + out->len - 4, 4);  // 0x06060606 that was sent out above
 
 				start_outq();
 
@@ -872,7 +872,7 @@ void main(void) {
 				msgq_pop_tail(&cmdq);
 
 				// the chk16 will be sent out with next footer/header
-				packetcrc16 = crc_update(packetcrc16, out->buf, out->len);
+				packetcrc16 = crc16_update(packetcrc16, out->buf, out->len);
 
 				start_outq();
 			}
