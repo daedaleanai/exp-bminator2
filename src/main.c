@@ -524,7 +524,7 @@ void main(void) {
 	}
 
 	// Enable all the devices we are going to need
-	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
+	RCC.AHB1ENR |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN | RCC_AHB1ENR_CRCEN;
 	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN | RCC_AHB2ENR_ADCEN;
 	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM6EN | RCC_APB1ENR1_TIM7EN | RCC_APB1ENR1_TIM2EN;
 	RCC.APB2ENR |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_USART1EN | RCC_APB2ENR_TIM16EN;
@@ -563,7 +563,7 @@ void main(void) {
 	usart_wait(&USART2);
 
 	// Set up SPI1 for talking to all the connected chips.
-	spiq_init(&spiq, &SPI1, 3, SPI1_DMA1_CH23, spi1_ss);  // 4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+	spiq_init(&spiq, &SPI1, SPI_5MHz, SPI1_DMA1_CH23, spi1_ss); 
 	NVIC_EnableIRQ(DMA1_CH3_IRQn);						  // only used to count tx errors
 
 	// test and config BMI088

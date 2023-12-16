@@ -13,7 +13,7 @@ struct DMA_Channel {
 };
 #undef __IO
 
-// indexed by enum SPIQ_DMA dma
+// indexed by enum spi_dma_t dma
 static struct {
 	struct DMA_Channel *rx;
 	struct DMA_Channel *tx;
@@ -38,7 +38,7 @@ static inline int enq_empty(struct SPIQ *q) { return q->head == q->curr; }	// no
 static inline int deq_empty(struct SPIQ *q) { return q->curr == q->tail; }	// no more to dequeue
 static inline int enq_full(struct SPIQ *q) { return q->head == q->tail + NELEM(q->elem); }
 
-void spiq_init(struct SPIQ *q, struct SPI1_Type *spi, uint8_t clock_div, enum SPIQ_DMA dma, spi_slave_select_func_t ss_func) {
+void spiq_init(struct SPIQ *q, struct SPI1_Type *spi, enum spi_clock_div_t clock_div, enum spiq_dma_t dma, spi_slave_select_func_t ss_func) {
 	q->spi	   = spi;
 	q->dma	   = dma;
 	q->ss_func = ss_func;

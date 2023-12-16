@@ -15,7 +15,7 @@ struct SPIXmit {
 
 // The following SPI/DMA (rx/tx chan) combinations are available:
 // cf RM0394 section 11.3 p298 table 14, 15
-enum SPIQ_DMA {
+enum spiq_dma_t {
 	SPI1_DMA1_CH23,	 // C2S=1 C3S=1
 	SPI2_DMA1_CH45,	 // C4S=1 C5S=1
 	SPI3_DMA2_CH12,	 // C1S=3 C2S=3
@@ -33,7 +33,7 @@ typedef void spi_slave_select_func_t(uint16_t addr, int on);
 // background after which te result can be popped off the queue again.
 struct SPIQ {
 	struct SPI1_Type		*spi;
-	enum SPIQ_DMA			 dma;
+	enum spiq_dma_t			 dma;
 	spi_slave_select_func_t *ss_func;
 
 	// a ringbuffer with one element between head and tail
@@ -44,11 +44,14 @@ struct SPIQ {
 	struct SPIXmit	  elem[8];	// must be power of 2 to make the indexing % size efficient.
 };
 
+// For HCLK 80Mhz:  4: 80MHz/32 = 2.5Mhz, 3: 80MHz/16 = 5MHz.
+enum spi_clock_div_t {  SPI_10MHz = 2, SPI_5MHz = 3, SPI_2_5MHZ = 4 };
+
 // Initializes the SPIQ structure and sets up for use with spi as master,
 // read/write, 8-bit transfers, pol/pha = 00 with the given clock divisor.
 // valid values for div are 0...7 for divisor f/(2^(div+1))
 // If ss_func is non-null, the NSS mechanism is disabled.
-void spiq_init(struct SPIQ *q, struct SPI1_Type *spi, uint8_t clock_div, enum SPIQ_DMA dma, spi_slave_select_func_t ss_func);
+void spiq_init(struct SPIQ *q, struct SPI1_Type *spi, enum spi_clock_div_t clock_div, enum spiq_dma_t dma, spi_slave_select_func_t ss_func);
 
 // Call this function in the RX DMA handler as follows:
 //
