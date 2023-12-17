@@ -39,6 +39,9 @@ RMA0394 Section 6.1.1 p.182 'External Clock (HSE Bypass)'
 The SPI1 bus connects SCK, MISO, MOSI to the BMI088 and BME280. They each require their own
 separate CSB (active low).
 
+TODO(lvd): Kaya version has PA3 USART2 RX debug serial console and PA11 bmi088 INT3 (EXTI11).
+
+
 ## DMA Mappings
 
 | Device    | DMA | Ch  | Function          |
