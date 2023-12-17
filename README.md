@@ -99,7 +99,7 @@ A guide to the source code is [here](doc/design.md).
 
 the console can be displayed with 
 
-    reset; (stty $((115200)) raw && cat) < /dev/cu.usbmodem1103
+    reset; (stty $15200 raw && cat) < /dev/cu.usbmodem1103
 
 and looks like:
 
@@ -154,6 +154,7 @@ after which a periodic report looks like:
 The period, cumulative and maximum times are in microseconds.
 The cumulative time must be divided by the count to get the average time spent.
 The spiq_xmit and spiq_deq timers measure the time spent between the enqueueing irq and the time the SPI transaction is done, resp dequeued in the main loop.
+The IDLE and MAIN counters should add up to 1M microseconds per second, the REPORT until SPIRXDMA all run during the IDLE time, the WAIT runs during the MAIN timer.
 
 The tools/ subdirectory contains two self contained Go programs, one that can read a serial stream
 on stdin and prints a readable format on stdout, and one that can produce messages to set/get

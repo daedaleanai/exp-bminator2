@@ -51,3 +51,19 @@ void sort8u32(uint32_t a[8]) {
     CMP_SWAP(2, 6); CMP_SWAP(3, 7); CMP_SWAP(2, 4); CMP_SWAP(3, 5);
     CMP_SWAP(1, 2); CMP_SWAP(3, 4); CMP_SWAP(5, 6);
 }
+
+
+
+
+	printf("crc sw: %x\n", crc16_update(0,"IRON", 4));
+
+		CRC.CR = 0;
+		crc_cr_set_polysize(&CRC, 1); 16 bits
+		CRC.INIT = 0;
+		CRC.POL = 0x1021;
+		CRC.CR |= CRC_CR_RESET;
+		CRC.DR8 = 'I';
+		CRC.DR8 = 'R';
+		CRC.DR8 = 'O';
+		CRC.DR8 = 'N';
+		printf("crc hw: %lx\n", CRC.DR32);

@@ -1206,7 +1206,11 @@ inline uint32_t comp_comp2_csr_get_comp2_pwrmode(struct COMP_Type* p) { return (
 
 /* Cyclic redundancy check calculation unit */
 struct CRC_Type {
-	__IO uint32_t DR; // @0 Data register
+	union { // WARNING HAND EDITED
+		__IO uint32_t DR32; // @0 Data register
+		__IO uint16_t DR16; // @0 Data register
+		__IO uint8_t DR8; // @0 Data register
+	};
 	__IO uint8_t IDR; // @4 Independent data register
 	 uint8_t RESERVED0[3]; // @5 
 	__IO uint8_t CR; // @8 Control register

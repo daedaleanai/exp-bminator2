@@ -573,6 +573,7 @@ void main(void) {
 	printf("cal ts %u %u vref %u\n", TS_CAL1, TS_CAL2, VREFINT);
 	usart_wait(&USART2);
 
+
 	// Set up SPI1 for talking to all the connected chips.
 	spiq_init(&spiq, &SPI1, SPI_5MHz, SPI1_DMA1_CH23, spi1_ss);
 	NVIC_EnableIRQ(DMA1_CH3_IRQn);	// only used to count tx errors
@@ -814,7 +815,7 @@ void main(void) {
 			// send header
 			struct Msg *out = wait_outq();
 			msg_reset(out);
-			msg_append16(out, packetcrc16);	// crc16 of previous packet as accumulated in CRC
+			msg_append16(out, packetcrc16);	// crc16 of previous packet
 			msg_append32(out, 0x49524F4E);	// 'IRON'
 			msg_append16(out, PACKETSIZE);	// of the next packet
 			start_outq();
