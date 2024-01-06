@@ -211,7 +211,7 @@ static void spi1_ss(uint16_t addr, int on) {
 void DMA1_CH2_Handler(void) {
 	uint64_t now = cycleCount();
 	uint32_t isr = DMA1.ISR;
-	if (isr & DMA1_ISR_TEIF2) {
+	if (isr & DMA_ISR_TEIF2) {
 		++spi1rxdmaerr_cnt;
 	}
 	DMA1.IFCR = isr & 0x00000f0;  // clear pending flags
@@ -229,7 +229,7 @@ void DMA1_CH2_Handler(void) {
 // SPI1 TX DMA only used to count errors
 void DMA1_CH3_Handler(void) {
 	uint32_t isr = DMA1.ISR;
-	if (isr & DMA1_ISR_TEIF3) {
+	if (isr & DMA_ISR_TEIF3) {
 		++spi1txdmaerr_cnt;
 	}
 	DMA1.IFCR = isr & 0x0000f00;  // clear pending flags
@@ -413,11 +413,11 @@ void DMA2_CH6_Handler(void) {
 	rt_start(&usart1txdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
 	DMA2.IFCR	 = isr & 0x00f00000;
-	if (isr & DMA1_ISR_TEIF6) {
+	if (isr & DMA_ISR_TEIF6) {
 		++usart1txdmaerr_cnt;
 	}
 
-	if (isr & DMA1_ISR_TCIF6) {
+	if (isr & DMA_ISR_TCIF6) {
 		if (msgq_tail(&outq)) {
 			msgq_pop_tail(&outq);
 		}
@@ -428,7 +428,7 @@ void DMA2_CH6_Handler(void) {
 
 void USART1_Handler(void) {
 	// Transmission Complete
-	if ((USART1.ISR & USART1_ISR_TC) == 0) {
+	if ((USART1.ISR & UART_ISR_TC) == 0) {
 		return;
 	}
 	rt_start(&usart1irq_rt, cycleCount());
@@ -436,19 +436,19 @@ void USART1_Handler(void) {
 	struct Msg *msg = msgq_tail(&outq);
 	if (msg == NULL) {
 		// queue empty, clear IRQ Enable
-		USART1.CR1 &= ~USART1_CR1_TCIE;
+		USART1.CR1 &= ~UART_CR1_TCIE;
 
 	} else {
 		// queue not empty, start a new transfer
 		// TODO(lvd) it's not entirely clear to me why we must only clear TC flag in this case
-		USART1.ICR |= USART1_ICR_TCCF;	// clear irq flag
+		USART1.ICR |= UART_ICR_TCCF;	// clear irq flag
 
 		DMA2.CCR6 = 0;
-		dma1_cselr_set_c6s(&DMA2, 2);  // select usart1 for dma2 ch6
+		dma_cselr_set_c6s(&DMA2, 2);  // select usart1 for dma2 ch6
 		DMA2.CPAR6	= (uintptr_t)&USART1.TDR;
 		DMA2.CMAR6	= (uintptr_t)msg->buf;
 		DMA2.CNDTR6 = msg->len;
-		DMA2.CCR6	= DMA1_CCR6_DIR | DMA1_CCR6_TEIE | DMA1_CCR6_TCIE | DMA1_CCR6_EN | DMA1_CCR6_MINC;
+		DMA2.CCR6	= DMA_CCR6_DIR | DMA_CCR6_TEIE | DMA_CCR6_TCIE | DMA_CCR6_EN | DMA_CCR6_MINC;
 	}
 
 	rt_stop(&usart1irq_rt, cycleCount());
@@ -458,12 +458,12 @@ void USART1_Handler(void) {
 // set CC7 to run at higher priority level compared to ch6 (CCR PL bits)
 static void usart1_start_rx(size_t len) {
 	DMA2.CCR7 = 0;
-	dma1_cselr_set_c7s(&DMA2, 2);  // select usart1 for dma2 ch7
+	dma_cselr_set_c7s(&DMA2, 2);  // select usart1 for dma2 ch7
 	DMA2.CPAR7 = (uintptr_t)&USART1.RDR;
 	DMA2.CMAR7 = (uintptr_t)cmdbuf.buf + cmdbuf.head;
 	cmdbuf.head += len;
 	DMA2.CNDTR7 = len;
-	DMA2.CCR7	= DMA1_CCR7_PL | DMA1_CCR7_TEIE | DMA1_CCR7_TCIE | DMA1_CCR7_EN | DMA1_CCR7_MINC;
+	DMA2.CCR7	= DMA_CCR7_PL | DMA_CCR7_TEIE | DMA_CCR7_TCIE | DMA_CCR7_EN | DMA_CCR7_MINC;
 }
 
 // USART1 RX: irq on dma error or reception complete
@@ -471,11 +471,11 @@ void DMA2_CH7_Handler(void) {
 	rt_start(&usart1rxdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
 	DMA2.IFCR	 = isr & 0x0f000000;  // clear all pending
-	if (isr & DMA1_ISR_TEIF7) {
+	if (isr & DMA_ISR_TEIF7) {
 		++usart1rxdmaerr_cnt;
 	}
 
-	if (isr & DMA1_ISR_TCIF7) {
+	if (isr & DMA_ISR_TCIF7) {
 		size_t n = input_cmdrx(&cmdq, &spiq);
 		usart1_start_rx(n);
 	}
@@ -497,7 +497,7 @@ static inline struct Msg *wait_outq(void) {
 static inline void start_outq(void) {
 	__DMB();						// make sure all writes are committed so the DMA sees them
 	msgq_push_head(&outq);			// enqueue the message at the head
-	USART1.CR1 |= USART1_CR1_TCIE;	// if necessary start USART1
+	USART1.CR1 |= UART_CR1_TCIE;	// if necessary start USART1
 }
 
 // A 1Hz report on the queues and all the handlers
@@ -569,8 +569,8 @@ void main(void) {
 	printf("DEVID:%08lx:%08lx:%08lx\n", UNIQUE_DEVICE_ID[2], UNIQUE_DEVICE_ID[1], UNIQUE_DEVICE_ID[0]);
 	printf("RESET:%02x%s%s%s%s%s%s\n", rf, rf & 0x80 ? " LPWR" : "", rf & 0x40 ? " WWDG" : "", rf & 0x20 ? " IWDG" : "",
 		   rf & 0x10 ? " SFT" : "", rf & 0x08 ? " POR" : "", rf & 0x04 ? " PIN" : "");
-	printf("PPLSRC: %s%s\n", pplsrcstr[rcc_pllcfgr_get_pllsrc(&RCC)],
-		   (RCC.CR & RCC_CR_HSEBYP) && (rcc_pllcfgr_get_pllsrc(&RCC) == 3) ? " (CK_IN)" : "");
+	printf("PPLSRC: %s%s\n", pplsrcstr[rcc_pllcfgr_get_pllsrc()],
+		   (RCC.CR & RCC_CR_HSEBYP) && (rcc_pllcfgr_get_pllsrc() == 3) ? " (CK_IN)" : "");
 	printf("cal ts %u %u vref %u\n", TS_CAL1, TS_CAL2, VREFINT);
 	usart_wait(&USART2);
 
@@ -653,9 +653,9 @@ void main(void) {
 	USART1.CR2 = 0;
 	USART1.CR3 = 0;
 	USART1.BRR = ((80000000 + 921600 / 2) / 921600);
-	USART1.CR3 = USART1_CR3_DMAT | USART1_CR3_DMAR;	 // enable DMA output and input
+	USART1.CR3 = UART_CR3_DMAT | UART_CR3_DMAR;	 // enable DMA output and input
 	usart1_start_rx(CMDMINSIZE);
-	USART1.CR1 = USART1_CR1_UE | USART1_CR1_TE | USART1_CR1_RE;
+	USART1.CR1 = UART_CR1_UE | UART_CR1_TE | UART_CR1_RE;
 	NVIC_EnableIRQ(DMA2_CH6_IRQn);	// reception
 	NVIC_EnableIRQ(DMA2_CH7_IRQn);	// transmission
 	NVIC_EnableIRQ(USART1_IRQn);
@@ -675,8 +675,8 @@ void main(void) {
 	NVIC_EnableIRQ(TIM2_IRQn);
 
 	// ADC
-	rcc_ccipr_set_adcsel(&RCC, 3);					// System clock selected as ADCs clock  6.4.27
-	adc12_common_ccr_set_ckmode(&ADC12_Common, 1);	// HCLK, 80MHz
+	rcc_ccipr_set_adcsel(3);					// System clock selected as ADCs clock  6.4.27
+	adc_common_ccr_set_ckmode(1);	// HCLK, 80MHz
 
 	ADC.CR &= ~ADC_CR_DEEPPWD;	// end deep power down
 	ADC.CR |= ADC_CR_ADVREGEN;	// enable voltage regulator
@@ -693,22 +693,22 @@ void main(void) {
 	}
 
 	// Enable VRef on chan 0 and Temp Sens on chan 17
-	ADC12_Common.CCR |= ADC12_COMMON_CCR_VSENSESEL | ADC12_COMMON_CCR_VREFEN;
+	ADC12_Common.CCR |= ADC_COMMON_CCR_VSENSESEL | ADC_COMMON_CCR_VREFEN;
 
 	// configure to sample channels 0,9,11,17
-	adc_sqr1_set_l3(&ADC, 4 - 1);  // 4 samples
-	adc_sqr1_set_sq1(&ADC, 0);	   // channel  0, Vrefint cf sec 16.4.34 p 448
-	adc_sqr1_set_sq2(&ADC, 9);	   // channel  9, pin PA4 thermistor
-	adc_sqr1_set_sq3(&ADC, 11);	   // channel 11, pin PA6 current sense
-	adc_sqr1_set_sq4(&ADC, 17);	   // channel 17, internal temperature cf 16.4.32 p 444
+	adc_sqr1_set_l3(4 - 1);  // 4 samples
+	adc_sqr1_set_sq1(0);	   // channel  0, Vrefint cf sec 16.4.34 p 448
+	adc_sqr1_set_sq2(9);	   // channel  9, pin PA4 thermistor
+	adc_sqr1_set_sq3(11);	   // channel 11, pin PA6 current sense
+	adc_sqr1_set_sq4(17);	   // channel 17, internal temperature cf 16.4.32 p 444
 
-	adc_smpr1_set_smp0(&ADC, 7);   // 640.5 adc clock cycles 8us
-	adc_smpr1_set_smp9(&ADC, 5);   //  92.5 adc clock cycles 1.2us
-	adc_smpr2_set_smp11(&ADC, 5);  //  92.5 adc clock cycles 1.2us
-	adc_smpr2_set_smp17(&ADC, 7);  // 640.5 adc clock cycles 8us
+	adc_smpr1_set_smp0(7);   // 640.5 adc clock cycles 8us
+	adc_smpr1_set_smp9(5);   //  92.5 adc clock cycles 1.2us
+	adc_smpr2_set_smp11(5);  //  92.5 adc clock cycles 1.2us
+	adc_smpr2_set_smp17(7);  // 640.5 adc clock cycles 8us
 
-	adc_cfgr_set_exten(&ADC, 1);	// trigger on rising edge
-	adc_cfgr_set_extsel(&ADC, 13);	// ext 13 is TIM6 TRGO (see below)
+	adc_cfgr_set_exten(1);	// trigger on rising edge
+	adc_cfgr_set_extsel(13);	// ext 13 is TIM6 TRGO (see below)
 
 	ADC.CFGR |= ADC_CFGR_AUTDLY;  // without this, more than 3 samples trigger an overflow error (this was hard to find)
 	ADC.IER = ADC_IER_EOCIE;	  // irq at end of conversion. the last one will also have EOS bit set, no need for extra IRQ

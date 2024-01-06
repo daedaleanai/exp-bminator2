@@ -9,7 +9,7 @@
 
 // putc_ has the only reference to the used USART in this file.
 static void putc_(char c) {
-	while ((USART2.ISR & USART1_ISR_TXE) == 0)
+	while ((USART2.ISR & UART_ISR_TXE) == 0)
 		__NOP();
 	USART2.TDR = c;
 }

@@ -32,7 +32,7 @@ typedef void spi_slave_select_func_t(uint16_t addr, int on);
 // The user can push transactions into the queue which will be executed in the
 // background after which te result can be popped off the queue again.
 struct SPIQ {
-	struct SPI1_Type		*spi;
+	struct SPI_Type		*spi;
 	enum spiq_dma_t			 dma;
 	spi_slave_select_func_t *ss_func;
 
@@ -51,7 +51,7 @@ enum spi_clock_div_t {  SPI_10MHz = 2, SPI_5MHz = 3, SPI_2_5MHZ = 4 };
 // read/write, 8-bit transfers, pol/pha = 00 with the given clock divisor.
 // valid values for div are 0...7 for divisor f/(2^(div+1))
 // If ss_func is non-null, the NSS mechanism is disabled.
-void spiq_init(struct SPIQ *q, struct SPI1_Type *spi, enum spi_clock_div_t clock_div, enum spiq_dma_t dma, spi_slave_select_func_t ss_func);
+void spiq_init(struct SPIQ *q, struct SPI_Type *spi, enum spi_clock_div_t clock_div, enum spiq_dma_t dma, spi_slave_select_func_t ss_func);
 
 // Call this function in the RX DMA handler as follows:
 //

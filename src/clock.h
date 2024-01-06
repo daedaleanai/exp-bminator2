@@ -10,11 +10,11 @@ enum { CLOCKSPEED_HZ = 80000000, C_US = CLOCKSPEED_HZ / 1000000 };
 extern volatile uint64_t clockticks;
 
 // return the current time as measured in cpu cycles since initCycleCount was called.
-inline uint64_t cycleCount(void) { return clockticks - stk_val_get_current(&STK); }
+static inline uint64_t cycleCount(void) { return clockticks - stk_val_get_current(); }
 
 // spinlock using the systick
 // usec = 10...1000000 (.01 ms ..  1s)
-inline void delay(uint32_t usec) {
+static inline void delay(uint32_t usec) {
 	uint64_t then = cycleCount() + C_US * usec;
 	while (cycleCount() < then)
 		;

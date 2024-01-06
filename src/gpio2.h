@@ -177,7 +177,7 @@ void gpioConfig(enum GPIO_Pin pins, enum GPIO_Conf mode);
 uint32_t gpioLock(enum GPIO_Pin pins);
 
 extern union GPIO_Page {
-	struct GPIOA_Type gpio;
+	struct GPIOE_Type gpio;
 	struct {
 		uint8_t bytes[0x400];
 	} page;

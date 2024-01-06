@@ -38,7 +38,7 @@ static inline int enq_empty(struct SPIQ *q) { return q->head == q->curr; }	// no
 static inline int deq_empty(struct SPIQ *q) { return q->curr == q->tail; }	// no more to dequeue
 static inline int enq_full(struct SPIQ *q) { return q->head == q->tail + NELEM(q->elem); }
 
-void spiq_init(struct SPIQ *q, struct SPI1_Type *spi, enum spi_clock_div_t clock_div, enum spiq_dma_t dma, spi_slave_select_func_t ss_func) {
+void spiq_init(struct SPIQ *q, struct SPI_Type *spi, enum spi_clock_div_t clock_div, enum spiq_dma_t dma, spi_slave_select_func_t ss_func) {
 	q->spi	   = spi;
 	q->dma	   = dma;
 	q->ss_func = ss_func;
@@ -46,39 +46,39 @@ void spiq_init(struct SPIQ *q, struct SPI1_Type *spi, enum spi_clock_div_t clock
 
 	spi->CR1 = 0;
 	// 8 bit master mode
-	spi->CR1 = SPI1_CR1_MSTR | ((clock_div & 0x7) << 3);
-	spi->CR2 = SPI1_CR2_FRXTH | SPI1_CR2_RXDMAEN | SPI1_CR2_TXDMAEN;
+	spi->CR1 = SPI_CR1_MSTR | ((clock_div & 0x7) << 3);
+	spi->CR2 = SPI_CR2_FRXTH | SPI_CR2_RXDMAEN | SPI_CR2_TXDMAEN;
 
 	if (ss_func != NULL) {
-		spi->CR1 |= SPI1_CR1_SSM | SPI1_CR1_SSI;
+		spi->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI;
 	} else {
-		spi->CR2 |= SPI1_CR2_SSOE;
+		spi->CR2 |= SPI_CR2_SSOE;
 	}
 
 	switch (dma) {
 	case SPI1_DMA1_CH23:  // C2S=1 C3S=1
-		dma1_cselr_set_c2s(&DMA1, 1);
-		dma1_cselr_set_c3s(&DMA1, 1);
+		dma_cselr_set_c2s(&DMA1, 1);
+		dma_cselr_set_c3s(&DMA1, 1);
 		break;
 	case SPI2_DMA1_CH45:  // C4S=1 C5S=1
-		dma1_cselr_set_c4s(&DMA1, 1);
-		dma1_cselr_set_c5s(&DMA1, 1);
+		dma_cselr_set_c4s(&DMA1, 1);
+		dma_cselr_set_c5s(&DMA1, 1);
 		break;
 	case SPI3_DMA2_CH12:  // C1S=3 C2S=3
-		dma1_cselr_set_c1s(&DMA2, 3);
-		dma1_cselr_set_c2s(&DMA2, 3);
+		dma_cselr_set_c1s(&DMA2, 3);
+		dma_cselr_set_c2s(&DMA2, 3);
 		break;
 	case SPI1_DMA2_CH34:  // C3S=4 C4S=4
-		dma1_cselr_set_c3s(&DMA2, 4);
-		dma1_cselr_set_c4s(&DMA2, 4);
+		dma_cselr_set_c3s(&DMA2, 4);
+		dma_cselr_set_c4s(&DMA2, 4);
 		break;
 	}
 
 	NVIC_EnableIRQ(irqn[q->dma]);
 }
 
-inline static void spidmamove(struct SPI1_Type *spi, struct DMA_Channel *dmach, uint8_t *mem, size_t len) {
-	dmach->CCR	 = DMA1_CCR1_MINC;	// all defaults, disable, except the Memory Increment flag
+inline static void spidmamove(struct SPI_Type *spi, struct DMA_Channel *dmach, uint8_t *mem, size_t len) {
+	dmach->CCR	 = DMA_CCR1_MINC;	// all defaults, disable, except the Memory Increment flag
 	dmach->CNDTR = len;
 	dmach->CPAR	 = (uint32_t)&spi->DR;
 	dmach->CMAR	 = (uint32_t)mem;
@@ -92,16 +92,16 @@ static void startxmit(struct SPIQ *q) {
 	}
 
 	spidmamove(q->spi, dmach[q->dma].rx, x->buf, x->len);
-	dmach[q->dma].rx->CCR |= DMA1_CCR1_TEIE | DMA1_CCR1_TCIE | DMA1_CCR1_EN;
+	dmach[q->dma].rx->CCR |= DMA_CCR1_TEIE | DMA_CCR1_TCIE | DMA_CCR1_EN;
 
 	spidmamove(q->spi, dmach[q->dma].tx, x->buf, x->len);
-	dmach[q->dma].tx->CCR |= DMA1_CCR1_TEIE | DMA1_CCR1_DIR | DMA1_CCR1_EN;
+	dmach[q->dma].tx->CCR |= DMA_CCR1_TEIE | DMA_CCR1_DIR | DMA_CCR1_EN;
 
-	q->spi->CR1 |= SPI1_CR1_SPE;
+	q->spi->CR1 |= SPI_CR1_SPE;
 }
 
 // idle == not enabled. start_xmit sets enable, dma irq handler clears it.
-static inline int spi_idle(struct SPI1_Type *spi) { return (spi->CR1 & SPI1_CR1_SPE) ? 0 : 1; }
+static inline int spi_idle(struct SPI_Type *spi) { return (spi->CR1 & SPI_CR1_SPE) ? 0 : 1; }
 
 void spiq_enq_head(struct SPIQ *q) {
 	q->head++;
@@ -118,7 +118,7 @@ void spiq_enq_head(struct SPIQ *q) {
 void spi_rx_dma_handler(struct SPIQ *q) {
 	struct SPIXmit *x = q->elem + (q->curr % NELEM(q->elem));
 	x->status		  = q->spi->SR & 0xf0;
-	q->spi->CR1 &= ~SPI1_CR1_SPE;
+	q->spi->CR1 &= ~SPI_CR1_SPE;
 	if (q->ss_func != NULL) {
 		q->ss_func(x->addr, 0);
 	}
