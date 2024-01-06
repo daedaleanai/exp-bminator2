@@ -6,5936 +6,6808 @@
 #include <stdint.h>
 
 enum IRQn_Type {
-	None_IRQn  = -16, // 0 position of estack reset pointer
-	Reset_IRQn = -15, // 1 Reset, not a real IRQ           
+	None_IRQn  = -16,  // 0 position of estack reset pointer
+	Reset_IRQn = -15,  // 1 Reset, not a real IRQ
 
-	//  Cortex-CM4 Processor Exceptions Numbers 
-	NonMaskableInt_IRQn   = -14, // 2 Non Maskable Interrupt                           
-	Reserved_3_IRQn       = -13,
-	MemoryManagement_IRQn = -12, // 4 Memory Management Interrupt            
-	BusFault_IRQn         = -11, // 5 Bus Fault Interrupt                    
-	UsageFault_IRQn       = -10, // 6 Usage Fault Interrupt                  
-	Reserved_7_IRQn       = -9,
-	Reserved_8_IRQn       = -8,
-	Reserved_9_IRQn       = -7,
-	Reserved_10_IRQn      = -6,
-	SVCall_IRQn           = -5, // 11 SV Call Interrupt                     
-	DebugMonitor_IRQn     = -4, // 12 Debug Monitor Interrupt               
-	Reserved_13_IRQn      = -3,
-	PendSV_IRQn           = -2, // 14 Pend SV Interrupt                     
-	SysTick_IRQn          = -1, // 15 System Tick Interrupt                 
+	//  Cortex-CM4 Processor Exceptions Numbers
+	NonMaskableInt_IRQn	  = -14,  // 2 Non Maskable Interrupt
+	Reserved_3_IRQn		  = -13,
+	MemoryManagement_IRQn = -12,  // 4 Memory Management Interrupt
+	BusFault_IRQn		  = -11,  // 5 Bus Fault Interrupt
+	UsageFault_IRQn		  = -10,  // 6 Usage Fault Interrupt
+	Reserved_7_IRQn		  = -9,
+	Reserved_8_IRQn		  = -8,
+	Reserved_9_IRQn		  = -7,
+	Reserved_10_IRQn	  = -6,
+	SVCall_IRQn			  = -5,	 // 11 SV Call Interrupt
+	DebugMonitor_IRQn	  = -4,	 // 12 Debug Monitor Interrupt
+	Reserved_13_IRQn	  = -3,
+	PendSV_IRQn			  = -2,	 // 14 Pend SV Interrupt
+	SysTick_IRQn		  = -1,	 // 15 System Tick Interrupt
 
 	//  Device specific Interrupt Numbers
-	WWDG_IRQn = 0, // Window Watchdog interrupt
-	PVD_PVM_IRQn = 1, // PVD through EXTI line detection
-	RTC_TAMP_STAMP_IRQn = 2, // Tamper and TimeStamp interrupts
-	RTC_WKUP_IRQn = 3, // RTC Tamper or TimeStamp /CSS on LSE through EXTI line 19 interrupts
-	FLASH_IRQn = 4, // Flash global interrupt
-	RCC_IRQn = 5, // RCC global interrupt
-	EXTI0_IRQn = 6, // EXTI Line 0 interrupt
-	EXTI1_IRQn = 7, // EXTI Line 1 interrupt
-	EXTI2_IRQn = 8, // EXTI Line 2 interrupt
-	EXTI3_IRQn = 9, // EXTI Line 3 interrupt
-	EXTI4_IRQn = 10, // EXTI Line4 interrupt
-	DMA1_CH1_IRQn = 11, // DMA1 Channel1 global interrupt
-	DMA1_CH2_IRQn = 12, // DMA1 Channel2 global interrupt
-	DMA1_CH3_IRQn = 13, // DMA1 Channel3 interrupt
-	DMA1_CH4_IRQn = 14, // DMA1 Channel4 interrupt
-	DMA1_CH5_IRQn = 15, // DMA1 Channel5 interrupt
-	DMA1_CH6_IRQn = 16, // DMA1 Channel6 interrupt
-	DMA1_CH7_IRQn = 17, // DMA1 Channel 7 interrupt
-	ADC1_IRQn = 18, // ADC1 and ADC2 global interrupt
-	CAN1_TX_IRQn = 19, // CAN1 TX interrupts
-	CAN1_RX0_IRQn = 20, // CAN1 RX0 interrupts
-	CAN1_RX1_IRQn = 21, // CAN1 RX1 interrupts
-	CAN1_SCE_IRQn = 22, // CAN1 SCE interrupt
-	EXTI9_5_IRQn = 23, // EXTI Line5 to Line9 interrupts
-	TIM1_BRK_TIM15_IRQn = 24, // Timer 15 global interrupt
-	TIM1_UP_TIM16_IRQn = 25, // Timer 16 global interrupt
-	TIM1_TRG_COM_IRQn = 26, // TIM1 trigger and commutation interrupt
-	TIM1_CC_IRQn = 27, // TIM1 Capture Compare interrupt
-	TIM2_IRQn = 28, // TIM2 global interrupt
-	TIM3_IRQn = 29, // TIM3 global interrupt
-	I2C1_EV_IRQn = 31, // I2C1 event interrupt
-	I2C1_ER_IRQn = 32, // I2C1 error interrupt
-	I2C2_EV_IRQn = 33, // I2C2 event interrupt
-	I2C2_ER_IRQn = 34, // I2C2 error interrupt
-	SPI1_IRQn = 35, // SPI1 global interrupt
-	SPI2_IRQn = 36, // SPI2 global interrupt
-	USART1_IRQn = 37, // USART1 global interrupt
-	USART2_IRQn = 38, // USART2 global interrupt
-	USART3_IRQn = 39, // USART2 global interrupt
-	EXTI15_10_IRQn = 40, // EXTI Lines 10 to 15 interrupts
-	RTC_ALARM_IRQn = 41, // RTC alarms through EXTI line 18 interrupts
-	SPI3_IRQn = 51, // SPI3 global Interrupt
-	UART4_IRQn = 52, // UART4 global Interrupt
-	TIM6_DACUNDER_IRQn = 54, // TIM6 global and DAC1 and 2 underrun error interrupts
-	TIM7_IRQn = 55, // TIM7 global interrupt
-	DMA2_CH1_IRQn = 56, // DMA2 Channel 1 global Interrupt
-	DMA2_CH2_IRQn = 57, // DMA2 Channel 2 global Interrupt
-	DMA2_CH3_IRQn = 58, // DMA2 Channel 3 global Interrupt
-	DMA2_CH4_IRQn = 59, // DMA2 Channel 4 global Interrupt
-	DMA2_CH5_IRQn = 60, // DMA2 Channel 5 global Interrupt
-	COMP_IRQn = 64, // COMP1 and COMP2 interrupts
-	LPTIM1_IRQn = 65, // LP TIM1 interrupt
-	LPTIM2_IRQn = 66, // LP TIM2 interrupt
-	DMA2_CH6_IRQn = 68, // DMA2 Channel 6 global Interrupt
-	DMA2_CH7_IRQn = 69, // DMA2 Channel 7 global Interrupt
-	LPUART1_IRQn = 70, // LPUART1 global interrupt
-	I2C3_EV_IRQn = 72, // I2C3 event interrupt
-	I2C3_ER_IRQn = 73, // I2C3 error interrupt
-	FPU_IRQn = 81, // Floating point interrupt
-	CRS_IRQn = 82, // CRS interrupt
-	I2C4_EV_IRQn = 83, // I2C4 event interrupt, wakeup through EXTI
+	WWDG_IRQn			= 0,   // Window Watchdog interrupt
+	PVD_PVM_IRQn		= 1,   // PVD through EXTI line detection
+	RTC_TAMP_STAMP_IRQn = 2,   // Tamper and TimeStamp interrupts
+	RTC_WKUP_IRQn		= 3,   // RTC Tamper or TimeStamp /CSS on LSE through EXTI line 19 interrupts
+	FLASH_IRQn			= 4,   // Flash global interrupt
+	RCC_IRQn			= 5,   // RCC global interrupt
+	EXTI0_IRQn			= 6,   // EXTI Line 0 interrupt
+	EXTI1_IRQn			= 7,   // EXTI Line 1 interrupt
+	EXTI2_IRQn			= 8,   // EXTI Line 2 interrupt
+	EXTI3_IRQn			= 9,   // EXTI Line 3 interrupt
+	EXTI4_IRQn			= 10,  // EXTI Line4 interrupt
+	DMA1_CH1_IRQn		= 11,  // DMA1 Channel1 global interrupt
+	DMA1_CH2_IRQn		= 12,  // DMA1 Channel2 global interrupt
+	DMA1_CH3_IRQn		= 13,  // DMA1 Channel3 interrupt
+	DMA1_CH4_IRQn		= 14,  // DMA1 Channel4 interrupt
+	DMA1_CH5_IRQn		= 15,  // DMA1 Channel5 interrupt
+	DMA1_CH6_IRQn		= 16,  // DMA1 Channel6 interrupt
+	DMA1_CH7_IRQn		= 17,  // DMA1 Channel 7 interrupt
+	ADC1_IRQn			= 18,  // ADC1 and ADC2 global interrupt
+	CAN1_TX_IRQn		= 19,  // CAN1 TX interrupts
+	CAN1_RX0_IRQn		= 20,  // CAN1 RX0 interrupts
+	CAN1_RX1_IRQn		= 21,  // CAN1 RX1 interrupts
+	CAN1_SCE_IRQn		= 22,  // CAN1 SCE interrupt
+	EXTI9_5_IRQn		= 23,  // EXTI Line5 to Line9 interrupts
+	TIM1_BRK_TIM15_IRQn = 24,  // Timer 15 global interrupt
+	TIM1_UP_TIM16_IRQn	= 25,  // Timer 16 global interrupt
+	TIM1_TRG_COM_IRQn	= 26,  // TIM1 trigger and commutation interrupt
+	TIM1_CC_IRQn		= 27,  // TIM1 Capture Compare interrupt
+	TIM2_IRQn			= 28,  // TIM2 global interrupt
+	TIM3_IRQn			= 29,  // TIM3 global interrupt
+	I2C1_EV_IRQn		= 31,  // I2C1 event interrupt
+	I2C1_ER_IRQn		= 32,  // I2C1 error interrupt
+	I2C2_EV_IRQn		= 33,  // I2C2 event interrupt
+	I2C2_ER_IRQn		= 34,  // I2C2 error interrupt
+	SPI1_IRQn			= 35,  // SPI1 global interrupt
+	SPI2_IRQn			= 36,  // SPI2 global interrupt
+	USART1_IRQn			= 37,  // USART1 global interrupt
+	USART2_IRQn			= 38,  // USART2 global interrupt
+	USART3_IRQn			= 39,  // USART2 global interrupt
+	EXTI15_10_IRQn		= 40,  // EXTI Lines 10 to 15 interrupts
+	RTC_ALARM_IRQn		= 41,  // RTC alarms through EXTI line 18 interrupts
+	SPI3_IRQn			= 51,  // SPI3 global Interrupt
+	UART4_IRQn			= 52,  // UART4 global Interrupt
+	TIM6_DACUNDER_IRQn	= 54,  // TIM6 global and DAC1 and 2 underrun error interrupts
+	TIM7_IRQn			= 55,  // TIM7 global interrupt
+	DMA2_CH1_IRQn		= 56,  // DMA2 Channel 1 global Interrupt
+	DMA2_CH2_IRQn		= 57,  // DMA2 Channel 2 global Interrupt
+	DMA2_CH3_IRQn		= 58,  // DMA2 Channel 3 global Interrupt
+	DMA2_CH4_IRQn		= 59,  // DMA2 Channel 4 global Interrupt
+	DMA2_CH5_IRQn		= 60,  // DMA2 Channel 5 global Interrupt
+	COMP_IRQn			= 64,  // COMP1 and COMP2 interrupts
+	LPTIM1_IRQn			= 65,  // LP TIM1 interrupt
+	LPTIM2_IRQn			= 66,  // LP TIM2 interrupt
+	DMA2_CH6_IRQn		= 68,  // DMA2 Channel 6 global Interrupt
+	DMA2_CH7_IRQn		= 69,  // DMA2 Channel 7 global Interrupt
+	LPUART1_IRQn		= 70,  // LPUART1 global interrupt
+	I2C3_EV_IRQn		= 72,  // I2C3 event interrupt
+	I2C3_ER_IRQn		= 73,  // I2C3 error interrupt
+	FPU_IRQn			= 81,  // Floating point interrupt
+	CRS_IRQn			= 82,  // CRS interrupt
+	I2C4_EV_IRQn		= 83,  // I2C4 event interrupt, wakeup through EXTI
 };
 
-
-#define __I volatile const // 'read only' permissions
-#define __O volatile       // 'write only' permissions
-#define __IO volatile      // 'read / write' permissions
-
+#define __I volatile const	// 'read only' permissions
+#define __O volatile		// 'write only' permissions
+#define __IO volatile		// 'read / write' permissions
 
 /* Analog-to-Digital Converter
 There is only one peripheral of type ADC. */
 struct ADC_Type {
-	__IO uint16_t ISR; // @0 interrupt and status register
-	 uint8_t RESERVED0[2]; // @2 
-	__IO uint16_t IER; // @4 interrupt enable register
-	 uint8_t RESERVED1[2]; // @6 
-	__IO uint32_t CR; // @8 control register
-	__IO uint32_t CFGR; // @12 configuration register
-	__IO uint16_t CFGR2; // @16 configuration register
-	 uint8_t RESERVED2[2]; // @18 
-	__IO uint32_t SMPR1; // @20 sample time register 1
-	__IO uint32_t SMPR2; // @24 sample time register 2
-	 uint8_t RESERVED3[4]; // @28 
-	__IO uint32_t TR1; // @32 watchdog threshold register 1
-	__IO uint32_t TR2; // @36 watchdog threshold register
-	__IO uint32_t TR3; // @40 watchdog threshold register 3
-	 uint8_t RESERVED4[4]; // @44 
-	__IO uint32_t SQR1; // @48 regular sequence register 1
-	__IO uint32_t SQR2; // @52 regular sequence register 2
-	__IO uint32_t SQR3; // @56 regular sequence register 3
-	__IO uint16_t SQR4; // @60 regular sequence register 4
-	 uint8_t RESERVED5[2]; // @62 
-	__I uint16_t DR; // @64 regular Data Register
-	 uint8_t RESERVED6[10]; // @66 
-	__IO uint32_t JSQR; // @76 injected sequence register
-	 uint8_t RESERVED7[16]; // @80 
-	__IO uint32_t OFR1; // @96 offset register 1
-	__IO uint32_t OFR2; // @100 offset register 2
-	__IO uint32_t OFR3; // @104 offset register 3
-	__IO uint32_t OFR4; // @108 offset register 4
-	 uint8_t RESERVED8[16]; // @112 
-	__I uint16_t JDR1; // @128 injected data register 1
-	 uint8_t RESERVED9[2]; // @130 
-	__I uint16_t JDR2; // @132 injected data register 2
-	 uint8_t RESERVED10[2]; // @134 
-	__I uint16_t JDR3; // @136 injected data register 3
-	 uint8_t RESERVED11[2]; // @138 
-	__I uint16_t JDR4; // @140 injected data register 4
-	 uint8_t RESERVED12[18]; // @142 
-	__IO uint32_t AWD2CR; // @160 Analog Watchdog 2 Configuration Register
-	__IO uint32_t AWD3CR; // @164 Analog Watchdog 3 Configuration Register
-	 uint8_t RESERVED13[8]; // @168 
-	__IO uint32_t DIFSEL; // @176 Differential Mode Selection Register 2
-	__IO uint32_t CALFACT; // @180 Calibration Factors
+	__IO uint16_t ISR;			   // @0 interrupt and status register
+	uint8_t		  RESERVED0[2];	   // @2
+	__IO uint16_t IER;			   // @4 interrupt enable register
+	uint8_t		  RESERVED1[2];	   // @6
+	__IO uint32_t CR;			   // @8 control register
+	__IO uint32_t CFGR;			   // @12 configuration register
+	__IO uint16_t CFGR2;		   // @16 configuration register
+	uint8_t		  RESERVED2[2];	   // @18
+	__IO uint32_t SMPR1;		   // @20 sample time register 1
+	__IO uint32_t SMPR2;		   // @24 sample time register 2
+	uint8_t		  RESERVED3[4];	   // @28
+	__IO uint32_t TR1;			   // @32 watchdog threshold register 1
+	__IO uint32_t TR2;			   // @36 watchdog threshold register
+	__IO uint32_t TR3;			   // @40 watchdog threshold register 3
+	uint8_t		  RESERVED4[4];	   // @44
+	__IO uint32_t SQR1;			   // @48 regular sequence register 1
+	__IO uint32_t SQR2;			   // @52 regular sequence register 2
+	__IO uint32_t SQR3;			   // @56 regular sequence register 3
+	__IO uint16_t SQR4;			   // @60 regular sequence register 4
+	uint8_t		  RESERVED5[2];	   // @62
+	__I uint16_t  DR;			   // @64 regular Data Register
+	uint8_t		  RESERVED6[10];   // @66
+	__IO uint32_t JSQR;			   // @76 injected sequence register
+	uint8_t		  RESERVED7[16];   // @80
+	__IO uint32_t OFR1;			   // @96 offset register 1
+	__IO uint32_t OFR2;			   // @100 offset register 2
+	__IO uint32_t OFR3;			   // @104 offset register 3
+	__IO uint32_t OFR4;			   // @108 offset register 4
+	uint8_t		  RESERVED8[16];   // @112
+	__I uint16_t  JDR1;			   // @128 injected data register 1
+	uint8_t		  RESERVED9[2];	   // @130
+	__I uint16_t  JDR2;			   // @132 injected data register 2
+	uint8_t		  RESERVED10[2];   // @134
+	__I uint16_t  JDR3;			   // @136 injected data register 3
+	uint8_t		  RESERVED11[2];   // @138
+	__I uint16_t  JDR4;			   // @140 injected data register 4
+	uint8_t		  RESERVED12[18];  // @142
+	__IO uint32_t AWD2CR;		   // @160 Analog Watchdog 2 Configuration Register
+	__IO uint32_t AWD3CR;		   // @164 Analog Watchdog 3 Configuration Register
+	uint8_t		  RESERVED13[8];   // @168
+	__IO uint32_t DIFSEL;		   // @176 Differential Mode Selection Register 2
+	__IO uint32_t CALFACT;		   // @180 Calibration Factors
 };
-extern struct ADC_Type	ADC;	// @0x50040000 
+extern struct ADC_Type ADC;	 // @0x50040000
 
 // ADC->ISR interrupt and status register
 enum {
-	ADC_ISR_JQOVF = 1UL<<10, // JQOVF
-	ADC_ISR_AWD3 = 1UL<<9, // AWD3
-	ADC_ISR_AWD2 = 1UL<<8, // AWD2
-	ADC_ISR_AWD1 = 1UL<<7, // AWD1
-	ADC_ISR_JEOS = 1UL<<6, // JEOS
-	ADC_ISR_JEOC = 1UL<<5, // JEOC
-	ADC_ISR_OVR = 1UL<<4, // OVR
-	ADC_ISR_EOS = 1UL<<3, // EOS
-	ADC_ISR_EOC = 1UL<<2, // EOC
-	ADC_ISR_EOSMP = 1UL<<1, // EOSMP
-	ADC_ISR_ADRDY = 1UL<<0, // ADRDY		
+	ADC_ISR_JQOVF = 1UL << 10,	// JQOVF
+	ADC_ISR_AWD3  = 1UL << 9,	// AWD3
+	ADC_ISR_AWD2  = 1UL << 8,	// AWD2
+	ADC_ISR_AWD1  = 1UL << 7,	// AWD1
+	ADC_ISR_JEOS  = 1UL << 6,	// JEOS
+	ADC_ISR_JEOC  = 1UL << 5,	// JEOC
+	ADC_ISR_OVR	  = 1UL << 4,	// OVR
+	ADC_ISR_EOS	  = 1UL << 3,	// EOS
+	ADC_ISR_EOC	  = 1UL << 2,	// EOC
+	ADC_ISR_EOSMP = 1UL << 1,	// EOSMP
+	ADC_ISR_ADRDY = 1UL << 0,	// ADRDY
 };
 
 // ADC->IER interrupt enable register
 enum {
-	ADC_IER_JQOVFIE = 1UL<<10, // JQOVFIE
-	ADC_IER_AWD3IE = 1UL<<9, // AWD3IE
-	ADC_IER_AWD2IE = 1UL<<8, // AWD2IE
-	ADC_IER_AWD1IE = 1UL<<7, // AWD1IE
-	ADC_IER_JEOSIE = 1UL<<6, // JEOSIE
-	ADC_IER_JEOCIE = 1UL<<5, // JEOCIE
-	ADC_IER_OVRIE = 1UL<<4, // OVRIE
-	ADC_IER_EOSIE = 1UL<<3, // EOSIE
-	ADC_IER_EOCIE = 1UL<<2, // EOCIE
-	ADC_IER_EOSMPIE = 1UL<<1, // EOSMPIE
-	ADC_IER_ADRDYIE = 1UL<<0, // ADRDYIE		
+	ADC_IER_JQOVFIE = 1UL << 10,  // JQOVFIE
+	ADC_IER_AWD3IE	= 1UL << 9,	  // AWD3IE
+	ADC_IER_AWD2IE	= 1UL << 8,	  // AWD2IE
+	ADC_IER_AWD1IE	= 1UL << 7,	  // AWD1IE
+	ADC_IER_JEOSIE	= 1UL << 6,	  // JEOSIE
+	ADC_IER_JEOCIE	= 1UL << 5,	  // JEOCIE
+	ADC_IER_OVRIE	= 1UL << 4,	  // OVRIE
+	ADC_IER_EOSIE	= 1UL << 3,	  // EOSIE
+	ADC_IER_EOCIE	= 1UL << 2,	  // EOCIE
+	ADC_IER_EOSMPIE = 1UL << 1,	  // EOSMPIE
+	ADC_IER_ADRDYIE = 1UL << 0,	  // ADRDYIE
 };
 
 // ADC->CR control register
 enum {
-	ADC_CR_ADCAL = 1UL<<31, // ADCAL
-	ADC_CR_ADCALDIF = 1UL<<30, // ADCALDIF
-	ADC_CR_DEEPPWD = 1UL<<29, // DEEPPWD
-	ADC_CR_ADVREGEN = 1UL<<28, // ADVREGEN
-	ADC_CR_JADSTP = 1UL<<5, // JADSTP
-	ADC_CR_ADSTP = 1UL<<4, // ADSTP
-	ADC_CR_JADSTART = 1UL<<3, // JADSTART
-	ADC_CR_ADSTART = 1UL<<2, // ADSTART
-	ADC_CR_ADDIS = 1UL<<1, // ADDIS
-	ADC_CR_ADEN = 1UL<<0, // ADEN		
+	ADC_CR_ADCAL	= 1UL << 31,  // ADCAL
+	ADC_CR_ADCALDIF = 1UL << 30,  // ADCALDIF
+	ADC_CR_DEEPPWD	= 1UL << 29,  // DEEPPWD
+	ADC_CR_ADVREGEN = 1UL << 28,  // ADVREGEN
+	ADC_CR_JADSTP	= 1UL << 5,	  // JADSTP
+	ADC_CR_ADSTP	= 1UL << 4,	  // ADSTP
+	ADC_CR_JADSTART = 1UL << 3,	  // JADSTART
+	ADC_CR_ADSTART	= 1UL << 2,	  // ADSTART
+	ADC_CR_ADDIS	= 1UL << 1,	  // ADDIS
+	ADC_CR_ADEN		= 1UL << 0,	  // ADEN
 };
 
 // ADC->CFGR configuration register
 enum {
-	ADC_CFGR_AWDCH1CH = ((1UL<<5)-1) << 26, // AWDCH1CH
-	ADC_CFGR_JAUTO = 1UL<<25, // JAUTO
-	ADC_CFGR_JAWD1EN = 1UL<<24, // JAWD1EN
-	ADC_CFGR_AWD1EN = 1UL<<23, // AWD1EN
-	ADC_CFGR_AWD1SGL = 1UL<<22, // AWD1SGL
-	ADC_CFGR_JQM = 1UL<<21, // JQM
-	ADC_CFGR_JDISCEN = 1UL<<20, // JDISCEN
-	ADC_CFGR_DISCNUM = ((1UL<<3)-1) << 17, // DISCNUM
-	ADC_CFGR_DISCEN = 1UL<<16, // DISCEN
-	ADC_CFGR_AUTOFF = 1UL<<15, // AUTOFF
-	ADC_CFGR_AUTDLY = 1UL<<14, // AUTDLY
-	ADC_CFGR_CONT = 1UL<<13, // CONT
-	ADC_CFGR_OVRMOD = 1UL<<12, // OVRMOD
-	ADC_CFGR_EXTEN = ((1UL<<2)-1) << 10, // EXTEN
-	ADC_CFGR_EXTSEL = ((1UL<<4)-1) << 6, // EXTSEL
-	ADC_CFGR_ALIGN = 1UL<<5, // ALIGN
-	ADC_CFGR_RES = ((1UL<<2)-1) << 3, // RES
-	ADC_CFGR_DMACFG = 1UL<<1, // DMACFG
-	ADC_CFGR_DMAEN = 1UL<<0, // DMAEN		
+	ADC_CFGR_AWDCH1CH = ((1UL << 5) - 1) << 26,	 // AWDCH1CH
+	ADC_CFGR_JAUTO	  = 1UL << 25,				 // JAUTO
+	ADC_CFGR_JAWD1EN  = 1UL << 24,				 // JAWD1EN
+	ADC_CFGR_AWD1EN	  = 1UL << 23,				 // AWD1EN
+	ADC_CFGR_AWD1SGL  = 1UL << 22,				 // AWD1SGL
+	ADC_CFGR_JQM	  = 1UL << 21,				 // JQM
+	ADC_CFGR_JDISCEN  = 1UL << 20,				 // JDISCEN
+	ADC_CFGR_DISCNUM  = ((1UL << 3) - 1) << 17,	 // DISCNUM
+	ADC_CFGR_DISCEN	  = 1UL << 16,				 // DISCEN
+	ADC_CFGR_AUTOFF	  = 1UL << 15,				 // AUTOFF
+	ADC_CFGR_AUTDLY	  = 1UL << 14,				 // AUTDLY
+	ADC_CFGR_CONT	  = 1UL << 13,				 // CONT
+	ADC_CFGR_OVRMOD	  = 1UL << 12,				 // OVRMOD
+	ADC_CFGR_EXTEN	  = ((1UL << 2) - 1) << 10,	 // EXTEN
+	ADC_CFGR_EXTSEL	  = ((1UL << 4) - 1) << 6,	 // EXTSEL
+	ADC_CFGR_ALIGN	  = 1UL << 5,				 // ALIGN
+	ADC_CFGR_RES	  = ((1UL << 2) - 1) << 3,	 // RES
+	ADC_CFGR_DMACFG	  = 1UL << 1,				 // DMACFG
+	ADC_CFGR_DMAEN	  = 1UL << 0,				 // DMAEN
 };
-static inline void adc_cfgr_set_awdch1ch(uint32_t val) { ADC.CFGR = (ADC.CFGR & ~ADC_CFGR_AWDCH1CH) | ((val<<26) & ADC_CFGR_AWDCH1CH); }
-static inline void adc_cfgr_set_discnum(uint32_t val) { ADC.CFGR = (ADC.CFGR & ~ADC_CFGR_DISCNUM) | ((val<<17) & ADC_CFGR_DISCNUM); }
-static inline void adc_cfgr_set_exten(uint32_t val) { ADC.CFGR = (ADC.CFGR & ~ADC_CFGR_EXTEN) | ((val<<10) & ADC_CFGR_EXTEN); }
-static inline void adc_cfgr_set_extsel(uint32_t val) { ADC.CFGR = (ADC.CFGR & ~ADC_CFGR_EXTSEL) | ((val<<6) & ADC_CFGR_EXTSEL); }
-static inline void adc_cfgr_set_res(uint32_t val) { ADC.CFGR = (ADC.CFGR & ~ADC_CFGR_RES) | ((val<<3) & ADC_CFGR_RES); }
-static inline uint32_t adc_cfgr_get_awdch1ch(void) { return (ADC.CFGR & ADC_CFGR_AWDCH1CH) >> 26 ; }
-static inline uint32_t adc_cfgr_get_discnum(void) { return (ADC.CFGR & ADC_CFGR_DISCNUM) >> 17 ; }
-static inline uint32_t adc_cfgr_get_exten(void) { return (ADC.CFGR & ADC_CFGR_EXTEN) >> 10 ; }
-static inline uint32_t adc_cfgr_get_extsel(void) { return (ADC.CFGR & ADC_CFGR_EXTSEL) >> 6 ; }
-static inline uint32_t adc_cfgr_get_res(void) { return (ADC.CFGR & ADC_CFGR_RES) >> 3 ; }
+static inline void adc_cfgr_set_awdch1ch(uint32_t val) {
+	ADC.CFGR = (ADC.CFGR & ~ADC_CFGR_AWDCH1CH) | ((val << 26) & ADC_CFGR_AWDCH1CH);
+}
+static inline void adc_cfgr_set_discnum(uint32_t val) {
+	ADC.CFGR = (ADC.CFGR & ~ADC_CFGR_DISCNUM) | ((val << 17) & ADC_CFGR_DISCNUM);
+}
+static inline void adc_cfgr_set_exten(uint32_t val) { ADC.CFGR = (ADC.CFGR & ~ADC_CFGR_EXTEN) | ((val << 10) & ADC_CFGR_EXTEN); }
+static inline void adc_cfgr_set_extsel(uint32_t val) { ADC.CFGR = (ADC.CFGR & ~ADC_CFGR_EXTSEL) | ((val << 6) & ADC_CFGR_EXTSEL); }
+static inline void adc_cfgr_set_res(uint32_t val) { ADC.CFGR = (ADC.CFGR & ~ADC_CFGR_RES) | ((val << 3) & ADC_CFGR_RES); }
+static inline uint32_t adc_cfgr_get_awdch1ch(void) { return (ADC.CFGR & ADC_CFGR_AWDCH1CH) >> 26; }
+static inline uint32_t adc_cfgr_get_discnum(void) { return (ADC.CFGR & ADC_CFGR_DISCNUM) >> 17; }
+static inline uint32_t adc_cfgr_get_exten(void) { return (ADC.CFGR & ADC_CFGR_EXTEN) >> 10; }
+static inline uint32_t adc_cfgr_get_extsel(void) { return (ADC.CFGR & ADC_CFGR_EXTSEL) >> 6; }
+static inline uint32_t adc_cfgr_get_res(void) { return (ADC.CFGR & ADC_CFGR_RES) >> 3; }
 
 // ADC->CFGR2 configuration register
 enum {
-	ADC_CFGR2_ROVSM = 1UL<<10, // EXTEN
-	ADC_CFGR2_TOVS = 1UL<<9, // EXTSEL
-	ADC_CFGR2_OVSS = ((1UL<<4)-1) << 5, // ALIGN
-	ADC_CFGR2_OVSR = ((1UL<<3)-1) << 2, // RES
-	ADC_CFGR2_JOVSE = 1UL<<1, // DMACFG
-	ADC_CFGR2_ROVSE = 1UL<<0, // DMAEN		
+	ADC_CFGR2_ROVSM = 1UL << 10,			  // EXTEN
+	ADC_CFGR2_TOVS	= 1UL << 9,				  // EXTSEL
+	ADC_CFGR2_OVSS	= ((1UL << 4) - 1) << 5,  // ALIGN
+	ADC_CFGR2_OVSR	= ((1UL << 3) - 1) << 2,  // RES
+	ADC_CFGR2_JOVSE = 1UL << 1,				  // DMACFG
+	ADC_CFGR2_ROVSE = 1UL << 0,				  // DMAEN
 };
-static inline void adc_cfgr2_set_ovss(uint32_t val) { ADC.CFGR2 = (ADC.CFGR2 & ~ADC_CFGR2_OVSS) | ((val<<5) & ADC_CFGR2_OVSS); }
-static inline void adc_cfgr2_set_ovsr(uint32_t val) { ADC.CFGR2 = (ADC.CFGR2 & ~ADC_CFGR2_OVSR) | ((val<<2) & ADC_CFGR2_OVSR); }
-static inline uint32_t adc_cfgr2_get_ovss(void) { return (ADC.CFGR2 & ADC_CFGR2_OVSS) >> 5 ; }
-static inline uint32_t adc_cfgr2_get_ovsr(void) { return (ADC.CFGR2 & ADC_CFGR2_OVSR) >> 2 ; }
+static inline void adc_cfgr2_set_ovss(uint32_t val) { ADC.CFGR2 = (ADC.CFGR2 & ~ADC_CFGR2_OVSS) | ((val << 5) & ADC_CFGR2_OVSS); }
+static inline void adc_cfgr2_set_ovsr(uint32_t val) { ADC.CFGR2 = (ADC.CFGR2 & ~ADC_CFGR2_OVSR) | ((val << 2) & ADC_CFGR2_OVSR); }
+static inline uint32_t adc_cfgr2_get_ovss(void) { return (ADC.CFGR2 & ADC_CFGR2_OVSS) >> 5; }
+static inline uint32_t adc_cfgr2_get_ovsr(void) { return (ADC.CFGR2 & ADC_CFGR2_OVSR) >> 2; }
 
 // ADC->SMPR1 sample time register 1
 enum {
-	ADC_SMPR1_SMP9 = ((1UL<<3)-1) << 27, // SMP9
-	ADC_SMPR1_SMP8 = ((1UL<<3)-1) << 24, // SMP8
-	ADC_SMPR1_SMP7 = ((1UL<<3)-1) << 21, // SMP7
-	ADC_SMPR1_SMP6 = ((1UL<<3)-1) << 18, // SMP6
-	ADC_SMPR1_SMP5 = ((1UL<<3)-1) << 15, // SMP5
-	ADC_SMPR1_SMP4 = ((1UL<<3)-1) << 12, // SMP4
-	ADC_SMPR1_SMP3 = ((1UL<<3)-1) << 9, // SMP3
-	ADC_SMPR1_SMP2 = ((1UL<<3)-1) << 6, // SMP2
-	ADC_SMPR1_SMP1 = ((1UL<<3)-1) << 3, // SMP1
-	ADC_SMPR1_SMP0 = ((1UL<<3)-1) << 0, // SMP0		
+	ADC_SMPR1_SMP9 = ((1UL << 3) - 1) << 27,  // SMP9
+	ADC_SMPR1_SMP8 = ((1UL << 3) - 1) << 24,  // SMP8
+	ADC_SMPR1_SMP7 = ((1UL << 3) - 1) << 21,  // SMP7
+	ADC_SMPR1_SMP6 = ((1UL << 3) - 1) << 18,  // SMP6
+	ADC_SMPR1_SMP5 = ((1UL << 3) - 1) << 15,  // SMP5
+	ADC_SMPR1_SMP4 = ((1UL << 3) - 1) << 12,  // SMP4
+	ADC_SMPR1_SMP3 = ((1UL << 3) - 1) << 9,	  // SMP3
+	ADC_SMPR1_SMP2 = ((1UL << 3) - 1) << 6,	  // SMP2
+	ADC_SMPR1_SMP1 = ((1UL << 3) - 1) << 3,	  // SMP1
+	ADC_SMPR1_SMP0 = ((1UL << 3) - 1) << 0,	  // SMP0
 };
-static inline void adc_smpr1_set_smp9(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP9) | ((val<<27) & ADC_SMPR1_SMP9); }
-static inline void adc_smpr1_set_smp8(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP8) | ((val<<24) & ADC_SMPR1_SMP8); }
-static inline void adc_smpr1_set_smp7(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP7) | ((val<<21) & ADC_SMPR1_SMP7); }
-static inline void adc_smpr1_set_smp6(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP6) | ((val<<18) & ADC_SMPR1_SMP6); }
-static inline void adc_smpr1_set_smp5(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP5) | ((val<<15) & ADC_SMPR1_SMP5); }
-static inline void adc_smpr1_set_smp4(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP4) | ((val<<12) & ADC_SMPR1_SMP4); }
-static inline void adc_smpr1_set_smp3(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP3) | ((val<<9) & ADC_SMPR1_SMP3); }
-static inline void adc_smpr1_set_smp2(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP2) | ((val<<6) & ADC_SMPR1_SMP2); }
-static inline void adc_smpr1_set_smp1(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP1) | ((val<<3) & ADC_SMPR1_SMP1); }
-static inline void adc_smpr1_set_smp0(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP0) | ((val<<0) & ADC_SMPR1_SMP0); }
-static inline uint32_t adc_smpr1_get_smp9(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP9) >> 27 ; }
-static inline uint32_t adc_smpr1_get_smp8(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP8) >> 24 ; }
-static inline uint32_t adc_smpr1_get_smp7(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP7) >> 21 ; }
-static inline uint32_t adc_smpr1_get_smp6(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP6) >> 18 ; }
-static inline uint32_t adc_smpr1_get_smp5(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP5) >> 15 ; }
-static inline uint32_t adc_smpr1_get_smp4(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP4) >> 12 ; }
-static inline uint32_t adc_smpr1_get_smp3(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP3) >> 9 ; }
-static inline uint32_t adc_smpr1_get_smp2(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP2) >> 6 ; }
-static inline uint32_t adc_smpr1_get_smp1(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP1) >> 3 ; }
-static inline uint32_t adc_smpr1_get_smp0(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP0) >> 0 ; }
+static inline void adc_smpr1_set_smp9(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP9) | ((val << 27) & ADC_SMPR1_SMP9); }
+static inline void adc_smpr1_set_smp8(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP8) | ((val << 24) & ADC_SMPR1_SMP8); }
+static inline void adc_smpr1_set_smp7(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP7) | ((val << 21) & ADC_SMPR1_SMP7); }
+static inline void adc_smpr1_set_smp6(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP6) | ((val << 18) & ADC_SMPR1_SMP6); }
+static inline void adc_smpr1_set_smp5(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP5) | ((val << 15) & ADC_SMPR1_SMP5); }
+static inline void adc_smpr1_set_smp4(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP4) | ((val << 12) & ADC_SMPR1_SMP4); }
+static inline void adc_smpr1_set_smp3(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP3) | ((val << 9) & ADC_SMPR1_SMP3); }
+static inline void adc_smpr1_set_smp2(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP2) | ((val << 6) & ADC_SMPR1_SMP2); }
+static inline void adc_smpr1_set_smp1(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP1) | ((val << 3) & ADC_SMPR1_SMP1); }
+static inline void adc_smpr1_set_smp0(uint32_t val) { ADC.SMPR1 = (ADC.SMPR1 & ~ADC_SMPR1_SMP0) | ((val << 0) & ADC_SMPR1_SMP0); }
+static inline uint32_t adc_smpr1_get_smp9(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP9) >> 27; }
+static inline uint32_t adc_smpr1_get_smp8(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP8) >> 24; }
+static inline uint32_t adc_smpr1_get_smp7(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP7) >> 21; }
+static inline uint32_t adc_smpr1_get_smp6(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP6) >> 18; }
+static inline uint32_t adc_smpr1_get_smp5(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP5) >> 15; }
+static inline uint32_t adc_smpr1_get_smp4(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP4) >> 12; }
+static inline uint32_t adc_smpr1_get_smp3(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP3) >> 9; }
+static inline uint32_t adc_smpr1_get_smp2(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP2) >> 6; }
+static inline uint32_t adc_smpr1_get_smp1(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP1) >> 3; }
+static inline uint32_t adc_smpr1_get_smp0(void) { return (ADC.SMPR1 & ADC_SMPR1_SMP0) >> 0; }
 
 // ADC->SMPR2 sample time register 2
 enum {
-	ADC_SMPR2_SMP18 = ((1UL<<3)-1) << 24, // SMP18
-	ADC_SMPR2_SMP17 = ((1UL<<3)-1) << 21, // SMP17
-	ADC_SMPR2_SMP16 = ((1UL<<3)-1) << 18, // SMP16
-	ADC_SMPR2_SMP15 = ((1UL<<3)-1) << 15, // SMP15
-	ADC_SMPR2_SMP14 = ((1UL<<3)-1) << 12, // SMP14
-	ADC_SMPR2_SMP13 = ((1UL<<3)-1) << 9, // SMP13
-	ADC_SMPR2_SMP12 = ((1UL<<3)-1) << 6, // SMP12
-	ADC_SMPR2_SMP11 = ((1UL<<3)-1) << 3, // SMP11
-	ADC_SMPR2_SMP10 = ((1UL<<3)-1) << 0, // SMP10		
+	ADC_SMPR2_SMP18 = ((1UL << 3) - 1) << 24,  // SMP18
+	ADC_SMPR2_SMP17 = ((1UL << 3) - 1) << 21,  // SMP17
+	ADC_SMPR2_SMP16 = ((1UL << 3) - 1) << 18,  // SMP16
+	ADC_SMPR2_SMP15 = ((1UL << 3) - 1) << 15,  // SMP15
+	ADC_SMPR2_SMP14 = ((1UL << 3) - 1) << 12,  // SMP14
+	ADC_SMPR2_SMP13 = ((1UL << 3) - 1) << 9,   // SMP13
+	ADC_SMPR2_SMP12 = ((1UL << 3) - 1) << 6,   // SMP12
+	ADC_SMPR2_SMP11 = ((1UL << 3) - 1) << 3,   // SMP11
+	ADC_SMPR2_SMP10 = ((1UL << 3) - 1) << 0,   // SMP10
 };
-static inline void adc_smpr2_set_smp18(uint32_t val) { ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP18) | ((val<<24) & ADC_SMPR2_SMP18); }
-static inline void adc_smpr2_set_smp17(uint32_t val) { ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP17) | ((val<<21) & ADC_SMPR2_SMP17); }
-static inline void adc_smpr2_set_smp16(uint32_t val) { ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP16) | ((val<<18) & ADC_SMPR2_SMP16); }
-static inline void adc_smpr2_set_smp15(uint32_t val) { ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP15) | ((val<<15) & ADC_SMPR2_SMP15); }
-static inline void adc_smpr2_set_smp14(uint32_t val) { ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP14) | ((val<<12) & ADC_SMPR2_SMP14); }
-static inline void adc_smpr2_set_smp13(uint32_t val) { ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP13) | ((val<<9) & ADC_SMPR2_SMP13); }
-static inline void adc_smpr2_set_smp12(uint32_t val) { ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP12) | ((val<<6) & ADC_SMPR2_SMP12); }
-static inline void adc_smpr2_set_smp11(uint32_t val) { ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP11) | ((val<<3) & ADC_SMPR2_SMP11); }
-static inline void adc_smpr2_set_smp10(uint32_t val) { ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP10) | ((val<<0) & ADC_SMPR2_SMP10); }
-static inline uint32_t adc_smpr2_get_smp18(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP18) >> 24 ; }
-static inline uint32_t adc_smpr2_get_smp17(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP17) >> 21 ; }
-static inline uint32_t adc_smpr2_get_smp16(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP16) >> 18 ; }
-static inline uint32_t adc_smpr2_get_smp15(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP15) >> 15 ; }
-static inline uint32_t adc_smpr2_get_smp14(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP14) >> 12 ; }
-static inline uint32_t adc_smpr2_get_smp13(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP13) >> 9 ; }
-static inline uint32_t adc_smpr2_get_smp12(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP12) >> 6 ; }
-static inline uint32_t adc_smpr2_get_smp11(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP11) >> 3 ; }
-static inline uint32_t adc_smpr2_get_smp10(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP10) >> 0 ; }
+static inline void adc_smpr2_set_smp18(uint32_t val) {
+	ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP18) | ((val << 24) & ADC_SMPR2_SMP18);
+}
+static inline void adc_smpr2_set_smp17(uint32_t val) {
+	ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP17) | ((val << 21) & ADC_SMPR2_SMP17);
+}
+static inline void adc_smpr2_set_smp16(uint32_t val) {
+	ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP16) | ((val << 18) & ADC_SMPR2_SMP16);
+}
+static inline void adc_smpr2_set_smp15(uint32_t val) {
+	ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP15) | ((val << 15) & ADC_SMPR2_SMP15);
+}
+static inline void adc_smpr2_set_smp14(uint32_t val) {
+	ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP14) | ((val << 12) & ADC_SMPR2_SMP14);
+}
+static inline void adc_smpr2_set_smp13(uint32_t val) {
+	ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP13) | ((val << 9) & ADC_SMPR2_SMP13);
+}
+static inline void adc_smpr2_set_smp12(uint32_t val) {
+	ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP12) | ((val << 6) & ADC_SMPR2_SMP12);
+}
+static inline void adc_smpr2_set_smp11(uint32_t val) {
+	ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP11) | ((val << 3) & ADC_SMPR2_SMP11);
+}
+static inline void adc_smpr2_set_smp10(uint32_t val) {
+	ADC.SMPR2 = (ADC.SMPR2 & ~ADC_SMPR2_SMP10) | ((val << 0) & ADC_SMPR2_SMP10);
+}
+static inline uint32_t adc_smpr2_get_smp18(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP18) >> 24; }
+static inline uint32_t adc_smpr2_get_smp17(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP17) >> 21; }
+static inline uint32_t adc_smpr2_get_smp16(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP16) >> 18; }
+static inline uint32_t adc_smpr2_get_smp15(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP15) >> 15; }
+static inline uint32_t adc_smpr2_get_smp14(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP14) >> 12; }
+static inline uint32_t adc_smpr2_get_smp13(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP13) >> 9; }
+static inline uint32_t adc_smpr2_get_smp12(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP12) >> 6; }
+static inline uint32_t adc_smpr2_get_smp11(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP11) >> 3; }
+static inline uint32_t adc_smpr2_get_smp10(void) { return (ADC.SMPR2 & ADC_SMPR2_SMP10) >> 0; }
 
 // ADC->TR1 watchdog threshold register 1
 enum {
-	ADC_TR1_HT1 = ((1UL<<12)-1) << 16, // HT1
-	ADC_TR1_LT1 = ((1UL<<12)-1) << 0, // LT1		
+	ADC_TR1_HT1 = ((1UL << 12) - 1) << 16,	// HT1
+	ADC_TR1_LT1 = ((1UL << 12) - 1) << 0,	// LT1
 };
-static inline void adc_tr1_set_ht1(uint32_t val) { ADC.TR1 = (ADC.TR1 & ~ADC_TR1_HT1) | ((val<<16) & ADC_TR1_HT1); }
-static inline void adc_tr1_set_lt1(uint32_t val) { ADC.TR1 = (ADC.TR1 & ~ADC_TR1_LT1) | ((val<<0) & ADC_TR1_LT1); }
-static inline uint32_t adc_tr1_get_ht1(void) { return (ADC.TR1 & ADC_TR1_HT1) >> 16 ; }
-static inline uint32_t adc_tr1_get_lt1(void) { return (ADC.TR1 & ADC_TR1_LT1) >> 0 ; }
+static inline void	   adc_tr1_set_ht1(uint32_t val) { ADC.TR1 = (ADC.TR1 & ~ADC_TR1_HT1) | ((val << 16) & ADC_TR1_HT1); }
+static inline void	   adc_tr1_set_lt1(uint32_t val) { ADC.TR1 = (ADC.TR1 & ~ADC_TR1_LT1) | ((val << 0) & ADC_TR1_LT1); }
+static inline uint32_t adc_tr1_get_ht1(void) { return (ADC.TR1 & ADC_TR1_HT1) >> 16; }
+static inline uint32_t adc_tr1_get_lt1(void) { return (ADC.TR1 & ADC_TR1_LT1) >> 0; }
 
 // ADC->TR2 watchdog threshold register
 enum {
-	ADC_TR2_HT2 = ((1UL<<8)-1) << 16, // HT2
-	ADC_TR2_LT2 = ((1UL<<8)-1) << 0, // LT2		
+	ADC_TR2_HT2 = ((1UL << 8) - 1) << 16,  // HT2
+	ADC_TR2_LT2 = ((1UL << 8) - 1) << 0,   // LT2
 };
-static inline void adc_tr2_set_ht2(uint32_t val) { ADC.TR2 = (ADC.TR2 & ~ADC_TR2_HT2) | ((val<<16) & ADC_TR2_HT2); }
-static inline void adc_tr2_set_lt2(uint32_t val) { ADC.TR2 = (ADC.TR2 & ~ADC_TR2_LT2) | ((val<<0) & ADC_TR2_LT2); }
-static inline uint32_t adc_tr2_get_ht2(void) { return (ADC.TR2 & ADC_TR2_HT2) >> 16 ; }
-static inline uint32_t adc_tr2_get_lt2(void) { return (ADC.TR2 & ADC_TR2_LT2) >> 0 ; }
+static inline void	   adc_tr2_set_ht2(uint32_t val) { ADC.TR2 = (ADC.TR2 & ~ADC_TR2_HT2) | ((val << 16) & ADC_TR2_HT2); }
+static inline void	   adc_tr2_set_lt2(uint32_t val) { ADC.TR2 = (ADC.TR2 & ~ADC_TR2_LT2) | ((val << 0) & ADC_TR2_LT2); }
+static inline uint32_t adc_tr2_get_ht2(void) { return (ADC.TR2 & ADC_TR2_HT2) >> 16; }
+static inline uint32_t adc_tr2_get_lt2(void) { return (ADC.TR2 & ADC_TR2_LT2) >> 0; }
 
 // ADC->TR3 watchdog threshold register 3
 enum {
-	ADC_TR3_HT3 = ((1UL<<8)-1) << 16, // HT3
-	ADC_TR3_LT3 = ((1UL<<8)-1) << 0, // LT3		
+	ADC_TR3_HT3 = ((1UL << 8) - 1) << 16,  // HT3
+	ADC_TR3_LT3 = ((1UL << 8) - 1) << 0,   // LT3
 };
-static inline void adc_tr3_set_ht3(uint32_t val) { ADC.TR3 = (ADC.TR3 & ~ADC_TR3_HT3) | ((val<<16) & ADC_TR3_HT3); }
-static inline void adc_tr3_set_lt3(uint32_t val) { ADC.TR3 = (ADC.TR3 & ~ADC_TR3_LT3) | ((val<<0) & ADC_TR3_LT3); }
-static inline uint32_t adc_tr3_get_ht3(void) { return (ADC.TR3 & ADC_TR3_HT3) >> 16 ; }
-static inline uint32_t adc_tr3_get_lt3(void) { return (ADC.TR3 & ADC_TR3_LT3) >> 0 ; }
+static inline void	   adc_tr3_set_ht3(uint32_t val) { ADC.TR3 = (ADC.TR3 & ~ADC_TR3_HT3) | ((val << 16) & ADC_TR3_HT3); }
+static inline void	   adc_tr3_set_lt3(uint32_t val) { ADC.TR3 = (ADC.TR3 & ~ADC_TR3_LT3) | ((val << 0) & ADC_TR3_LT3); }
+static inline uint32_t adc_tr3_get_ht3(void) { return (ADC.TR3 & ADC_TR3_HT3) >> 16; }
+static inline uint32_t adc_tr3_get_lt3(void) { return (ADC.TR3 & ADC_TR3_LT3) >> 0; }
 
 // ADC->SQR1 regular sequence register 1
 enum {
-	ADC_SQR1_SQ4 = ((1UL<<5)-1) << 24, // SQ4
-	ADC_SQR1_SQ3 = ((1UL<<5)-1) << 18, // SQ3
-	ADC_SQR1_SQ2 = ((1UL<<5)-1) << 12, // SQ2
-	ADC_SQR1_SQ1 = ((1UL<<5)-1) << 6, // SQ1
-	ADC_SQR1_L3 = ((1UL<<4)-1) << 0, // L3		
+	ADC_SQR1_SQ4 = ((1UL << 5) - 1) << 24,	// SQ4
+	ADC_SQR1_SQ3 = ((1UL << 5) - 1) << 18,	// SQ3
+	ADC_SQR1_SQ2 = ((1UL << 5) - 1) << 12,	// SQ2
+	ADC_SQR1_SQ1 = ((1UL << 5) - 1) << 6,	// SQ1
+	ADC_SQR1_L3	 = ((1UL << 4) - 1) << 0,	// L3
 };
-static inline void adc_sqr1_set_sq4(uint32_t val) { ADC.SQR1 = (ADC.SQR1 & ~ADC_SQR1_SQ4) | ((val<<24) & ADC_SQR1_SQ4); }
-static inline void adc_sqr1_set_sq3(uint32_t val) { ADC.SQR1 = (ADC.SQR1 & ~ADC_SQR1_SQ3) | ((val<<18) & ADC_SQR1_SQ3); }
-static inline void adc_sqr1_set_sq2(uint32_t val) { ADC.SQR1 = (ADC.SQR1 & ~ADC_SQR1_SQ2) | ((val<<12) & ADC_SQR1_SQ2); }
-static inline void adc_sqr1_set_sq1(uint32_t val) { ADC.SQR1 = (ADC.SQR1 & ~ADC_SQR1_SQ1) | ((val<<6) & ADC_SQR1_SQ1); }
-static inline void adc_sqr1_set_l3(uint32_t val) { ADC.SQR1 = (ADC.SQR1 & ~ADC_SQR1_L3) | ((val<<0) & ADC_SQR1_L3); }
-static inline uint32_t adc_sqr1_get_sq4(void) { return (ADC.SQR1 & ADC_SQR1_SQ4) >> 24 ; }
-static inline uint32_t adc_sqr1_get_sq3(void) { return (ADC.SQR1 & ADC_SQR1_SQ3) >> 18 ; }
-static inline uint32_t adc_sqr1_get_sq2(void) { return (ADC.SQR1 & ADC_SQR1_SQ2) >> 12 ; }
-static inline uint32_t adc_sqr1_get_sq1(void) { return (ADC.SQR1 & ADC_SQR1_SQ1) >> 6 ; }
-static inline uint32_t adc_sqr1_get_l3(void) { return (ADC.SQR1 & ADC_SQR1_L3) >> 0 ; }
+static inline void	   adc_sqr1_set_sq4(uint32_t val) { ADC.SQR1 = (ADC.SQR1 & ~ADC_SQR1_SQ4) | ((val << 24) & ADC_SQR1_SQ4); }
+static inline void	   adc_sqr1_set_sq3(uint32_t val) { ADC.SQR1 = (ADC.SQR1 & ~ADC_SQR1_SQ3) | ((val << 18) & ADC_SQR1_SQ3); }
+static inline void	   adc_sqr1_set_sq2(uint32_t val) { ADC.SQR1 = (ADC.SQR1 & ~ADC_SQR1_SQ2) | ((val << 12) & ADC_SQR1_SQ2); }
+static inline void	   adc_sqr1_set_sq1(uint32_t val) { ADC.SQR1 = (ADC.SQR1 & ~ADC_SQR1_SQ1) | ((val << 6) & ADC_SQR1_SQ1); }
+static inline void	   adc_sqr1_set_l3(uint32_t val) { ADC.SQR1 = (ADC.SQR1 & ~ADC_SQR1_L3) | ((val << 0) & ADC_SQR1_L3); }
+static inline uint32_t adc_sqr1_get_sq4(void) { return (ADC.SQR1 & ADC_SQR1_SQ4) >> 24; }
+static inline uint32_t adc_sqr1_get_sq3(void) { return (ADC.SQR1 & ADC_SQR1_SQ3) >> 18; }
+static inline uint32_t adc_sqr1_get_sq2(void) { return (ADC.SQR1 & ADC_SQR1_SQ2) >> 12; }
+static inline uint32_t adc_sqr1_get_sq1(void) { return (ADC.SQR1 & ADC_SQR1_SQ1) >> 6; }
+static inline uint32_t adc_sqr1_get_l3(void) { return (ADC.SQR1 & ADC_SQR1_L3) >> 0; }
 
 // ADC->SQR2 regular sequence register 2
 enum {
-	ADC_SQR2_SQ9 = ((1UL<<5)-1) << 24, // SQ9
-	ADC_SQR2_SQ8 = ((1UL<<5)-1) << 18, // SQ8
-	ADC_SQR2_SQ7 = ((1UL<<5)-1) << 12, // SQ7
-	ADC_SQR2_SQ6 = ((1UL<<5)-1) << 6, // SQ6
-	ADC_SQR2_SQ5 = ((1UL<<5)-1) << 0, // SQ5		
+	ADC_SQR2_SQ9 = ((1UL << 5) - 1) << 24,	// SQ9
+	ADC_SQR2_SQ8 = ((1UL << 5) - 1) << 18,	// SQ8
+	ADC_SQR2_SQ7 = ((1UL << 5) - 1) << 12,	// SQ7
+	ADC_SQR2_SQ6 = ((1UL << 5) - 1) << 6,	// SQ6
+	ADC_SQR2_SQ5 = ((1UL << 5) - 1) << 0,	// SQ5
 };
-static inline void adc_sqr2_set_sq9(uint32_t val) { ADC.SQR2 = (ADC.SQR2 & ~ADC_SQR2_SQ9) | ((val<<24) & ADC_SQR2_SQ9); }
-static inline void adc_sqr2_set_sq8(uint32_t val) { ADC.SQR2 = (ADC.SQR2 & ~ADC_SQR2_SQ8) | ((val<<18) & ADC_SQR2_SQ8); }
-static inline void adc_sqr2_set_sq7(uint32_t val) { ADC.SQR2 = (ADC.SQR2 & ~ADC_SQR2_SQ7) | ((val<<12) & ADC_SQR2_SQ7); }
-static inline void adc_sqr2_set_sq6(uint32_t val) { ADC.SQR2 = (ADC.SQR2 & ~ADC_SQR2_SQ6) | ((val<<6) & ADC_SQR2_SQ6); }
-static inline void adc_sqr2_set_sq5(uint32_t val) { ADC.SQR2 = (ADC.SQR2 & ~ADC_SQR2_SQ5) | ((val<<0) & ADC_SQR2_SQ5); }
-static inline uint32_t adc_sqr2_get_sq9(void) { return (ADC.SQR2 & ADC_SQR2_SQ9) >> 24 ; }
-static inline uint32_t adc_sqr2_get_sq8(void) { return (ADC.SQR2 & ADC_SQR2_SQ8) >> 18 ; }
-static inline uint32_t adc_sqr2_get_sq7(void) { return (ADC.SQR2 & ADC_SQR2_SQ7) >> 12 ; }
-static inline uint32_t adc_sqr2_get_sq6(void) { return (ADC.SQR2 & ADC_SQR2_SQ6) >> 6 ; }
-static inline uint32_t adc_sqr2_get_sq5(void) { return (ADC.SQR2 & ADC_SQR2_SQ5) >> 0 ; }
+static inline void	   adc_sqr2_set_sq9(uint32_t val) { ADC.SQR2 = (ADC.SQR2 & ~ADC_SQR2_SQ9) | ((val << 24) & ADC_SQR2_SQ9); }
+static inline void	   adc_sqr2_set_sq8(uint32_t val) { ADC.SQR2 = (ADC.SQR2 & ~ADC_SQR2_SQ8) | ((val << 18) & ADC_SQR2_SQ8); }
+static inline void	   adc_sqr2_set_sq7(uint32_t val) { ADC.SQR2 = (ADC.SQR2 & ~ADC_SQR2_SQ7) | ((val << 12) & ADC_SQR2_SQ7); }
+static inline void	   adc_sqr2_set_sq6(uint32_t val) { ADC.SQR2 = (ADC.SQR2 & ~ADC_SQR2_SQ6) | ((val << 6) & ADC_SQR2_SQ6); }
+static inline void	   adc_sqr2_set_sq5(uint32_t val) { ADC.SQR2 = (ADC.SQR2 & ~ADC_SQR2_SQ5) | ((val << 0) & ADC_SQR2_SQ5); }
+static inline uint32_t adc_sqr2_get_sq9(void) { return (ADC.SQR2 & ADC_SQR2_SQ9) >> 24; }
+static inline uint32_t adc_sqr2_get_sq8(void) { return (ADC.SQR2 & ADC_SQR2_SQ8) >> 18; }
+static inline uint32_t adc_sqr2_get_sq7(void) { return (ADC.SQR2 & ADC_SQR2_SQ7) >> 12; }
+static inline uint32_t adc_sqr2_get_sq6(void) { return (ADC.SQR2 & ADC_SQR2_SQ6) >> 6; }
+static inline uint32_t adc_sqr2_get_sq5(void) { return (ADC.SQR2 & ADC_SQR2_SQ5) >> 0; }
 
 // ADC->SQR3 regular sequence register 3
 enum {
-	ADC_SQR3_SQ14 = ((1UL<<5)-1) << 24, // SQ14
-	ADC_SQR3_SQ13 = ((1UL<<5)-1) << 18, // SQ13
-	ADC_SQR3_SQ12 = ((1UL<<5)-1) << 12, // SQ12
-	ADC_SQR3_SQ11 = ((1UL<<5)-1) << 6, // SQ11
-	ADC_SQR3_SQ10 = ((1UL<<5)-1) << 0, // SQ10		
+	ADC_SQR3_SQ14 = ((1UL << 5) - 1) << 24,	 // SQ14
+	ADC_SQR3_SQ13 = ((1UL << 5) - 1) << 18,	 // SQ13
+	ADC_SQR3_SQ12 = ((1UL << 5) - 1) << 12,	 // SQ12
+	ADC_SQR3_SQ11 = ((1UL << 5) - 1) << 6,	 // SQ11
+	ADC_SQR3_SQ10 = ((1UL << 5) - 1) << 0,	 // SQ10
 };
-static inline void adc_sqr3_set_sq14(uint32_t val) { ADC.SQR3 = (ADC.SQR3 & ~ADC_SQR3_SQ14) | ((val<<24) & ADC_SQR3_SQ14); }
-static inline void adc_sqr3_set_sq13(uint32_t val) { ADC.SQR3 = (ADC.SQR3 & ~ADC_SQR3_SQ13) | ((val<<18) & ADC_SQR3_SQ13); }
-static inline void adc_sqr3_set_sq12(uint32_t val) { ADC.SQR3 = (ADC.SQR3 & ~ADC_SQR3_SQ12) | ((val<<12) & ADC_SQR3_SQ12); }
-static inline void adc_sqr3_set_sq11(uint32_t val) { ADC.SQR3 = (ADC.SQR3 & ~ADC_SQR3_SQ11) | ((val<<6) & ADC_SQR3_SQ11); }
-static inline void adc_sqr3_set_sq10(uint32_t val) { ADC.SQR3 = (ADC.SQR3 & ~ADC_SQR3_SQ10) | ((val<<0) & ADC_SQR3_SQ10); }
-static inline uint32_t adc_sqr3_get_sq14(void) { return (ADC.SQR3 & ADC_SQR3_SQ14) >> 24 ; }
-static inline uint32_t adc_sqr3_get_sq13(void) { return (ADC.SQR3 & ADC_SQR3_SQ13) >> 18 ; }
-static inline uint32_t adc_sqr3_get_sq12(void) { return (ADC.SQR3 & ADC_SQR3_SQ12) >> 12 ; }
-static inline uint32_t adc_sqr3_get_sq11(void) { return (ADC.SQR3 & ADC_SQR3_SQ11) >> 6 ; }
-static inline uint32_t adc_sqr3_get_sq10(void) { return (ADC.SQR3 & ADC_SQR3_SQ10) >> 0 ; }
+static inline void	   adc_sqr3_set_sq14(uint32_t val) { ADC.SQR3 = (ADC.SQR3 & ~ADC_SQR3_SQ14) | ((val << 24) & ADC_SQR3_SQ14); }
+static inline void	   adc_sqr3_set_sq13(uint32_t val) { ADC.SQR3 = (ADC.SQR3 & ~ADC_SQR3_SQ13) | ((val << 18) & ADC_SQR3_SQ13); }
+static inline void	   adc_sqr3_set_sq12(uint32_t val) { ADC.SQR3 = (ADC.SQR3 & ~ADC_SQR3_SQ12) | ((val << 12) & ADC_SQR3_SQ12); }
+static inline void	   adc_sqr3_set_sq11(uint32_t val) { ADC.SQR3 = (ADC.SQR3 & ~ADC_SQR3_SQ11) | ((val << 6) & ADC_SQR3_SQ11); }
+static inline void	   adc_sqr3_set_sq10(uint32_t val) { ADC.SQR3 = (ADC.SQR3 & ~ADC_SQR3_SQ10) | ((val << 0) & ADC_SQR3_SQ10); }
+static inline uint32_t adc_sqr3_get_sq14(void) { return (ADC.SQR3 & ADC_SQR3_SQ14) >> 24; }
+static inline uint32_t adc_sqr3_get_sq13(void) { return (ADC.SQR3 & ADC_SQR3_SQ13) >> 18; }
+static inline uint32_t adc_sqr3_get_sq12(void) { return (ADC.SQR3 & ADC_SQR3_SQ12) >> 12; }
+static inline uint32_t adc_sqr3_get_sq11(void) { return (ADC.SQR3 & ADC_SQR3_SQ11) >> 6; }
+static inline uint32_t adc_sqr3_get_sq10(void) { return (ADC.SQR3 & ADC_SQR3_SQ10) >> 0; }
 
 // ADC->SQR4 regular sequence register 4
 enum {
-	ADC_SQR4_SQ16 = ((1UL<<5)-1) << 6, // SQ16
-	ADC_SQR4_SQ15 = ((1UL<<5)-1) << 0, // SQ15		
+	ADC_SQR4_SQ16 = ((1UL << 5) - 1) << 6,	// SQ16
+	ADC_SQR4_SQ15 = ((1UL << 5) - 1) << 0,	// SQ15
 };
-static inline void adc_sqr4_set_sq16(uint32_t val) { ADC.SQR4 = (ADC.SQR4 & ~ADC_SQR4_SQ16) | ((val<<6) & ADC_SQR4_SQ16); }
-static inline void adc_sqr4_set_sq15(uint32_t val) { ADC.SQR4 = (ADC.SQR4 & ~ADC_SQR4_SQ15) | ((val<<0) & ADC_SQR4_SQ15); }
-static inline uint32_t adc_sqr4_get_sq16(void) { return (ADC.SQR4 & ADC_SQR4_SQ16) >> 6 ; }
-static inline uint32_t adc_sqr4_get_sq15(void) { return (ADC.SQR4 & ADC_SQR4_SQ15) >> 0 ; }
+static inline void	   adc_sqr4_set_sq16(uint32_t val) { ADC.SQR4 = (ADC.SQR4 & ~ADC_SQR4_SQ16) | ((val << 6) & ADC_SQR4_SQ16); }
+static inline void	   adc_sqr4_set_sq15(uint32_t val) { ADC.SQR4 = (ADC.SQR4 & ~ADC_SQR4_SQ15) | ((val << 0) & ADC_SQR4_SQ15); }
+static inline uint32_t adc_sqr4_get_sq16(void) { return (ADC.SQR4 & ADC_SQR4_SQ16) >> 6; }
+static inline uint32_t adc_sqr4_get_sq15(void) { return (ADC.SQR4 & ADC_SQR4_SQ15) >> 0; }
 
 // ADC->JSQR injected sequence register
 enum {
-	ADC_JSQR_JSQ4 = ((1UL<<5)-1) << 26, // JSQ4
-	ADC_JSQR_JSQ3 = ((1UL<<5)-1) << 20, // JSQ3
-	ADC_JSQR_JSQ2 = ((1UL<<5)-1) << 14, // JSQ2
-	ADC_JSQR_JSQ1 = ((1UL<<5)-1) << 8, // JSQ1
-	ADC_JSQR_JEXTEN = ((1UL<<2)-1) << 6, // JEXTEN
-	ADC_JSQR_JEXTSEL = ((1UL<<4)-1) << 2, // JEXTSEL
-	ADC_JSQR_JL = ((1UL<<2)-1) << 0, // JL		
+	ADC_JSQR_JSQ4	 = ((1UL << 5) - 1) << 26,	// JSQ4
+	ADC_JSQR_JSQ3	 = ((1UL << 5) - 1) << 20,	// JSQ3
+	ADC_JSQR_JSQ2	 = ((1UL << 5) - 1) << 14,	// JSQ2
+	ADC_JSQR_JSQ1	 = ((1UL << 5) - 1) << 8,	// JSQ1
+	ADC_JSQR_JEXTEN	 = ((1UL << 2) - 1) << 6,	// JEXTEN
+	ADC_JSQR_JEXTSEL = ((1UL << 4) - 1) << 2,	// JEXTSEL
+	ADC_JSQR_JL		 = ((1UL << 2) - 1) << 0,	// JL
 };
-static inline void adc_jsqr_set_jsq4(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JSQ4) | ((val<<26) & ADC_JSQR_JSQ4); }
-static inline void adc_jsqr_set_jsq3(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JSQ3) | ((val<<20) & ADC_JSQR_JSQ3); }
-static inline void adc_jsqr_set_jsq2(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JSQ2) | ((val<<14) & ADC_JSQR_JSQ2); }
-static inline void adc_jsqr_set_jsq1(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JSQ1) | ((val<<8) & ADC_JSQR_JSQ1); }
-static inline void adc_jsqr_set_jexten(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JEXTEN) | ((val<<6) & ADC_JSQR_JEXTEN); }
-static inline void adc_jsqr_set_jextsel(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JEXTSEL) | ((val<<2) & ADC_JSQR_JEXTSEL); }
-static inline void adc_jsqr_set_jl(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JL) | ((val<<0) & ADC_JSQR_JL); }
-static inline uint32_t adc_jsqr_get_jsq4(void) { return (ADC.JSQR & ADC_JSQR_JSQ4) >> 26 ; }
-static inline uint32_t adc_jsqr_get_jsq3(void) { return (ADC.JSQR & ADC_JSQR_JSQ3) >> 20 ; }
-static inline uint32_t adc_jsqr_get_jsq2(void) { return (ADC.JSQR & ADC_JSQR_JSQ2) >> 14 ; }
-static inline uint32_t adc_jsqr_get_jsq1(void) { return (ADC.JSQR & ADC_JSQR_JSQ1) >> 8 ; }
-static inline uint32_t adc_jsqr_get_jexten(void) { return (ADC.JSQR & ADC_JSQR_JEXTEN) >> 6 ; }
-static inline uint32_t adc_jsqr_get_jextsel(void) { return (ADC.JSQR & ADC_JSQR_JEXTSEL) >> 2 ; }
-static inline uint32_t adc_jsqr_get_jl(void) { return (ADC.JSQR & ADC_JSQR_JL) >> 0 ; }
+static inline void adc_jsqr_set_jsq4(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JSQ4) | ((val << 26) & ADC_JSQR_JSQ4); }
+static inline void adc_jsqr_set_jsq3(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JSQ3) | ((val << 20) & ADC_JSQR_JSQ3); }
+static inline void adc_jsqr_set_jsq2(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JSQ2) | ((val << 14) & ADC_JSQR_JSQ2); }
+static inline void adc_jsqr_set_jsq1(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JSQ1) | ((val << 8) & ADC_JSQR_JSQ1); }
+static inline void adc_jsqr_set_jexten(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JEXTEN) | ((val << 6) & ADC_JSQR_JEXTEN); }
+static inline void adc_jsqr_set_jextsel(uint32_t val) {
+	ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JEXTSEL) | ((val << 2) & ADC_JSQR_JEXTSEL);
+}
+static inline void	   adc_jsqr_set_jl(uint32_t val) { ADC.JSQR = (ADC.JSQR & ~ADC_JSQR_JL) | ((val << 0) & ADC_JSQR_JL); }
+static inline uint32_t adc_jsqr_get_jsq4(void) { return (ADC.JSQR & ADC_JSQR_JSQ4) >> 26; }
+static inline uint32_t adc_jsqr_get_jsq3(void) { return (ADC.JSQR & ADC_JSQR_JSQ3) >> 20; }
+static inline uint32_t adc_jsqr_get_jsq2(void) { return (ADC.JSQR & ADC_JSQR_JSQ2) >> 14; }
+static inline uint32_t adc_jsqr_get_jsq1(void) { return (ADC.JSQR & ADC_JSQR_JSQ1) >> 8; }
+static inline uint32_t adc_jsqr_get_jexten(void) { return (ADC.JSQR & ADC_JSQR_JEXTEN) >> 6; }
+static inline uint32_t adc_jsqr_get_jextsel(void) { return (ADC.JSQR & ADC_JSQR_JEXTSEL) >> 2; }
+static inline uint32_t adc_jsqr_get_jl(void) { return (ADC.JSQR & ADC_JSQR_JL) >> 0; }
 
 // ADC->OFR1 offset register 1
 enum {
-	ADC_OFR1_OFFSET1_EN = 1UL<<31, // OFFSET1_EN
-	ADC_OFR1_OFFSET1_CH = ((1UL<<5)-1) << 26, // OFFSET1_CH
-	ADC_OFR1_OFFSET1 = ((1UL<<12)-1) << 0, // OFFSET1		
+	ADC_OFR1_OFFSET1_EN = 1UL << 31,			   // OFFSET1_EN
+	ADC_OFR1_OFFSET1_CH = ((1UL << 5) - 1) << 26,  // OFFSET1_CH
+	ADC_OFR1_OFFSET1	= ((1UL << 12) - 1) << 0,  // OFFSET1
 };
-static inline void adc_ofr1_set_offset1_ch(uint32_t val) { ADC.OFR1 = (ADC.OFR1 & ~ADC_OFR1_OFFSET1_CH) | ((val<<26) & ADC_OFR1_OFFSET1_CH); }
-static inline void adc_ofr1_set_offset1(uint32_t val) { ADC.OFR1 = (ADC.OFR1 & ~ADC_OFR1_OFFSET1) | ((val<<0) & ADC_OFR1_OFFSET1); }
-static inline uint32_t adc_ofr1_get_offset1_ch(void) { return (ADC.OFR1 & ADC_OFR1_OFFSET1_CH) >> 26 ; }
-static inline uint32_t adc_ofr1_get_offset1(void) { return (ADC.OFR1 & ADC_OFR1_OFFSET1) >> 0 ; }
+static inline void adc_ofr1_set_offset1_ch(uint32_t val) {
+	ADC.OFR1 = (ADC.OFR1 & ~ADC_OFR1_OFFSET1_CH) | ((val << 26) & ADC_OFR1_OFFSET1_CH);
+}
+static inline void adc_ofr1_set_offset1(uint32_t val) {
+	ADC.OFR1 = (ADC.OFR1 & ~ADC_OFR1_OFFSET1) | ((val << 0) & ADC_OFR1_OFFSET1);
+}
+static inline uint32_t adc_ofr1_get_offset1_ch(void) { return (ADC.OFR1 & ADC_OFR1_OFFSET1_CH) >> 26; }
+static inline uint32_t adc_ofr1_get_offset1(void) { return (ADC.OFR1 & ADC_OFR1_OFFSET1) >> 0; }
 
 // ADC->OFR2 offset register 2
 enum {
-	ADC_OFR2_OFFSET2_EN = 1UL<<31, // OFFSET2_EN
-	ADC_OFR2_OFFSET2_CH = ((1UL<<5)-1) << 26, // OFFSET2_CH
-	ADC_OFR2_OFFSET2 = ((1UL<<12)-1) << 0, // OFFSET2		
+	ADC_OFR2_OFFSET2_EN = 1UL << 31,			   // OFFSET2_EN
+	ADC_OFR2_OFFSET2_CH = ((1UL << 5) - 1) << 26,  // OFFSET2_CH
+	ADC_OFR2_OFFSET2	= ((1UL << 12) - 1) << 0,  // OFFSET2
 };
-static inline void adc_ofr2_set_offset2_ch(uint32_t val) { ADC.OFR2 = (ADC.OFR2 & ~ADC_OFR2_OFFSET2_CH) | ((val<<26) & ADC_OFR2_OFFSET2_CH); }
-static inline void adc_ofr2_set_offset2(uint32_t val) { ADC.OFR2 = (ADC.OFR2 & ~ADC_OFR2_OFFSET2) | ((val<<0) & ADC_OFR2_OFFSET2); }
-static inline uint32_t adc_ofr2_get_offset2_ch(void) { return (ADC.OFR2 & ADC_OFR2_OFFSET2_CH) >> 26 ; }
-static inline uint32_t adc_ofr2_get_offset2(void) { return (ADC.OFR2 & ADC_OFR2_OFFSET2) >> 0 ; }
+static inline void adc_ofr2_set_offset2_ch(uint32_t val) {
+	ADC.OFR2 = (ADC.OFR2 & ~ADC_OFR2_OFFSET2_CH) | ((val << 26) & ADC_OFR2_OFFSET2_CH);
+}
+static inline void adc_ofr2_set_offset2(uint32_t val) {
+	ADC.OFR2 = (ADC.OFR2 & ~ADC_OFR2_OFFSET2) | ((val << 0) & ADC_OFR2_OFFSET2);
+}
+static inline uint32_t adc_ofr2_get_offset2_ch(void) { return (ADC.OFR2 & ADC_OFR2_OFFSET2_CH) >> 26; }
+static inline uint32_t adc_ofr2_get_offset2(void) { return (ADC.OFR2 & ADC_OFR2_OFFSET2) >> 0; }
 
 // ADC->OFR3 offset register 3
 enum {
-	ADC_OFR3_OFFSET3_EN = 1UL<<31, // OFFSET3_EN
-	ADC_OFR3_OFFSET3_CH = ((1UL<<5)-1) << 26, // OFFSET3_CH
-	ADC_OFR3_OFFSET3 = ((1UL<<12)-1) << 0, // OFFSET3		
+	ADC_OFR3_OFFSET3_EN = 1UL << 31,			   // OFFSET3_EN
+	ADC_OFR3_OFFSET3_CH = ((1UL << 5) - 1) << 26,  // OFFSET3_CH
+	ADC_OFR3_OFFSET3	= ((1UL << 12) - 1) << 0,  // OFFSET3
 };
-static inline void adc_ofr3_set_offset3_ch(uint32_t val) { ADC.OFR3 = (ADC.OFR3 & ~ADC_OFR3_OFFSET3_CH) | ((val<<26) & ADC_OFR3_OFFSET3_CH); }
-static inline void adc_ofr3_set_offset3(uint32_t val) { ADC.OFR3 = (ADC.OFR3 & ~ADC_OFR3_OFFSET3) | ((val<<0) & ADC_OFR3_OFFSET3); }
-static inline uint32_t adc_ofr3_get_offset3_ch(void) { return (ADC.OFR3 & ADC_OFR3_OFFSET3_CH) >> 26 ; }
-static inline uint32_t adc_ofr3_get_offset3(void) { return (ADC.OFR3 & ADC_OFR3_OFFSET3) >> 0 ; }
+static inline void adc_ofr3_set_offset3_ch(uint32_t val) {
+	ADC.OFR3 = (ADC.OFR3 & ~ADC_OFR3_OFFSET3_CH) | ((val << 26) & ADC_OFR3_OFFSET3_CH);
+}
+static inline void adc_ofr3_set_offset3(uint32_t val) {
+	ADC.OFR3 = (ADC.OFR3 & ~ADC_OFR3_OFFSET3) | ((val << 0) & ADC_OFR3_OFFSET3);
+}
+static inline uint32_t adc_ofr3_get_offset3_ch(void) { return (ADC.OFR3 & ADC_OFR3_OFFSET3_CH) >> 26; }
+static inline uint32_t adc_ofr3_get_offset3(void) { return (ADC.OFR3 & ADC_OFR3_OFFSET3) >> 0; }
 
 // ADC->OFR4 offset register 4
 enum {
-	ADC_OFR4_OFFSET4_EN = 1UL<<31, // OFFSET4_EN
-	ADC_OFR4_OFFSET4_CH = ((1UL<<5)-1) << 26, // OFFSET4_CH
-	ADC_OFR4_OFFSET4 = ((1UL<<12)-1) << 0, // OFFSET4		
+	ADC_OFR4_OFFSET4_EN = 1UL << 31,			   // OFFSET4_EN
+	ADC_OFR4_OFFSET4_CH = ((1UL << 5) - 1) << 26,  // OFFSET4_CH
+	ADC_OFR4_OFFSET4	= ((1UL << 12) - 1) << 0,  // OFFSET4
 };
-static inline void adc_ofr4_set_offset4_ch(uint32_t val) { ADC.OFR4 = (ADC.OFR4 & ~ADC_OFR4_OFFSET4_CH) | ((val<<26) & ADC_OFR4_OFFSET4_CH); }
-static inline void adc_ofr4_set_offset4(uint32_t val) { ADC.OFR4 = (ADC.OFR4 & ~ADC_OFR4_OFFSET4) | ((val<<0) & ADC_OFR4_OFFSET4); }
-static inline uint32_t adc_ofr4_get_offset4_ch(void) { return (ADC.OFR4 & ADC_OFR4_OFFSET4_CH) >> 26 ; }
-static inline uint32_t adc_ofr4_get_offset4(void) { return (ADC.OFR4 & ADC_OFR4_OFFSET4) >> 0 ; }
+static inline void adc_ofr4_set_offset4_ch(uint32_t val) {
+	ADC.OFR4 = (ADC.OFR4 & ~ADC_OFR4_OFFSET4_CH) | ((val << 26) & ADC_OFR4_OFFSET4_CH);
+}
+static inline void adc_ofr4_set_offset4(uint32_t val) {
+	ADC.OFR4 = (ADC.OFR4 & ~ADC_OFR4_OFFSET4) | ((val << 0) & ADC_OFR4_OFFSET4);
+}
+static inline uint32_t adc_ofr4_get_offset4_ch(void) { return (ADC.OFR4 & ADC_OFR4_OFFSET4_CH) >> 26; }
+static inline uint32_t adc_ofr4_get_offset4(void) { return (ADC.OFR4 & ADC_OFR4_OFFSET4) >> 0; }
 
 // ADC->AWD2CR Analog Watchdog 2 Configuration Register
 enum {
-	ADC_AWD2CR_AWD2CH = ((1UL<<18)-1) << 1, // AWD2CH		
+	ADC_AWD2CR_AWD2CH = ((1UL << 18) - 1) << 1,	 // AWD2CH
 };
-static inline void adc_awd2cr_set_awd2ch(uint32_t val) { ADC.AWD2CR = (ADC.AWD2CR & ~ADC_AWD2CR_AWD2CH) | ((val<<1) & ADC_AWD2CR_AWD2CH); }
-static inline uint32_t adc_awd2cr_get_awd2ch(void) { return (ADC.AWD2CR & ADC_AWD2CR_AWD2CH) >> 1 ; }
+static inline void adc_awd2cr_set_awd2ch(uint32_t val) {
+	ADC.AWD2CR = (ADC.AWD2CR & ~ADC_AWD2CR_AWD2CH) | ((val << 1) & ADC_AWD2CR_AWD2CH);
+}
+static inline uint32_t adc_awd2cr_get_awd2ch(void) { return (ADC.AWD2CR & ADC_AWD2CR_AWD2CH) >> 1; }
 
 // ADC->AWD3CR Analog Watchdog 3 Configuration Register
 enum {
-	ADC_AWD3CR_AWD3CH = ((1UL<<18)-1) << 1, // AWD3CH		
+	ADC_AWD3CR_AWD3CH = ((1UL << 18) - 1) << 1,	 // AWD3CH
 };
-static inline void adc_awd3cr_set_awd3ch(uint32_t val) { ADC.AWD3CR = (ADC.AWD3CR & ~ADC_AWD3CR_AWD3CH) | ((val<<1) & ADC_AWD3CR_AWD3CH); }
-static inline uint32_t adc_awd3cr_get_awd3ch(void) { return (ADC.AWD3CR & ADC_AWD3CR_AWD3CH) >> 1 ; }
+static inline void adc_awd3cr_set_awd3ch(uint32_t val) {
+	ADC.AWD3CR = (ADC.AWD3CR & ~ADC_AWD3CR_AWD3CH) | ((val << 1) & ADC_AWD3CR_AWD3CH);
+}
+static inline uint32_t adc_awd3cr_get_awd3ch(void) { return (ADC.AWD3CR & ADC_AWD3CR_AWD3CH) >> 1; }
 
 // ADC->DIFSEL Differential Mode Selection Register 2
 enum {
-	ADC_DIFSEL_DIFSEL_16_18 = ((1UL<<3)-1) << 16, // Differential mode for channels 18 to 16
-	ADC_DIFSEL_DIFSEL_1_15 = ((1UL<<15)-1) << 1, // Differential mode for channels 15 to 1		
+	ADC_DIFSEL_DIFSEL_16_18 = ((1UL << 3) - 1) << 16,  // Differential mode for channels 18 to 16
+	ADC_DIFSEL_DIFSEL_1_15	= ((1UL << 15) - 1) << 1,  // Differential mode for channels 15 to 1
 };
-static inline void adc_difsel_set_difsel_16_18(uint32_t val) { ADC.DIFSEL = (ADC.DIFSEL & ~ADC_DIFSEL_DIFSEL_16_18) | ((val<<16) & ADC_DIFSEL_DIFSEL_16_18); }
-static inline void adc_difsel_set_difsel_1_15(uint32_t val) { ADC.DIFSEL = (ADC.DIFSEL & ~ADC_DIFSEL_DIFSEL_1_15) | ((val<<1) & ADC_DIFSEL_DIFSEL_1_15); }
-static inline uint32_t adc_difsel_get_difsel_16_18(void) { return (ADC.DIFSEL & ADC_DIFSEL_DIFSEL_16_18) >> 16 ; }
-static inline uint32_t adc_difsel_get_difsel_1_15(void) { return (ADC.DIFSEL & ADC_DIFSEL_DIFSEL_1_15) >> 1 ; }
+static inline void adc_difsel_set_difsel_16_18(uint32_t val) {
+	ADC.DIFSEL = (ADC.DIFSEL & ~ADC_DIFSEL_DIFSEL_16_18) | ((val << 16) & ADC_DIFSEL_DIFSEL_16_18);
+}
+static inline void adc_difsel_set_difsel_1_15(uint32_t val) {
+	ADC.DIFSEL = (ADC.DIFSEL & ~ADC_DIFSEL_DIFSEL_1_15) | ((val << 1) & ADC_DIFSEL_DIFSEL_1_15);
+}
+static inline uint32_t adc_difsel_get_difsel_16_18(void) { return (ADC.DIFSEL & ADC_DIFSEL_DIFSEL_16_18) >> 16; }
+static inline uint32_t adc_difsel_get_difsel_1_15(void) { return (ADC.DIFSEL & ADC_DIFSEL_DIFSEL_1_15) >> 1; }
 
 // ADC->CALFACT Calibration Factors
 enum {
-	ADC_CALFACT_CALFACT_D = ((1UL<<7)-1) << 16, // CALFACT_D
-	ADC_CALFACT_CALFACT_S = ((1UL<<7)-1) << 0, // CALFACT_S		
+	ADC_CALFACT_CALFACT_D = ((1UL << 7) - 1) << 16,	 // CALFACT_D
+	ADC_CALFACT_CALFACT_S = ((1UL << 7) - 1) << 0,	 // CALFACT_S
 };
-static inline void adc_calfact_set_calfact_d(uint32_t val) { ADC.CALFACT = (ADC.CALFACT & ~ADC_CALFACT_CALFACT_D) | ((val<<16) & ADC_CALFACT_CALFACT_D); }
-static inline void adc_calfact_set_calfact_s(uint32_t val) { ADC.CALFACT = (ADC.CALFACT & ~ADC_CALFACT_CALFACT_S) | ((val<<0) & ADC_CALFACT_CALFACT_S); }
-static inline uint32_t adc_calfact_get_calfact_d(void) { return (ADC.CALFACT & ADC_CALFACT_CALFACT_D) >> 16 ; }
-static inline uint32_t adc_calfact_get_calfact_s(void) { return (ADC.CALFACT & ADC_CALFACT_CALFACT_S) >> 0 ; }
+static inline void adc_calfact_set_calfact_d(uint32_t val) {
+	ADC.CALFACT = (ADC.CALFACT & ~ADC_CALFACT_CALFACT_D) | ((val << 16) & ADC_CALFACT_CALFACT_D);
+}
+static inline void adc_calfact_set_calfact_s(uint32_t val) {
+	ADC.CALFACT = (ADC.CALFACT & ~ADC_CALFACT_CALFACT_S) | ((val << 0) & ADC_CALFACT_CALFACT_S);
+}
+static inline uint32_t adc_calfact_get_calfact_d(void) { return (ADC.CALFACT & ADC_CALFACT_CALFACT_D) >> 16; }
+static inline uint32_t adc_calfact_get_calfact_s(void) { return (ADC.CALFACT & ADC_CALFACT_CALFACT_S) >> 0; }
 
 /* Analog-to-Digital Converter
 There is only one peripheral of type ADC_Common. */
 struct ADC_Common_Type {
-	__I uint32_t CSR; // @0 ADC Common status register
-	 uint8_t RESERVED0[4]; // @4 
-	__IO uint32_t CCR; // @8 ADC common control register
-	__I uint32_t CDR; // @12 ADC common regular data register for dual and triple modes
+	__I uint32_t  CSR;			 // @0 ADC Common status register
+	uint8_t		  RESERVED0[4];	 // @4
+	__IO uint32_t CCR;			 // @8 ADC common control register
+	__I uint32_t  CDR;			 // @12 ADC common regular data register for dual and triple modes
 };
-extern struct ADC_Common_Type	ADC12_Common;	// @0x50040300 
+extern struct ADC_Common_Type ADC12_Common;	 // @0x50040300
 
 // ADC_Common->CSR ADC Common status register
 enum {
-	ADC_COMMON_CSR_JQOVF_SLV = 1UL<<26, // Injected Context Queue Overflow flag of the slave ADC
-	ADC_COMMON_CSR_AWD3_SLV = 1UL<<25, // Analog watchdog 3 flag of the slave ADC
-	ADC_COMMON_CSR_AWD2_SLV = 1UL<<24, // Analog watchdog 2 flag of the slave ADC
-	ADC_COMMON_CSR_AWD1_SLV = 1UL<<23, // Analog watchdog 1 flag of the slave ADC
-	ADC_COMMON_CSR_JEOS_SLV = 1UL<<22, // End of injected sequence flag of the slave ADC
-	ADC_COMMON_CSR_JEOC_SLV = 1UL<<21, // End of injected conversion flag of the slave ADC
-	ADC_COMMON_CSR_OVR_SLV = 1UL<<20, // Overrun flag of the slave ADC
-	ADC_COMMON_CSR_EOS_SLV = 1UL<<19, // End of regular sequence flag of the slave ADC
-	ADC_COMMON_CSR_EOC_SLV = 1UL<<18, // End of regular conversion of the slave ADC
-	ADC_COMMON_CSR_EOSMP_SLV = 1UL<<17, // EOSMP_SLV
-	ADC_COMMON_CSR_ADRDY_SLV = 1UL<<16, // ADRDY_SLV
-	ADC_COMMON_CSR_JQOVF_MST = 1UL<<10, // JQOVF_MST
-	ADC_COMMON_CSR_AWD3_MST = 1UL<<9, // AWD3_MST
-	ADC_COMMON_CSR_AWD2_MST = 1UL<<8, // AWD2_MST
-	ADC_COMMON_CSR_AWD1_MST = 1UL<<7, // AWD1_MST
-	ADC_COMMON_CSR_JEOS_MST = 1UL<<6, // JEOS_MST
-	ADC_COMMON_CSR_JEOC_MST = 1UL<<5, // JEOC_MST
-	ADC_COMMON_CSR_OVR_MST = 1UL<<4, // OVR_MST
-	ADC_COMMON_CSR_EOS_MST = 1UL<<3, // EOS_MST
-	ADC_COMMON_CSR_EOC_MST = 1UL<<2, // EOC_MST
-	ADC_COMMON_CSR_EOSMP_MST = 1UL<<1, // EOSMP_MST
-	ADC_COMMON_CSR_ADDRDY_MST = 1UL<<0, // ADDRDY_MST		
+	ADC_COMMON_CSR_JQOVF_SLV  = 1UL << 26,	// Injected Context Queue Overflow flag of the slave ADC
+	ADC_COMMON_CSR_AWD3_SLV	  = 1UL << 25,	// Analog watchdog 3 flag of the slave ADC
+	ADC_COMMON_CSR_AWD2_SLV	  = 1UL << 24,	// Analog watchdog 2 flag of the slave ADC
+	ADC_COMMON_CSR_AWD1_SLV	  = 1UL << 23,	// Analog watchdog 1 flag of the slave ADC
+	ADC_COMMON_CSR_JEOS_SLV	  = 1UL << 22,	// End of injected sequence flag of the slave ADC
+	ADC_COMMON_CSR_JEOC_SLV	  = 1UL << 21,	// End of injected conversion flag of the slave ADC
+	ADC_COMMON_CSR_OVR_SLV	  = 1UL << 20,	// Overrun flag of the slave ADC
+	ADC_COMMON_CSR_EOS_SLV	  = 1UL << 19,	// End of regular sequence flag of the slave ADC
+	ADC_COMMON_CSR_EOC_SLV	  = 1UL << 18,	// End of regular conversion of the slave ADC
+	ADC_COMMON_CSR_EOSMP_SLV  = 1UL << 17,	// EOSMP_SLV
+	ADC_COMMON_CSR_ADRDY_SLV  = 1UL << 16,	// ADRDY_SLV
+	ADC_COMMON_CSR_JQOVF_MST  = 1UL << 10,	// JQOVF_MST
+	ADC_COMMON_CSR_AWD3_MST	  = 1UL << 9,	// AWD3_MST
+	ADC_COMMON_CSR_AWD2_MST	  = 1UL << 8,	// AWD2_MST
+	ADC_COMMON_CSR_AWD1_MST	  = 1UL << 7,	// AWD1_MST
+	ADC_COMMON_CSR_JEOS_MST	  = 1UL << 6,	// JEOS_MST
+	ADC_COMMON_CSR_JEOC_MST	  = 1UL << 5,	// JEOC_MST
+	ADC_COMMON_CSR_OVR_MST	  = 1UL << 4,	// OVR_MST
+	ADC_COMMON_CSR_EOS_MST	  = 1UL << 3,	// EOS_MST
+	ADC_COMMON_CSR_EOC_MST	  = 1UL << 2,	// EOC_MST
+	ADC_COMMON_CSR_EOSMP_MST  = 1UL << 1,	// EOSMP_MST
+	ADC_COMMON_CSR_ADDRDY_MST = 1UL << 0,	// ADDRDY_MST
 };
 
 // ADC_Common->CCR ADC common control register
 enum {
-	ADC_COMMON_CCR_VBATSEL = 1UL<<24, // VBAT selection
-	ADC_COMMON_CCR_VSENSESEL = 1UL<<23, // VTS selection
-	ADC_COMMON_CCR_VREFEN = 1UL<<22, // VREFINT enable
-	ADC_COMMON_CCR_PRESC = ((1UL<<4)-1) << 18, // ADC prescaler
-	ADC_COMMON_CCR_CKMODE = ((1UL<<2)-1) << 16, // ADC clock mode
-	ADC_COMMON_CCR_MDMA = ((1UL<<2)-1) << 14, // Direct memory access mode for multi ADC mode
-	ADC_COMMON_CCR_DMACFG = 1UL<<13, // DMA configuration (for multi-ADC mode)
-	ADC_COMMON_CCR_DELAY = ((1UL<<4)-1) << 8, // Delay between 2 sampling phases
-	ADC_COMMON_CCR_DUAL = ((1UL<<5)-1) << 0, // Dual ADC mode selection		
+	ADC_COMMON_CCR_VBATSEL	 = 1UL << 24,				// VBAT selection
+	ADC_COMMON_CCR_VSENSESEL = 1UL << 23,				// VTS selection
+	ADC_COMMON_CCR_VREFEN	 = 1UL << 22,				// VREFINT enable
+	ADC_COMMON_CCR_PRESC	 = ((1UL << 4) - 1) << 18,	// ADC prescaler
+	ADC_COMMON_CCR_CKMODE	 = ((1UL << 2) - 1) << 16,	// ADC clock mode
+	ADC_COMMON_CCR_MDMA		 = ((1UL << 2) - 1) << 14,	// Direct memory access mode for multi ADC mode
+	ADC_COMMON_CCR_DMACFG	 = 1UL << 13,				// DMA configuration (for multi-ADC mode)
+	ADC_COMMON_CCR_DELAY	 = ((1UL << 4) - 1) << 8,	// Delay between 2 sampling phases
+	ADC_COMMON_CCR_DUAL		 = ((1UL << 5) - 1) << 0,	// Dual ADC mode selection
 };
-static inline void adc_common_ccr_set_presc(uint32_t val) { ADC12_Common.CCR = (ADC12_Common.CCR & ~ADC_COMMON_CCR_PRESC) | ((val<<18) & ADC_COMMON_CCR_PRESC); }
-static inline void adc_common_ccr_set_ckmode(uint32_t val) { ADC12_Common.CCR = (ADC12_Common.CCR & ~ADC_COMMON_CCR_CKMODE) | ((val<<16) & ADC_COMMON_CCR_CKMODE); }
-static inline void adc_common_ccr_set_mdma(uint32_t val) { ADC12_Common.CCR = (ADC12_Common.CCR & ~ADC_COMMON_CCR_MDMA) | ((val<<14) & ADC_COMMON_CCR_MDMA); }
-static inline void adc_common_ccr_set_delay(uint32_t val) { ADC12_Common.CCR = (ADC12_Common.CCR & ~ADC_COMMON_CCR_DELAY) | ((val<<8) & ADC_COMMON_CCR_DELAY); }
-static inline void adc_common_ccr_set_dual(uint32_t val) { ADC12_Common.CCR = (ADC12_Common.CCR & ~ADC_COMMON_CCR_DUAL) | ((val<<0) & ADC_COMMON_CCR_DUAL); }
-static inline uint32_t adc_common_ccr_get_presc(void) { return (ADC12_Common.CCR & ADC_COMMON_CCR_PRESC) >> 18 ; }
-static inline uint32_t adc_common_ccr_get_ckmode(void) { return (ADC12_Common.CCR & ADC_COMMON_CCR_CKMODE) >> 16 ; }
-static inline uint32_t adc_common_ccr_get_mdma(void) { return (ADC12_Common.CCR & ADC_COMMON_CCR_MDMA) >> 14 ; }
-static inline uint32_t adc_common_ccr_get_delay(void) { return (ADC12_Common.CCR & ADC_COMMON_CCR_DELAY) >> 8 ; }
-static inline uint32_t adc_common_ccr_get_dual(void) { return (ADC12_Common.CCR & ADC_COMMON_CCR_DUAL) >> 0 ; }
+static inline void adc_common_ccr_set_presc(uint32_t val) {
+	ADC12_Common.CCR = (ADC12_Common.CCR & ~ADC_COMMON_CCR_PRESC) | ((val << 18) & ADC_COMMON_CCR_PRESC);
+}
+static inline void adc_common_ccr_set_ckmode(uint32_t val) {
+	ADC12_Common.CCR = (ADC12_Common.CCR & ~ADC_COMMON_CCR_CKMODE) | ((val << 16) & ADC_COMMON_CCR_CKMODE);
+}
+static inline void adc_common_ccr_set_mdma(uint32_t val) {
+	ADC12_Common.CCR = (ADC12_Common.CCR & ~ADC_COMMON_CCR_MDMA) | ((val << 14) & ADC_COMMON_CCR_MDMA);
+}
+static inline void adc_common_ccr_set_delay(uint32_t val) {
+	ADC12_Common.CCR = (ADC12_Common.CCR & ~ADC_COMMON_CCR_DELAY) | ((val << 8) & ADC_COMMON_CCR_DELAY);
+}
+static inline void adc_common_ccr_set_dual(uint32_t val) {
+	ADC12_Common.CCR = (ADC12_Common.CCR & ~ADC_COMMON_CCR_DUAL) | ((val << 0) & ADC_COMMON_CCR_DUAL);
+}
+static inline uint32_t adc_common_ccr_get_presc(void) { return (ADC12_Common.CCR & ADC_COMMON_CCR_PRESC) >> 18; }
+static inline uint32_t adc_common_ccr_get_ckmode(void) { return (ADC12_Common.CCR & ADC_COMMON_CCR_CKMODE) >> 16; }
+static inline uint32_t adc_common_ccr_get_mdma(void) { return (ADC12_Common.CCR & ADC_COMMON_CCR_MDMA) >> 14; }
+static inline uint32_t adc_common_ccr_get_delay(void) { return (ADC12_Common.CCR & ADC_COMMON_CCR_DELAY) >> 8; }
+static inline uint32_t adc_common_ccr_get_dual(void) { return (ADC12_Common.CCR & ADC_COMMON_CCR_DUAL) >> 0; }
 
 // ADC_Common->CDR ADC common regular data register for dual and triple modes
 enum {
-	ADC_COMMON_CDR_RDATA_SLV = ((1UL<<16)-1) << 16, // Regular data of the slave ADC
-	ADC_COMMON_CDR_RDATA_MST = ((1UL<<16)-1) << 0, // Regular data of the master ADC		
+	ADC_COMMON_CDR_RDATA_SLV = ((1UL << 16) - 1) << 16,	 // Regular data of the slave ADC
+	ADC_COMMON_CDR_RDATA_MST = ((1UL << 16) - 1) << 0,	 // Regular data of the master ADC
 };
-static inline uint32_t adc_common_cdr_get_rdata_slv(void) { return (ADC12_Common.CDR & ADC_COMMON_CDR_RDATA_SLV) >> 16 ; }
-static inline uint32_t adc_common_cdr_get_rdata_mst(void) { return (ADC12_Common.CDR & ADC_COMMON_CDR_RDATA_MST) >> 0 ; }
+static inline uint32_t adc_common_cdr_get_rdata_slv(void) { return (ADC12_Common.CDR & ADC_COMMON_CDR_RDATA_SLV) >> 16; }
+static inline uint32_t adc_common_cdr_get_rdata_mst(void) { return (ADC12_Common.CDR & ADC_COMMON_CDR_RDATA_MST) >> 0; }
 
 /* Controller area network
 There is only one peripheral of type CAN. */
 struct CAN_Type {
-	__IO uint32_t MCR; // @0 master control register
-	__IO uint16_t MSR; // @4 master status register
-	 uint8_t RESERVED0[2]; // @6 
-	__IO uint32_t TSR; // @8 transmit status register
-	__IO uint8_t RF0R; // @12 receive FIFO 0 register
-	 uint8_t RESERVED1[3]; // @13 
-	__IO uint8_t RF1R; // @16 receive FIFO 1 register
-	 uint8_t RESERVED2[3]; // @17 
-	__IO uint32_t IER; // @20 interrupt enable register
-	__IO uint32_t ESR; // @24 interrupt enable register
-	__IO uint32_t BTR; // @28 bit timing register
-	 uint8_t RESERVED3[352]; // @32 
-	__IO uint32_t TI0R; // @384 TX mailbox identifier register
-	__IO uint32_t TDT0R; // @388 mailbox data length control and time stamp register
-	__IO uint32_t TDL0R; // @392 mailbox data low register
-	__IO uint32_t TDH0R; // @396 mailbox data high register
-	__IO uint32_t TI1R; // @400 mailbox identifier register
-	__IO uint32_t TDT1R; // @404 mailbox data length control and time stamp register
-	__IO uint32_t TDL1R; // @408 mailbox data low register
-	__IO uint32_t TDH1R; // @412 mailbox data high register
-	__IO uint32_t TI2R; // @416 mailbox identifier register
-	__IO uint32_t TDT2R; // @420 mailbox data length control and time stamp register
-	__IO uint32_t TDL2R; // @424 mailbox data low register
-	__IO uint32_t TDH2R; // @428 mailbox data high register
-	__I uint32_t RI0R; // @432 receive FIFO mailbox identifier register
-	__I uint32_t RDT0R; // @436 mailbox data high register
-	__I uint32_t RDL0R; // @440 mailbox data high register
-	__I uint32_t RDH0R; // @444 receive FIFO mailbox data high register
-	__I uint32_t RI1R; // @448 mailbox data high register
-	__I uint32_t RDT1R; // @452 mailbox data high register
-	__I uint32_t RDL1R; // @456 mailbox data high register
-	__I uint32_t RDH1R; // @460 mailbox data high register
-	 uint8_t RESERVED4[48]; // @464 
-	__IO uint8_t FMR; // @512 filter master register
-	 uint8_t RESERVED5[3]; // @513 
-	__IO uint16_t FM1R; // @516 filter mode register
-	 uint8_t RESERVED6[6]; // @518 
-	__IO uint16_t FS1R; // @524 filter scale register
-	 uint8_t RESERVED7[6]; // @526 
-	__IO uint16_t FFA1R; // @532 filter FIFO assignment register
-	 uint8_t RESERVED8[6]; // @534 
-	__IO uint16_t FA1R; // @540 filter activation register
-	 uint8_t RESERVED9[34]; // @542 
-	__IO uint32_t F0R1; // @576 Filter bank 0 register 1
-	__IO uint32_t F0R2; // @580 Filter bank 0 register 2
-	__IO uint32_t F1R1; // @584 Filter bank 1 register 1
-	__IO uint32_t F1R2; // @588 Filter bank 1 register 2
-	__IO uint32_t F2R1; // @592 Filter bank 2 register 1
-	__IO uint32_t F2R2; // @596 Filter bank 2 register 2
-	__IO uint32_t F3R1; // @600 Filter bank 3 register 1
-	__IO uint32_t F3R2; // @604 Filter bank 3 register 2
-	__IO uint32_t F4R1; // @608 Filter bank 4 register 1
-	__IO uint32_t F4R2; // @612 Filter bank 4 register 2
-	__IO uint32_t F5R1; // @616 Filter bank 5 register 1
-	__IO uint32_t F5R2; // @620 Filter bank 5 register 2
-	__IO uint32_t F6R1; // @624 Filter bank 6 register 1
-	__IO uint32_t F6R2; // @628 Filter bank 6 register 2
-	__IO uint32_t F7R1; // @632 Filter bank 7 register 1
-	__IO uint32_t F7R2; // @636 Filter bank 7 register 2
-	__IO uint32_t F8R1; // @640 Filter bank 8 register 1
-	__IO uint32_t F8R2; // @644 Filter bank 8 register 2
-	__IO uint32_t F9R1; // @648 Filter bank 9 register 1
-	__IO uint32_t F9R2; // @652 Filter bank 9 register 2
-	__IO uint32_t F10R1; // @656 Filter bank 10 register 1
-	__IO uint32_t F10R2; // @660 Filter bank 10 register 2
-	__IO uint32_t F11R1; // @664 Filter bank 11 register 1
-	__IO uint32_t F11R2; // @668 Filter bank 11 register 2
-	__IO uint32_t F12R1; // @672 Filter bank 4 register 1
-	__IO uint32_t F12R2; // @676 Filter bank 12 register 2
-	__IO uint32_t F13R1; // @680 Filter bank 13 register 1
-	__IO uint32_t F13R2; // @684 Filter bank 13 register 2
-	__IO uint32_t F14R1; // @688 Filter bank 14 register 1
-	__IO uint32_t F14R2; // @692 Filter bank 14 register 2
-	__IO uint32_t F15R1; // @696 Filter bank 15 register 1
-	__IO uint32_t F15R2; // @700 Filter bank 15 register 2
-	__IO uint32_t F16R1; // @704 Filter bank 16 register 1
-	__IO uint32_t F16R2; // @708 Filter bank 16 register 2
-	__IO uint32_t F17R1; // @712 Filter bank 17 register 1
-	__IO uint32_t F17R2; // @716 Filter bank 17 register 2
-	__IO uint32_t F18R1; // @720 Filter bank 18 register 1
-	__IO uint32_t F18R2; // @724 Filter bank 18 register 2
-	__IO uint32_t F19R1; // @728 Filter bank 19 register 1
-	__IO uint32_t F19R2; // @732 Filter bank 19 register 2
-	__IO uint32_t F20R1; // @736 Filter bank 20 register 1
-	__IO uint32_t F20R2; // @740 Filter bank 20 register 2
-	__IO uint32_t F21R1; // @744 Filter bank 21 register 1
-	__IO uint32_t F21R2; // @748 Filter bank 21 register 2
-	__IO uint32_t F22R1; // @752 Filter bank 22 register 1
-	__IO uint32_t F22R2; // @756 Filter bank 22 register 2
-	__IO uint32_t F23R1; // @760 Filter bank 23 register 1
-	__IO uint32_t F23R2; // @764 Filter bank 23 register 2
-	__IO uint32_t F24R1; // @768 Filter bank 24 register 1
-	__IO uint32_t F24R2; // @772 Filter bank 24 register 2
-	__IO uint32_t F25R1; // @776 Filter bank 25 register 1
-	__IO uint32_t F25R2; // @780 Filter bank 25 register 2
-	__IO uint32_t F26R1; // @784 Filter bank 26 register 1
-	__IO uint32_t F26R2; // @788 Filter bank 26 register 2
-	__IO uint32_t F27R1; // @792 Filter bank 27 register 1
-	__IO uint32_t F27R2; // @796 Filter bank 27 register 2
+	__IO uint32_t MCR;			   // @0 master control register
+	__IO uint16_t MSR;			   // @4 master status register
+	uint8_t		  RESERVED0[2];	   // @6
+	__IO uint32_t TSR;			   // @8 transmit status register
+	__IO uint8_t  RF0R;			   // @12 receive FIFO 0 register
+	uint8_t		  RESERVED1[3];	   // @13
+	__IO uint8_t  RF1R;			   // @16 receive FIFO 1 register
+	uint8_t		  RESERVED2[3];	   // @17
+	__IO uint32_t IER;			   // @20 interrupt enable register
+	__IO uint32_t ESR;			   // @24 interrupt enable register
+	__IO uint32_t BTR;			   // @28 bit timing register
+	uint8_t		  RESERVED3[352];  // @32
+	__IO uint32_t TI0R;			   // @384 TX mailbox identifier register
+	__IO uint32_t TDT0R;		   // @388 mailbox data length control and time stamp register
+	__IO uint32_t TDL0R;		   // @392 mailbox data low register
+	__IO uint32_t TDH0R;		   // @396 mailbox data high register
+	__IO uint32_t TI1R;			   // @400 mailbox identifier register
+	__IO uint32_t TDT1R;		   // @404 mailbox data length control and time stamp register
+	__IO uint32_t TDL1R;		   // @408 mailbox data low register
+	__IO uint32_t TDH1R;		   // @412 mailbox data high register
+	__IO uint32_t TI2R;			   // @416 mailbox identifier register
+	__IO uint32_t TDT2R;		   // @420 mailbox data length control and time stamp register
+	__IO uint32_t TDL2R;		   // @424 mailbox data low register
+	__IO uint32_t TDH2R;		   // @428 mailbox data high register
+	__I uint32_t  RI0R;			   // @432 receive FIFO mailbox identifier register
+	__I uint32_t  RDT0R;		   // @436 mailbox data high register
+	__I uint32_t  RDL0R;		   // @440 mailbox data high register
+	__I uint32_t  RDH0R;		   // @444 receive FIFO mailbox data high register
+	__I uint32_t  RI1R;			   // @448 mailbox data high register
+	__I uint32_t  RDT1R;		   // @452 mailbox data high register
+	__I uint32_t  RDL1R;		   // @456 mailbox data high register
+	__I uint32_t  RDH1R;		   // @460 mailbox data high register
+	uint8_t		  RESERVED4[48];   // @464
+	__IO uint8_t  FMR;			   // @512 filter master register
+	uint8_t		  RESERVED5[3];	   // @513
+	__IO uint16_t FM1R;			   // @516 filter mode register
+	uint8_t		  RESERVED6[6];	   // @518
+	__IO uint16_t FS1R;			   // @524 filter scale register
+	uint8_t		  RESERVED7[6];	   // @526
+	__IO uint16_t FFA1R;		   // @532 filter FIFO assignment register
+	uint8_t		  RESERVED8[6];	   // @534
+	__IO uint16_t FA1R;			   // @540 filter activation register
+	uint8_t		  RESERVED9[34];   // @542
+	__IO uint32_t F0R1;			   // @576 Filter bank 0 register 1
+	__IO uint32_t F0R2;			   // @580 Filter bank 0 register 2
+	__IO uint32_t F1R1;			   // @584 Filter bank 1 register 1
+	__IO uint32_t F1R2;			   // @588 Filter bank 1 register 2
+	__IO uint32_t F2R1;			   // @592 Filter bank 2 register 1
+	__IO uint32_t F2R2;			   // @596 Filter bank 2 register 2
+	__IO uint32_t F3R1;			   // @600 Filter bank 3 register 1
+	__IO uint32_t F3R2;			   // @604 Filter bank 3 register 2
+	__IO uint32_t F4R1;			   // @608 Filter bank 4 register 1
+	__IO uint32_t F4R2;			   // @612 Filter bank 4 register 2
+	__IO uint32_t F5R1;			   // @616 Filter bank 5 register 1
+	__IO uint32_t F5R2;			   // @620 Filter bank 5 register 2
+	__IO uint32_t F6R1;			   // @624 Filter bank 6 register 1
+	__IO uint32_t F6R2;			   // @628 Filter bank 6 register 2
+	__IO uint32_t F7R1;			   // @632 Filter bank 7 register 1
+	__IO uint32_t F7R2;			   // @636 Filter bank 7 register 2
+	__IO uint32_t F8R1;			   // @640 Filter bank 8 register 1
+	__IO uint32_t F8R2;			   // @644 Filter bank 8 register 2
+	__IO uint32_t F9R1;			   // @648 Filter bank 9 register 1
+	__IO uint32_t F9R2;			   // @652 Filter bank 9 register 2
+	__IO uint32_t F10R1;		   // @656 Filter bank 10 register 1
+	__IO uint32_t F10R2;		   // @660 Filter bank 10 register 2
+	__IO uint32_t F11R1;		   // @664 Filter bank 11 register 1
+	__IO uint32_t F11R2;		   // @668 Filter bank 11 register 2
+	__IO uint32_t F12R1;		   // @672 Filter bank 4 register 1
+	__IO uint32_t F12R2;		   // @676 Filter bank 12 register 2
+	__IO uint32_t F13R1;		   // @680 Filter bank 13 register 1
+	__IO uint32_t F13R2;		   // @684 Filter bank 13 register 2
+	__IO uint32_t F14R1;		   // @688 Filter bank 14 register 1
+	__IO uint32_t F14R2;		   // @692 Filter bank 14 register 2
+	__IO uint32_t F15R1;		   // @696 Filter bank 15 register 1
+	__IO uint32_t F15R2;		   // @700 Filter bank 15 register 2
+	__IO uint32_t F16R1;		   // @704 Filter bank 16 register 1
+	__IO uint32_t F16R2;		   // @708 Filter bank 16 register 2
+	__IO uint32_t F17R1;		   // @712 Filter bank 17 register 1
+	__IO uint32_t F17R2;		   // @716 Filter bank 17 register 2
+	__IO uint32_t F18R1;		   // @720 Filter bank 18 register 1
+	__IO uint32_t F18R2;		   // @724 Filter bank 18 register 2
+	__IO uint32_t F19R1;		   // @728 Filter bank 19 register 1
+	__IO uint32_t F19R2;		   // @732 Filter bank 19 register 2
+	__IO uint32_t F20R1;		   // @736 Filter bank 20 register 1
+	__IO uint32_t F20R2;		   // @740 Filter bank 20 register 2
+	__IO uint32_t F21R1;		   // @744 Filter bank 21 register 1
+	__IO uint32_t F21R2;		   // @748 Filter bank 21 register 2
+	__IO uint32_t F22R1;		   // @752 Filter bank 22 register 1
+	__IO uint32_t F22R2;		   // @756 Filter bank 22 register 2
+	__IO uint32_t F23R1;		   // @760 Filter bank 23 register 1
+	__IO uint32_t F23R2;		   // @764 Filter bank 23 register 2
+	__IO uint32_t F24R1;		   // @768 Filter bank 24 register 1
+	__IO uint32_t F24R2;		   // @772 Filter bank 24 register 2
+	__IO uint32_t F25R1;		   // @776 Filter bank 25 register 1
+	__IO uint32_t F25R2;		   // @780 Filter bank 25 register 2
+	__IO uint32_t F26R1;		   // @784 Filter bank 26 register 1
+	__IO uint32_t F26R2;		   // @788 Filter bank 26 register 2
+	__IO uint32_t F27R1;		   // @792 Filter bank 27 register 1
+	__IO uint32_t F27R2;		   // @796 Filter bank 27 register 2
 };
-extern struct CAN_Type	CAN1;	// @0x40006400 
+extern struct CAN_Type CAN1;  // @0x40006400
 
 // CAN->MCR master control register
 enum {
-	CAN_MCR_DBF = 1UL<<16, // DBF
-	CAN_MCR_RESET = 1UL<<15, // RESET
-	CAN_MCR_TTCM = 1UL<<7, // TTCM
-	CAN_MCR_ABOM = 1UL<<6, // ABOM
-	CAN_MCR_AWUM = 1UL<<5, // AWUM
-	CAN_MCR_NART = 1UL<<4, // NART
-	CAN_MCR_RFLM = 1UL<<3, // RFLM
-	CAN_MCR_TXFP = 1UL<<2, // TXFP
-	CAN_MCR_SLEEP = 1UL<<1, // SLEEP
-	CAN_MCR_INRQ = 1UL<<0, // INRQ		
+	CAN_MCR_DBF	  = 1UL << 16,	// DBF
+	CAN_MCR_RESET = 1UL << 15,	// RESET
+	CAN_MCR_TTCM  = 1UL << 7,	// TTCM
+	CAN_MCR_ABOM  = 1UL << 6,	// ABOM
+	CAN_MCR_AWUM  = 1UL << 5,	// AWUM
+	CAN_MCR_NART  = 1UL << 4,	// NART
+	CAN_MCR_RFLM  = 1UL << 3,	// RFLM
+	CAN_MCR_TXFP  = 1UL << 2,	// TXFP
+	CAN_MCR_SLEEP = 1UL << 1,	// SLEEP
+	CAN_MCR_INRQ  = 1UL << 0,	// INRQ
 };
 
 // CAN->MSR master status register
 enum {
-	CAN_MSR_RX = 1UL<<11, // RX
-	CAN_MSR_SAMP = 1UL<<10, // SAMP
-	CAN_MSR_RXM = 1UL<<9, // RXM
-	CAN_MSR_TXM = 1UL<<8, // TXM
-	CAN_MSR_SLAKI = 1UL<<4, // SLAKI
-	CAN_MSR_WKUI = 1UL<<3, // WKUI
-	CAN_MSR_ERRI = 1UL<<2, // ERRI
-	CAN_MSR_SLAK = 1UL<<1, // SLAK
-	CAN_MSR_INAK = 1UL<<0, // INAK		
+	CAN_MSR_RX	  = 1UL << 11,	// RX
+	CAN_MSR_SAMP  = 1UL << 10,	// SAMP
+	CAN_MSR_RXM	  = 1UL << 9,	// RXM
+	CAN_MSR_TXM	  = 1UL << 8,	// TXM
+	CAN_MSR_SLAKI = 1UL << 4,	// SLAKI
+	CAN_MSR_WKUI  = 1UL << 3,	// WKUI
+	CAN_MSR_ERRI  = 1UL << 2,	// ERRI
+	CAN_MSR_SLAK  = 1UL << 1,	// SLAK
+	CAN_MSR_INAK  = 1UL << 0,	// INAK
 };
 
 // CAN->TSR transmit status register
 enum {
-	CAN_TSR_LOW2 = 1UL<<31, // Lowest priority flag for mailbox 2
-	CAN_TSR_LOW1 = 1UL<<30, // Lowest priority flag for mailbox 1
-	CAN_TSR_LOW0 = 1UL<<29, // Lowest priority flag for mailbox 0
-	CAN_TSR_TME2 = 1UL<<28, // Lowest priority flag for mailbox 2
-	CAN_TSR_TME1 = 1UL<<27, // Lowest priority flag for mailbox 1
-	CAN_TSR_TME0 = 1UL<<26, // Lowest priority flag for mailbox 0
-	CAN_TSR_CODE = ((1UL<<2)-1) << 24, // CODE
-	CAN_TSR_ABRQ2 = 1UL<<23, // ABRQ2
-	CAN_TSR_TERR2 = 1UL<<19, // TERR2
-	CAN_TSR_ALST2 = 1UL<<18, // ALST2
-	CAN_TSR_TXOK2 = 1UL<<17, // TXOK2
-	CAN_TSR_RQCP2 = 1UL<<16, // RQCP2
-	CAN_TSR_ABRQ1 = 1UL<<15, // ABRQ1
-	CAN_TSR_TERR1 = 1UL<<11, // TERR1
-	CAN_TSR_ALST1 = 1UL<<10, // ALST1
-	CAN_TSR_TXOK1 = 1UL<<9, // TXOK1
-	CAN_TSR_RQCP1 = 1UL<<8, // RQCP1
-	CAN_TSR_ABRQ0 = 1UL<<7, // ABRQ0
-	CAN_TSR_TERR0 = 1UL<<3, // TERR0
-	CAN_TSR_ALST0 = 1UL<<2, // ALST0
-	CAN_TSR_TXOK0 = 1UL<<1, // TXOK0
-	CAN_TSR_RQCP0 = 1UL<<0, // RQCP0		
+	CAN_TSR_LOW2  = 1UL << 31,				 // Lowest priority flag for mailbox 2
+	CAN_TSR_LOW1  = 1UL << 30,				 // Lowest priority flag for mailbox 1
+	CAN_TSR_LOW0  = 1UL << 29,				 // Lowest priority flag for mailbox 0
+	CAN_TSR_TME2  = 1UL << 28,				 // Lowest priority flag for mailbox 2
+	CAN_TSR_TME1  = 1UL << 27,				 // Lowest priority flag for mailbox 1
+	CAN_TSR_TME0  = 1UL << 26,				 // Lowest priority flag for mailbox 0
+	CAN_TSR_CODE  = ((1UL << 2) - 1) << 24,	 // CODE
+	CAN_TSR_ABRQ2 = 1UL << 23,				 // ABRQ2
+	CAN_TSR_TERR2 = 1UL << 19,				 // TERR2
+	CAN_TSR_ALST2 = 1UL << 18,				 // ALST2
+	CAN_TSR_TXOK2 = 1UL << 17,				 // TXOK2
+	CAN_TSR_RQCP2 = 1UL << 16,				 // RQCP2
+	CAN_TSR_ABRQ1 = 1UL << 15,				 // ABRQ1
+	CAN_TSR_TERR1 = 1UL << 11,				 // TERR1
+	CAN_TSR_ALST1 = 1UL << 10,				 // ALST1
+	CAN_TSR_TXOK1 = 1UL << 9,				 // TXOK1
+	CAN_TSR_RQCP1 = 1UL << 8,				 // RQCP1
+	CAN_TSR_ABRQ0 = 1UL << 7,				 // ABRQ0
+	CAN_TSR_TERR0 = 1UL << 3,				 // TERR0
+	CAN_TSR_ALST0 = 1UL << 2,				 // ALST0
+	CAN_TSR_TXOK0 = 1UL << 1,				 // TXOK0
+	CAN_TSR_RQCP0 = 1UL << 0,				 // RQCP0
 };
-static inline void can_tsr_set_code(uint32_t val) { CAN1.TSR = (CAN1.TSR & ~CAN_TSR_CODE) | ((val<<24) & CAN_TSR_CODE); }
-static inline uint32_t can_tsr_get_code(void) { return (CAN1.TSR & CAN_TSR_CODE) >> 24 ; }
+static inline void	   can_tsr_set_code(uint32_t val) { CAN1.TSR = (CAN1.TSR & ~CAN_TSR_CODE) | ((val << 24) & CAN_TSR_CODE); }
+static inline uint32_t can_tsr_get_code(void) { return (CAN1.TSR & CAN_TSR_CODE) >> 24; }
 
 // CAN->RF0R receive FIFO 0 register
 enum {
-	CAN_RF0R_RFOM0 = 1UL<<5, // RFOM0
-	CAN_RF0R_FOVR0 = 1UL<<4, // FOVR0
-	CAN_RF0R_FULL0 = 1UL<<3, // FULL0
-	CAN_RF0R_FMP0 = ((1UL<<2)-1) << 0, // FMP0		
+	CAN_RF0R_RFOM0 = 1UL << 5,				 // RFOM0
+	CAN_RF0R_FOVR0 = 1UL << 4,				 // FOVR0
+	CAN_RF0R_FULL0 = 1UL << 3,				 // FULL0
+	CAN_RF0R_FMP0  = ((1UL << 2) - 1) << 0,	 // FMP0
 };
-static inline void can_rf0r_set_fmp0(uint32_t val) { CAN1.RF0R = (CAN1.RF0R & ~CAN_RF0R_FMP0) | ((val<<0) & CAN_RF0R_FMP0); }
-static inline uint32_t can_rf0r_get_fmp0(void) { return (CAN1.RF0R & CAN_RF0R_FMP0) >> 0 ; }
+static inline void	   can_rf0r_set_fmp0(uint32_t val) { CAN1.RF0R = (CAN1.RF0R & ~CAN_RF0R_FMP0) | ((val << 0) & CAN_RF0R_FMP0); }
+static inline uint32_t can_rf0r_get_fmp0(void) { return (CAN1.RF0R & CAN_RF0R_FMP0) >> 0; }
 
 // CAN->RF1R receive FIFO 1 register
 enum {
-	CAN_RF1R_RFOM1 = 1UL<<5, // RFOM1
-	CAN_RF1R_FOVR1 = 1UL<<4, // FOVR1
-	CAN_RF1R_FULL1 = 1UL<<3, // FULL1
-	CAN_RF1R_FMP1 = ((1UL<<2)-1) << 0, // FMP1		
+	CAN_RF1R_RFOM1 = 1UL << 5,				 // RFOM1
+	CAN_RF1R_FOVR1 = 1UL << 4,				 // FOVR1
+	CAN_RF1R_FULL1 = 1UL << 3,				 // FULL1
+	CAN_RF1R_FMP1  = ((1UL << 2) - 1) << 0,	 // FMP1
 };
-static inline void can_rf1r_set_fmp1(uint32_t val) { CAN1.RF1R = (CAN1.RF1R & ~CAN_RF1R_FMP1) | ((val<<0) & CAN_RF1R_FMP1); }
-static inline uint32_t can_rf1r_get_fmp1(void) { return (CAN1.RF1R & CAN_RF1R_FMP1) >> 0 ; }
+static inline void	   can_rf1r_set_fmp1(uint32_t val) { CAN1.RF1R = (CAN1.RF1R & ~CAN_RF1R_FMP1) | ((val << 0) & CAN_RF1R_FMP1); }
+static inline uint32_t can_rf1r_get_fmp1(void) { return (CAN1.RF1R & CAN_RF1R_FMP1) >> 0; }
 
 // CAN->IER interrupt enable register
 enum {
-	CAN_IER_SLKIE = 1UL<<17, // SLKIE
-	CAN_IER_WKUIE = 1UL<<16, // WKUIE
-	CAN_IER_ERRIE = 1UL<<15, // ERRIE
-	CAN_IER_LECIE = 1UL<<11, // LECIE
-	CAN_IER_BOFIE = 1UL<<10, // BOFIE
-	CAN_IER_EPVIE = 1UL<<9, // EPVIE
-	CAN_IER_EWGIE = 1UL<<8, // EWGIE
-	CAN_IER_FOVIE1 = 1UL<<6, // FOVIE1
-	CAN_IER_FFIE1 = 1UL<<5, // FFIE1
-	CAN_IER_FMPIE1 = 1UL<<4, // FMPIE1
-	CAN_IER_FOVIE0 = 1UL<<3, // FOVIE0
-	CAN_IER_FFIE0 = 1UL<<2, // FFIE0
-	CAN_IER_FMPIE0 = 1UL<<1, // FMPIE0
-	CAN_IER_TMEIE = 1UL<<0, // TMEIE		
+	CAN_IER_SLKIE  = 1UL << 17,	 // SLKIE
+	CAN_IER_WKUIE  = 1UL << 16,	 // WKUIE
+	CAN_IER_ERRIE  = 1UL << 15,	 // ERRIE
+	CAN_IER_LECIE  = 1UL << 11,	 // LECIE
+	CAN_IER_BOFIE  = 1UL << 10,	 // BOFIE
+	CAN_IER_EPVIE  = 1UL << 9,	 // EPVIE
+	CAN_IER_EWGIE  = 1UL << 8,	 // EWGIE
+	CAN_IER_FOVIE1 = 1UL << 6,	 // FOVIE1
+	CAN_IER_FFIE1  = 1UL << 5,	 // FFIE1
+	CAN_IER_FMPIE1 = 1UL << 4,	 // FMPIE1
+	CAN_IER_FOVIE0 = 1UL << 3,	 // FOVIE0
+	CAN_IER_FFIE0  = 1UL << 2,	 // FFIE0
+	CAN_IER_FMPIE0 = 1UL << 1,	 // FMPIE0
+	CAN_IER_TMEIE  = 1UL << 0,	 // TMEIE
 };
 
 // CAN->ESR interrupt enable register
 enum {
-	CAN_ESR_REC = ((1UL<<8)-1) << 24, // REC
-	CAN_ESR_TEC = ((1UL<<8)-1) << 16, // TEC
-	CAN_ESR_LEC = ((1UL<<3)-1) << 4, // LEC
-	CAN_ESR_BOFF = 1UL<<2, // BOFF
-	CAN_ESR_EPVF = 1UL<<1, // EPVF
-	CAN_ESR_EWGF = 1UL<<0, // EWGF		
+	CAN_ESR_REC	 = ((1UL << 8) - 1) << 24,	// REC
+	CAN_ESR_TEC	 = ((1UL << 8) - 1) << 16,	// TEC
+	CAN_ESR_LEC	 = ((1UL << 3) - 1) << 4,	// LEC
+	CAN_ESR_BOFF = 1UL << 2,				// BOFF
+	CAN_ESR_EPVF = 1UL << 1,				// EPVF
+	CAN_ESR_EWGF = 1UL << 0,				// EWGF
 };
-static inline void can_esr_set_rec(uint32_t val) { CAN1.ESR = (CAN1.ESR & ~CAN_ESR_REC) | ((val<<24) & CAN_ESR_REC); }
-static inline void can_esr_set_tec(uint32_t val) { CAN1.ESR = (CAN1.ESR & ~CAN_ESR_TEC) | ((val<<16) & CAN_ESR_TEC); }
-static inline void can_esr_set_lec(uint32_t val) { CAN1.ESR = (CAN1.ESR & ~CAN_ESR_LEC) | ((val<<4) & CAN_ESR_LEC); }
-static inline uint32_t can_esr_get_rec(void) { return (CAN1.ESR & CAN_ESR_REC) >> 24 ; }
-static inline uint32_t can_esr_get_tec(void) { return (CAN1.ESR & CAN_ESR_TEC) >> 16 ; }
-static inline uint32_t can_esr_get_lec(void) { return (CAN1.ESR & CAN_ESR_LEC) >> 4 ; }
+static inline void	   can_esr_set_rec(uint32_t val) { CAN1.ESR = (CAN1.ESR & ~CAN_ESR_REC) | ((val << 24) & CAN_ESR_REC); }
+static inline void	   can_esr_set_tec(uint32_t val) { CAN1.ESR = (CAN1.ESR & ~CAN_ESR_TEC) | ((val << 16) & CAN_ESR_TEC); }
+static inline void	   can_esr_set_lec(uint32_t val) { CAN1.ESR = (CAN1.ESR & ~CAN_ESR_LEC) | ((val << 4) & CAN_ESR_LEC); }
+static inline uint32_t can_esr_get_rec(void) { return (CAN1.ESR & CAN_ESR_REC) >> 24; }
+static inline uint32_t can_esr_get_tec(void) { return (CAN1.ESR & CAN_ESR_TEC) >> 16; }
+static inline uint32_t can_esr_get_lec(void) { return (CAN1.ESR & CAN_ESR_LEC) >> 4; }
 
 // CAN->BTR bit timing register
 enum {
-	CAN_BTR_SILM = 1UL<<31, // SILM
-	CAN_BTR_LBKM = 1UL<<30, // LBKM
-	CAN_BTR_SJW = ((1UL<<2)-1) << 24, // SJW
-	CAN_BTR_TS2 = ((1UL<<3)-1) << 20, // TS2
-	CAN_BTR_TS1 = ((1UL<<4)-1) << 16, // TS1
-	CAN_BTR_BRP = ((1UL<<10)-1) << 0, // BRP		
+	CAN_BTR_SILM = 1UL << 31,				// SILM
+	CAN_BTR_LBKM = 1UL << 30,				// LBKM
+	CAN_BTR_SJW	 = ((1UL << 2) - 1) << 24,	// SJW
+	CAN_BTR_TS2	 = ((1UL << 3) - 1) << 20,	// TS2
+	CAN_BTR_TS1	 = ((1UL << 4) - 1) << 16,	// TS1
+	CAN_BTR_BRP	 = ((1UL << 10) - 1) << 0,	// BRP
 };
-static inline void can_btr_set_sjw(uint32_t val) { CAN1.BTR = (CAN1.BTR & ~CAN_BTR_SJW) | ((val<<24) & CAN_BTR_SJW); }
-static inline void can_btr_set_ts2(uint32_t val) { CAN1.BTR = (CAN1.BTR & ~CAN_BTR_TS2) | ((val<<20) & CAN_BTR_TS2); }
-static inline void can_btr_set_ts1(uint32_t val) { CAN1.BTR = (CAN1.BTR & ~CAN_BTR_TS1) | ((val<<16) & CAN_BTR_TS1); }
-static inline void can_btr_set_brp(uint32_t val) { CAN1.BTR = (CAN1.BTR & ~CAN_BTR_BRP) | ((val<<0) & CAN_BTR_BRP); }
-static inline uint32_t can_btr_get_sjw(void) { return (CAN1.BTR & CAN_BTR_SJW) >> 24 ; }
-static inline uint32_t can_btr_get_ts2(void) { return (CAN1.BTR & CAN_BTR_TS2) >> 20 ; }
-static inline uint32_t can_btr_get_ts1(void) { return (CAN1.BTR & CAN_BTR_TS1) >> 16 ; }
-static inline uint32_t can_btr_get_brp(void) { return (CAN1.BTR & CAN_BTR_BRP) >> 0 ; }
+static inline void	   can_btr_set_sjw(uint32_t val) { CAN1.BTR = (CAN1.BTR & ~CAN_BTR_SJW) | ((val << 24) & CAN_BTR_SJW); }
+static inline void	   can_btr_set_ts2(uint32_t val) { CAN1.BTR = (CAN1.BTR & ~CAN_BTR_TS2) | ((val << 20) & CAN_BTR_TS2); }
+static inline void	   can_btr_set_ts1(uint32_t val) { CAN1.BTR = (CAN1.BTR & ~CAN_BTR_TS1) | ((val << 16) & CAN_BTR_TS1); }
+static inline void	   can_btr_set_brp(uint32_t val) { CAN1.BTR = (CAN1.BTR & ~CAN_BTR_BRP) | ((val << 0) & CAN_BTR_BRP); }
+static inline uint32_t can_btr_get_sjw(void) { return (CAN1.BTR & CAN_BTR_SJW) >> 24; }
+static inline uint32_t can_btr_get_ts2(void) { return (CAN1.BTR & CAN_BTR_TS2) >> 20; }
+static inline uint32_t can_btr_get_ts1(void) { return (CAN1.BTR & CAN_BTR_TS1) >> 16; }
+static inline uint32_t can_btr_get_brp(void) { return (CAN1.BTR & CAN_BTR_BRP) >> 0; }
 
 // CAN->TI0R TX mailbox identifier register
 enum {
-	CAN_TI0R_STID = ((1UL<<11)-1) << 21, // STID
-	CAN_TI0R_EXID = ((1UL<<18)-1) << 3, // EXID
-	CAN_TI0R_IDE = 1UL<<2, // IDE
-	CAN_TI0R_RTR = 1UL<<1, // RTR
-	CAN_TI0R_TXRQ = 1UL<<0, // TXRQ		
+	CAN_TI0R_STID = ((1UL << 11) - 1) << 21,  // STID
+	CAN_TI0R_EXID = ((1UL << 18) - 1) << 3,	  // EXID
+	CAN_TI0R_IDE  = 1UL << 2,				  // IDE
+	CAN_TI0R_RTR  = 1UL << 1,				  // RTR
+	CAN_TI0R_TXRQ = 1UL << 0,				  // TXRQ
 };
-static inline void can_ti0r_set_stid(uint32_t val) { CAN1.TI0R = (CAN1.TI0R & ~CAN_TI0R_STID) | ((val<<21) & CAN_TI0R_STID); }
-static inline void can_ti0r_set_exid(uint32_t val) { CAN1.TI0R = (CAN1.TI0R & ~CAN_TI0R_EXID) | ((val<<3) & CAN_TI0R_EXID); }
-static inline uint32_t can_ti0r_get_stid(void) { return (CAN1.TI0R & CAN_TI0R_STID) >> 21 ; }
-static inline uint32_t can_ti0r_get_exid(void) { return (CAN1.TI0R & CAN_TI0R_EXID) >> 3 ; }
+static inline void	   can_ti0r_set_stid(uint32_t val) { CAN1.TI0R = (CAN1.TI0R & ~CAN_TI0R_STID) | ((val << 21) & CAN_TI0R_STID); }
+static inline void	   can_ti0r_set_exid(uint32_t val) { CAN1.TI0R = (CAN1.TI0R & ~CAN_TI0R_EXID) | ((val << 3) & CAN_TI0R_EXID); }
+static inline uint32_t can_ti0r_get_stid(void) { return (CAN1.TI0R & CAN_TI0R_STID) >> 21; }
+static inline uint32_t can_ti0r_get_exid(void) { return (CAN1.TI0R & CAN_TI0R_EXID) >> 3; }
 
 // CAN->TDT0R mailbox data length control and time stamp register
 enum {
-	CAN_TDT0R_TIME = ((1UL<<16)-1) << 16, // TIME
-	CAN_TDT0R_TGT = 1UL<<8, // TGT
-	CAN_TDT0R_DLC = ((1UL<<4)-1) << 0, // DLC		
+	CAN_TDT0R_TIME = ((1UL << 16) - 1) << 16,  // TIME
+	CAN_TDT0R_TGT  = 1UL << 8,				   // TGT
+	CAN_TDT0R_DLC  = ((1UL << 4) - 1) << 0,	   // DLC
 };
-static inline void can_tdt0r_set_time(uint32_t val) { CAN1.TDT0R = (CAN1.TDT0R & ~CAN_TDT0R_TIME) | ((val<<16) & CAN_TDT0R_TIME); }
-static inline void can_tdt0r_set_dlc(uint32_t val) { CAN1.TDT0R = (CAN1.TDT0R & ~CAN_TDT0R_DLC) | ((val<<0) & CAN_TDT0R_DLC); }
-static inline uint32_t can_tdt0r_get_time(void) { return (CAN1.TDT0R & CAN_TDT0R_TIME) >> 16 ; }
-static inline uint32_t can_tdt0r_get_dlc(void) { return (CAN1.TDT0R & CAN_TDT0R_DLC) >> 0 ; }
+static inline void can_tdt0r_set_time(uint32_t val) {
+	CAN1.TDT0R = (CAN1.TDT0R & ~CAN_TDT0R_TIME) | ((val << 16) & CAN_TDT0R_TIME);
+}
+static inline void can_tdt0r_set_dlc(uint32_t val) { CAN1.TDT0R = (CAN1.TDT0R & ~CAN_TDT0R_DLC) | ((val << 0) & CAN_TDT0R_DLC); }
+static inline uint32_t can_tdt0r_get_time(void) { return (CAN1.TDT0R & CAN_TDT0R_TIME) >> 16; }
+static inline uint32_t can_tdt0r_get_dlc(void) { return (CAN1.TDT0R & CAN_TDT0R_DLC) >> 0; }
 
 // CAN->TDL0R mailbox data low register
 enum {
-	CAN_TDL0R_DATA3 = ((1UL<<8)-1) << 24, // DATA3
-	CAN_TDL0R_DATA2 = ((1UL<<8)-1) << 16, // DATA2
-	CAN_TDL0R_DATA1 = ((1UL<<8)-1) << 8, // DATA1
-	CAN_TDL0R_DATA0 = ((1UL<<8)-1) << 0, // DATA0		
+	CAN_TDL0R_DATA3 = ((1UL << 8) - 1) << 24,  // DATA3
+	CAN_TDL0R_DATA2 = ((1UL << 8) - 1) << 16,  // DATA2
+	CAN_TDL0R_DATA1 = ((1UL << 8) - 1) << 8,   // DATA1
+	CAN_TDL0R_DATA0 = ((1UL << 8) - 1) << 0,   // DATA0
 };
-static inline void can_tdl0r_set_data3(uint32_t val) { CAN1.TDL0R = (CAN1.TDL0R & ~CAN_TDL0R_DATA3) | ((val<<24) & CAN_TDL0R_DATA3); }
-static inline void can_tdl0r_set_data2(uint32_t val) { CAN1.TDL0R = (CAN1.TDL0R & ~CAN_TDL0R_DATA2) | ((val<<16) & CAN_TDL0R_DATA2); }
-static inline void can_tdl0r_set_data1(uint32_t val) { CAN1.TDL0R = (CAN1.TDL0R & ~CAN_TDL0R_DATA1) | ((val<<8) & CAN_TDL0R_DATA1); }
-static inline void can_tdl0r_set_data0(uint32_t val) { CAN1.TDL0R = (CAN1.TDL0R & ~CAN_TDL0R_DATA0) | ((val<<0) & CAN_TDL0R_DATA0); }
-static inline uint32_t can_tdl0r_get_data3(void) { return (CAN1.TDL0R & CAN_TDL0R_DATA3) >> 24 ; }
-static inline uint32_t can_tdl0r_get_data2(void) { return (CAN1.TDL0R & CAN_TDL0R_DATA2) >> 16 ; }
-static inline uint32_t can_tdl0r_get_data1(void) { return (CAN1.TDL0R & CAN_TDL0R_DATA1) >> 8 ; }
-static inline uint32_t can_tdl0r_get_data0(void) { return (CAN1.TDL0R & CAN_TDL0R_DATA0) >> 0 ; }
+static inline void can_tdl0r_set_data3(uint32_t val) {
+	CAN1.TDL0R = (CAN1.TDL0R & ~CAN_TDL0R_DATA3) | ((val << 24) & CAN_TDL0R_DATA3);
+}
+static inline void can_tdl0r_set_data2(uint32_t val) {
+	CAN1.TDL0R = (CAN1.TDL0R & ~CAN_TDL0R_DATA2) | ((val << 16) & CAN_TDL0R_DATA2);
+}
+static inline void can_tdl0r_set_data1(uint32_t val) {
+	CAN1.TDL0R = (CAN1.TDL0R & ~CAN_TDL0R_DATA1) | ((val << 8) & CAN_TDL0R_DATA1);
+}
+static inline void can_tdl0r_set_data0(uint32_t val) {
+	CAN1.TDL0R = (CAN1.TDL0R & ~CAN_TDL0R_DATA0) | ((val << 0) & CAN_TDL0R_DATA0);
+}
+static inline uint32_t can_tdl0r_get_data3(void) { return (CAN1.TDL0R & CAN_TDL0R_DATA3) >> 24; }
+static inline uint32_t can_tdl0r_get_data2(void) { return (CAN1.TDL0R & CAN_TDL0R_DATA2) >> 16; }
+static inline uint32_t can_tdl0r_get_data1(void) { return (CAN1.TDL0R & CAN_TDL0R_DATA1) >> 8; }
+static inline uint32_t can_tdl0r_get_data0(void) { return (CAN1.TDL0R & CAN_TDL0R_DATA0) >> 0; }
 
 // CAN->TDH0R mailbox data high register
 enum {
-	CAN_TDH0R_DATA7 = ((1UL<<8)-1) << 24, // DATA7
-	CAN_TDH0R_DATA6 = ((1UL<<8)-1) << 16, // DATA6
-	CAN_TDH0R_DATA5 = ((1UL<<8)-1) << 8, // DATA5
-	CAN_TDH0R_DATA4 = ((1UL<<8)-1) << 0, // DATA4		
+	CAN_TDH0R_DATA7 = ((1UL << 8) - 1) << 24,  // DATA7
+	CAN_TDH0R_DATA6 = ((1UL << 8) - 1) << 16,  // DATA6
+	CAN_TDH0R_DATA5 = ((1UL << 8) - 1) << 8,   // DATA5
+	CAN_TDH0R_DATA4 = ((1UL << 8) - 1) << 0,   // DATA4
 };
-static inline void can_tdh0r_set_data7(uint32_t val) { CAN1.TDH0R = (CAN1.TDH0R & ~CAN_TDH0R_DATA7) | ((val<<24) & CAN_TDH0R_DATA7); }
-static inline void can_tdh0r_set_data6(uint32_t val) { CAN1.TDH0R = (CAN1.TDH0R & ~CAN_TDH0R_DATA6) | ((val<<16) & CAN_TDH0R_DATA6); }
-static inline void can_tdh0r_set_data5(uint32_t val) { CAN1.TDH0R = (CAN1.TDH0R & ~CAN_TDH0R_DATA5) | ((val<<8) & CAN_TDH0R_DATA5); }
-static inline void can_tdh0r_set_data4(uint32_t val) { CAN1.TDH0R = (CAN1.TDH0R & ~CAN_TDH0R_DATA4) | ((val<<0) & CAN_TDH0R_DATA4); }
-static inline uint32_t can_tdh0r_get_data7(void) { return (CAN1.TDH0R & CAN_TDH0R_DATA7) >> 24 ; }
-static inline uint32_t can_tdh0r_get_data6(void) { return (CAN1.TDH0R & CAN_TDH0R_DATA6) >> 16 ; }
-static inline uint32_t can_tdh0r_get_data5(void) { return (CAN1.TDH0R & CAN_TDH0R_DATA5) >> 8 ; }
-static inline uint32_t can_tdh0r_get_data4(void) { return (CAN1.TDH0R & CAN_TDH0R_DATA4) >> 0 ; }
+static inline void can_tdh0r_set_data7(uint32_t val) {
+	CAN1.TDH0R = (CAN1.TDH0R & ~CAN_TDH0R_DATA7) | ((val << 24) & CAN_TDH0R_DATA7);
+}
+static inline void can_tdh0r_set_data6(uint32_t val) {
+	CAN1.TDH0R = (CAN1.TDH0R & ~CAN_TDH0R_DATA6) | ((val << 16) & CAN_TDH0R_DATA6);
+}
+static inline void can_tdh0r_set_data5(uint32_t val) {
+	CAN1.TDH0R = (CAN1.TDH0R & ~CAN_TDH0R_DATA5) | ((val << 8) & CAN_TDH0R_DATA5);
+}
+static inline void can_tdh0r_set_data4(uint32_t val) {
+	CAN1.TDH0R = (CAN1.TDH0R & ~CAN_TDH0R_DATA4) | ((val << 0) & CAN_TDH0R_DATA4);
+}
+static inline uint32_t can_tdh0r_get_data7(void) { return (CAN1.TDH0R & CAN_TDH0R_DATA7) >> 24; }
+static inline uint32_t can_tdh0r_get_data6(void) { return (CAN1.TDH0R & CAN_TDH0R_DATA6) >> 16; }
+static inline uint32_t can_tdh0r_get_data5(void) { return (CAN1.TDH0R & CAN_TDH0R_DATA5) >> 8; }
+static inline uint32_t can_tdh0r_get_data4(void) { return (CAN1.TDH0R & CAN_TDH0R_DATA4) >> 0; }
 
 // CAN->TI1R mailbox identifier register
 enum {
-	CAN_TI1R_STID = ((1UL<<11)-1) << 21, // STID
-	CAN_TI1R_EXID = ((1UL<<18)-1) << 3, // EXID
-	CAN_TI1R_IDE = 1UL<<2, // IDE
-	CAN_TI1R_RTR = 1UL<<1, // RTR
-	CAN_TI1R_TXRQ = 1UL<<0, // TXRQ		
+	CAN_TI1R_STID = ((1UL << 11) - 1) << 21,  // STID
+	CAN_TI1R_EXID = ((1UL << 18) - 1) << 3,	  // EXID
+	CAN_TI1R_IDE  = 1UL << 2,				  // IDE
+	CAN_TI1R_RTR  = 1UL << 1,				  // RTR
+	CAN_TI1R_TXRQ = 1UL << 0,				  // TXRQ
 };
-static inline void can_ti1r_set_stid(uint32_t val) { CAN1.TI1R = (CAN1.TI1R & ~CAN_TI1R_STID) | ((val<<21) & CAN_TI1R_STID); }
-static inline void can_ti1r_set_exid(uint32_t val) { CAN1.TI1R = (CAN1.TI1R & ~CAN_TI1R_EXID) | ((val<<3) & CAN_TI1R_EXID); }
-static inline uint32_t can_ti1r_get_stid(void) { return (CAN1.TI1R & CAN_TI1R_STID) >> 21 ; }
-static inline uint32_t can_ti1r_get_exid(void) { return (CAN1.TI1R & CAN_TI1R_EXID) >> 3 ; }
+static inline void	   can_ti1r_set_stid(uint32_t val) { CAN1.TI1R = (CAN1.TI1R & ~CAN_TI1R_STID) | ((val << 21) & CAN_TI1R_STID); }
+static inline void	   can_ti1r_set_exid(uint32_t val) { CAN1.TI1R = (CAN1.TI1R & ~CAN_TI1R_EXID) | ((val << 3) & CAN_TI1R_EXID); }
+static inline uint32_t can_ti1r_get_stid(void) { return (CAN1.TI1R & CAN_TI1R_STID) >> 21; }
+static inline uint32_t can_ti1r_get_exid(void) { return (CAN1.TI1R & CAN_TI1R_EXID) >> 3; }
 
 // CAN->TDT1R mailbox data length control and time stamp register
 enum {
-	CAN_TDT1R_TIME = ((1UL<<16)-1) << 16, // TIME
-	CAN_TDT1R_TGT = 1UL<<8, // TGT
-	CAN_TDT1R_DLC = ((1UL<<4)-1) << 0, // DLC		
+	CAN_TDT1R_TIME = ((1UL << 16) - 1) << 16,  // TIME
+	CAN_TDT1R_TGT  = 1UL << 8,				   // TGT
+	CAN_TDT1R_DLC  = ((1UL << 4) - 1) << 0,	   // DLC
 };
-static inline void can_tdt1r_set_time(uint32_t val) { CAN1.TDT1R = (CAN1.TDT1R & ~CAN_TDT1R_TIME) | ((val<<16) & CAN_TDT1R_TIME); }
-static inline void can_tdt1r_set_dlc(uint32_t val) { CAN1.TDT1R = (CAN1.TDT1R & ~CAN_TDT1R_DLC) | ((val<<0) & CAN_TDT1R_DLC); }
-static inline uint32_t can_tdt1r_get_time(void) { return (CAN1.TDT1R & CAN_TDT1R_TIME) >> 16 ; }
-static inline uint32_t can_tdt1r_get_dlc(void) { return (CAN1.TDT1R & CAN_TDT1R_DLC) >> 0 ; }
+static inline void can_tdt1r_set_time(uint32_t val) {
+	CAN1.TDT1R = (CAN1.TDT1R & ~CAN_TDT1R_TIME) | ((val << 16) & CAN_TDT1R_TIME);
+}
+static inline void can_tdt1r_set_dlc(uint32_t val) { CAN1.TDT1R = (CAN1.TDT1R & ~CAN_TDT1R_DLC) | ((val << 0) & CAN_TDT1R_DLC); }
+static inline uint32_t can_tdt1r_get_time(void) { return (CAN1.TDT1R & CAN_TDT1R_TIME) >> 16; }
+static inline uint32_t can_tdt1r_get_dlc(void) { return (CAN1.TDT1R & CAN_TDT1R_DLC) >> 0; }
 
 // CAN->TDL1R mailbox data low register
 enum {
-	CAN_TDL1R_DATA3 = ((1UL<<8)-1) << 24, // DATA3
-	CAN_TDL1R_DATA2 = ((1UL<<8)-1) << 16, // DATA2
-	CAN_TDL1R_DATA1 = ((1UL<<8)-1) << 8, // DATA1
-	CAN_TDL1R_DATA0 = ((1UL<<8)-1) << 0, // DATA0		
+	CAN_TDL1R_DATA3 = ((1UL << 8) - 1) << 24,  // DATA3
+	CAN_TDL1R_DATA2 = ((1UL << 8) - 1) << 16,  // DATA2
+	CAN_TDL1R_DATA1 = ((1UL << 8) - 1) << 8,   // DATA1
+	CAN_TDL1R_DATA0 = ((1UL << 8) - 1) << 0,   // DATA0
 };
-static inline void can_tdl1r_set_data3(uint32_t val) { CAN1.TDL1R = (CAN1.TDL1R & ~CAN_TDL1R_DATA3) | ((val<<24) & CAN_TDL1R_DATA3); }
-static inline void can_tdl1r_set_data2(uint32_t val) { CAN1.TDL1R = (CAN1.TDL1R & ~CAN_TDL1R_DATA2) | ((val<<16) & CAN_TDL1R_DATA2); }
-static inline void can_tdl1r_set_data1(uint32_t val) { CAN1.TDL1R = (CAN1.TDL1R & ~CAN_TDL1R_DATA1) | ((val<<8) & CAN_TDL1R_DATA1); }
-static inline void can_tdl1r_set_data0(uint32_t val) { CAN1.TDL1R = (CAN1.TDL1R & ~CAN_TDL1R_DATA0) | ((val<<0) & CAN_TDL1R_DATA0); }
-static inline uint32_t can_tdl1r_get_data3(void) { return (CAN1.TDL1R & CAN_TDL1R_DATA3) >> 24 ; }
-static inline uint32_t can_tdl1r_get_data2(void) { return (CAN1.TDL1R & CAN_TDL1R_DATA2) >> 16 ; }
-static inline uint32_t can_tdl1r_get_data1(void) { return (CAN1.TDL1R & CAN_TDL1R_DATA1) >> 8 ; }
-static inline uint32_t can_tdl1r_get_data0(void) { return (CAN1.TDL1R & CAN_TDL1R_DATA0) >> 0 ; }
+static inline void can_tdl1r_set_data3(uint32_t val) {
+	CAN1.TDL1R = (CAN1.TDL1R & ~CAN_TDL1R_DATA3) | ((val << 24) & CAN_TDL1R_DATA3);
+}
+static inline void can_tdl1r_set_data2(uint32_t val) {
+	CAN1.TDL1R = (CAN1.TDL1R & ~CAN_TDL1R_DATA2) | ((val << 16) & CAN_TDL1R_DATA2);
+}
+static inline void can_tdl1r_set_data1(uint32_t val) {
+	CAN1.TDL1R = (CAN1.TDL1R & ~CAN_TDL1R_DATA1) | ((val << 8) & CAN_TDL1R_DATA1);
+}
+static inline void can_tdl1r_set_data0(uint32_t val) {
+	CAN1.TDL1R = (CAN1.TDL1R & ~CAN_TDL1R_DATA0) | ((val << 0) & CAN_TDL1R_DATA0);
+}
+static inline uint32_t can_tdl1r_get_data3(void) { return (CAN1.TDL1R & CAN_TDL1R_DATA3) >> 24; }
+static inline uint32_t can_tdl1r_get_data2(void) { return (CAN1.TDL1R & CAN_TDL1R_DATA2) >> 16; }
+static inline uint32_t can_tdl1r_get_data1(void) { return (CAN1.TDL1R & CAN_TDL1R_DATA1) >> 8; }
+static inline uint32_t can_tdl1r_get_data0(void) { return (CAN1.TDL1R & CAN_TDL1R_DATA0) >> 0; }
 
 // CAN->TDH1R mailbox data high register
 enum {
-	CAN_TDH1R_DATA7 = ((1UL<<8)-1) << 24, // DATA7
-	CAN_TDH1R_DATA6 = ((1UL<<8)-1) << 16, // DATA6
-	CAN_TDH1R_DATA5 = ((1UL<<8)-1) << 8, // DATA5
-	CAN_TDH1R_DATA4 = ((1UL<<8)-1) << 0, // DATA4		
+	CAN_TDH1R_DATA7 = ((1UL << 8) - 1) << 24,  // DATA7
+	CAN_TDH1R_DATA6 = ((1UL << 8) - 1) << 16,  // DATA6
+	CAN_TDH1R_DATA5 = ((1UL << 8) - 1) << 8,   // DATA5
+	CAN_TDH1R_DATA4 = ((1UL << 8) - 1) << 0,   // DATA4
 };
-static inline void can_tdh1r_set_data7(uint32_t val) { CAN1.TDH1R = (CAN1.TDH1R & ~CAN_TDH1R_DATA7) | ((val<<24) & CAN_TDH1R_DATA7); }
-static inline void can_tdh1r_set_data6(uint32_t val) { CAN1.TDH1R = (CAN1.TDH1R & ~CAN_TDH1R_DATA6) | ((val<<16) & CAN_TDH1R_DATA6); }
-static inline void can_tdh1r_set_data5(uint32_t val) { CAN1.TDH1R = (CAN1.TDH1R & ~CAN_TDH1R_DATA5) | ((val<<8) & CAN_TDH1R_DATA5); }
-static inline void can_tdh1r_set_data4(uint32_t val) { CAN1.TDH1R = (CAN1.TDH1R & ~CAN_TDH1R_DATA4) | ((val<<0) & CAN_TDH1R_DATA4); }
-static inline uint32_t can_tdh1r_get_data7(void) { return (CAN1.TDH1R & CAN_TDH1R_DATA7) >> 24 ; }
-static inline uint32_t can_tdh1r_get_data6(void) { return (CAN1.TDH1R & CAN_TDH1R_DATA6) >> 16 ; }
-static inline uint32_t can_tdh1r_get_data5(void) { return (CAN1.TDH1R & CAN_TDH1R_DATA5) >> 8 ; }
-static inline uint32_t can_tdh1r_get_data4(void) { return (CAN1.TDH1R & CAN_TDH1R_DATA4) >> 0 ; }
+static inline void can_tdh1r_set_data7(uint32_t val) {
+	CAN1.TDH1R = (CAN1.TDH1R & ~CAN_TDH1R_DATA7) | ((val << 24) & CAN_TDH1R_DATA7);
+}
+static inline void can_tdh1r_set_data6(uint32_t val) {
+	CAN1.TDH1R = (CAN1.TDH1R & ~CAN_TDH1R_DATA6) | ((val << 16) & CAN_TDH1R_DATA6);
+}
+static inline void can_tdh1r_set_data5(uint32_t val) {
+	CAN1.TDH1R = (CAN1.TDH1R & ~CAN_TDH1R_DATA5) | ((val << 8) & CAN_TDH1R_DATA5);
+}
+static inline void can_tdh1r_set_data4(uint32_t val) {
+	CAN1.TDH1R = (CAN1.TDH1R & ~CAN_TDH1R_DATA4) | ((val << 0) & CAN_TDH1R_DATA4);
+}
+static inline uint32_t can_tdh1r_get_data7(void) { return (CAN1.TDH1R & CAN_TDH1R_DATA7) >> 24; }
+static inline uint32_t can_tdh1r_get_data6(void) { return (CAN1.TDH1R & CAN_TDH1R_DATA6) >> 16; }
+static inline uint32_t can_tdh1r_get_data5(void) { return (CAN1.TDH1R & CAN_TDH1R_DATA5) >> 8; }
+static inline uint32_t can_tdh1r_get_data4(void) { return (CAN1.TDH1R & CAN_TDH1R_DATA4) >> 0; }
 
 // CAN->TI2R mailbox identifier register
 enum {
-	CAN_TI2R_STID = ((1UL<<11)-1) << 21, // STID
-	CAN_TI2R_EXID = ((1UL<<18)-1) << 3, // EXID
-	CAN_TI2R_IDE = 1UL<<2, // IDE
-	CAN_TI2R_RTR = 1UL<<1, // RTR
-	CAN_TI2R_TXRQ = 1UL<<0, // TXRQ		
+	CAN_TI2R_STID = ((1UL << 11) - 1) << 21,  // STID
+	CAN_TI2R_EXID = ((1UL << 18) - 1) << 3,	  // EXID
+	CAN_TI2R_IDE  = 1UL << 2,				  // IDE
+	CAN_TI2R_RTR  = 1UL << 1,				  // RTR
+	CAN_TI2R_TXRQ = 1UL << 0,				  // TXRQ
 };
-static inline void can_ti2r_set_stid(uint32_t val) { CAN1.TI2R = (CAN1.TI2R & ~CAN_TI2R_STID) | ((val<<21) & CAN_TI2R_STID); }
-static inline void can_ti2r_set_exid(uint32_t val) { CAN1.TI2R = (CAN1.TI2R & ~CAN_TI2R_EXID) | ((val<<3) & CAN_TI2R_EXID); }
-static inline uint32_t can_ti2r_get_stid(void) { return (CAN1.TI2R & CAN_TI2R_STID) >> 21 ; }
-static inline uint32_t can_ti2r_get_exid(void) { return (CAN1.TI2R & CAN_TI2R_EXID) >> 3 ; }
+static inline void	   can_ti2r_set_stid(uint32_t val) { CAN1.TI2R = (CAN1.TI2R & ~CAN_TI2R_STID) | ((val << 21) & CAN_TI2R_STID); }
+static inline void	   can_ti2r_set_exid(uint32_t val) { CAN1.TI2R = (CAN1.TI2R & ~CAN_TI2R_EXID) | ((val << 3) & CAN_TI2R_EXID); }
+static inline uint32_t can_ti2r_get_stid(void) { return (CAN1.TI2R & CAN_TI2R_STID) >> 21; }
+static inline uint32_t can_ti2r_get_exid(void) { return (CAN1.TI2R & CAN_TI2R_EXID) >> 3; }
 
 // CAN->TDT2R mailbox data length control and time stamp register
 enum {
-	CAN_TDT2R_TIME = ((1UL<<16)-1) << 16, // TIME
-	CAN_TDT2R_TGT = 1UL<<8, // TGT
-	CAN_TDT2R_DLC = ((1UL<<4)-1) << 0, // DLC		
+	CAN_TDT2R_TIME = ((1UL << 16) - 1) << 16,  // TIME
+	CAN_TDT2R_TGT  = 1UL << 8,				   // TGT
+	CAN_TDT2R_DLC  = ((1UL << 4) - 1) << 0,	   // DLC
 };
-static inline void can_tdt2r_set_time(uint32_t val) { CAN1.TDT2R = (CAN1.TDT2R & ~CAN_TDT2R_TIME) | ((val<<16) & CAN_TDT2R_TIME); }
-static inline void can_tdt2r_set_dlc(uint32_t val) { CAN1.TDT2R = (CAN1.TDT2R & ~CAN_TDT2R_DLC) | ((val<<0) & CAN_TDT2R_DLC); }
-static inline uint32_t can_tdt2r_get_time(void) { return (CAN1.TDT2R & CAN_TDT2R_TIME) >> 16 ; }
-static inline uint32_t can_tdt2r_get_dlc(void) { return (CAN1.TDT2R & CAN_TDT2R_DLC) >> 0 ; }
+static inline void can_tdt2r_set_time(uint32_t val) {
+	CAN1.TDT2R = (CAN1.TDT2R & ~CAN_TDT2R_TIME) | ((val << 16) & CAN_TDT2R_TIME);
+}
+static inline void can_tdt2r_set_dlc(uint32_t val) { CAN1.TDT2R = (CAN1.TDT2R & ~CAN_TDT2R_DLC) | ((val << 0) & CAN_TDT2R_DLC); }
+static inline uint32_t can_tdt2r_get_time(void) { return (CAN1.TDT2R & CAN_TDT2R_TIME) >> 16; }
+static inline uint32_t can_tdt2r_get_dlc(void) { return (CAN1.TDT2R & CAN_TDT2R_DLC) >> 0; }
 
 // CAN->TDL2R mailbox data low register
 enum {
-	CAN_TDL2R_DATA3 = ((1UL<<8)-1) << 24, // DATA3
-	CAN_TDL2R_DATA2 = ((1UL<<8)-1) << 16, // DATA2
-	CAN_TDL2R_DATA1 = ((1UL<<8)-1) << 8, // DATA1
-	CAN_TDL2R_DATA0 = ((1UL<<8)-1) << 0, // DATA0		
+	CAN_TDL2R_DATA3 = ((1UL << 8) - 1) << 24,  // DATA3
+	CAN_TDL2R_DATA2 = ((1UL << 8) - 1) << 16,  // DATA2
+	CAN_TDL2R_DATA1 = ((1UL << 8) - 1) << 8,   // DATA1
+	CAN_TDL2R_DATA0 = ((1UL << 8) - 1) << 0,   // DATA0
 };
-static inline void can_tdl2r_set_data3(uint32_t val) { CAN1.TDL2R = (CAN1.TDL2R & ~CAN_TDL2R_DATA3) | ((val<<24) & CAN_TDL2R_DATA3); }
-static inline void can_tdl2r_set_data2(uint32_t val) { CAN1.TDL2R = (CAN1.TDL2R & ~CAN_TDL2R_DATA2) | ((val<<16) & CAN_TDL2R_DATA2); }
-static inline void can_tdl2r_set_data1(uint32_t val) { CAN1.TDL2R = (CAN1.TDL2R & ~CAN_TDL2R_DATA1) | ((val<<8) & CAN_TDL2R_DATA1); }
-static inline void can_tdl2r_set_data0(uint32_t val) { CAN1.TDL2R = (CAN1.TDL2R & ~CAN_TDL2R_DATA0) | ((val<<0) & CAN_TDL2R_DATA0); }
-static inline uint32_t can_tdl2r_get_data3(void) { return (CAN1.TDL2R & CAN_TDL2R_DATA3) >> 24 ; }
-static inline uint32_t can_tdl2r_get_data2(void) { return (CAN1.TDL2R & CAN_TDL2R_DATA2) >> 16 ; }
-static inline uint32_t can_tdl2r_get_data1(void) { return (CAN1.TDL2R & CAN_TDL2R_DATA1) >> 8 ; }
-static inline uint32_t can_tdl2r_get_data0(void) { return (CAN1.TDL2R & CAN_TDL2R_DATA0) >> 0 ; }
+static inline void can_tdl2r_set_data3(uint32_t val) {
+	CAN1.TDL2R = (CAN1.TDL2R & ~CAN_TDL2R_DATA3) | ((val << 24) & CAN_TDL2R_DATA3);
+}
+static inline void can_tdl2r_set_data2(uint32_t val) {
+	CAN1.TDL2R = (CAN1.TDL2R & ~CAN_TDL2R_DATA2) | ((val << 16) & CAN_TDL2R_DATA2);
+}
+static inline void can_tdl2r_set_data1(uint32_t val) {
+	CAN1.TDL2R = (CAN1.TDL2R & ~CAN_TDL2R_DATA1) | ((val << 8) & CAN_TDL2R_DATA1);
+}
+static inline void can_tdl2r_set_data0(uint32_t val) {
+	CAN1.TDL2R = (CAN1.TDL2R & ~CAN_TDL2R_DATA0) | ((val << 0) & CAN_TDL2R_DATA0);
+}
+static inline uint32_t can_tdl2r_get_data3(void) { return (CAN1.TDL2R & CAN_TDL2R_DATA3) >> 24; }
+static inline uint32_t can_tdl2r_get_data2(void) { return (CAN1.TDL2R & CAN_TDL2R_DATA2) >> 16; }
+static inline uint32_t can_tdl2r_get_data1(void) { return (CAN1.TDL2R & CAN_TDL2R_DATA1) >> 8; }
+static inline uint32_t can_tdl2r_get_data0(void) { return (CAN1.TDL2R & CAN_TDL2R_DATA0) >> 0; }
 
 // CAN->TDH2R mailbox data high register
 enum {
-	CAN_TDH2R_DATA7 = ((1UL<<8)-1) << 24, // DATA7
-	CAN_TDH2R_DATA6 = ((1UL<<8)-1) << 16, // DATA6
-	CAN_TDH2R_DATA5 = ((1UL<<8)-1) << 8, // DATA5
-	CAN_TDH2R_DATA4 = ((1UL<<8)-1) << 0, // DATA4		
+	CAN_TDH2R_DATA7 = ((1UL << 8) - 1) << 24,  // DATA7
+	CAN_TDH2R_DATA6 = ((1UL << 8) - 1) << 16,  // DATA6
+	CAN_TDH2R_DATA5 = ((1UL << 8) - 1) << 8,   // DATA5
+	CAN_TDH2R_DATA4 = ((1UL << 8) - 1) << 0,   // DATA4
 };
-static inline void can_tdh2r_set_data7(uint32_t val) { CAN1.TDH2R = (CAN1.TDH2R & ~CAN_TDH2R_DATA7) | ((val<<24) & CAN_TDH2R_DATA7); }
-static inline void can_tdh2r_set_data6(uint32_t val) { CAN1.TDH2R = (CAN1.TDH2R & ~CAN_TDH2R_DATA6) | ((val<<16) & CAN_TDH2R_DATA6); }
-static inline void can_tdh2r_set_data5(uint32_t val) { CAN1.TDH2R = (CAN1.TDH2R & ~CAN_TDH2R_DATA5) | ((val<<8) & CAN_TDH2R_DATA5); }
-static inline void can_tdh2r_set_data4(uint32_t val) { CAN1.TDH2R = (CAN1.TDH2R & ~CAN_TDH2R_DATA4) | ((val<<0) & CAN_TDH2R_DATA4); }
-static inline uint32_t can_tdh2r_get_data7(void) { return (CAN1.TDH2R & CAN_TDH2R_DATA7) >> 24 ; }
-static inline uint32_t can_tdh2r_get_data6(void) { return (CAN1.TDH2R & CAN_TDH2R_DATA6) >> 16 ; }
-static inline uint32_t can_tdh2r_get_data5(void) { return (CAN1.TDH2R & CAN_TDH2R_DATA5) >> 8 ; }
-static inline uint32_t can_tdh2r_get_data4(void) { return (CAN1.TDH2R & CAN_TDH2R_DATA4) >> 0 ; }
+static inline void can_tdh2r_set_data7(uint32_t val) {
+	CAN1.TDH2R = (CAN1.TDH2R & ~CAN_TDH2R_DATA7) | ((val << 24) & CAN_TDH2R_DATA7);
+}
+static inline void can_tdh2r_set_data6(uint32_t val) {
+	CAN1.TDH2R = (CAN1.TDH2R & ~CAN_TDH2R_DATA6) | ((val << 16) & CAN_TDH2R_DATA6);
+}
+static inline void can_tdh2r_set_data5(uint32_t val) {
+	CAN1.TDH2R = (CAN1.TDH2R & ~CAN_TDH2R_DATA5) | ((val << 8) & CAN_TDH2R_DATA5);
+}
+static inline void can_tdh2r_set_data4(uint32_t val) {
+	CAN1.TDH2R = (CAN1.TDH2R & ~CAN_TDH2R_DATA4) | ((val << 0) & CAN_TDH2R_DATA4);
+}
+static inline uint32_t can_tdh2r_get_data7(void) { return (CAN1.TDH2R & CAN_TDH2R_DATA7) >> 24; }
+static inline uint32_t can_tdh2r_get_data6(void) { return (CAN1.TDH2R & CAN_TDH2R_DATA6) >> 16; }
+static inline uint32_t can_tdh2r_get_data5(void) { return (CAN1.TDH2R & CAN_TDH2R_DATA5) >> 8; }
+static inline uint32_t can_tdh2r_get_data4(void) { return (CAN1.TDH2R & CAN_TDH2R_DATA4) >> 0; }
 
 // CAN->RI0R receive FIFO mailbox identifier register
 enum {
-	CAN_RI0R_STID = ((1UL<<11)-1) << 21, // STID
-	CAN_RI0R_EXID = ((1UL<<18)-1) << 3, // EXID
-	CAN_RI0R_IDE = 1UL<<2, // IDE
-	CAN_RI0R_RTR = 1UL<<1, // RTR		
+	CAN_RI0R_STID = ((1UL << 11) - 1) << 21,  // STID
+	CAN_RI0R_EXID = ((1UL << 18) - 1) << 3,	  // EXID
+	CAN_RI0R_IDE  = 1UL << 2,				  // IDE
+	CAN_RI0R_RTR  = 1UL << 1,				  // RTR
 };
-static inline uint32_t can_ri0r_get_stid(void) { return (CAN1.RI0R & CAN_RI0R_STID) >> 21 ; }
-static inline uint32_t can_ri0r_get_exid(void) { return (CAN1.RI0R & CAN_RI0R_EXID) >> 3 ; }
+static inline uint32_t can_ri0r_get_stid(void) { return (CAN1.RI0R & CAN_RI0R_STID) >> 21; }
+static inline uint32_t can_ri0r_get_exid(void) { return (CAN1.RI0R & CAN_RI0R_EXID) >> 3; }
 
 // CAN->RDT0R mailbox data high register
 enum {
-	CAN_RDT0R_TIME = ((1UL<<16)-1) << 16, // TIME
-	CAN_RDT0R_FMI = ((1UL<<8)-1) << 8, // FMI
-	CAN_RDT0R_DLC = ((1UL<<4)-1) << 0, // DLC		
+	CAN_RDT0R_TIME = ((1UL << 16) - 1) << 16,  // TIME
+	CAN_RDT0R_FMI  = ((1UL << 8) - 1) << 8,	   // FMI
+	CAN_RDT0R_DLC  = ((1UL << 4) - 1) << 0,	   // DLC
 };
-static inline uint32_t can_rdt0r_get_time(void) { return (CAN1.RDT0R & CAN_RDT0R_TIME) >> 16 ; }
-static inline uint32_t can_rdt0r_get_fmi(void) { return (CAN1.RDT0R & CAN_RDT0R_FMI) >> 8 ; }
-static inline uint32_t can_rdt0r_get_dlc(void) { return (CAN1.RDT0R & CAN_RDT0R_DLC) >> 0 ; }
+static inline uint32_t can_rdt0r_get_time(void) { return (CAN1.RDT0R & CAN_RDT0R_TIME) >> 16; }
+static inline uint32_t can_rdt0r_get_fmi(void) { return (CAN1.RDT0R & CAN_RDT0R_FMI) >> 8; }
+static inline uint32_t can_rdt0r_get_dlc(void) { return (CAN1.RDT0R & CAN_RDT0R_DLC) >> 0; }
 
 // CAN->RDL0R mailbox data high register
 enum {
-	CAN_RDL0R_DATA3 = ((1UL<<8)-1) << 24, // DATA3
-	CAN_RDL0R_DATA2 = ((1UL<<8)-1) << 16, // DATA2
-	CAN_RDL0R_DATA1 = ((1UL<<8)-1) << 8, // DATA1
-	CAN_RDL0R_DATA0 = ((1UL<<8)-1) << 0, // DATA0		
+	CAN_RDL0R_DATA3 = ((1UL << 8) - 1) << 24,  // DATA3
+	CAN_RDL0R_DATA2 = ((1UL << 8) - 1) << 16,  // DATA2
+	CAN_RDL0R_DATA1 = ((1UL << 8) - 1) << 8,   // DATA1
+	CAN_RDL0R_DATA0 = ((1UL << 8) - 1) << 0,   // DATA0
 };
-static inline uint32_t can_rdl0r_get_data3(void) { return (CAN1.RDL0R & CAN_RDL0R_DATA3) >> 24 ; }
-static inline uint32_t can_rdl0r_get_data2(void) { return (CAN1.RDL0R & CAN_RDL0R_DATA2) >> 16 ; }
-static inline uint32_t can_rdl0r_get_data1(void) { return (CAN1.RDL0R & CAN_RDL0R_DATA1) >> 8 ; }
-static inline uint32_t can_rdl0r_get_data0(void) { return (CAN1.RDL0R & CAN_RDL0R_DATA0) >> 0 ; }
+static inline uint32_t can_rdl0r_get_data3(void) { return (CAN1.RDL0R & CAN_RDL0R_DATA3) >> 24; }
+static inline uint32_t can_rdl0r_get_data2(void) { return (CAN1.RDL0R & CAN_RDL0R_DATA2) >> 16; }
+static inline uint32_t can_rdl0r_get_data1(void) { return (CAN1.RDL0R & CAN_RDL0R_DATA1) >> 8; }
+static inline uint32_t can_rdl0r_get_data0(void) { return (CAN1.RDL0R & CAN_RDL0R_DATA0) >> 0; }
 
 // CAN->RDH0R receive FIFO mailbox data high register
 enum {
-	CAN_RDH0R_DATA7 = ((1UL<<8)-1) << 24, // DATA7
-	CAN_RDH0R_DATA6 = ((1UL<<8)-1) << 16, // DATA6
-	CAN_RDH0R_DATA5 = ((1UL<<8)-1) << 8, // DATA5
-	CAN_RDH0R_DATA4 = ((1UL<<8)-1) << 0, // DATA4		
+	CAN_RDH0R_DATA7 = ((1UL << 8) - 1) << 24,  // DATA7
+	CAN_RDH0R_DATA6 = ((1UL << 8) - 1) << 16,  // DATA6
+	CAN_RDH0R_DATA5 = ((1UL << 8) - 1) << 8,   // DATA5
+	CAN_RDH0R_DATA4 = ((1UL << 8) - 1) << 0,   // DATA4
 };
-static inline uint32_t can_rdh0r_get_data7(void) { return (CAN1.RDH0R & CAN_RDH0R_DATA7) >> 24 ; }
-static inline uint32_t can_rdh0r_get_data6(void) { return (CAN1.RDH0R & CAN_RDH0R_DATA6) >> 16 ; }
-static inline uint32_t can_rdh0r_get_data5(void) { return (CAN1.RDH0R & CAN_RDH0R_DATA5) >> 8 ; }
-static inline uint32_t can_rdh0r_get_data4(void) { return (CAN1.RDH0R & CAN_RDH0R_DATA4) >> 0 ; }
+static inline uint32_t can_rdh0r_get_data7(void) { return (CAN1.RDH0R & CAN_RDH0R_DATA7) >> 24; }
+static inline uint32_t can_rdh0r_get_data6(void) { return (CAN1.RDH0R & CAN_RDH0R_DATA6) >> 16; }
+static inline uint32_t can_rdh0r_get_data5(void) { return (CAN1.RDH0R & CAN_RDH0R_DATA5) >> 8; }
+static inline uint32_t can_rdh0r_get_data4(void) { return (CAN1.RDH0R & CAN_RDH0R_DATA4) >> 0; }
 
 // CAN->RI1R mailbox data high register
 enum {
-	CAN_RI1R_STID = ((1UL<<11)-1) << 21, // STID
-	CAN_RI1R_EXID = ((1UL<<18)-1) << 3, // EXID
-	CAN_RI1R_IDE = 1UL<<2, // IDE
-	CAN_RI1R_RTR = 1UL<<1, // RTR		
+	CAN_RI1R_STID = ((1UL << 11) - 1) << 21,  // STID
+	CAN_RI1R_EXID = ((1UL << 18) - 1) << 3,	  // EXID
+	CAN_RI1R_IDE  = 1UL << 2,				  // IDE
+	CAN_RI1R_RTR  = 1UL << 1,				  // RTR
 };
-static inline uint32_t can_ri1r_get_stid(void) { return (CAN1.RI1R & CAN_RI1R_STID) >> 21 ; }
-static inline uint32_t can_ri1r_get_exid(void) { return (CAN1.RI1R & CAN_RI1R_EXID) >> 3 ; }
+static inline uint32_t can_ri1r_get_stid(void) { return (CAN1.RI1R & CAN_RI1R_STID) >> 21; }
+static inline uint32_t can_ri1r_get_exid(void) { return (CAN1.RI1R & CAN_RI1R_EXID) >> 3; }
 
 // CAN->RDT1R mailbox data high register
 enum {
-	CAN_RDT1R_TIME = ((1UL<<16)-1) << 16, // TIME
-	CAN_RDT1R_FMI = ((1UL<<8)-1) << 8, // FMI
-	CAN_RDT1R_DLC = ((1UL<<4)-1) << 0, // DLC		
+	CAN_RDT1R_TIME = ((1UL << 16) - 1) << 16,  // TIME
+	CAN_RDT1R_FMI  = ((1UL << 8) - 1) << 8,	   // FMI
+	CAN_RDT1R_DLC  = ((1UL << 4) - 1) << 0,	   // DLC
 };
-static inline uint32_t can_rdt1r_get_time(void) { return (CAN1.RDT1R & CAN_RDT1R_TIME) >> 16 ; }
-static inline uint32_t can_rdt1r_get_fmi(void) { return (CAN1.RDT1R & CAN_RDT1R_FMI) >> 8 ; }
-static inline uint32_t can_rdt1r_get_dlc(void) { return (CAN1.RDT1R & CAN_RDT1R_DLC) >> 0 ; }
+static inline uint32_t can_rdt1r_get_time(void) { return (CAN1.RDT1R & CAN_RDT1R_TIME) >> 16; }
+static inline uint32_t can_rdt1r_get_fmi(void) { return (CAN1.RDT1R & CAN_RDT1R_FMI) >> 8; }
+static inline uint32_t can_rdt1r_get_dlc(void) { return (CAN1.RDT1R & CAN_RDT1R_DLC) >> 0; }
 
 // CAN->RDL1R mailbox data high register
 enum {
-	CAN_RDL1R_DATA3 = ((1UL<<8)-1) << 24, // DATA3
-	CAN_RDL1R_DATA2 = ((1UL<<8)-1) << 16, // DATA2
-	CAN_RDL1R_DATA1 = ((1UL<<8)-1) << 8, // DATA1
-	CAN_RDL1R_DATA0 = ((1UL<<8)-1) << 0, // DATA0		
+	CAN_RDL1R_DATA3 = ((1UL << 8) - 1) << 24,  // DATA3
+	CAN_RDL1R_DATA2 = ((1UL << 8) - 1) << 16,  // DATA2
+	CAN_RDL1R_DATA1 = ((1UL << 8) - 1) << 8,   // DATA1
+	CAN_RDL1R_DATA0 = ((1UL << 8) - 1) << 0,   // DATA0
 };
-static inline uint32_t can_rdl1r_get_data3(void) { return (CAN1.RDL1R & CAN_RDL1R_DATA3) >> 24 ; }
-static inline uint32_t can_rdl1r_get_data2(void) { return (CAN1.RDL1R & CAN_RDL1R_DATA2) >> 16 ; }
-static inline uint32_t can_rdl1r_get_data1(void) { return (CAN1.RDL1R & CAN_RDL1R_DATA1) >> 8 ; }
-static inline uint32_t can_rdl1r_get_data0(void) { return (CAN1.RDL1R & CAN_RDL1R_DATA0) >> 0 ; }
+static inline uint32_t can_rdl1r_get_data3(void) { return (CAN1.RDL1R & CAN_RDL1R_DATA3) >> 24; }
+static inline uint32_t can_rdl1r_get_data2(void) { return (CAN1.RDL1R & CAN_RDL1R_DATA2) >> 16; }
+static inline uint32_t can_rdl1r_get_data1(void) { return (CAN1.RDL1R & CAN_RDL1R_DATA1) >> 8; }
+static inline uint32_t can_rdl1r_get_data0(void) { return (CAN1.RDL1R & CAN_RDL1R_DATA0) >> 0; }
 
 // CAN->RDH1R mailbox data high register
 enum {
-	CAN_RDH1R_DATA7 = ((1UL<<8)-1) << 24, // DATA7
-	CAN_RDH1R_DATA6 = ((1UL<<8)-1) << 16, // DATA6
-	CAN_RDH1R_DATA5 = ((1UL<<8)-1) << 8, // DATA5
-	CAN_RDH1R_DATA4 = ((1UL<<8)-1) << 0, // DATA4		
+	CAN_RDH1R_DATA7 = ((1UL << 8) - 1) << 24,  // DATA7
+	CAN_RDH1R_DATA6 = ((1UL << 8) - 1) << 16,  // DATA6
+	CAN_RDH1R_DATA5 = ((1UL << 8) - 1) << 8,   // DATA5
+	CAN_RDH1R_DATA4 = ((1UL << 8) - 1) << 0,   // DATA4
 };
-static inline uint32_t can_rdh1r_get_data7(void) { return (CAN1.RDH1R & CAN_RDH1R_DATA7) >> 24 ; }
-static inline uint32_t can_rdh1r_get_data6(void) { return (CAN1.RDH1R & CAN_RDH1R_DATA6) >> 16 ; }
-static inline uint32_t can_rdh1r_get_data5(void) { return (CAN1.RDH1R & CAN_RDH1R_DATA5) >> 8 ; }
-static inline uint32_t can_rdh1r_get_data4(void) { return (CAN1.RDH1R & CAN_RDH1R_DATA4) >> 0 ; }
+static inline uint32_t can_rdh1r_get_data7(void) { return (CAN1.RDH1R & CAN_RDH1R_DATA7) >> 24; }
+static inline uint32_t can_rdh1r_get_data6(void) { return (CAN1.RDH1R & CAN_RDH1R_DATA6) >> 16; }
+static inline uint32_t can_rdh1r_get_data5(void) { return (CAN1.RDH1R & CAN_RDH1R_DATA5) >> 8; }
+static inline uint32_t can_rdh1r_get_data4(void) { return (CAN1.RDH1R & CAN_RDH1R_DATA4) >> 0; }
 
 // CAN->FMR filter master register
 enum {
-	CAN_FMR_FINIT = 1UL<<0, // Filter initialization mode		
+	CAN_FMR_FINIT = 1UL << 0,  // Filter initialization mode
 };
 
 // CAN->FM1R filter mode register
 enum {
-	CAN_FM1R_FBMX  = ((1UL<<14)-1) << 0, // Merged Filter mode		
+	CAN_FM1R_FBMX = ((1UL << 14) - 1) << 0,	 // Merged Filter mode
 };
-static inline void can_fm1r_set_fbmx (uint32_t val) { CAN1.FM1R = (CAN1.FM1R & ~CAN_FM1R_FBMX ) | ((val<<0) & CAN_FM1R_FBMX ); }
-static inline uint32_t can_fm1r_get_fbmx (void) { return (CAN1.FM1R & CAN_FM1R_FBMX ) >> 0 ; }
+static inline void	   can_fm1r_set_fbmx(uint32_t val) { CAN1.FM1R = (CAN1.FM1R & ~CAN_FM1R_FBMX) | ((val << 0) & CAN_FM1R_FBMX); }
+static inline uint32_t can_fm1r_get_fbmx(void) { return (CAN1.FM1R & CAN_FM1R_FBMX) >> 0; }
 
 // CAN->FS1R filter scale register
 enum {
-	CAN_FS1R_FSCX  = ((1UL<<14)-1) << 0, // Merged Filter scale configuration		
+	CAN_FS1R_FSCX = ((1UL << 14) - 1) << 0,	 // Merged Filter scale configuration
 };
-static inline void can_fs1r_set_fscx (uint32_t val) { CAN1.FS1R = (CAN1.FS1R & ~CAN_FS1R_FSCX ) | ((val<<0) & CAN_FS1R_FSCX ); }
-static inline uint32_t can_fs1r_get_fscx (void) { return (CAN1.FS1R & CAN_FS1R_FSCX ) >> 0 ; }
+static inline void	   can_fs1r_set_fscx(uint32_t val) { CAN1.FS1R = (CAN1.FS1R & ~CAN_FS1R_FSCX) | ((val << 0) & CAN_FS1R_FSCX); }
+static inline uint32_t can_fs1r_get_fscx(void) { return (CAN1.FS1R & CAN_FS1R_FSCX) >> 0; }
 
 // CAN->FFA1R filter FIFO assignment register
 enum {
-	CAN_FFA1R_FFAX  = ((1UL<<14)-1) << 0, // Merged Filter FIFO assignment for filter 13		
+	CAN_FFA1R_FFAX = ((1UL << 14) - 1) << 0,  // Merged Filter FIFO assignment for filter 13
 };
-static inline void can_ffa1r_set_ffax (uint32_t val) { CAN1.FFA1R = (CAN1.FFA1R & ~CAN_FFA1R_FFAX ) | ((val<<0) & CAN_FFA1R_FFAX ); }
-static inline uint32_t can_ffa1r_get_ffax (void) { return (CAN1.FFA1R & CAN_FFA1R_FFAX ) >> 0 ; }
+static inline void can_ffa1r_set_ffax(uint32_t val) { CAN1.FFA1R = (CAN1.FFA1R & ~CAN_FFA1R_FFAX) | ((val << 0) & CAN_FFA1R_FFAX); }
+static inline uint32_t can_ffa1r_get_ffax(void) { return (CAN1.FFA1R & CAN_FFA1R_FFAX) >> 0; }
 
 // CAN->FA1R filter activation register
 enum {
-	CAN_FA1R_FACTX  = ((1UL<<14)-1) << 0, // Merged Filter active		
+	CAN_FA1R_FACTX = ((1UL << 14) - 1) << 0,  // Merged Filter active
 };
-static inline void can_fa1r_set_factx (uint32_t val) { CAN1.FA1R = (CAN1.FA1R & ~CAN_FA1R_FACTX ) | ((val<<0) & CAN_FA1R_FACTX ); }
-static inline uint32_t can_fa1r_get_factx (void) { return (CAN1.FA1R & CAN_FA1R_FACTX ) >> 0 ; }
+static inline void can_fa1r_set_factx(uint32_t val) { CAN1.FA1R = (CAN1.FA1R & ~CAN_FA1R_FACTX) | ((val << 0) & CAN_FA1R_FACTX); }
+static inline uint32_t can_fa1r_get_factx(void) { return (CAN1.FA1R & CAN_FA1R_FACTX) >> 0; }
 
 /* Comparator
 There is only one peripheral of type COMP. */
 struct COMP_Type {
-	__IO uint32_t COMP1_CSR; // @0 Comparator 1 control and status register
-	__IO uint32_t COMP2_CSR; // @4 Comparator 2 control and status register
+	__IO uint32_t COMP1_CSR;  // @0 Comparator 1 control and status register
+	__IO uint32_t COMP2_CSR;  // @4 Comparator 2 control and status register
 };
-extern struct COMP_Type	COMP;	// @0x40010200 
+extern struct COMP_Type COMP;  // @0x40010200
 
 // COMP->COMP1_CSR Comparator 1 control and status register
 enum {
-	COMP_COMP1_CSR_COMP1_LOCK = 1UL<<31, // COMP1_CSR register lock bit
-	COMP_COMP1_CSR_COMP1_VALUE = 1UL<<30, // Comparator 1 output status bit
-	COMP_COMP1_CSR_COMP1_INMESEL = ((1UL<<2)-1) << 25, // comparator 1 input minus extended selection bits
-	COMP_COMP1_CSR_COMP1_SCALEN = 1UL<<23, // Voltage scaler enable bit
-	COMP_COMP1_CSR_COMP1_BRGEN = 1UL<<22, // Scaler bridge enable
-	COMP_COMP1_CSR_COMP1_BLANKING = ((1UL<<3)-1) << 18, // Comparator 1 blanking source selection bits
-	COMP_COMP1_CSR_COMP1_HYST = ((1UL<<2)-1) << 16, // Comparator 1 hysteresis selection bits
-	COMP_COMP1_CSR_COMP1_POLARITY = 1UL<<15, // Comparator 1 polarity selection bit
-	COMP_COMP1_CSR_COMP1_INPSEL = ((1UL<<2)-1) << 7, // Comparator1 input plus selection bit
-	COMP_COMP1_CSR_COMP1_INMSEL = ((1UL<<3)-1) << 4, // Comparator 1 Input Minus connection configuration bit
-	COMP_COMP1_CSR_COMP1_PWRMODE = ((1UL<<2)-1) << 2, // Power Mode of the comparator 1
-	COMP_COMP1_CSR_COMP1_EN = 1UL<<0, // Comparator 1 enable bit		
+	COMP_COMP1_CSR_COMP1_LOCK	  = 1UL << 31,				 // COMP1_CSR register lock bit
+	COMP_COMP1_CSR_COMP1_VALUE	  = 1UL << 30,				 // Comparator 1 output status bit
+	COMP_COMP1_CSR_COMP1_INMESEL  = ((1UL << 2) - 1) << 25,	 // comparator 1 input minus extended selection bits
+	COMP_COMP1_CSR_COMP1_SCALEN	  = 1UL << 23,				 // Voltage scaler enable bit
+	COMP_COMP1_CSR_COMP1_BRGEN	  = 1UL << 22,				 // Scaler bridge enable
+	COMP_COMP1_CSR_COMP1_BLANKING = ((1UL << 3) - 1) << 18,	 // Comparator 1 blanking source selection bits
+	COMP_COMP1_CSR_COMP1_HYST	  = ((1UL << 2) - 1) << 16,	 // Comparator 1 hysteresis selection bits
+	COMP_COMP1_CSR_COMP1_POLARITY = 1UL << 15,				 // Comparator 1 polarity selection bit
+	COMP_COMP1_CSR_COMP1_INPSEL	  = ((1UL << 2) - 1) << 7,	 // Comparator1 input plus selection bit
+	COMP_COMP1_CSR_COMP1_INMSEL	  = ((1UL << 3) - 1) << 4,	 // Comparator 1 Input Minus connection configuration bit
+	COMP_COMP1_CSR_COMP1_PWRMODE  = ((1UL << 2) - 1) << 2,	 // Power Mode of the comparator 1
+	COMP_COMP1_CSR_COMP1_EN		  = 1UL << 0,				 // Comparator 1 enable bit
 };
-static inline void comp_comp1_csr_set_comp1_inmesel(uint32_t val) { COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_INMESEL) | ((val<<25) & COMP_COMP1_CSR_COMP1_INMESEL); }
-static inline void comp_comp1_csr_set_comp1_blanking(uint32_t val) { COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_BLANKING) | ((val<<18) & COMP_COMP1_CSR_COMP1_BLANKING); }
-static inline void comp_comp1_csr_set_comp1_hyst(uint32_t val) { COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_HYST) | ((val<<16) & COMP_COMP1_CSR_COMP1_HYST); }
-static inline void comp_comp1_csr_set_comp1_inpsel(uint32_t val) { COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_INPSEL) | ((val<<7) & COMP_COMP1_CSR_COMP1_INPSEL); }
-static inline void comp_comp1_csr_set_comp1_inmsel(uint32_t val) { COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_INMSEL) | ((val<<4) & COMP_COMP1_CSR_COMP1_INMSEL); }
-static inline void comp_comp1_csr_set_comp1_pwrmode(uint32_t val) { COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_PWRMODE) | ((val<<2) & COMP_COMP1_CSR_COMP1_PWRMODE); }
-static inline uint32_t comp_comp1_csr_get_comp1_inmesel(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_INMESEL) >> 25 ; }
-static inline uint32_t comp_comp1_csr_get_comp1_blanking(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_BLANKING) >> 18 ; }
-static inline uint32_t comp_comp1_csr_get_comp1_hyst(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_HYST) >> 16 ; }
-static inline uint32_t comp_comp1_csr_get_comp1_inpsel(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_INPSEL) >> 7 ; }
-static inline uint32_t comp_comp1_csr_get_comp1_inmsel(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_INMSEL) >> 4 ; }
-static inline uint32_t comp_comp1_csr_get_comp1_pwrmode(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_PWRMODE) >> 2 ; }
+static inline void comp_comp1_csr_set_comp1_inmesel(uint32_t val) {
+	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_INMESEL) | ((val << 25) & COMP_COMP1_CSR_COMP1_INMESEL);
+}
+static inline void comp_comp1_csr_set_comp1_blanking(uint32_t val) {
+	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_BLANKING) | ((val << 18) & COMP_COMP1_CSR_COMP1_BLANKING);
+}
+static inline void comp_comp1_csr_set_comp1_hyst(uint32_t val) {
+	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_HYST) | ((val << 16) & COMP_COMP1_CSR_COMP1_HYST);
+}
+static inline void comp_comp1_csr_set_comp1_inpsel(uint32_t val) {
+	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_INPSEL) | ((val << 7) & COMP_COMP1_CSR_COMP1_INPSEL);
+}
+static inline void comp_comp1_csr_set_comp1_inmsel(uint32_t val) {
+	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_INMSEL) | ((val << 4) & COMP_COMP1_CSR_COMP1_INMSEL);
+}
+static inline void comp_comp1_csr_set_comp1_pwrmode(uint32_t val) {
+	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_PWRMODE) | ((val << 2) & COMP_COMP1_CSR_COMP1_PWRMODE);
+}
+static inline uint32_t comp_comp1_csr_get_comp1_inmesel(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_INMESEL) >> 25; }
+static inline uint32_t comp_comp1_csr_get_comp1_blanking(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_BLANKING) >> 18; }
+static inline uint32_t comp_comp1_csr_get_comp1_hyst(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_HYST) >> 16; }
+static inline uint32_t comp_comp1_csr_get_comp1_inpsel(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_INPSEL) >> 7; }
+static inline uint32_t comp_comp1_csr_get_comp1_inmsel(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_INMSEL) >> 4; }
+static inline uint32_t comp_comp1_csr_get_comp1_pwrmode(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_PWRMODE) >> 2; }
 
 // COMP->COMP2_CSR Comparator 2 control and status register
 enum {
-	COMP_COMP2_CSR_COMP2_LOCK = 1UL<<31, // COMP2_CSR register lock bit
-	COMP_COMP2_CSR_COMP2_VALUE = 1UL<<30, // Comparator 2 output status bit
-	COMP_COMP2_CSR_COMP2_INMESEL = ((1UL<<2)-1) << 25, // comparator 2 input minus extended selection bits
-	COMP_COMP2_CSR_COMP2_SCALEN = 1UL<<23, // Voltage scaler enable bit
-	COMP_COMP2_CSR_COMP2_BRGEN = 1UL<<22, // Scaler bridge enable
-	COMP_COMP2_CSR_COMP2_BLANKING = ((1UL<<3)-1) << 18, // Comparator 2 blanking source selection bits
-	COMP_COMP2_CSR_COMP2_HYST = ((1UL<<2)-1) << 16, // Comparator 2 hysteresis selection bits
-	COMP_COMP2_CSR_COMP2_POLARITY = 1UL<<15, // Comparator 2 polarity selection bit
-	COMP_COMP2_CSR_COMP2_WINMODE = 1UL<<9, // Windows mode selection bit
-	COMP_COMP2_CSR_COMP2_INPSEL = ((1UL<<2)-1) << 7, // Comparator 2 Input Plus connection configuration bit
-	COMP_COMP2_CSR_COMP2_INMSEL = ((1UL<<3)-1) << 4, // Comparator 2 Input Minus connection configuration bit
-	COMP_COMP2_CSR_COMP2_PWRMODE = ((1UL<<2)-1) << 2, // Power Mode of the comparator 2
-	COMP_COMP2_CSR_COMP2_EN = 1UL<<0, // Comparator 2 enable bit		
+	COMP_COMP2_CSR_COMP2_LOCK	  = 1UL << 31,				 // COMP2_CSR register lock bit
+	COMP_COMP2_CSR_COMP2_VALUE	  = 1UL << 30,				 // Comparator 2 output status bit
+	COMP_COMP2_CSR_COMP2_INMESEL  = ((1UL << 2) - 1) << 25,	 // comparator 2 input minus extended selection bits
+	COMP_COMP2_CSR_COMP2_SCALEN	  = 1UL << 23,				 // Voltage scaler enable bit
+	COMP_COMP2_CSR_COMP2_BRGEN	  = 1UL << 22,				 // Scaler bridge enable
+	COMP_COMP2_CSR_COMP2_BLANKING = ((1UL << 3) - 1) << 18,	 // Comparator 2 blanking source selection bits
+	COMP_COMP2_CSR_COMP2_HYST	  = ((1UL << 2) - 1) << 16,	 // Comparator 2 hysteresis selection bits
+	COMP_COMP2_CSR_COMP2_POLARITY = 1UL << 15,				 // Comparator 2 polarity selection bit
+	COMP_COMP2_CSR_COMP2_WINMODE  = 1UL << 9,				 // Windows mode selection bit
+	COMP_COMP2_CSR_COMP2_INPSEL	  = ((1UL << 2) - 1) << 7,	 // Comparator 2 Input Plus connection configuration bit
+	COMP_COMP2_CSR_COMP2_INMSEL	  = ((1UL << 3) - 1) << 4,	 // Comparator 2 Input Minus connection configuration bit
+	COMP_COMP2_CSR_COMP2_PWRMODE  = ((1UL << 2) - 1) << 2,	 // Power Mode of the comparator 2
+	COMP_COMP2_CSR_COMP2_EN		  = 1UL << 0,				 // Comparator 2 enable bit
 };
-static inline void comp_comp2_csr_set_comp2_inmesel(uint32_t val) { COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_INMESEL) | ((val<<25) & COMP_COMP2_CSR_COMP2_INMESEL); }
-static inline void comp_comp2_csr_set_comp2_blanking(uint32_t val) { COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_BLANKING) | ((val<<18) & COMP_COMP2_CSR_COMP2_BLANKING); }
-static inline void comp_comp2_csr_set_comp2_hyst(uint32_t val) { COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_HYST) | ((val<<16) & COMP_COMP2_CSR_COMP2_HYST); }
-static inline void comp_comp2_csr_set_comp2_inpsel(uint32_t val) { COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_INPSEL) | ((val<<7) & COMP_COMP2_CSR_COMP2_INPSEL); }
-static inline void comp_comp2_csr_set_comp2_inmsel(uint32_t val) { COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_INMSEL) | ((val<<4) & COMP_COMP2_CSR_COMP2_INMSEL); }
-static inline void comp_comp2_csr_set_comp2_pwrmode(uint32_t val) { COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_PWRMODE) | ((val<<2) & COMP_COMP2_CSR_COMP2_PWRMODE); }
-static inline uint32_t comp_comp2_csr_get_comp2_inmesel(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_INMESEL) >> 25 ; }
-static inline uint32_t comp_comp2_csr_get_comp2_blanking(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_BLANKING) >> 18 ; }
-static inline uint32_t comp_comp2_csr_get_comp2_hyst(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_HYST) >> 16 ; }
-static inline uint32_t comp_comp2_csr_get_comp2_inpsel(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_INPSEL) >> 7 ; }
-static inline uint32_t comp_comp2_csr_get_comp2_inmsel(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_INMSEL) >> 4 ; }
-static inline uint32_t comp_comp2_csr_get_comp2_pwrmode(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_PWRMODE) >> 2 ; }
+static inline void comp_comp2_csr_set_comp2_inmesel(uint32_t val) {
+	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_INMESEL) | ((val << 25) & COMP_COMP2_CSR_COMP2_INMESEL);
+}
+static inline void comp_comp2_csr_set_comp2_blanking(uint32_t val) {
+	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_BLANKING) | ((val << 18) & COMP_COMP2_CSR_COMP2_BLANKING);
+}
+static inline void comp_comp2_csr_set_comp2_hyst(uint32_t val) {
+	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_HYST) | ((val << 16) & COMP_COMP2_CSR_COMP2_HYST);
+}
+static inline void comp_comp2_csr_set_comp2_inpsel(uint32_t val) {
+	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_INPSEL) | ((val << 7) & COMP_COMP2_CSR_COMP2_INPSEL);
+}
+static inline void comp_comp2_csr_set_comp2_inmsel(uint32_t val) {
+	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_INMSEL) | ((val << 4) & COMP_COMP2_CSR_COMP2_INMSEL);
+}
+static inline void comp_comp2_csr_set_comp2_pwrmode(uint32_t val) {
+	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_PWRMODE) | ((val << 2) & COMP_COMP2_CSR_COMP2_PWRMODE);
+}
+static inline uint32_t comp_comp2_csr_get_comp2_inmesel(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_INMESEL) >> 25; }
+static inline uint32_t comp_comp2_csr_get_comp2_blanking(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_BLANKING) >> 18; }
+static inline uint32_t comp_comp2_csr_get_comp2_hyst(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_HYST) >> 16; }
+static inline uint32_t comp_comp2_csr_get_comp2_inpsel(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_INPSEL) >> 7; }
+static inline uint32_t comp_comp2_csr_get_comp2_inmsel(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_INMSEL) >> 4; }
+static inline uint32_t comp_comp2_csr_get_comp2_pwrmode(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_PWRMODE) >> 2; }
 
 /* Cyclic redundancy check calculation unit
 There is only one peripheral of type CRC. */
 struct CRC_Type {
-	__IO uint32_t DR; // @0 Data register
-	__IO uint8_t IDR; // @4 Independent data register
-	 uint8_t RESERVED0[3]; // @5 
-	__IO uint8_t CR; // @8 Control register
-	 uint8_t RESERVED1[7]; // @9 
-	__IO uint32_t INIT; // @16 Initial CRC value
-	__IO uint32_t POL; // @20 polynomial
+	__IO uint32_t DR;			 // @0 Data register
+	__IO uint8_t  IDR;			 // @4 Independent data register
+	uint8_t		  RESERVED0[3];	 // @5
+	__IO uint8_t  CR;			 // @8 Control register
+	uint8_t		  RESERVED1[7];	 // @9
+	__IO uint32_t INIT;			 // @16 Initial CRC value
+	__IO uint32_t POL;			 // @20 polynomial
 };
-extern struct CRC_Type	CRC;	// @0x40023000 
+extern struct CRC_Type CRC;	 // @0x40023000
 
 // CRC->CR Control register
 enum {
-	CRC_CR_REV_OUT = 1UL<<7, // Reverse output data
-	CRC_CR_REV_IN = ((1UL<<2)-1) << 5, // Reverse input data
-	CRC_CR_POLYSIZE = ((1UL<<2)-1) << 3, // Polynomial size
-	CRC_CR_RESET = 1UL<<0, // RESET bit		
+	CRC_CR_REV_OUT	= 1UL << 7,				  // Reverse output data
+	CRC_CR_REV_IN	= ((1UL << 2) - 1) << 5,  // Reverse input data
+	CRC_CR_POLYSIZE = ((1UL << 2) - 1) << 3,  // Polynomial size
+	CRC_CR_RESET	= 1UL << 0,				  // RESET bit
 };
-static inline void crc_cr_set_rev_in(uint32_t val) { CRC.CR = (CRC.CR & ~CRC_CR_REV_IN) | ((val<<5) & CRC_CR_REV_IN); }
-static inline void crc_cr_set_polysize(uint32_t val) { CRC.CR = (CRC.CR & ~CRC_CR_POLYSIZE) | ((val<<3) & CRC_CR_POLYSIZE); }
-static inline uint32_t crc_cr_get_rev_in(void) { return (CRC.CR & CRC_CR_REV_IN) >> 5 ; }
-static inline uint32_t crc_cr_get_polysize(void) { return (CRC.CR & CRC_CR_POLYSIZE) >> 3 ; }
+static inline void	   crc_cr_set_rev_in(uint32_t val) { CRC.CR = (CRC.CR & ~CRC_CR_REV_IN) | ((val << 5) & CRC_CR_REV_IN); }
+static inline void	   crc_cr_set_polysize(uint32_t val) { CRC.CR = (CRC.CR & ~CRC_CR_POLYSIZE) | ((val << 3) & CRC_CR_POLYSIZE); }
+static inline uint32_t crc_cr_get_rev_in(void) { return (CRC.CR & CRC_CR_REV_IN) >> 5; }
+static inline uint32_t crc_cr_get_polysize(void) { return (CRC.CR & CRC_CR_POLYSIZE) >> 3; }
 
 /* Clock recovery system
 There is only one peripheral of type CRS. */
 struct CRS_Type {
-	__IO uint16_t CR; // @0 control register
-	 uint8_t RESERVED0[2]; // @2 
-	__IO uint32_t CFGR; // @4 configuration register
-	__I uint32_t ISR; // @8 interrupt and status register
-	__IO uint8_t ICR; // @12 interrupt flag clear register
+	__IO uint16_t CR;			 // @0 control register
+	uint8_t		  RESERVED0[2];	 // @2
+	__IO uint32_t CFGR;			 // @4 configuration register
+	__I uint32_t  ISR;			 // @8 interrupt and status register
+	__IO uint8_t  ICR;			 // @12 interrupt flag clear register
 };
-extern struct CRS_Type	CRS;	// @0x40006000 
+extern struct CRS_Type CRS;	 // @0x40006000
 
 // CRS->CR control register
 enum {
-	CRS_CR_TRIM = ((1UL<<6)-1) << 8, // HSI48 oscillator smooth trimming
-	CRS_CR_SWSYNC = 1UL<<7, // Generate software SYNC event
-	CRS_CR_AUTOTRIMEN = 1UL<<6, // Automatic trimming enable
-	CRS_CR_CEN = 1UL<<5, // Frequency error counter enable
-	CRS_CR_ESYNCIE = 1UL<<3, // Expected SYNC interrupt enable
-	CRS_CR_ERRIE = 1UL<<2, // Synchronization or trimming error interrupt enable
-	CRS_CR_SYNCWARNIE = 1UL<<1, // SYNC warning interrupt enable
-	CRS_CR_SYNCOKIE = 1UL<<0, // SYNC event OK interrupt enable		
+	CRS_CR_TRIM		  = ((1UL << 6) - 1) << 8,	// HSI48 oscillator smooth trimming
+	CRS_CR_SWSYNC	  = 1UL << 7,				// Generate software SYNC event
+	CRS_CR_AUTOTRIMEN = 1UL << 6,				// Automatic trimming enable
+	CRS_CR_CEN		  = 1UL << 5,				// Frequency error counter enable
+	CRS_CR_ESYNCIE	  = 1UL << 3,				// Expected SYNC interrupt enable
+	CRS_CR_ERRIE	  = 1UL << 2,				// Synchronization or trimming error interrupt enable
+	CRS_CR_SYNCWARNIE = 1UL << 1,				// SYNC warning interrupt enable
+	CRS_CR_SYNCOKIE	  = 1UL << 0,				// SYNC event OK interrupt enable
 };
-static inline void crs_cr_set_trim(uint32_t val) { CRS.CR = (CRS.CR & ~CRS_CR_TRIM) | ((val<<8) & CRS_CR_TRIM); }
-static inline uint32_t crs_cr_get_trim(void) { return (CRS.CR & CRS_CR_TRIM) >> 8 ; }
+static inline void	   crs_cr_set_trim(uint32_t val) { CRS.CR = (CRS.CR & ~CRS_CR_TRIM) | ((val << 8) & CRS_CR_TRIM); }
+static inline uint32_t crs_cr_get_trim(void) { return (CRS.CR & CRS_CR_TRIM) >> 8; }
 
 // CRS->CFGR configuration register
 enum {
-	CRS_CFGR_SYNCPOL = 1UL<<31, // SYNC polarity selection
-	CRS_CFGR_SYNCSRC = ((1UL<<2)-1) << 28, // SYNC signal source selection
-	CRS_CFGR_SYNCDIV = ((1UL<<3)-1) << 24, // SYNC divider
-	CRS_CFGR_FELIM = ((1UL<<8)-1) << 16, // Frequency error limit
-	CRS_CFGR_RELOAD = ((1UL<<16)-1) << 0, // Counter reload value		
+	CRS_CFGR_SYNCPOL = 1UL << 31,				// SYNC polarity selection
+	CRS_CFGR_SYNCSRC = ((1UL << 2) - 1) << 28,	// SYNC signal source selection
+	CRS_CFGR_SYNCDIV = ((1UL << 3) - 1) << 24,	// SYNC divider
+	CRS_CFGR_FELIM	 = ((1UL << 8) - 1) << 16,	// Frequency error limit
+	CRS_CFGR_RELOAD	 = ((1UL << 16) - 1) << 0,	// Counter reload value
 };
-static inline void crs_cfgr_set_syncsrc(uint32_t val) { CRS.CFGR = (CRS.CFGR & ~CRS_CFGR_SYNCSRC) | ((val<<28) & CRS_CFGR_SYNCSRC); }
-static inline void crs_cfgr_set_syncdiv(uint32_t val) { CRS.CFGR = (CRS.CFGR & ~CRS_CFGR_SYNCDIV) | ((val<<24) & CRS_CFGR_SYNCDIV); }
-static inline void crs_cfgr_set_felim(uint32_t val) { CRS.CFGR = (CRS.CFGR & ~CRS_CFGR_FELIM) | ((val<<16) & CRS_CFGR_FELIM); }
-static inline void crs_cfgr_set_reload(uint32_t val) { CRS.CFGR = (CRS.CFGR & ~CRS_CFGR_RELOAD) | ((val<<0) & CRS_CFGR_RELOAD); }
-static inline uint32_t crs_cfgr_get_syncsrc(void) { return (CRS.CFGR & CRS_CFGR_SYNCSRC) >> 28 ; }
-static inline uint32_t crs_cfgr_get_syncdiv(void) { return (CRS.CFGR & CRS_CFGR_SYNCDIV) >> 24 ; }
-static inline uint32_t crs_cfgr_get_felim(void) { return (CRS.CFGR & CRS_CFGR_FELIM) >> 16 ; }
-static inline uint32_t crs_cfgr_get_reload(void) { return (CRS.CFGR & CRS_CFGR_RELOAD) >> 0 ; }
+static inline void crs_cfgr_set_syncsrc(uint32_t val) {
+	CRS.CFGR = (CRS.CFGR & ~CRS_CFGR_SYNCSRC) | ((val << 28) & CRS_CFGR_SYNCSRC);
+}
+static inline void crs_cfgr_set_syncdiv(uint32_t val) {
+	CRS.CFGR = (CRS.CFGR & ~CRS_CFGR_SYNCDIV) | ((val << 24) & CRS_CFGR_SYNCDIV);
+}
+static inline void crs_cfgr_set_felim(uint32_t val) { CRS.CFGR = (CRS.CFGR & ~CRS_CFGR_FELIM) | ((val << 16) & CRS_CFGR_FELIM); }
+static inline void crs_cfgr_set_reload(uint32_t val) { CRS.CFGR = (CRS.CFGR & ~CRS_CFGR_RELOAD) | ((val << 0) & CRS_CFGR_RELOAD); }
+static inline uint32_t crs_cfgr_get_syncsrc(void) { return (CRS.CFGR & CRS_CFGR_SYNCSRC) >> 28; }
+static inline uint32_t crs_cfgr_get_syncdiv(void) { return (CRS.CFGR & CRS_CFGR_SYNCDIV) >> 24; }
+static inline uint32_t crs_cfgr_get_felim(void) { return (CRS.CFGR & CRS_CFGR_FELIM) >> 16; }
+static inline uint32_t crs_cfgr_get_reload(void) { return (CRS.CFGR & CRS_CFGR_RELOAD) >> 0; }
 
 // CRS->ISR interrupt and status register
 enum {
-	CRS_ISR_FECAP = ((1UL<<16)-1) << 16, // Frequency error capture
-	CRS_ISR_FEDIR = 1UL<<15, // Frequency error direction
-	CRS_ISR_TRIMOVF = 1UL<<10, // Trimming overflow or underflow
-	CRS_ISR_SYNCMISS = 1UL<<9, // SYNC missed
-	CRS_ISR_SYNCERR = 1UL<<8, // SYNC error
-	CRS_ISR_ESYNCF = 1UL<<3, // Expected SYNC flag
-	CRS_ISR_ERRF = 1UL<<2, // Error flag
-	CRS_ISR_SYNCWARNF = 1UL<<1, // SYNC warning flag
-	CRS_ISR_SYNCOKF = 1UL<<0, // SYNC event OK flag		
+	CRS_ISR_FECAP	  = ((1UL << 16) - 1) << 16,  // Frequency error capture
+	CRS_ISR_FEDIR	  = 1UL << 15,				  // Frequency error direction
+	CRS_ISR_TRIMOVF	  = 1UL << 10,				  // Trimming overflow or underflow
+	CRS_ISR_SYNCMISS  = 1UL << 9,				  // SYNC missed
+	CRS_ISR_SYNCERR	  = 1UL << 8,				  // SYNC error
+	CRS_ISR_ESYNCF	  = 1UL << 3,				  // Expected SYNC flag
+	CRS_ISR_ERRF	  = 1UL << 2,				  // Error flag
+	CRS_ISR_SYNCWARNF = 1UL << 1,				  // SYNC warning flag
+	CRS_ISR_SYNCOKF	  = 1UL << 0,				  // SYNC event OK flag
 };
-static inline uint32_t crs_isr_get_fecap(void) { return (CRS.ISR & CRS_ISR_FECAP) >> 16 ; }
+static inline uint32_t crs_isr_get_fecap(void) { return (CRS.ISR & CRS_ISR_FECAP) >> 16; }
 
 // CRS->ICR interrupt flag clear register
 enum {
-	CRS_ICR_ESYNCC = 1UL<<3, // Expected SYNC clear flag
-	CRS_ICR_ERRC = 1UL<<2, // Error clear flag
-	CRS_ICR_SYNCWARNC = 1UL<<1, // SYNC warning clear flag
-	CRS_ICR_SYNCOKC = 1UL<<0, // SYNC event OK clear flag		
+	CRS_ICR_ESYNCC	  = 1UL << 3,  // Expected SYNC clear flag
+	CRS_ICR_ERRC	  = 1UL << 2,  // Error clear flag
+	CRS_ICR_SYNCWARNC = 1UL << 1,  // SYNC warning clear flag
+	CRS_ICR_SYNCOKC	  = 1UL << 0,  // SYNC event OK clear flag
 };
 
 /* Digital-to-analog converter
 There is only one peripheral of type DAC. */
 struct DAC_Type {
-	__IO uint32_t CR; // @0 control register
-	__O uint8_t SWTRIGR; // @4 software trigger register
-	 uint8_t RESERVED0[3]; // @5 
-	__IO uint16_t DHR12R1; // @8 channel1 12-bit right-aligned data holding register
-	 uint8_t RESERVED1[2]; // @10 
-	__IO uint16_t DHR12L1; // @12 channel1 12-bit left-aligned data holding register
-	 uint8_t RESERVED2[2]; // @14 
-	__IO uint8_t DHR8R1; // @16 channel1 8-bit right-aligned data holding register
-	 uint8_t RESERVED3[3]; // @17 
-	__IO uint16_t DHR12R2; // @20 channel2 12-bit right aligned data holding register
-	 uint8_t RESERVED4[2]; // @22 
-	__IO uint16_t DHR12L2; // @24 channel2 12-bit left aligned data holding register
-	 uint8_t RESERVED5[2]; // @26 
-	__IO uint8_t DHR8R2; // @28 channel2 8-bit right-aligned data holding register
-	 uint8_t RESERVED6[3]; // @29 
-	__IO uint32_t DHR12RD; // @32 Dual DAC 12-bit right-aligned data holding register
-	__IO uint32_t DHR12LD; // @36 DUAL DAC 12-bit left aligned data holding register
-	__IO uint16_t DHR8RD; // @40 DUAL DAC 8-bit right aligned data holding register
-	 uint8_t RESERVED7[2]; // @42 
-	__I uint16_t DOR1; // @44 channel1 data output register
-	 uint8_t RESERVED8[2]; // @46 
-	__I uint16_t DOR2; // @48 channel2 data output register
-	 uint8_t RESERVED9[2]; // @50 
-	__IO uint32_t SR; // @52 status register
-	__IO uint32_t CCR; // @56 calibration control register
-	__IO uint32_t MCR; // @60 mode control register
-	__IO uint16_t SHSR1; // @64 Sample and Hold sample time register 1
-	 uint8_t RESERVED10[2]; // @66 
-	__IO uint16_t SHSR2; // @68 Sample and Hold sample time register 2
-	 uint8_t RESERVED11[2]; // @70 
-	__IO uint32_t SHHR; // @72 Sample and Hold hold time register
-	__IO uint32_t SHRR; // @76 Sample and Hold refresh time register
+	__IO uint32_t CR;			  // @0 control register
+	__O uint8_t	  SWTRIGR;		  // @4 software trigger register
+	uint8_t		  RESERVED0[3];	  // @5
+	__IO uint16_t DHR12R1;		  // @8 channel1 12-bit right-aligned data holding register
+	uint8_t		  RESERVED1[2];	  // @10
+	__IO uint16_t DHR12L1;		  // @12 channel1 12-bit left-aligned data holding register
+	uint8_t		  RESERVED2[2];	  // @14
+	__IO uint8_t  DHR8R1;		  // @16 channel1 8-bit right-aligned data holding register
+	uint8_t		  RESERVED3[3];	  // @17
+	__IO uint16_t DHR12R2;		  // @20 channel2 12-bit right aligned data holding register
+	uint8_t		  RESERVED4[2];	  // @22
+	__IO uint16_t DHR12L2;		  // @24 channel2 12-bit left aligned data holding register
+	uint8_t		  RESERVED5[2];	  // @26
+	__IO uint8_t  DHR8R2;		  // @28 channel2 8-bit right-aligned data holding register
+	uint8_t		  RESERVED6[3];	  // @29
+	__IO uint32_t DHR12RD;		  // @32 Dual DAC 12-bit right-aligned data holding register
+	__IO uint32_t DHR12LD;		  // @36 DUAL DAC 12-bit left aligned data holding register
+	__IO uint16_t DHR8RD;		  // @40 DUAL DAC 8-bit right aligned data holding register
+	uint8_t		  RESERVED7[2];	  // @42
+	__I uint16_t  DOR1;			  // @44 channel1 data output register
+	uint8_t		  RESERVED8[2];	  // @46
+	__I uint16_t  DOR2;			  // @48 channel2 data output register
+	uint8_t		  RESERVED9[2];	  // @50
+	__IO uint32_t SR;			  // @52 status register
+	__IO uint32_t CCR;			  // @56 calibration control register
+	__IO uint32_t MCR;			  // @60 mode control register
+	__IO uint16_t SHSR1;		  // @64 Sample and Hold sample time register 1
+	uint8_t		  RESERVED10[2];  // @66
+	__IO uint16_t SHSR2;		  // @68 Sample and Hold sample time register 2
+	uint8_t		  RESERVED11[2];  // @70
+	__IO uint32_t SHHR;			  // @72 Sample and Hold hold time register
+	__IO uint32_t SHRR;			  // @76 Sample and Hold refresh time register
 };
-extern struct DAC_Type	DAC1;	// @0x40007400 
+extern struct DAC_Type DAC1;  // @0x40007400
 
 // DAC->CR control register
 enum {
-	DAC_CR_CEN2 = 1UL<<30, // DAC Channel 2 calibration enable
-	DAC_CR_DMAUDRIE2 = 1UL<<29, // DAC channel2 DMA underrun interrupt enable
-	DAC_CR_DMAEN2 = 1UL<<28, // DAC channel2 DMA enable
-	DAC_CR_MAMP2 = ((1UL<<4)-1) << 24, // DAC channel2 mask/amplitude selector
-	DAC_CR_WAVE2 = ((1UL<<2)-1) << 22, // DAC channel2 noise/triangle wave generation enable
-	DAC_CR_TSEL2 = ((1UL<<3)-1) << 19, // DAC channel2 trigger selection
-	DAC_CR_TEN2 = 1UL<<18, // DAC channel2 trigger enable
-	DAC_CR_EN2 = 1UL<<16, // DAC channel2 enable
-	DAC_CR_CEN1 = 1UL<<14, // DAC Channel 1 calibration enable
-	DAC_CR_DMAUDRIE1 = 1UL<<13, // DAC channel1 DMA Underrun Interrupt enable
-	DAC_CR_DMAEN1 = 1UL<<12, // DAC channel1 DMA enable
-	DAC_CR_MAMP1 = ((1UL<<4)-1) << 8, // DAC channel1 mask/amplitude selector
-	DAC_CR_WAVE1 = ((1UL<<2)-1) << 6, // DAC channel1 noise/triangle wave generation enable
-	DAC_CR_TSEL1 = ((1UL<<3)-1) << 3, // DAC channel1 trigger selection
-	DAC_CR_TEN1 = 1UL<<2, // DAC channel1 trigger enable
-	DAC_CR_EN1 = 1UL<<0, // DAC channel1 enable		
+	DAC_CR_CEN2		 = 1UL << 30,				// DAC Channel 2 calibration enable
+	DAC_CR_DMAUDRIE2 = 1UL << 29,				// DAC channel2 DMA underrun interrupt enable
+	DAC_CR_DMAEN2	 = 1UL << 28,				// DAC channel2 DMA enable
+	DAC_CR_MAMP2	 = ((1UL << 4) - 1) << 24,	// DAC channel2 mask/amplitude selector
+	DAC_CR_WAVE2	 = ((1UL << 2) - 1) << 22,	// DAC channel2 noise/triangle wave generation enable
+	DAC_CR_TSEL2	 = ((1UL << 3) - 1) << 19,	// DAC channel2 trigger selection
+	DAC_CR_TEN2		 = 1UL << 18,				// DAC channel2 trigger enable
+	DAC_CR_EN2		 = 1UL << 16,				// DAC channel2 enable
+	DAC_CR_CEN1		 = 1UL << 14,				// DAC Channel 1 calibration enable
+	DAC_CR_DMAUDRIE1 = 1UL << 13,				// DAC channel1 DMA Underrun Interrupt enable
+	DAC_CR_DMAEN1	 = 1UL << 12,				// DAC channel1 DMA enable
+	DAC_CR_MAMP1	 = ((1UL << 4) - 1) << 8,	// DAC channel1 mask/amplitude selector
+	DAC_CR_WAVE1	 = ((1UL << 2) - 1) << 6,	// DAC channel1 noise/triangle wave generation enable
+	DAC_CR_TSEL1	 = ((1UL << 3) - 1) << 3,	// DAC channel1 trigger selection
+	DAC_CR_TEN1		 = 1UL << 2,				// DAC channel1 trigger enable
+	DAC_CR_EN1		 = 1UL << 0,				// DAC channel1 enable
 };
-static inline void dac_cr_set_mamp2(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_MAMP2) | ((val<<24) & DAC_CR_MAMP2); }
-static inline void dac_cr_set_wave2(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_WAVE2) | ((val<<22) & DAC_CR_WAVE2); }
-static inline void dac_cr_set_tsel2(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_TSEL2) | ((val<<19) & DAC_CR_TSEL2); }
-static inline void dac_cr_set_mamp1(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_MAMP1) | ((val<<8) & DAC_CR_MAMP1); }
-static inline void dac_cr_set_wave1(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_WAVE1) | ((val<<6) & DAC_CR_WAVE1); }
-static inline void dac_cr_set_tsel1(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_TSEL1) | ((val<<3) & DAC_CR_TSEL1); }
-static inline uint32_t dac_cr_get_mamp2(void) { return (DAC1.CR & DAC_CR_MAMP2) >> 24 ; }
-static inline uint32_t dac_cr_get_wave2(void) { return (DAC1.CR & DAC_CR_WAVE2) >> 22 ; }
-static inline uint32_t dac_cr_get_tsel2(void) { return (DAC1.CR & DAC_CR_TSEL2) >> 19 ; }
-static inline uint32_t dac_cr_get_mamp1(void) { return (DAC1.CR & DAC_CR_MAMP1) >> 8 ; }
-static inline uint32_t dac_cr_get_wave1(void) { return (DAC1.CR & DAC_CR_WAVE1) >> 6 ; }
-static inline uint32_t dac_cr_get_tsel1(void) { return (DAC1.CR & DAC_CR_TSEL1) >> 3 ; }
+static inline void	   dac_cr_set_mamp2(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_MAMP2) | ((val << 24) & DAC_CR_MAMP2); }
+static inline void	   dac_cr_set_wave2(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_WAVE2) | ((val << 22) & DAC_CR_WAVE2); }
+static inline void	   dac_cr_set_tsel2(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_TSEL2) | ((val << 19) & DAC_CR_TSEL2); }
+static inline void	   dac_cr_set_mamp1(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_MAMP1) | ((val << 8) & DAC_CR_MAMP1); }
+static inline void	   dac_cr_set_wave1(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_WAVE1) | ((val << 6) & DAC_CR_WAVE1); }
+static inline void	   dac_cr_set_tsel1(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_TSEL1) | ((val << 3) & DAC_CR_TSEL1); }
+static inline uint32_t dac_cr_get_mamp2(void) { return (DAC1.CR & DAC_CR_MAMP2) >> 24; }
+static inline uint32_t dac_cr_get_wave2(void) { return (DAC1.CR & DAC_CR_WAVE2) >> 22; }
+static inline uint32_t dac_cr_get_tsel2(void) { return (DAC1.CR & DAC_CR_TSEL2) >> 19; }
+static inline uint32_t dac_cr_get_mamp1(void) { return (DAC1.CR & DAC_CR_MAMP1) >> 8; }
+static inline uint32_t dac_cr_get_wave1(void) { return (DAC1.CR & DAC_CR_WAVE1) >> 6; }
+static inline uint32_t dac_cr_get_tsel1(void) { return (DAC1.CR & DAC_CR_TSEL1) >> 3; }
 
 // DAC->SWTRIGR software trigger register
 enum {
-	DAC_SWTRIGR_SWTRIGX  = ((1UL<<2)-1) << 0, // Merged DAC channel2 software trigger		
+	DAC_SWTRIGR_SWTRIGX = ((1UL << 2) - 1) << 0,  // Merged DAC channel2 software trigger
 };
-static inline void dac_swtrigr_set_swtrigx (uint32_t val) { DAC1.SWTRIGR = (DAC1.SWTRIGR & ~DAC_SWTRIGR_SWTRIGX ) | ((val<<0) & DAC_SWTRIGR_SWTRIGX ); }
-static inline uint32_t dac_swtrigr_get_swtrigx (void) { return (DAC1.SWTRIGR & DAC_SWTRIGR_SWTRIGX ) >> 0 ; }
+static inline void dac_swtrigr_set_swtrigx(uint32_t val) {
+	DAC1.SWTRIGR = (DAC1.SWTRIGR & ~DAC_SWTRIGR_SWTRIGX) | ((val << 0) & DAC_SWTRIGR_SWTRIGX);
+}
+static inline uint32_t dac_swtrigr_get_swtrigx(void) { return (DAC1.SWTRIGR & DAC_SWTRIGR_SWTRIGX) >> 0; }
 
 // DAC->DHR12R1 channel1 12-bit right-aligned data holding register
 enum {
-	DAC_DHR12R1_DACC1DHR = ((1UL<<12)-1) << 0, // DAC channel1 12-bit right-aligned data		
+	DAC_DHR12R1_DACC1DHR = ((1UL << 12) - 1) << 0,	// DAC channel1 12-bit right-aligned data
 };
-static inline void dac_dhr12r1_set_dacc1dhr(uint32_t val) { DAC1.DHR12R1 = (DAC1.DHR12R1 & ~DAC_DHR12R1_DACC1DHR) | ((val<<0) & DAC_DHR12R1_DACC1DHR); }
-static inline uint32_t dac_dhr12r1_get_dacc1dhr(void) { return (DAC1.DHR12R1 & DAC_DHR12R1_DACC1DHR) >> 0 ; }
+static inline void dac_dhr12r1_set_dacc1dhr(uint32_t val) {
+	DAC1.DHR12R1 = (DAC1.DHR12R1 & ~DAC_DHR12R1_DACC1DHR) | ((val << 0) & DAC_DHR12R1_DACC1DHR);
+}
+static inline uint32_t dac_dhr12r1_get_dacc1dhr(void) { return (DAC1.DHR12R1 & DAC_DHR12R1_DACC1DHR) >> 0; }
 
 // DAC->DHR12L1 channel1 12-bit left-aligned data holding register
 enum {
-	DAC_DHR12L1_DACC1DHR = ((1UL<<12)-1) << 4, // DAC channel1 12-bit left-aligned data		
+	DAC_DHR12L1_DACC1DHR = ((1UL << 12) - 1) << 4,	// DAC channel1 12-bit left-aligned data
 };
-static inline void dac_dhr12l1_set_dacc1dhr(uint32_t val) { DAC1.DHR12L1 = (DAC1.DHR12L1 & ~DAC_DHR12L1_DACC1DHR) | ((val<<4) & DAC_DHR12L1_DACC1DHR); }
-static inline uint32_t dac_dhr12l1_get_dacc1dhr(void) { return (DAC1.DHR12L1 & DAC_DHR12L1_DACC1DHR) >> 4 ; }
+static inline void dac_dhr12l1_set_dacc1dhr(uint32_t val) {
+	DAC1.DHR12L1 = (DAC1.DHR12L1 & ~DAC_DHR12L1_DACC1DHR) | ((val << 4) & DAC_DHR12L1_DACC1DHR);
+}
+static inline uint32_t dac_dhr12l1_get_dacc1dhr(void) { return (DAC1.DHR12L1 & DAC_DHR12L1_DACC1DHR) >> 4; }
 
 // DAC->DHR12R2 channel2 12-bit right aligned data holding register
 enum {
-	DAC_DHR12R2_DACC2DHR = ((1UL<<12)-1) << 0, // DAC channel2 12-bit right-aligned data		
+	DAC_DHR12R2_DACC2DHR = ((1UL << 12) - 1) << 0,	// DAC channel2 12-bit right-aligned data
 };
-static inline void dac_dhr12r2_set_dacc2dhr(uint32_t val) { DAC1.DHR12R2 = (DAC1.DHR12R2 & ~DAC_DHR12R2_DACC2DHR) | ((val<<0) & DAC_DHR12R2_DACC2DHR); }
-static inline uint32_t dac_dhr12r2_get_dacc2dhr(void) { return (DAC1.DHR12R2 & DAC_DHR12R2_DACC2DHR) >> 0 ; }
+static inline void dac_dhr12r2_set_dacc2dhr(uint32_t val) {
+	DAC1.DHR12R2 = (DAC1.DHR12R2 & ~DAC_DHR12R2_DACC2DHR) | ((val << 0) & DAC_DHR12R2_DACC2DHR);
+}
+static inline uint32_t dac_dhr12r2_get_dacc2dhr(void) { return (DAC1.DHR12R2 & DAC_DHR12R2_DACC2DHR) >> 0; }
 
 // DAC->DHR12L2 channel2 12-bit left aligned data holding register
 enum {
-	DAC_DHR12L2_DACC2DHR = ((1UL<<12)-1) << 4, // DAC channel2 12-bit left-aligned data		
+	DAC_DHR12L2_DACC2DHR = ((1UL << 12) - 1) << 4,	// DAC channel2 12-bit left-aligned data
 };
-static inline void dac_dhr12l2_set_dacc2dhr(uint32_t val) { DAC1.DHR12L2 = (DAC1.DHR12L2 & ~DAC_DHR12L2_DACC2DHR) | ((val<<4) & DAC_DHR12L2_DACC2DHR); }
-static inline uint32_t dac_dhr12l2_get_dacc2dhr(void) { return (DAC1.DHR12L2 & DAC_DHR12L2_DACC2DHR) >> 4 ; }
+static inline void dac_dhr12l2_set_dacc2dhr(uint32_t val) {
+	DAC1.DHR12L2 = (DAC1.DHR12L2 & ~DAC_DHR12L2_DACC2DHR) | ((val << 4) & DAC_DHR12L2_DACC2DHR);
+}
+static inline uint32_t dac_dhr12l2_get_dacc2dhr(void) { return (DAC1.DHR12L2 & DAC_DHR12L2_DACC2DHR) >> 4; }
 
 // DAC->DHR12RD Dual DAC 12-bit right-aligned data holding register
 enum {
-	DAC_DHR12RD_DACC2DHR = ((1UL<<12)-1) << 16, // DAC channel2 12-bit right-aligned data
-	DAC_DHR12RD_DACC1DHR = ((1UL<<12)-1) << 0, // DAC channel1 12-bit right-aligned data		
+	DAC_DHR12RD_DACC2DHR = ((1UL << 12) - 1) << 16,	 // DAC channel2 12-bit right-aligned data
+	DAC_DHR12RD_DACC1DHR = ((1UL << 12) - 1) << 0,	 // DAC channel1 12-bit right-aligned data
 };
-static inline void dac_dhr12rd_set_dacc2dhr(uint32_t val) { DAC1.DHR12RD = (DAC1.DHR12RD & ~DAC_DHR12RD_DACC2DHR) | ((val<<16) & DAC_DHR12RD_DACC2DHR); }
-static inline void dac_dhr12rd_set_dacc1dhr(uint32_t val) { DAC1.DHR12RD = (DAC1.DHR12RD & ~DAC_DHR12RD_DACC1DHR) | ((val<<0) & DAC_DHR12RD_DACC1DHR); }
-static inline uint32_t dac_dhr12rd_get_dacc2dhr(void) { return (DAC1.DHR12RD & DAC_DHR12RD_DACC2DHR) >> 16 ; }
-static inline uint32_t dac_dhr12rd_get_dacc1dhr(void) { return (DAC1.DHR12RD & DAC_DHR12RD_DACC1DHR) >> 0 ; }
+static inline void dac_dhr12rd_set_dacc2dhr(uint32_t val) {
+	DAC1.DHR12RD = (DAC1.DHR12RD & ~DAC_DHR12RD_DACC2DHR) | ((val << 16) & DAC_DHR12RD_DACC2DHR);
+}
+static inline void dac_dhr12rd_set_dacc1dhr(uint32_t val) {
+	DAC1.DHR12RD = (DAC1.DHR12RD & ~DAC_DHR12RD_DACC1DHR) | ((val << 0) & DAC_DHR12RD_DACC1DHR);
+}
+static inline uint32_t dac_dhr12rd_get_dacc2dhr(void) { return (DAC1.DHR12RD & DAC_DHR12RD_DACC2DHR) >> 16; }
+static inline uint32_t dac_dhr12rd_get_dacc1dhr(void) { return (DAC1.DHR12RD & DAC_DHR12RD_DACC1DHR) >> 0; }
 
 // DAC->DHR12LD DUAL DAC 12-bit left aligned data holding register
 enum {
-	DAC_DHR12LD_DACC2DHR = ((1UL<<12)-1) << 20, // DAC channel2 12-bit left-aligned data
-	DAC_DHR12LD_DACC1DHR = ((1UL<<12)-1) << 4, // DAC channel1 12-bit left-aligned data		
+	DAC_DHR12LD_DACC2DHR = ((1UL << 12) - 1) << 20,	 // DAC channel2 12-bit left-aligned data
+	DAC_DHR12LD_DACC1DHR = ((1UL << 12) - 1) << 4,	 // DAC channel1 12-bit left-aligned data
 };
-static inline void dac_dhr12ld_set_dacc2dhr(uint32_t val) { DAC1.DHR12LD = (DAC1.DHR12LD & ~DAC_DHR12LD_DACC2DHR) | ((val<<20) & DAC_DHR12LD_DACC2DHR); }
-static inline void dac_dhr12ld_set_dacc1dhr(uint32_t val) { DAC1.DHR12LD = (DAC1.DHR12LD & ~DAC_DHR12LD_DACC1DHR) | ((val<<4) & DAC_DHR12LD_DACC1DHR); }
-static inline uint32_t dac_dhr12ld_get_dacc2dhr(void) { return (DAC1.DHR12LD & DAC_DHR12LD_DACC2DHR) >> 20 ; }
-static inline uint32_t dac_dhr12ld_get_dacc1dhr(void) { return (DAC1.DHR12LD & DAC_DHR12LD_DACC1DHR) >> 4 ; }
+static inline void dac_dhr12ld_set_dacc2dhr(uint32_t val) {
+	DAC1.DHR12LD = (DAC1.DHR12LD & ~DAC_DHR12LD_DACC2DHR) | ((val << 20) & DAC_DHR12LD_DACC2DHR);
+}
+static inline void dac_dhr12ld_set_dacc1dhr(uint32_t val) {
+	DAC1.DHR12LD = (DAC1.DHR12LD & ~DAC_DHR12LD_DACC1DHR) | ((val << 4) & DAC_DHR12LD_DACC1DHR);
+}
+static inline uint32_t dac_dhr12ld_get_dacc2dhr(void) { return (DAC1.DHR12LD & DAC_DHR12LD_DACC2DHR) >> 20; }
+static inline uint32_t dac_dhr12ld_get_dacc1dhr(void) { return (DAC1.DHR12LD & DAC_DHR12LD_DACC1DHR) >> 4; }
 
 // DAC->DHR8RD DUAL DAC 8-bit right aligned data holding register
 enum {
-	DAC_DHR8RD_DACC2DHR = ((1UL<<8)-1) << 8, // DAC channel2 8-bit right-aligned data
-	DAC_DHR8RD_DACC1DHR = ((1UL<<8)-1) << 0, // DAC channel1 8-bit right-aligned data		
+	DAC_DHR8RD_DACC2DHR = ((1UL << 8) - 1) << 8,  // DAC channel2 8-bit right-aligned data
+	DAC_DHR8RD_DACC1DHR = ((1UL << 8) - 1) << 0,  // DAC channel1 8-bit right-aligned data
 };
-static inline void dac_dhr8rd_set_dacc2dhr(uint32_t val) { DAC1.DHR8RD = (DAC1.DHR8RD & ~DAC_DHR8RD_DACC2DHR) | ((val<<8) & DAC_DHR8RD_DACC2DHR); }
-static inline void dac_dhr8rd_set_dacc1dhr(uint32_t val) { DAC1.DHR8RD = (DAC1.DHR8RD & ~DAC_DHR8RD_DACC1DHR) | ((val<<0) & DAC_DHR8RD_DACC1DHR); }
-static inline uint32_t dac_dhr8rd_get_dacc2dhr(void) { return (DAC1.DHR8RD & DAC_DHR8RD_DACC2DHR) >> 8 ; }
-static inline uint32_t dac_dhr8rd_get_dacc1dhr(void) { return (DAC1.DHR8RD & DAC_DHR8RD_DACC1DHR) >> 0 ; }
+static inline void dac_dhr8rd_set_dacc2dhr(uint32_t val) {
+	DAC1.DHR8RD = (DAC1.DHR8RD & ~DAC_DHR8RD_DACC2DHR) | ((val << 8) & DAC_DHR8RD_DACC2DHR);
+}
+static inline void dac_dhr8rd_set_dacc1dhr(uint32_t val) {
+	DAC1.DHR8RD = (DAC1.DHR8RD & ~DAC_DHR8RD_DACC1DHR) | ((val << 0) & DAC_DHR8RD_DACC1DHR);
+}
+static inline uint32_t dac_dhr8rd_get_dacc2dhr(void) { return (DAC1.DHR8RD & DAC_DHR8RD_DACC2DHR) >> 8; }
+static inline uint32_t dac_dhr8rd_get_dacc1dhr(void) { return (DAC1.DHR8RD & DAC_DHR8RD_DACC1DHR) >> 0; }
 
 // DAC->DOR1 channel1 data output register
 enum {
-	DAC_DOR1_DACC1DOR = ((1UL<<12)-1) << 0, // DAC channel1 data output		
+	DAC_DOR1_DACC1DOR = ((1UL << 12) - 1) << 0,	 // DAC channel1 data output
 };
-static inline uint32_t dac_dor1_get_dacc1dor(void) { return (DAC1.DOR1 & DAC_DOR1_DACC1DOR) >> 0 ; }
+static inline uint32_t dac_dor1_get_dacc1dor(void) { return (DAC1.DOR1 & DAC_DOR1_DACC1DOR) >> 0; }
 
 // DAC->DOR2 channel2 data output register
 enum {
-	DAC_DOR2_DACC2DOR = ((1UL<<12)-1) << 0, // DAC channel2 data output		
+	DAC_DOR2_DACC2DOR = ((1UL << 12) - 1) << 0,	 // DAC channel2 data output
 };
-static inline uint32_t dac_dor2_get_dacc2dor(void) { return (DAC1.DOR2 & DAC_DOR2_DACC2DOR) >> 0 ; }
+static inline uint32_t dac_dor2_get_dacc2dor(void) { return (DAC1.DOR2 & DAC_DOR2_DACC2DOR) >> 0; }
 
 // DAC->SR status register
 enum {
-	DAC_SR_BWST2 = 1UL<<31, // DAC Channel 2 busy writing sample time flag
-	DAC_SR_CAL_FLAG2 = 1UL<<30, // DAC Channel 2 calibration offset status
-	DAC_SR_DMAUDR2 = 1UL<<29, // DAC channel2 DMA underrun flag
-	DAC_SR_BWST1 = 1UL<<15, // DAC Channel 1 busy writing sample time flag
-	DAC_SR_CAL_FLAG1 = 1UL<<14, // DAC Channel 1 calibration offset status
-	DAC_SR_DMAUDR1 = 1UL<<13, // DAC channel1 DMA underrun flag		
+	DAC_SR_BWST2	 = 1UL << 31,  // DAC Channel 2 busy writing sample time flag
+	DAC_SR_CAL_FLAG2 = 1UL << 30,  // DAC Channel 2 calibration offset status
+	DAC_SR_DMAUDR2	 = 1UL << 29,  // DAC channel2 DMA underrun flag
+	DAC_SR_BWST1	 = 1UL << 15,  // DAC Channel 1 busy writing sample time flag
+	DAC_SR_CAL_FLAG1 = 1UL << 14,  // DAC Channel 1 calibration offset status
+	DAC_SR_DMAUDR1	 = 1UL << 13,  // DAC channel1 DMA underrun flag
 };
 
 // DAC->CCR calibration control register
 enum {
-	DAC_CCR_OTRIM2 = ((1UL<<5)-1) << 16, // DAC Channel 2 offset trimming value
-	DAC_CCR_OTRIM1 = ((1UL<<5)-1) << 0, // DAC Channel 1 offset trimming value		
+	DAC_CCR_OTRIM2 = ((1UL << 5) - 1) << 16,  // DAC Channel 2 offset trimming value
+	DAC_CCR_OTRIM1 = ((1UL << 5) - 1) << 0,	  // DAC Channel 1 offset trimming value
 };
-static inline void dac_ccr_set_otrim2(uint32_t val) { DAC1.CCR = (DAC1.CCR & ~DAC_CCR_OTRIM2) | ((val<<16) & DAC_CCR_OTRIM2); }
-static inline void dac_ccr_set_otrim1(uint32_t val) { DAC1.CCR = (DAC1.CCR & ~DAC_CCR_OTRIM1) | ((val<<0) & DAC_CCR_OTRIM1); }
-static inline uint32_t dac_ccr_get_otrim2(void) { return (DAC1.CCR & DAC_CCR_OTRIM2) >> 16 ; }
-static inline uint32_t dac_ccr_get_otrim1(void) { return (DAC1.CCR & DAC_CCR_OTRIM1) >> 0 ; }
+static inline void dac_ccr_set_otrim2(uint32_t val) { DAC1.CCR = (DAC1.CCR & ~DAC_CCR_OTRIM2) | ((val << 16) & DAC_CCR_OTRIM2); }
+static inline void dac_ccr_set_otrim1(uint32_t val) { DAC1.CCR = (DAC1.CCR & ~DAC_CCR_OTRIM1) | ((val << 0) & DAC_CCR_OTRIM1); }
+static inline uint32_t dac_ccr_get_otrim2(void) { return (DAC1.CCR & DAC_CCR_OTRIM2) >> 16; }
+static inline uint32_t dac_ccr_get_otrim1(void) { return (DAC1.CCR & DAC_CCR_OTRIM1) >> 0; }
 
 // DAC->MCR mode control register
 enum {
-	DAC_MCR_MODE2 = ((1UL<<3)-1) << 16, // DAC Channel 2 mode
-	DAC_MCR_MODE1 = ((1UL<<3)-1) << 0, // DAC Channel 1 mode		
+	DAC_MCR_MODE2 = ((1UL << 3) - 1) << 16,	 // DAC Channel 2 mode
+	DAC_MCR_MODE1 = ((1UL << 3) - 1) << 0,	 // DAC Channel 1 mode
 };
-static inline void dac_mcr_set_mode2(uint32_t val) { DAC1.MCR = (DAC1.MCR & ~DAC_MCR_MODE2) | ((val<<16) & DAC_MCR_MODE2); }
-static inline void dac_mcr_set_mode1(uint32_t val) { DAC1.MCR = (DAC1.MCR & ~DAC_MCR_MODE1) | ((val<<0) & DAC_MCR_MODE1); }
-static inline uint32_t dac_mcr_get_mode2(void) { return (DAC1.MCR & DAC_MCR_MODE2) >> 16 ; }
-static inline uint32_t dac_mcr_get_mode1(void) { return (DAC1.MCR & DAC_MCR_MODE1) >> 0 ; }
+static inline void	   dac_mcr_set_mode2(uint32_t val) { DAC1.MCR = (DAC1.MCR & ~DAC_MCR_MODE2) | ((val << 16) & DAC_MCR_MODE2); }
+static inline void	   dac_mcr_set_mode1(uint32_t val) { DAC1.MCR = (DAC1.MCR & ~DAC_MCR_MODE1) | ((val << 0) & DAC_MCR_MODE1); }
+static inline uint32_t dac_mcr_get_mode2(void) { return (DAC1.MCR & DAC_MCR_MODE2) >> 16; }
+static inline uint32_t dac_mcr_get_mode1(void) { return (DAC1.MCR & DAC_MCR_MODE1) >> 0; }
 
 // DAC->SHSR1 Sample and Hold sample time register 1
 enum {
-	DAC_SHSR1_TSAMPLE1 = ((1UL<<10)-1) << 0, // DAC Channel 1 sample Time		
+	DAC_SHSR1_TSAMPLE1 = ((1UL << 10) - 1) << 0,  // DAC Channel 1 sample Time
 };
-static inline void dac_shsr1_set_tsample1(uint32_t val) { DAC1.SHSR1 = (DAC1.SHSR1 & ~DAC_SHSR1_TSAMPLE1) | ((val<<0) & DAC_SHSR1_TSAMPLE1); }
-static inline uint32_t dac_shsr1_get_tsample1(void) { return (DAC1.SHSR1 & DAC_SHSR1_TSAMPLE1) >> 0 ; }
+static inline void dac_shsr1_set_tsample1(uint32_t val) {
+	DAC1.SHSR1 = (DAC1.SHSR1 & ~DAC_SHSR1_TSAMPLE1) | ((val << 0) & DAC_SHSR1_TSAMPLE1);
+}
+static inline uint32_t dac_shsr1_get_tsample1(void) { return (DAC1.SHSR1 & DAC_SHSR1_TSAMPLE1) >> 0; }
 
 // DAC->SHSR2 Sample and Hold sample time register 2
 enum {
-	DAC_SHSR2_TSAMPLE2 = ((1UL<<10)-1) << 0, // DAC Channel 2 sample Time		
+	DAC_SHSR2_TSAMPLE2 = ((1UL << 10) - 1) << 0,  // DAC Channel 2 sample Time
 };
-static inline void dac_shsr2_set_tsample2(uint32_t val) { DAC1.SHSR2 = (DAC1.SHSR2 & ~DAC_SHSR2_TSAMPLE2) | ((val<<0) & DAC_SHSR2_TSAMPLE2); }
-static inline uint32_t dac_shsr2_get_tsample2(void) { return (DAC1.SHSR2 & DAC_SHSR2_TSAMPLE2) >> 0 ; }
+static inline void dac_shsr2_set_tsample2(uint32_t val) {
+	DAC1.SHSR2 = (DAC1.SHSR2 & ~DAC_SHSR2_TSAMPLE2) | ((val << 0) & DAC_SHSR2_TSAMPLE2);
+}
+static inline uint32_t dac_shsr2_get_tsample2(void) { return (DAC1.SHSR2 & DAC_SHSR2_TSAMPLE2) >> 0; }
 
 // DAC->SHHR Sample and Hold hold time register
 enum {
-	DAC_SHHR_THOLD2 = ((1UL<<10)-1) << 16, // DAC Channel 2 hold time
-	DAC_SHHR_THOLD1 = ((1UL<<10)-1) << 0, // DAC Channel 1 hold Time		
+	DAC_SHHR_THOLD2 = ((1UL << 10) - 1) << 16,	// DAC Channel 2 hold time
+	DAC_SHHR_THOLD1 = ((1UL << 10) - 1) << 0,	// DAC Channel 1 hold Time
 };
-static inline void dac_shhr_set_thold2(uint32_t val) { DAC1.SHHR = (DAC1.SHHR & ~DAC_SHHR_THOLD2) | ((val<<16) & DAC_SHHR_THOLD2); }
-static inline void dac_shhr_set_thold1(uint32_t val) { DAC1.SHHR = (DAC1.SHHR & ~DAC_SHHR_THOLD1) | ((val<<0) & DAC_SHHR_THOLD1); }
-static inline uint32_t dac_shhr_get_thold2(void) { return (DAC1.SHHR & DAC_SHHR_THOLD2) >> 16 ; }
-static inline uint32_t dac_shhr_get_thold1(void) { return (DAC1.SHHR & DAC_SHHR_THOLD1) >> 0 ; }
+static inline void dac_shhr_set_thold2(uint32_t val) {
+	DAC1.SHHR = (DAC1.SHHR & ~DAC_SHHR_THOLD2) | ((val << 16) & DAC_SHHR_THOLD2);
+}
+static inline void dac_shhr_set_thold1(uint32_t val) {
+	DAC1.SHHR = (DAC1.SHHR & ~DAC_SHHR_THOLD1) | ((val << 0) & DAC_SHHR_THOLD1);
+}
+static inline uint32_t dac_shhr_get_thold2(void) { return (DAC1.SHHR & DAC_SHHR_THOLD2) >> 16; }
+static inline uint32_t dac_shhr_get_thold1(void) { return (DAC1.SHHR & DAC_SHHR_THOLD1) >> 0; }
 
 // DAC->SHRR Sample and Hold refresh time register
 enum {
-	DAC_SHRR_TREFRESH2 = ((1UL<<8)-1) << 16, // DAC Channel 2 refresh Time
-	DAC_SHRR_TREFRESH1 = ((1UL<<8)-1) << 0, // DAC Channel 1 refresh Time		
+	DAC_SHRR_TREFRESH2 = ((1UL << 8) - 1) << 16,  // DAC Channel 2 refresh Time
+	DAC_SHRR_TREFRESH1 = ((1UL << 8) - 1) << 0,	  // DAC Channel 1 refresh Time
 };
-static inline void dac_shrr_set_trefresh2(uint32_t val) { DAC1.SHRR = (DAC1.SHRR & ~DAC_SHRR_TREFRESH2) | ((val<<16) & DAC_SHRR_TREFRESH2); }
-static inline void dac_shrr_set_trefresh1(uint32_t val) { DAC1.SHRR = (DAC1.SHRR & ~DAC_SHRR_TREFRESH1) | ((val<<0) & DAC_SHRR_TREFRESH1); }
-static inline uint32_t dac_shrr_get_trefresh2(void) { return (DAC1.SHRR & DAC_SHRR_TREFRESH2) >> 16 ; }
-static inline uint32_t dac_shrr_get_trefresh1(void) { return (DAC1.SHRR & DAC_SHRR_TREFRESH1) >> 0 ; }
+static inline void dac_shrr_set_trefresh2(uint32_t val) {
+	DAC1.SHRR = (DAC1.SHRR & ~DAC_SHRR_TREFRESH2) | ((val << 16) & DAC_SHRR_TREFRESH2);
+}
+static inline void dac_shrr_set_trefresh1(uint32_t val) {
+	DAC1.SHRR = (DAC1.SHRR & ~DAC_SHRR_TREFRESH1) | ((val << 0) & DAC_SHRR_TREFRESH1);
+}
+static inline uint32_t dac_shrr_get_trefresh2(void) { return (DAC1.SHRR & DAC_SHRR_TREFRESH2) >> 16; }
+static inline uint32_t dac_shrr_get_trefresh1(void) { return (DAC1.SHRR & DAC_SHRR_TREFRESH1) >> 0; }
 
 /* MCU debug component
 There is only one peripheral of type DBGMCU. */
 struct DBGMCU_Type {
-	__I uint32_t IDCODE; // @0 DBGMCU_IDCODE
-	__IO uint8_t CR; // @4 Debug MCU configuration register
-	 uint8_t RESERVED0[3]; // @5 
-	__IO uint32_t APB1FZR1; // @8 Debug MCU APB1 freeze register1
-	__IO uint8_t APB1FZR2; // @12 Debug MCU APB1 freeze register 2
-	 uint8_t RESERVED1[3]; // @13 
-	__IO uint32_t APB2FZR; // @16 Debug MCU APB2 freeze register
+	__I uint32_t  IDCODE;		 // @0 DBGMCU_IDCODE
+	__IO uint8_t  CR;			 // @4 Debug MCU configuration register
+	uint8_t		  RESERVED0[3];	 // @5
+	__IO uint32_t APB1FZR1;		 // @8 Debug MCU APB1 freeze register1
+	__IO uint8_t  APB1FZR2;		 // @12 Debug MCU APB1 freeze register 2
+	uint8_t		  RESERVED1[3];	 // @13
+	__IO uint32_t APB2FZR;		 // @16 Debug MCU APB2 freeze register
 };
-extern struct DBGMCU_Type	DBGMCU;	// @0xE0042000 
+extern struct DBGMCU_Type DBGMCU;  // @0xE0042000
 
 // DBGMCU->IDCODE DBGMCU_IDCODE
 enum {
-	DBGMCU_IDCODE_REV_ID = ((1UL<<16)-1) << 16, // Revision identifie
-	DBGMCU_IDCODE_DEV_ID = ((1UL<<12)-1) << 0, // Device identifier		
+	DBGMCU_IDCODE_REV_ID = ((1UL << 16) - 1) << 16,	 // Revision identifie
+	DBGMCU_IDCODE_DEV_ID = ((1UL << 12) - 1) << 0,	 // Device identifier
 };
-static inline uint32_t dbgmcu_idcode_get_rev_id(void) { return (DBGMCU.IDCODE & DBGMCU_IDCODE_REV_ID) >> 16 ; }
-static inline uint32_t dbgmcu_idcode_get_dev_id(void) { return (DBGMCU.IDCODE & DBGMCU_IDCODE_DEV_ID) >> 0 ; }
+static inline uint32_t dbgmcu_idcode_get_rev_id(void) { return (DBGMCU.IDCODE & DBGMCU_IDCODE_REV_ID) >> 16; }
+static inline uint32_t dbgmcu_idcode_get_dev_id(void) { return (DBGMCU.IDCODE & DBGMCU_IDCODE_DEV_ID) >> 0; }
 
 // DBGMCU->CR Debug MCU configuration register
 enum {
-	DBGMCU_CR_TRACE_MODE = ((1UL<<2)-1) << 6, // Trace pin assignment control
-	DBGMCU_CR_TRACE_IOEN = 1UL<<5, // Trace pin assignment control
-	DBGMCU_CR_DBG_STANDBY = 1UL<<2, // Debug Standby mode
-	DBGMCU_CR_DBG_STOP = 1UL<<1, // Debug Stop mode
-	DBGMCU_CR_DBG_SLEEP = 1UL<<0, // Debug Sleep mode		
+	DBGMCU_CR_TRACE_MODE  = ((1UL << 2) - 1) << 6,	// Trace pin assignment control
+	DBGMCU_CR_TRACE_IOEN  = 1UL << 5,				// Trace pin assignment control
+	DBGMCU_CR_DBG_STANDBY = 1UL << 2,				// Debug Standby mode
+	DBGMCU_CR_DBG_STOP	  = 1UL << 1,				// Debug Stop mode
+	DBGMCU_CR_DBG_SLEEP	  = 1UL << 0,				// Debug Sleep mode
 };
-static inline void dbgmcu_cr_set_trace_mode(uint32_t val) { DBGMCU.CR = (DBGMCU.CR & ~DBGMCU_CR_TRACE_MODE) | ((val<<6) & DBGMCU_CR_TRACE_MODE); }
-static inline uint32_t dbgmcu_cr_get_trace_mode(void) { return (DBGMCU.CR & DBGMCU_CR_TRACE_MODE) >> 6 ; }
+static inline void dbgmcu_cr_set_trace_mode(uint32_t val) {
+	DBGMCU.CR = (DBGMCU.CR & ~DBGMCU_CR_TRACE_MODE) | ((val << 6) & DBGMCU_CR_TRACE_MODE);
+}
+static inline uint32_t dbgmcu_cr_get_trace_mode(void) { return (DBGMCU.CR & DBGMCU_CR_TRACE_MODE) >> 6; }
 
 // DBGMCU->APB1FZR1 Debug MCU APB1 freeze register1
 enum {
-	DBGMCU_APB1FZR1_DBG_LPTIM1_STOP = 1UL<<31, // LPTIM1 counter stopped when core is halted
-	DBGMCU_APB1FZR1_DBG_CAN_STOP = 1UL<<25, // bxCAN stopped when core is halted
-	DBGMCU_APB1FZR1_DBG_I2C3_STOP = 1UL<<23, // I2C3 SMBUS timeout counter stopped when core is halted
-	DBGMCU_APB1FZR1_DBG_I2C2_STOP = 1UL<<22, // I2C2 SMBUS timeout counter stopped when core is halted
-	DBGMCU_APB1FZR1_DBG_I2C1_STOP = 1UL<<21, // I2C1 SMBUS timeout counter stopped when core is halted
-	DBGMCU_APB1FZR1_DBG_IWDG_STOP = 1UL<<12, // Independent watchdog counter stopped when core is halted
-	DBGMCU_APB1FZR1_DBG_WWDG_STOP = 1UL<<11, // Window watchdog counter stopped when core is halted
-	DBGMCU_APB1FZR1_DBG_RTC_STOP = 1UL<<10, // RTC counter stopped when core is halted
-	DBGMCU_APB1FZR1_DBG_TIM7_STOP = 1UL<<5, // TIM7 counter stopped when core is halted
-	DBGMCU_APB1FZR1_DBG_TIM6_STOP = 1UL<<4, // TIM6 counter stopped when core is halted
-	DBGMCU_APB1FZR1_DBG_TIM2_STOP = 1UL<<0, // TIM2 counter stopped when core is halted		
+	DBGMCU_APB1FZR1_DBG_LPTIM1_STOP = 1UL << 31,  // LPTIM1 counter stopped when core is halted
+	DBGMCU_APB1FZR1_DBG_CAN_STOP	= 1UL << 25,  // bxCAN stopped when core is halted
+	DBGMCU_APB1FZR1_DBG_I2C3_STOP	= 1UL << 23,  // I2C3 SMBUS timeout counter stopped when core is halted
+	DBGMCU_APB1FZR1_DBG_I2C2_STOP	= 1UL << 22,  // I2C2 SMBUS timeout counter stopped when core is halted
+	DBGMCU_APB1FZR1_DBG_I2C1_STOP	= 1UL << 21,  // I2C1 SMBUS timeout counter stopped when core is halted
+	DBGMCU_APB1FZR1_DBG_IWDG_STOP	= 1UL << 12,  // Independent watchdog counter stopped when core is halted
+	DBGMCU_APB1FZR1_DBG_WWDG_STOP	= 1UL << 11,  // Window watchdog counter stopped when core is halted
+	DBGMCU_APB1FZR1_DBG_RTC_STOP	= 1UL << 10,  // RTC counter stopped when core is halted
+	DBGMCU_APB1FZR1_DBG_TIM7_STOP	= 1UL << 5,	  // TIM7 counter stopped when core is halted
+	DBGMCU_APB1FZR1_DBG_TIM6_STOP	= 1UL << 4,	  // TIM6 counter stopped when core is halted
+	DBGMCU_APB1FZR1_DBG_TIM2_STOP	= 1UL << 0,	  // TIM2 counter stopped when core is halted
 };
 
 // DBGMCU->APB1FZR2 Debug MCU APB1 freeze register 2
 enum {
-	DBGMCU_APB1FZR2_DBG_LPTIM2_STOP = 1UL<<5, // LPTIM2 counter stopped when core is halted		
+	DBGMCU_APB1FZR2_DBG_LPTIM2_STOP = 1UL << 5,	 // LPTIM2 counter stopped when core is halted
 };
 
 // DBGMCU->APB2FZR Debug MCU APB2 freeze register
 enum {
-	DBGMCU_APB2FZR_DBG_TIM16_STOP = 1UL<<17, // TIM16 counter stopped when core is halted
-	DBGMCU_APB2FZR_DBG_TIM15_STOP = 1UL<<16, // TIM15 counter stopped when core is halted
-	DBGMCU_APB2FZR_DBG_TIM1_STOP = 1UL<<11, // TIM1 counter stopped when core is halted		
+	DBGMCU_APB2FZR_DBG_TIM16_STOP = 1UL << 17,	// TIM16 counter stopped when core is halted
+	DBGMCU_APB2FZR_DBG_TIM15_STOP = 1UL << 16,	// TIM15 counter stopped when core is halted
+	DBGMCU_APB2FZR_DBG_TIM1_STOP  = 1UL << 11,	// TIM1 counter stopped when core is halted
 };
 
 /* Direct memory access controller */
 struct DMA_Type {
-	__I uint32_t ISR; // @0 interrupt status register
-	__O uint32_t IFCR; // @4 interrupt flag clear register
-	__IO uint32_t CCR1; // @8 channel x configuration register
-	__IO uint32_t CNDTR1; // @12 channel x number of data register
-	__IO uint32_t CPAR1; // @16 channel x peripheral address register
-	__IO uint32_t CMAR1; // @20 channel x memory address register
-	 uint8_t RESERVED0[4]; // @24 
-	__IO uint32_t CCR2; // @28 channel x configuration register
-	__IO uint32_t CNDTR2; // @32 channel x number of data register
-	__IO uint32_t CPAR2; // @36 channel x peripheral address register
-	__IO uint32_t CMAR2; // @40 channel x memory address register
-	 uint8_t RESERVED1[4]; // @44 
-	__IO uint32_t CCR3; // @48 channel x configuration register
-	__IO uint32_t CNDTR3; // @52 channel x number of data register
-	__IO uint32_t CPAR3; // @56 channel x peripheral address register
-	__IO uint32_t CMAR3; // @60 channel x memory address register
-	 uint8_t RESERVED2[4]; // @64 
-	__IO uint32_t CCR4; // @68 channel x configuration register
-	__IO uint32_t CNDTR4; // @72 channel x number of data register
-	__IO uint32_t CPAR4; // @76 channel x peripheral address register
-	__IO uint32_t CMAR4; // @80 channel x memory address register
-	 uint8_t RESERVED3[4]; // @84 
-	__IO uint32_t CCR5; // @88 channel x configuration register
-	__IO uint32_t CNDTR5; // @92 channel x number of data register
-	__IO uint32_t CPAR5; // @96 channel x peripheral address register
-	__IO uint32_t CMAR5; // @100 channel x memory address register
-	 uint8_t RESERVED4[4]; // @104 
-	__IO uint32_t CCR6; // @108 channel x configuration register
-	__IO uint32_t CNDTR6; // @112 channel x number of data register
-	__IO uint32_t CPAR6; // @116 channel x peripheral address register
-	__IO uint32_t CMAR6; // @120 channel x memory address register
-	 uint8_t RESERVED5[4]; // @124 
-	__IO uint32_t CCR7; // @128 channel x configuration register
-	__IO uint32_t CNDTR7; // @132 channel x number of data register
-	__IO uint32_t CPAR7; // @136 channel x peripheral address register
-	__IO uint32_t CMAR7; // @140 channel x memory address register
-	 uint8_t RESERVED6[24]; // @144 
-	__IO uint32_t CSELR; // @168 channel selection register
+	__I uint32_t  ISR;			  // @0 interrupt status register
+	__O uint32_t  IFCR;			  // @4 interrupt flag clear register
+	__IO uint32_t CCR1;			  // @8 channel x configuration register
+	__IO uint32_t CNDTR1;		  // @12 channel x number of data register
+	__IO uint32_t CPAR1;		  // @16 channel x peripheral address register
+	__IO uint32_t CMAR1;		  // @20 channel x memory address register
+	uint8_t		  RESERVED0[4];	  // @24
+	__IO uint32_t CCR2;			  // @28 channel x configuration register
+	__IO uint32_t CNDTR2;		  // @32 channel x number of data register
+	__IO uint32_t CPAR2;		  // @36 channel x peripheral address register
+	__IO uint32_t CMAR2;		  // @40 channel x memory address register
+	uint8_t		  RESERVED1[4];	  // @44
+	__IO uint32_t CCR3;			  // @48 channel x configuration register
+	__IO uint32_t CNDTR3;		  // @52 channel x number of data register
+	__IO uint32_t CPAR3;		  // @56 channel x peripheral address register
+	__IO uint32_t CMAR3;		  // @60 channel x memory address register
+	uint8_t		  RESERVED2[4];	  // @64
+	__IO uint32_t CCR4;			  // @68 channel x configuration register
+	__IO uint32_t CNDTR4;		  // @72 channel x number of data register
+	__IO uint32_t CPAR4;		  // @76 channel x peripheral address register
+	__IO uint32_t CMAR4;		  // @80 channel x memory address register
+	uint8_t		  RESERVED3[4];	  // @84
+	__IO uint32_t CCR5;			  // @88 channel x configuration register
+	__IO uint32_t CNDTR5;		  // @92 channel x number of data register
+	__IO uint32_t CPAR5;		  // @96 channel x peripheral address register
+	__IO uint32_t CMAR5;		  // @100 channel x memory address register
+	uint8_t		  RESERVED4[4];	  // @104
+	__IO uint32_t CCR6;			  // @108 channel x configuration register
+	__IO uint32_t CNDTR6;		  // @112 channel x number of data register
+	__IO uint32_t CPAR6;		  // @116 channel x peripheral address register
+	__IO uint32_t CMAR6;		  // @120 channel x memory address register
+	uint8_t		  RESERVED5[4];	  // @124
+	__IO uint32_t CCR7;			  // @128 channel x configuration register
+	__IO uint32_t CNDTR7;		  // @132 channel x number of data register
+	__IO uint32_t CPAR7;		  // @136 channel x peripheral address register
+	__IO uint32_t CMAR7;		  // @140 channel x memory address register
+	uint8_t		  RESERVED6[24];  // @144
+	__IO uint32_t CSELR;		  // @168 channel selection register
 };
-extern struct DMA_Type	DMA1;	// @0x40020000 
-extern struct DMA_Type 	DMA2;	// @0x40020400
+extern struct DMA_Type DMA1;  // @0x40020000
+extern struct DMA_Type DMA2;  // @0x40020400
 
 // DMA->ISR interrupt status register
 enum {
-	DMA_ISR_TEIF7 = 1UL<<27, // Channel x transfer error flag (x = 1 ..7)
-	DMA_ISR_HTIF7 = 1UL<<26, // Channel x half transfer flag (x = 1 ..7)
-	DMA_ISR_TCIF7 = 1UL<<25, // Channel x transfer complete flag (x = 1 ..7)
-	DMA_ISR_GIF7 = 1UL<<24, // Channel x global interrupt flag (x = 1 ..7)
-	DMA_ISR_TEIF6 = 1UL<<23, // Channel x transfer error flag (x = 1 ..7)
-	DMA_ISR_HTIF6 = 1UL<<22, // Channel x half transfer flag (x = 1 ..7)
-	DMA_ISR_TCIF6 = 1UL<<21, // Channel x transfer complete flag (x = 1 ..7)
-	DMA_ISR_GIF6 = 1UL<<20, // Channel x global interrupt flag (x = 1 ..7)
-	DMA_ISR_TEIF5 = 1UL<<19, // Channel x transfer error flag (x = 1 ..7)
-	DMA_ISR_HTIF5 = 1UL<<18, // Channel x half transfer flag (x = 1 ..7)
-	DMA_ISR_TCIF5 = 1UL<<17, // Channel x transfer complete flag (x = 1 ..7)
-	DMA_ISR_GIF5 = 1UL<<16, // Channel x global interrupt flag (x = 1 ..7)
-	DMA_ISR_TEIF4 = 1UL<<15, // Channel x transfer error flag (x = 1 ..7)
-	DMA_ISR_HTIF4 = 1UL<<14, // Channel x half transfer flag (x = 1 ..7)
-	DMA_ISR_TCIF4 = 1UL<<13, // Channel x transfer complete flag (x = 1 ..7)
-	DMA_ISR_GIF4 = 1UL<<12, // Channel x global interrupt flag (x = 1 ..7)
-	DMA_ISR_TEIF3 = 1UL<<11, // Channel x transfer error flag (x = 1 ..7)
-	DMA_ISR_HTIF3 = 1UL<<10, // Channel x half transfer flag (x = 1 ..7)
-	DMA_ISR_TCIF3 = 1UL<<9, // Channel x transfer complete flag (x = 1 ..7)
-	DMA_ISR_GIF3 = 1UL<<8, // Channel x global interrupt flag (x = 1 ..7)
-	DMA_ISR_TEIF2 = 1UL<<7, // Channel x transfer error flag (x = 1 ..7)
-	DMA_ISR_HTIF2 = 1UL<<6, // Channel x half transfer flag (x = 1 ..7)
-	DMA_ISR_TCIF2 = 1UL<<5, // Channel x transfer complete flag (x = 1 ..7)
-	DMA_ISR_GIF2 = 1UL<<4, // Channel x global interrupt flag (x = 1 ..7)
-	DMA_ISR_TEIF1 = 1UL<<3, // Channel x transfer error flag (x = 1 ..7)
-	DMA_ISR_HTIF1 = 1UL<<2, // Channel x half transfer flag (x = 1 ..7)
-	DMA_ISR_TCIF1 = 1UL<<1, // Channel x transfer complete flag (x = 1 ..7)
-	DMA_ISR_GIF1 = 1UL<<0, // Channel x global interrupt flag (x = 1 ..7)		
+	DMA_ISR_TEIF7 = 1UL << 27,	// Channel x transfer error flag (x = 1 ..7)
+	DMA_ISR_HTIF7 = 1UL << 26,	// Channel x half transfer flag (x = 1 ..7)
+	DMA_ISR_TCIF7 = 1UL << 25,	// Channel x transfer complete flag (x = 1 ..7)
+	DMA_ISR_GIF7  = 1UL << 24,	// Channel x global interrupt flag (x = 1 ..7)
+	DMA_ISR_TEIF6 = 1UL << 23,	// Channel x transfer error flag (x = 1 ..7)
+	DMA_ISR_HTIF6 = 1UL << 22,	// Channel x half transfer flag (x = 1 ..7)
+	DMA_ISR_TCIF6 = 1UL << 21,	// Channel x transfer complete flag (x = 1 ..7)
+	DMA_ISR_GIF6  = 1UL << 20,	// Channel x global interrupt flag (x = 1 ..7)
+	DMA_ISR_TEIF5 = 1UL << 19,	// Channel x transfer error flag (x = 1 ..7)
+	DMA_ISR_HTIF5 = 1UL << 18,	// Channel x half transfer flag (x = 1 ..7)
+	DMA_ISR_TCIF5 = 1UL << 17,	// Channel x transfer complete flag (x = 1 ..7)
+	DMA_ISR_GIF5  = 1UL << 16,	// Channel x global interrupt flag (x = 1 ..7)
+	DMA_ISR_TEIF4 = 1UL << 15,	// Channel x transfer error flag (x = 1 ..7)
+	DMA_ISR_HTIF4 = 1UL << 14,	// Channel x half transfer flag (x = 1 ..7)
+	DMA_ISR_TCIF4 = 1UL << 13,	// Channel x transfer complete flag (x = 1 ..7)
+	DMA_ISR_GIF4  = 1UL << 12,	// Channel x global interrupt flag (x = 1 ..7)
+	DMA_ISR_TEIF3 = 1UL << 11,	// Channel x transfer error flag (x = 1 ..7)
+	DMA_ISR_HTIF3 = 1UL << 10,	// Channel x half transfer flag (x = 1 ..7)
+	DMA_ISR_TCIF3 = 1UL << 9,	// Channel x transfer complete flag (x = 1 ..7)
+	DMA_ISR_GIF3  = 1UL << 8,	// Channel x global interrupt flag (x = 1 ..7)
+	DMA_ISR_TEIF2 = 1UL << 7,	// Channel x transfer error flag (x = 1 ..7)
+	DMA_ISR_HTIF2 = 1UL << 6,	// Channel x half transfer flag (x = 1 ..7)
+	DMA_ISR_TCIF2 = 1UL << 5,	// Channel x transfer complete flag (x = 1 ..7)
+	DMA_ISR_GIF2  = 1UL << 4,	// Channel x global interrupt flag (x = 1 ..7)
+	DMA_ISR_TEIF1 = 1UL << 3,	// Channel x transfer error flag (x = 1 ..7)
+	DMA_ISR_HTIF1 = 1UL << 2,	// Channel x half transfer flag (x = 1 ..7)
+	DMA_ISR_TCIF1 = 1UL << 1,	// Channel x transfer complete flag (x = 1 ..7)
+	DMA_ISR_GIF1  = 1UL << 0,	// Channel x global interrupt flag (x = 1 ..7)
 };
 
 // DMA->IFCR interrupt flag clear register
 enum {
-	DMA_IFCR_CTEIF7 = 1UL<<27, // Channel x transfer error clear (x = 1 ..7)
-	DMA_IFCR_CHTIF7 = 1UL<<26, // Channel x half transfer clear (x = 1 ..7)
-	DMA_IFCR_CTCIF7 = 1UL<<25, // Channel x transfer complete clear (x = 1 ..7)
-	DMA_IFCR_CGIF7 = 1UL<<24, // Channel x global interrupt clear (x = 1 ..7)
-	DMA_IFCR_CTEIF6 = 1UL<<23, // Channel x transfer error clear (x = 1 ..7)
-	DMA_IFCR_CHTIF6 = 1UL<<22, // Channel x half transfer clear (x = 1 ..7)
-	DMA_IFCR_CTCIF6 = 1UL<<21, // Channel x transfer complete clear (x = 1 ..7)
-	DMA_IFCR_CGIF6 = 1UL<<20, // Channel x global interrupt clear (x = 1 ..7)
-	DMA_IFCR_CTEIF5 = 1UL<<19, // Channel x transfer error clear (x = 1 ..7)
-	DMA_IFCR_CHTIF5 = 1UL<<18, // Channel x half transfer clear (x = 1 ..7)
-	DMA_IFCR_CTCIF5 = 1UL<<17, // Channel x transfer complete clear (x = 1 ..7)
-	DMA_IFCR_CGIF5 = 1UL<<16, // Channel x global interrupt clear (x = 1 ..7)
-	DMA_IFCR_CTEIF4 = 1UL<<15, // Channel x transfer error clear (x = 1 ..7)
-	DMA_IFCR_CHTIF4 = 1UL<<14, // Channel x half transfer clear (x = 1 ..7)
-	DMA_IFCR_CTCIF4 = 1UL<<13, // Channel x transfer complete clear (x = 1 ..7)
-	DMA_IFCR_CGIF4 = 1UL<<12, // Channel x global interrupt clear (x = 1 ..7)
-	DMA_IFCR_CTEIF3 = 1UL<<11, // Channel x transfer error clear (x = 1 ..7)
-	DMA_IFCR_CHTIF3 = 1UL<<10, // Channel x half transfer clear (x = 1 ..7)
-	DMA_IFCR_CTCIF3 = 1UL<<9, // Channel x transfer complete clear (x = 1 ..7)
-	DMA_IFCR_CGIF3 = 1UL<<8, // Channel x global interrupt clear (x = 1 ..7)
-	DMA_IFCR_CTEIF2 = 1UL<<7, // Channel x transfer error clear (x = 1 ..7)
-	DMA_IFCR_CHTIF2 = 1UL<<6, // Channel x half transfer clear (x = 1 ..7)
-	DMA_IFCR_CTCIF2 = 1UL<<5, // Channel x transfer complete clear (x = 1 ..7)
-	DMA_IFCR_CGIF2 = 1UL<<4, // Channel x global interrupt clear (x = 1 ..7)
-	DMA_IFCR_CTEIF1 = 1UL<<3, // Channel x transfer error clear (x = 1 ..7)
-	DMA_IFCR_CHTIF1 = 1UL<<2, // Channel x half transfer clear (x = 1 ..7)
-	DMA_IFCR_CTCIF1 = 1UL<<1, // Channel x transfer complete clear (x = 1 ..7)
-	DMA_IFCR_CGIF1 = 1UL<<0, // Channel x global interrupt clear (x = 1 ..7)		
+	DMA_IFCR_CTEIF7 = 1UL << 27,  // Channel x transfer error clear (x = 1 ..7)
+	DMA_IFCR_CHTIF7 = 1UL << 26,  // Channel x half transfer clear (x = 1 ..7)
+	DMA_IFCR_CTCIF7 = 1UL << 25,  // Channel x transfer complete clear (x = 1 ..7)
+	DMA_IFCR_CGIF7	= 1UL << 24,  // Channel x global interrupt clear (x = 1 ..7)
+	DMA_IFCR_CTEIF6 = 1UL << 23,  // Channel x transfer error clear (x = 1 ..7)
+	DMA_IFCR_CHTIF6 = 1UL << 22,  // Channel x half transfer clear (x = 1 ..7)
+	DMA_IFCR_CTCIF6 = 1UL << 21,  // Channel x transfer complete clear (x = 1 ..7)
+	DMA_IFCR_CGIF6	= 1UL << 20,  // Channel x global interrupt clear (x = 1 ..7)
+	DMA_IFCR_CTEIF5 = 1UL << 19,  // Channel x transfer error clear (x = 1 ..7)
+	DMA_IFCR_CHTIF5 = 1UL << 18,  // Channel x half transfer clear (x = 1 ..7)
+	DMA_IFCR_CTCIF5 = 1UL << 17,  // Channel x transfer complete clear (x = 1 ..7)
+	DMA_IFCR_CGIF5	= 1UL << 16,  // Channel x global interrupt clear (x = 1 ..7)
+	DMA_IFCR_CTEIF4 = 1UL << 15,  // Channel x transfer error clear (x = 1 ..7)
+	DMA_IFCR_CHTIF4 = 1UL << 14,  // Channel x half transfer clear (x = 1 ..7)
+	DMA_IFCR_CTCIF4 = 1UL << 13,  // Channel x transfer complete clear (x = 1 ..7)
+	DMA_IFCR_CGIF4	= 1UL << 12,  // Channel x global interrupt clear (x = 1 ..7)
+	DMA_IFCR_CTEIF3 = 1UL << 11,  // Channel x transfer error clear (x = 1 ..7)
+	DMA_IFCR_CHTIF3 = 1UL << 10,  // Channel x half transfer clear (x = 1 ..7)
+	DMA_IFCR_CTCIF3 = 1UL << 9,	  // Channel x transfer complete clear (x = 1 ..7)
+	DMA_IFCR_CGIF3	= 1UL << 8,	  // Channel x global interrupt clear (x = 1 ..7)
+	DMA_IFCR_CTEIF2 = 1UL << 7,	  // Channel x transfer error clear (x = 1 ..7)
+	DMA_IFCR_CHTIF2 = 1UL << 6,	  // Channel x half transfer clear (x = 1 ..7)
+	DMA_IFCR_CTCIF2 = 1UL << 5,	  // Channel x transfer complete clear (x = 1 ..7)
+	DMA_IFCR_CGIF2	= 1UL << 4,	  // Channel x global interrupt clear (x = 1 ..7)
+	DMA_IFCR_CTEIF1 = 1UL << 3,	  // Channel x transfer error clear (x = 1 ..7)
+	DMA_IFCR_CHTIF1 = 1UL << 2,	  // Channel x half transfer clear (x = 1 ..7)
+	DMA_IFCR_CTCIF1 = 1UL << 1,	  // Channel x transfer complete clear (x = 1 ..7)
+	DMA_IFCR_CGIF1	= 1UL << 0,	  // Channel x global interrupt clear (x = 1 ..7)
 };
 
 // DMA->CCR1 channel x configuration register
 enum {
-	DMA_CCR1_DUMMY = 1UL<<31, // force this to be a 32 bit register
-	DMA_CCR1_MEM2MEM = 1UL<<14, // Memory to memory mode
-	DMA_CCR1_PL = ((1UL<<2)-1) << 12, // Channel priority level
-	DMA_CCR1_MSIZE = ((1UL<<2)-1) << 10, // Memory size
-	DMA_CCR1_PSIZE = ((1UL<<2)-1) << 8, // Peripheral size
-	DMA_CCR1_MINC = 1UL<<7, // Memory increment mode
-	DMA_CCR1_PINC = 1UL<<6, // Peripheral increment mode
-	DMA_CCR1_CIRC = 1UL<<5, // Circular mode
-	DMA_CCR1_DIR = 1UL<<4, // Data transfer direction
-	DMA_CCR1_TEIE = 1UL<<3, // Transfer error interrupt enable
-	DMA_CCR1_HTIE = 1UL<<2, // Half transfer interrupt enable
-	DMA_CCR1_TCIE = 1UL<<1, // Transfer complete interrupt enable
-	DMA_CCR1_EN = 1UL<<0, // Channel enable		
+	DMA_CCR1_DUMMY	 = 1UL << 31,				// force this to be a 32 bit register
+	DMA_CCR1_MEM2MEM = 1UL << 14,				// Memory to memory mode
+	DMA_CCR1_PL		 = ((1UL << 2) - 1) << 12,	// Channel priority level
+	DMA_CCR1_MSIZE	 = ((1UL << 2) - 1) << 10,	// Memory size
+	DMA_CCR1_PSIZE	 = ((1UL << 2) - 1) << 8,	// Peripheral size
+	DMA_CCR1_MINC	 = 1UL << 7,				// Memory increment mode
+	DMA_CCR1_PINC	 = 1UL << 6,				// Peripheral increment mode
+	DMA_CCR1_CIRC	 = 1UL << 5,				// Circular mode
+	DMA_CCR1_DIR	 = 1UL << 4,				// Data transfer direction
+	DMA_CCR1_TEIE	 = 1UL << 3,				// Transfer error interrupt enable
+	DMA_CCR1_HTIE	 = 1UL << 2,				// Half transfer interrupt enable
+	DMA_CCR1_TCIE	 = 1UL << 1,				// Transfer complete interrupt enable
+	DMA_CCR1_EN		 = 1UL << 0,				// Channel enable
 };
-static inline void dma_ccr1_set_pl(struct DMA_Type* p, uint32_t val) { p->CCR1 = (p->CCR1 & ~DMA_CCR1_PL) | ((val<<12) & DMA_CCR1_PL); }
-static inline void dma_ccr1_set_msize(struct DMA_Type* p, uint32_t val) { p->CCR1 = (p->CCR1 & ~DMA_CCR1_MSIZE) | ((val<<10) & DMA_CCR1_MSIZE); }
-static inline void dma_ccr1_set_psize(struct DMA_Type* p, uint32_t val) { p->CCR1 = (p->CCR1 & ~DMA_CCR1_PSIZE) | ((val<<8) & DMA_CCR1_PSIZE); }
-static inline uint32_t dma_ccr1_get_pl(struct DMA_Type* p) { return (p->CCR1 & DMA_CCR1_PL) >> 12 ; }
-static inline uint32_t dma_ccr1_get_msize(struct DMA_Type* p) { return (p->CCR1 & DMA_CCR1_MSIZE) >> 10 ; }
-static inline uint32_t dma_ccr1_get_psize(struct DMA_Type* p) { return (p->CCR1 & DMA_CCR1_PSIZE) >> 8 ; }
+static inline void dma_ccr1_set_pl(struct DMA_Type *p, uint32_t val) {
+	p->CCR1 = (p->CCR1 & ~DMA_CCR1_PL) | ((val << 12) & DMA_CCR1_PL);
+}
+static inline void dma_ccr1_set_msize(struct DMA_Type *p, uint32_t val) {
+	p->CCR1 = (p->CCR1 & ~DMA_CCR1_MSIZE) | ((val << 10) & DMA_CCR1_MSIZE);
+}
+static inline void dma_ccr1_set_psize(struct DMA_Type *p, uint32_t val) {
+	p->CCR1 = (p->CCR1 & ~DMA_CCR1_PSIZE) | ((val << 8) & DMA_CCR1_PSIZE);
+}
+static inline uint32_t dma_ccr1_get_pl(struct DMA_Type *p) { return (p->CCR1 & DMA_CCR1_PL) >> 12; }
+static inline uint32_t dma_ccr1_get_msize(struct DMA_Type *p) { return (p->CCR1 & DMA_CCR1_MSIZE) >> 10; }
+static inline uint32_t dma_ccr1_get_psize(struct DMA_Type *p) { return (p->CCR1 & DMA_CCR1_PSIZE) >> 8; }
 
 // DMA->CCR2 channel x configuration register
 enum {
-	DMA_CCR2_DUMMY = 1UL<<31, // force this to be a 32 bit register
-	DMA_CCR2_MEM2MEM = 1UL<<14, // Memory to memory mode
-	DMA_CCR2_PL = ((1UL<<2)-1) << 12, // Channel priority level
-	DMA_CCR2_MSIZE = ((1UL<<2)-1) << 10, // Memory size
-	DMA_CCR2_PSIZE = ((1UL<<2)-1) << 8, // Peripheral size
-	DMA_CCR2_MINC = 1UL<<7, // Memory increment mode
-	DMA_CCR2_PINC = 1UL<<6, // Peripheral increment mode
-	DMA_CCR2_CIRC = 1UL<<5, // Circular mode
-	DMA_CCR2_DIR = 1UL<<4, // Data transfer direction
-	DMA_CCR2_TEIE = 1UL<<3, // Transfer error interrupt enable
-	DMA_CCR2_HTIE = 1UL<<2, // Half transfer interrupt enable
-	DMA_CCR2_TCIE = 1UL<<1, // Transfer complete interrupt enable
-	DMA_CCR2_EN = 1UL<<0, // Channel enable		
+	DMA_CCR2_DUMMY	 = 1UL << 31,				// force this to be a 32 bit register
+	DMA_CCR2_MEM2MEM = 1UL << 14,				// Memory to memory mode
+	DMA_CCR2_PL		 = ((1UL << 2) - 1) << 12,	// Channel priority level
+	DMA_CCR2_MSIZE	 = ((1UL << 2) - 1) << 10,	// Memory size
+	DMA_CCR2_PSIZE	 = ((1UL << 2) - 1) << 8,	// Peripheral size
+	DMA_CCR2_MINC	 = 1UL << 7,				// Memory increment mode
+	DMA_CCR2_PINC	 = 1UL << 6,				// Peripheral increment mode
+	DMA_CCR2_CIRC	 = 1UL << 5,				// Circular mode
+	DMA_CCR2_DIR	 = 1UL << 4,				// Data transfer direction
+	DMA_CCR2_TEIE	 = 1UL << 3,				// Transfer error interrupt enable
+	DMA_CCR2_HTIE	 = 1UL << 2,				// Half transfer interrupt enable
+	DMA_CCR2_TCIE	 = 1UL << 1,				// Transfer complete interrupt enable
+	DMA_CCR2_EN		 = 1UL << 0,				// Channel enable
 };
-static inline void dma_ccr2_set_pl(struct DMA_Type* p, uint32_t val) { p->CCR2 = (p->CCR2 & ~DMA_CCR2_PL) | ((val<<12) & DMA_CCR2_PL); }
-static inline void dma_ccr2_set_msize(struct DMA_Type* p, uint32_t val) { p->CCR2 = (p->CCR2 & ~DMA_CCR2_MSIZE) | ((val<<10) & DMA_CCR2_MSIZE); }
-static inline void dma_ccr2_set_psize(struct DMA_Type* p, uint32_t val) { p->CCR2 = (p->CCR2 & ~DMA_CCR2_PSIZE) | ((val<<8) & DMA_CCR2_PSIZE); }
-static inline uint32_t dma_ccr2_get_pl(struct DMA_Type* p) { return (p->CCR2 & DMA_CCR2_PL) >> 12 ; }
-static inline uint32_t dma_ccr2_get_msize(struct DMA_Type* p) { return (p->CCR2 & DMA_CCR2_MSIZE) >> 10 ; }
-static inline uint32_t dma_ccr2_get_psize(struct DMA_Type* p) { return (p->CCR2 & DMA_CCR2_PSIZE) >> 8 ; }
+static inline void dma_ccr2_set_pl(struct DMA_Type *p, uint32_t val) {
+	p->CCR2 = (p->CCR2 & ~DMA_CCR2_PL) | ((val << 12) & DMA_CCR2_PL);
+}
+static inline void dma_ccr2_set_msize(struct DMA_Type *p, uint32_t val) {
+	p->CCR2 = (p->CCR2 & ~DMA_CCR2_MSIZE) | ((val << 10) & DMA_CCR2_MSIZE);
+}
+static inline void dma_ccr2_set_psize(struct DMA_Type *p, uint32_t val) {
+	p->CCR2 = (p->CCR2 & ~DMA_CCR2_PSIZE) | ((val << 8) & DMA_CCR2_PSIZE);
+}
+static inline uint32_t dma_ccr2_get_pl(struct DMA_Type *p) { return (p->CCR2 & DMA_CCR2_PL) >> 12; }
+static inline uint32_t dma_ccr2_get_msize(struct DMA_Type *p) { return (p->CCR2 & DMA_CCR2_MSIZE) >> 10; }
+static inline uint32_t dma_ccr2_get_psize(struct DMA_Type *p) { return (p->CCR2 & DMA_CCR2_PSIZE) >> 8; }
 
 // DMA->CCR3 channel x configuration register
 enum {
-	DMA_CCR3_DUMMY = 1UL<<31, // force this to be a 32 bit register
-	DMA_CCR3_MEM2MEM = 1UL<<14, // Memory to memory mode
-	DMA_CCR3_PL = ((1UL<<2)-1) << 12, // Channel priority level
-	DMA_CCR3_MSIZE = ((1UL<<2)-1) << 10, // Memory size
-	DMA_CCR3_PSIZE = ((1UL<<2)-1) << 8, // Peripheral size
-	DMA_CCR3_MINC = 1UL<<7, // Memory increment mode
-	DMA_CCR3_PINC = 1UL<<6, // Peripheral increment mode
-	DMA_CCR3_CIRC = 1UL<<5, // Circular mode
-	DMA_CCR3_DIR = 1UL<<4, // Data transfer direction
-	DMA_CCR3_TEIE = 1UL<<3, // Transfer error interrupt enable
-	DMA_CCR3_HTIE = 1UL<<2, // Half transfer interrupt enable
-	DMA_CCR3_TCIE = 1UL<<1, // Transfer complete interrupt enable
-	DMA_CCR3_EN = 1UL<<0, // Channel enable		
+	DMA_CCR3_DUMMY	 = 1UL << 31,				// force this to be a 32 bit register
+	DMA_CCR3_MEM2MEM = 1UL << 14,				// Memory to memory mode
+	DMA_CCR3_PL		 = ((1UL << 2) - 1) << 12,	// Channel priority level
+	DMA_CCR3_MSIZE	 = ((1UL << 2) - 1) << 10,	// Memory size
+	DMA_CCR3_PSIZE	 = ((1UL << 2) - 1) << 8,	// Peripheral size
+	DMA_CCR3_MINC	 = 1UL << 7,				// Memory increment mode
+	DMA_CCR3_PINC	 = 1UL << 6,				// Peripheral increment mode
+	DMA_CCR3_CIRC	 = 1UL << 5,				// Circular mode
+	DMA_CCR3_DIR	 = 1UL << 4,				// Data transfer direction
+	DMA_CCR3_TEIE	 = 1UL << 3,				// Transfer error interrupt enable
+	DMA_CCR3_HTIE	 = 1UL << 2,				// Half transfer interrupt enable
+	DMA_CCR3_TCIE	 = 1UL << 1,				// Transfer complete interrupt enable
+	DMA_CCR3_EN		 = 1UL << 0,				// Channel enable
 };
-static inline void dma_ccr3_set_pl(struct DMA_Type* p, uint32_t val) { p->CCR3 = (p->CCR3 & ~DMA_CCR3_PL) | ((val<<12) & DMA_CCR3_PL); }
-static inline void dma_ccr3_set_msize(struct DMA_Type* p, uint32_t val) { p->CCR3 = (p->CCR3 & ~DMA_CCR3_MSIZE) | ((val<<10) & DMA_CCR3_MSIZE); }
-static inline void dma_ccr3_set_psize(struct DMA_Type* p, uint32_t val) { p->CCR3 = (p->CCR3 & ~DMA_CCR3_PSIZE) | ((val<<8) & DMA_CCR3_PSIZE); }
-static inline uint32_t dma_ccr3_get_pl(struct DMA_Type* p) { return (p->CCR3 & DMA_CCR3_PL) >> 12 ; }
-static inline uint32_t dma_ccr3_get_msize(struct DMA_Type* p) { return (p->CCR3 & DMA_CCR3_MSIZE) >> 10 ; }
-static inline uint32_t dma_ccr3_get_psize(struct DMA_Type* p) { return (p->CCR3 & DMA_CCR3_PSIZE) >> 8 ; }
+static inline void dma_ccr3_set_pl(struct DMA_Type *p, uint32_t val) {
+	p->CCR3 = (p->CCR3 & ~DMA_CCR3_PL) | ((val << 12) & DMA_CCR3_PL);
+}
+static inline void dma_ccr3_set_msize(struct DMA_Type *p, uint32_t val) {
+	p->CCR3 = (p->CCR3 & ~DMA_CCR3_MSIZE) | ((val << 10) & DMA_CCR3_MSIZE);
+}
+static inline void dma_ccr3_set_psize(struct DMA_Type *p, uint32_t val) {
+	p->CCR3 = (p->CCR3 & ~DMA_CCR3_PSIZE) | ((val << 8) & DMA_CCR3_PSIZE);
+}
+static inline uint32_t dma_ccr3_get_pl(struct DMA_Type *p) { return (p->CCR3 & DMA_CCR3_PL) >> 12; }
+static inline uint32_t dma_ccr3_get_msize(struct DMA_Type *p) { return (p->CCR3 & DMA_CCR3_MSIZE) >> 10; }
+static inline uint32_t dma_ccr3_get_psize(struct DMA_Type *p) { return (p->CCR3 & DMA_CCR3_PSIZE) >> 8; }
 
 // DMA->CCR4 channel x configuration register
 enum {
-	DMA_CCR4_DUMMY = 1UL<<31, // force this to be a 32 bit register
-	DMA_CCR4_MEM2MEM = 1UL<<14, // Memory to memory mode
-	DMA_CCR4_PL = ((1UL<<2)-1) << 12, // Channel priority level
-	DMA_CCR4_MSIZE = ((1UL<<2)-1) << 10, // Memory size
-	DMA_CCR4_PSIZE = ((1UL<<2)-1) << 8, // Peripheral size
-	DMA_CCR4_MINC = 1UL<<7, // Memory increment mode
-	DMA_CCR4_PINC = 1UL<<6, // Peripheral increment mode
-	DMA_CCR4_CIRC = 1UL<<5, // Circular mode
-	DMA_CCR4_DIR = 1UL<<4, // Data transfer direction
-	DMA_CCR4_TEIE = 1UL<<3, // Transfer error interrupt enable
-	DMA_CCR4_HTIE = 1UL<<2, // Half transfer interrupt enable
-	DMA_CCR4_TCIE = 1UL<<1, // Transfer complete interrupt enable
-	DMA_CCR4_EN = 1UL<<0, // Channel enable		
+	DMA_CCR4_DUMMY	 = 1UL << 31,				// force this to be a 32 bit register
+	DMA_CCR4_MEM2MEM = 1UL << 14,				// Memory to memory mode
+	DMA_CCR4_PL		 = ((1UL << 2) - 1) << 12,	// Channel priority level
+	DMA_CCR4_MSIZE	 = ((1UL << 2) - 1) << 10,	// Memory size
+	DMA_CCR4_PSIZE	 = ((1UL << 2) - 1) << 8,	// Peripheral size
+	DMA_CCR4_MINC	 = 1UL << 7,				// Memory increment mode
+	DMA_CCR4_PINC	 = 1UL << 6,				// Peripheral increment mode
+	DMA_CCR4_CIRC	 = 1UL << 5,				// Circular mode
+	DMA_CCR4_DIR	 = 1UL << 4,				// Data transfer direction
+	DMA_CCR4_TEIE	 = 1UL << 3,				// Transfer error interrupt enable
+	DMA_CCR4_HTIE	 = 1UL << 2,				// Half transfer interrupt enable
+	DMA_CCR4_TCIE	 = 1UL << 1,				// Transfer complete interrupt enable
+	DMA_CCR4_EN		 = 1UL << 0,				// Channel enable
 };
-static inline void dma_ccr4_set_pl(struct DMA_Type* p, uint32_t val) { p->CCR4 = (p->CCR4 & ~DMA_CCR4_PL) | ((val<<12) & DMA_CCR4_PL); }
-static inline void dma_ccr4_set_msize(struct DMA_Type* p, uint32_t val) { p->CCR4 = (p->CCR4 & ~DMA_CCR4_MSIZE) | ((val<<10) & DMA_CCR4_MSIZE); }
-static inline void dma_ccr4_set_psize(struct DMA_Type* p, uint32_t val) { p->CCR4 = (p->CCR4 & ~DMA_CCR4_PSIZE) | ((val<<8) & DMA_CCR4_PSIZE); }
-static inline uint32_t dma_ccr4_get_pl(struct DMA_Type* p) { return (p->CCR4 & DMA_CCR4_PL) >> 12 ; }
-static inline uint32_t dma_ccr4_get_msize(struct DMA_Type* p) { return (p->CCR4 & DMA_CCR4_MSIZE) >> 10 ; }
-static inline uint32_t dma_ccr4_get_psize(struct DMA_Type* p) { return (p->CCR4 & DMA_CCR4_PSIZE) >> 8 ; }
+static inline void dma_ccr4_set_pl(struct DMA_Type *p, uint32_t val) {
+	p->CCR4 = (p->CCR4 & ~DMA_CCR4_PL) | ((val << 12) & DMA_CCR4_PL);
+}
+static inline void dma_ccr4_set_msize(struct DMA_Type *p, uint32_t val) {
+	p->CCR4 = (p->CCR4 & ~DMA_CCR4_MSIZE) | ((val << 10) & DMA_CCR4_MSIZE);
+}
+static inline void dma_ccr4_set_psize(struct DMA_Type *p, uint32_t val) {
+	p->CCR4 = (p->CCR4 & ~DMA_CCR4_PSIZE) | ((val << 8) & DMA_CCR4_PSIZE);
+}
+static inline uint32_t dma_ccr4_get_pl(struct DMA_Type *p) { return (p->CCR4 & DMA_CCR4_PL) >> 12; }
+static inline uint32_t dma_ccr4_get_msize(struct DMA_Type *p) { return (p->CCR4 & DMA_CCR4_MSIZE) >> 10; }
+static inline uint32_t dma_ccr4_get_psize(struct DMA_Type *p) { return (p->CCR4 & DMA_CCR4_PSIZE) >> 8; }
 
 // DMA->CCR5 channel x configuration register
 enum {
-	DMA_CCR5_DUMMY = 1UL<<31, // force this to be a 32 bit register
-	DMA_CCR5_MEM2MEM = 1UL<<14, // Memory to memory mode
-	DMA_CCR5_PL = ((1UL<<2)-1) << 12, // Channel priority level
-	DMA_CCR5_MSIZE = ((1UL<<2)-1) << 10, // Memory size
-	DMA_CCR5_PSIZE = ((1UL<<2)-1) << 8, // Peripheral size
-	DMA_CCR5_MINC = 1UL<<7, // Memory increment mode
-	DMA_CCR5_PINC = 1UL<<6, // Peripheral increment mode
-	DMA_CCR5_CIRC = 1UL<<5, // Circular mode
-	DMA_CCR5_DIR = 1UL<<4, // Data transfer direction
-	DMA_CCR5_TEIE = 1UL<<3, // Transfer error interrupt enable
-	DMA_CCR5_HTIE = 1UL<<2, // Half transfer interrupt enable
-	DMA_CCR5_TCIE = 1UL<<1, // Transfer complete interrupt enable
-	DMA_CCR5_EN = 1UL<<0, // Channel enable		
+	DMA_CCR5_DUMMY	 = 1UL << 31,				// force this to be a 32 bit register
+	DMA_CCR5_MEM2MEM = 1UL << 14,				// Memory to memory mode
+	DMA_CCR5_PL		 = ((1UL << 2) - 1) << 12,	// Channel priority level
+	DMA_CCR5_MSIZE	 = ((1UL << 2) - 1) << 10,	// Memory size
+	DMA_CCR5_PSIZE	 = ((1UL << 2) - 1) << 8,	// Peripheral size
+	DMA_CCR5_MINC	 = 1UL << 7,				// Memory increment mode
+	DMA_CCR5_PINC	 = 1UL << 6,				// Peripheral increment mode
+	DMA_CCR5_CIRC	 = 1UL << 5,				// Circular mode
+	DMA_CCR5_DIR	 = 1UL << 4,				// Data transfer direction
+	DMA_CCR5_TEIE	 = 1UL << 3,				// Transfer error interrupt enable
+	DMA_CCR5_HTIE	 = 1UL << 2,				// Half transfer interrupt enable
+	DMA_CCR5_TCIE	 = 1UL << 1,				// Transfer complete interrupt enable
+	DMA_CCR5_EN		 = 1UL << 0,				// Channel enable
 };
-static inline void dma_ccr5_set_pl(struct DMA_Type* p, uint32_t val) { p->CCR5 = (p->CCR5 & ~DMA_CCR5_PL) | ((val<<12) & DMA_CCR5_PL); }
-static inline void dma_ccr5_set_msize(struct DMA_Type* p, uint32_t val) { p->CCR5 = (p->CCR5 & ~DMA_CCR5_MSIZE) | ((val<<10) & DMA_CCR5_MSIZE); }
-static inline void dma_ccr5_set_psize(struct DMA_Type* p, uint32_t val) { p->CCR5 = (p->CCR5 & ~DMA_CCR5_PSIZE) | ((val<<8) & DMA_CCR5_PSIZE); }
-static inline uint32_t dma_ccr5_get_pl(struct DMA_Type* p) { return (p->CCR5 & DMA_CCR5_PL) >> 12 ; }
-static inline uint32_t dma_ccr5_get_msize(struct DMA_Type* p) { return (p->CCR5 & DMA_CCR5_MSIZE) >> 10 ; }
-static inline uint32_t dma_ccr5_get_psize(struct DMA_Type* p) { return (p->CCR5 & DMA_CCR5_PSIZE) >> 8 ; }
+static inline void dma_ccr5_set_pl(struct DMA_Type *p, uint32_t val) {
+	p->CCR5 = (p->CCR5 & ~DMA_CCR5_PL) | ((val << 12) & DMA_CCR5_PL);
+}
+static inline void dma_ccr5_set_msize(struct DMA_Type *p, uint32_t val) {
+	p->CCR5 = (p->CCR5 & ~DMA_CCR5_MSIZE) | ((val << 10) & DMA_CCR5_MSIZE);
+}
+static inline void dma_ccr5_set_psize(struct DMA_Type *p, uint32_t val) {
+	p->CCR5 = (p->CCR5 & ~DMA_CCR5_PSIZE) | ((val << 8) & DMA_CCR5_PSIZE);
+}
+static inline uint32_t dma_ccr5_get_pl(struct DMA_Type *p) { return (p->CCR5 & DMA_CCR5_PL) >> 12; }
+static inline uint32_t dma_ccr5_get_msize(struct DMA_Type *p) { return (p->CCR5 & DMA_CCR5_MSIZE) >> 10; }
+static inline uint32_t dma_ccr5_get_psize(struct DMA_Type *p) { return (p->CCR5 & DMA_CCR5_PSIZE) >> 8; }
 
 // DMA->CCR6 channel x configuration register
 enum {
-	DMA_CCR6_DUMMY = 1UL<<31, // force this to be a 32 bit register
-	DMA_CCR6_MEM2MEM = 1UL<<14, // Memory to memory mode
-	DMA_CCR6_PL = ((1UL<<2)-1) << 12, // Channel priority level
-	DMA_CCR6_MSIZE = ((1UL<<2)-1) << 10, // Memory size
-	DMA_CCR6_PSIZE = ((1UL<<2)-1) << 8, // Peripheral size
-	DMA_CCR6_MINC = 1UL<<7, // Memory increment mode
-	DMA_CCR6_PINC = 1UL<<6, // Peripheral increment mode
-	DMA_CCR6_CIRC = 1UL<<5, // Circular mode
-	DMA_CCR6_DIR = 1UL<<4, // Data transfer direction
-	DMA_CCR6_TEIE = 1UL<<3, // Transfer error interrupt enable
-	DMA_CCR6_HTIE = 1UL<<2, // Half transfer interrupt enable
-	DMA_CCR6_TCIE = 1UL<<1, // Transfer complete interrupt enable
-	DMA_CCR6_EN = 1UL<<0, // Channel enable		
+	DMA_CCR6_DUMMY	 = 1UL << 31,				// force this to be a 32 bit register
+	DMA_CCR6_MEM2MEM = 1UL << 14,				// Memory to memory mode
+	DMA_CCR6_PL		 = ((1UL << 2) - 1) << 12,	// Channel priority level
+	DMA_CCR6_MSIZE	 = ((1UL << 2) - 1) << 10,	// Memory size
+	DMA_CCR6_PSIZE	 = ((1UL << 2) - 1) << 8,	// Peripheral size
+	DMA_CCR6_MINC	 = 1UL << 7,				// Memory increment mode
+	DMA_CCR6_PINC	 = 1UL << 6,				// Peripheral increment mode
+	DMA_CCR6_CIRC	 = 1UL << 5,				// Circular mode
+	DMA_CCR6_DIR	 = 1UL << 4,				// Data transfer direction
+	DMA_CCR6_TEIE	 = 1UL << 3,				// Transfer error interrupt enable
+	DMA_CCR6_HTIE	 = 1UL << 2,				// Half transfer interrupt enable
+	DMA_CCR6_TCIE	 = 1UL << 1,				// Transfer complete interrupt enable
+	DMA_CCR6_EN		 = 1UL << 0,				// Channel enable
 };
-static inline void dma_ccr6_set_pl(struct DMA_Type* p, uint32_t val) { p->CCR6 = (p->CCR6 & ~DMA_CCR6_PL) | ((val<<12) & DMA_CCR6_PL); }
-static inline void dma_ccr6_set_msize(struct DMA_Type* p, uint32_t val) { p->CCR6 = (p->CCR6 & ~DMA_CCR6_MSIZE) | ((val<<10) & DMA_CCR6_MSIZE); }
-static inline void dma_ccr6_set_psize(struct DMA_Type* p, uint32_t val) { p->CCR6 = (p->CCR6 & ~DMA_CCR6_PSIZE) | ((val<<8) & DMA_CCR6_PSIZE); }
-static inline uint32_t dma_ccr6_get_pl(struct DMA_Type* p) { return (p->CCR6 & DMA_CCR6_PL) >> 12 ; }
-static inline uint32_t dma_ccr6_get_msize(struct DMA_Type* p) { return (p->CCR6 & DMA_CCR6_MSIZE) >> 10 ; }
-static inline uint32_t dma_ccr6_get_psize(struct DMA_Type* p) { return (p->CCR6 & DMA_CCR6_PSIZE) >> 8 ; }
+static inline void dma_ccr6_set_pl(struct DMA_Type *p, uint32_t val) {
+	p->CCR6 = (p->CCR6 & ~DMA_CCR6_PL) | ((val << 12) & DMA_CCR6_PL);
+}
+static inline void dma_ccr6_set_msize(struct DMA_Type *p, uint32_t val) {
+	p->CCR6 = (p->CCR6 & ~DMA_CCR6_MSIZE) | ((val << 10) & DMA_CCR6_MSIZE);
+}
+static inline void dma_ccr6_set_psize(struct DMA_Type *p, uint32_t val) {
+	p->CCR6 = (p->CCR6 & ~DMA_CCR6_PSIZE) | ((val << 8) & DMA_CCR6_PSIZE);
+}
+static inline uint32_t dma_ccr6_get_pl(struct DMA_Type *p) { return (p->CCR6 & DMA_CCR6_PL) >> 12; }
+static inline uint32_t dma_ccr6_get_msize(struct DMA_Type *p) { return (p->CCR6 & DMA_CCR6_MSIZE) >> 10; }
+static inline uint32_t dma_ccr6_get_psize(struct DMA_Type *p) { return (p->CCR6 & DMA_CCR6_PSIZE) >> 8; }
 
 // DMA->CCR7 channel x configuration register
 enum {
-	DMA_CCR7_DUMMY = 1UL<<31, // force this to be a 32 bit register
-	DMA_CCR7_MEM2MEM = 1UL<<14, // Memory to memory mode
-	DMA_CCR7_PL = ((1UL<<2)-1) << 12, // Channel priority level
-	DMA_CCR7_MSIZE = ((1UL<<2)-1) << 10, // Memory size
-	DMA_CCR7_PSIZE = ((1UL<<2)-1) << 8, // Peripheral size
-	DMA_CCR7_MINC = 1UL<<7, // Memory increment mode
-	DMA_CCR7_PINC = 1UL<<6, // Peripheral increment mode
-	DMA_CCR7_CIRC = 1UL<<5, // Circular mode
-	DMA_CCR7_DIR = 1UL<<4, // Data transfer direction
-	DMA_CCR7_TEIE = 1UL<<3, // Transfer error interrupt enable
-	DMA_CCR7_HTIE = 1UL<<2, // Half transfer interrupt enable
-	DMA_CCR7_TCIE = 1UL<<1, // Transfer complete interrupt enable
-	DMA_CCR7_EN = 1UL<<0, // Channel enable		
+	DMA_CCR7_DUMMY	 = 1UL << 31,				// force this to be a 32 bit register
+	DMA_CCR7_MEM2MEM = 1UL << 14,				// Memory to memory mode
+	DMA_CCR7_PL		 = ((1UL << 2) - 1) << 12,	// Channel priority level
+	DMA_CCR7_MSIZE	 = ((1UL << 2) - 1) << 10,	// Memory size
+	DMA_CCR7_PSIZE	 = ((1UL << 2) - 1) << 8,	// Peripheral size
+	DMA_CCR7_MINC	 = 1UL << 7,				// Memory increment mode
+	DMA_CCR7_PINC	 = 1UL << 6,				// Peripheral increment mode
+	DMA_CCR7_CIRC	 = 1UL << 5,				// Circular mode
+	DMA_CCR7_DIR	 = 1UL << 4,				// Data transfer direction
+	DMA_CCR7_TEIE	 = 1UL << 3,				// Transfer error interrupt enable
+	DMA_CCR7_HTIE	 = 1UL << 2,				// Half transfer interrupt enable
+	DMA_CCR7_TCIE	 = 1UL << 1,				// Transfer complete interrupt enable
+	DMA_CCR7_EN		 = 1UL << 0,				// Channel enable
 };
-static inline void dma_ccr7_set_pl(struct DMA_Type* p, uint32_t val) { p->CCR7 = (p->CCR7 & ~DMA_CCR7_PL) | ((val<<12) & DMA_CCR7_PL); }
-static inline void dma_ccr7_set_msize(struct DMA_Type* p, uint32_t val) { p->CCR7 = (p->CCR7 & ~DMA_CCR7_MSIZE) | ((val<<10) & DMA_CCR7_MSIZE); }
-static inline void dma_ccr7_set_psize(struct DMA_Type* p, uint32_t val) { p->CCR7 = (p->CCR7 & ~DMA_CCR7_PSIZE) | ((val<<8) & DMA_CCR7_PSIZE); }
-static inline uint32_t dma_ccr7_get_pl(struct DMA_Type* p) { return (p->CCR7 & DMA_CCR7_PL) >> 12 ; }
-static inline uint32_t dma_ccr7_get_msize(struct DMA_Type* p) { return (p->CCR7 & DMA_CCR7_MSIZE) >> 10 ; }
-static inline uint32_t dma_ccr7_get_psize(struct DMA_Type* p) { return (p->CCR7 & DMA_CCR7_PSIZE) >> 8 ; }
+static inline void dma_ccr7_set_pl(struct DMA_Type *p, uint32_t val) {
+	p->CCR7 = (p->CCR7 & ~DMA_CCR7_PL) | ((val << 12) & DMA_CCR7_PL);
+}
+static inline void dma_ccr7_set_msize(struct DMA_Type *p, uint32_t val) {
+	p->CCR7 = (p->CCR7 & ~DMA_CCR7_MSIZE) | ((val << 10) & DMA_CCR7_MSIZE);
+}
+static inline void dma_ccr7_set_psize(struct DMA_Type *p, uint32_t val) {
+	p->CCR7 = (p->CCR7 & ~DMA_CCR7_PSIZE) | ((val << 8) & DMA_CCR7_PSIZE);
+}
+static inline uint32_t dma_ccr7_get_pl(struct DMA_Type *p) { return (p->CCR7 & DMA_CCR7_PL) >> 12; }
+static inline uint32_t dma_ccr7_get_msize(struct DMA_Type *p) { return (p->CCR7 & DMA_CCR7_MSIZE) >> 10; }
+static inline uint32_t dma_ccr7_get_psize(struct DMA_Type *p) { return (p->CCR7 & DMA_CCR7_PSIZE) >> 8; }
 
 // DMA->CSELR channel selection register
 enum {
-	DMA_CSELR_C7S = ((1UL<<4)-1) << 24, // DMA channel 7 selection
-	DMA_CSELR_C6S = ((1UL<<4)-1) << 20, // DMA channel 6 selection
-	DMA_CSELR_C5S = ((1UL<<4)-1) << 16, // DMA channel 5 selection
-	DMA_CSELR_C4S = ((1UL<<4)-1) << 12, // DMA channel 4 selection
-	DMA_CSELR_C3S = ((1UL<<4)-1) << 8, // DMA channel 3 selection
-	DMA_CSELR_C2S = ((1UL<<4)-1) << 4, // DMA channel 2 selection
-	DMA_CSELR_C1S = ((1UL<<4)-1) << 0, // DMA channel 1 selection		
+	DMA_CSELR_C7S = ((1UL << 4) - 1) << 24,	 // DMA channel 7 selection
+	DMA_CSELR_C6S = ((1UL << 4) - 1) << 20,	 // DMA channel 6 selection
+	DMA_CSELR_C5S = ((1UL << 4) - 1) << 16,	 // DMA channel 5 selection
+	DMA_CSELR_C4S = ((1UL << 4) - 1) << 12,	 // DMA channel 4 selection
+	DMA_CSELR_C3S = ((1UL << 4) - 1) << 8,	 // DMA channel 3 selection
+	DMA_CSELR_C2S = ((1UL << 4) - 1) << 4,	 // DMA channel 2 selection
+	DMA_CSELR_C1S = ((1UL << 4) - 1) << 0,	 // DMA channel 1 selection
 };
-static inline void dma_cselr_set_c7s(struct DMA_Type* p, uint32_t val) { p->CSELR = (p->CSELR & ~DMA_CSELR_C7S) | ((val<<24) & DMA_CSELR_C7S); }
-static inline void dma_cselr_set_c6s(struct DMA_Type* p, uint32_t val) { p->CSELR = (p->CSELR & ~DMA_CSELR_C6S) | ((val<<20) & DMA_CSELR_C6S); }
-static inline void dma_cselr_set_c5s(struct DMA_Type* p, uint32_t val) { p->CSELR = (p->CSELR & ~DMA_CSELR_C5S) | ((val<<16) & DMA_CSELR_C5S); }
-static inline void dma_cselr_set_c4s(struct DMA_Type* p, uint32_t val) { p->CSELR = (p->CSELR & ~DMA_CSELR_C4S) | ((val<<12) & DMA_CSELR_C4S); }
-static inline void dma_cselr_set_c3s(struct DMA_Type* p, uint32_t val) { p->CSELR = (p->CSELR & ~DMA_CSELR_C3S) | ((val<<8) & DMA_CSELR_C3S); }
-static inline void dma_cselr_set_c2s(struct DMA_Type* p, uint32_t val) { p->CSELR = (p->CSELR & ~DMA_CSELR_C2S) | ((val<<4) & DMA_CSELR_C2S); }
-static inline void dma_cselr_set_c1s(struct DMA_Type* p, uint32_t val) { p->CSELR = (p->CSELR & ~DMA_CSELR_C1S) | ((val<<0) & DMA_CSELR_C1S); }
-static inline uint32_t dma_cselr_get_c7s(struct DMA_Type* p) { return (p->CSELR & DMA_CSELR_C7S) >> 24 ; }
-static inline uint32_t dma_cselr_get_c6s(struct DMA_Type* p) { return (p->CSELR & DMA_CSELR_C6S) >> 20 ; }
-static inline uint32_t dma_cselr_get_c5s(struct DMA_Type* p) { return (p->CSELR & DMA_CSELR_C5S) >> 16 ; }
-static inline uint32_t dma_cselr_get_c4s(struct DMA_Type* p) { return (p->CSELR & DMA_CSELR_C4S) >> 12 ; }
-static inline uint32_t dma_cselr_get_c3s(struct DMA_Type* p) { return (p->CSELR & DMA_CSELR_C3S) >> 8 ; }
-static inline uint32_t dma_cselr_get_c2s(struct DMA_Type* p) { return (p->CSELR & DMA_CSELR_C2S) >> 4 ; }
-static inline uint32_t dma_cselr_get_c1s(struct DMA_Type* p) { return (p->CSELR & DMA_CSELR_C1S) >> 0 ; }
-
+static inline void dma_cselr_set_c7s(struct DMA_Type *p, uint32_t val) {
+	p->CSELR = (p->CSELR & ~DMA_CSELR_C7S) | ((val << 24) & DMA_CSELR_C7S);
+}
+static inline void dma_cselr_set_c6s(struct DMA_Type *p, uint32_t val) {
+	p->CSELR = (p->CSELR & ~DMA_CSELR_C6S) | ((val << 20) & DMA_CSELR_C6S);
+}
+static inline void dma_cselr_set_c5s(struct DMA_Type *p, uint32_t val) {
+	p->CSELR = (p->CSELR & ~DMA_CSELR_C5S) | ((val << 16) & DMA_CSELR_C5S);
+}
+static inline void dma_cselr_set_c4s(struct DMA_Type *p, uint32_t val) {
+	p->CSELR = (p->CSELR & ~DMA_CSELR_C4S) | ((val << 12) & DMA_CSELR_C4S);
+}
+static inline void dma_cselr_set_c3s(struct DMA_Type *p, uint32_t val) {
+	p->CSELR = (p->CSELR & ~DMA_CSELR_C3S) | ((val << 8) & DMA_CSELR_C3S);
+}
+static inline void dma_cselr_set_c2s(struct DMA_Type *p, uint32_t val) {
+	p->CSELR = (p->CSELR & ~DMA_CSELR_C2S) | ((val << 4) & DMA_CSELR_C2S);
+}
+static inline void dma_cselr_set_c1s(struct DMA_Type *p, uint32_t val) {
+	p->CSELR = (p->CSELR & ~DMA_CSELR_C1S) | ((val << 0) & DMA_CSELR_C1S);
+}
+static inline uint32_t dma_cselr_get_c7s(struct DMA_Type *p) { return (p->CSELR & DMA_CSELR_C7S) >> 24; }
+static inline uint32_t dma_cselr_get_c6s(struct DMA_Type *p) { return (p->CSELR & DMA_CSELR_C6S) >> 20; }
+static inline uint32_t dma_cselr_get_c5s(struct DMA_Type *p) { return (p->CSELR & DMA_CSELR_C5S) >> 16; }
+static inline uint32_t dma_cselr_get_c4s(struct DMA_Type *p) { return (p->CSELR & DMA_CSELR_C4S) >> 12; }
+static inline uint32_t dma_cselr_get_c3s(struct DMA_Type *p) { return (p->CSELR & DMA_CSELR_C3S) >> 8; }
+static inline uint32_t dma_cselr_get_c2s(struct DMA_Type *p) { return (p->CSELR & DMA_CSELR_C2S) >> 4; }
+static inline uint32_t dma_cselr_get_c1s(struct DMA_Type *p) { return (p->CSELR & DMA_CSELR_C1S) >> 0; }
 
 /* External interrupt/event controller
 There is only one peripheral of type EXTI. */
 struct EXTI_Type {
-	__IO uint32_t IMR1; // @0 Interrupt mask register
-	__IO uint32_t EMR1; // @4 Event mask register
-	__IO uint32_t RTSR1; // @8 Rising Trigger selection register
-	__IO uint32_t FTSR1; // @12 Falling Trigger selection register
-	__IO uint32_t SWIER1; // @16 Software interrupt event register
-	__IO uint32_t PR1; // @20 Pending register
-	 uint8_t RESERVED0[8]; // @24 
-	__IO uint8_t IMR2; // @32 Interrupt mask register
-	 uint8_t RESERVED1[3]; // @33 
-	__IO uint8_t EMR2; // @36 Event mask register
-	 uint8_t RESERVED2[3]; // @37 
-	__IO uint8_t RTSR2; // @40 Rising Trigger selection register
-	 uint8_t RESERVED3[3]; // @41 
-	__IO uint8_t FTSR2; // @44 Falling Trigger selection register
-	 uint8_t RESERVED4[3]; // @45 
-	__IO uint8_t SWIER2; // @48 Software interrupt event register
-	 uint8_t RESERVED5[3]; // @49 
-	__IO uint8_t PR2; // @52 Pending register
+	__IO uint32_t IMR1;			 // @0 Interrupt mask register
+	__IO uint32_t EMR1;			 // @4 Event mask register
+	__IO uint32_t RTSR1;		 // @8 Rising Trigger selection register
+	__IO uint32_t FTSR1;		 // @12 Falling Trigger selection register
+	__IO uint32_t SWIER1;		 // @16 Software interrupt event register
+	__IO uint32_t PR1;			 // @20 Pending register
+	uint8_t		  RESERVED0[8];	 // @24
+	__IO uint8_t  IMR2;			 // @32 Interrupt mask register
+	uint8_t		  RESERVED1[3];	 // @33
+	__IO uint8_t  EMR2;			 // @36 Event mask register
+	uint8_t		  RESERVED2[3];	 // @37
+	__IO uint8_t  RTSR2;		 // @40 Rising Trigger selection register
+	uint8_t		  RESERVED3[3];	 // @41
+	__IO uint8_t  FTSR2;		 // @44 Falling Trigger selection register
+	uint8_t		  RESERVED4[3];	 // @45
+	__IO uint8_t  SWIER2;		 // @48 Software interrupt event register
+	uint8_t		  RESERVED5[3];	 // @49
+	__IO uint8_t  PR2;			 // @52 Pending register
 };
-extern struct EXTI_Type	EXTI;	// @0x40010400 
+extern struct EXTI_Type EXTI;  // @0x40010400
 
 // EXTI->RTSR1 Rising Trigger selection register
 enum {
-	EXTI_RTSR1_TR22 = 1UL<<22, // Rising trigger event configuration of line 22
-	EXTI_RTSR1_TR21 = 1UL<<21, // Rising trigger event configuration of line 21
-	EXTI_RTSR1_TR20 = 1UL<<20, // Rising trigger event configuration of line 20
-	EXTI_RTSR1_TR19 = 1UL<<19, // Rising trigger event configuration of line 19
-	EXTI_RTSR1_TR18 = 1UL<<18, // Rising trigger event configuration of line 18
-	EXTI_RTSR1_TR16 = 1UL<<16, // Rising trigger event configuration of line 16
-	EXTI_RTSR1_TR15 = 1UL<<15, // Rising trigger event configuration of line 15
-	EXTI_RTSR1_TR14 = 1UL<<14, // Rising trigger event configuration of line 14
-	EXTI_RTSR1_TR13 = 1UL<<13, // Rising trigger event configuration of line 13
-	EXTI_RTSR1_TR12 = 1UL<<12, // Rising trigger event configuration of line 12
-	EXTI_RTSR1_TR11 = 1UL<<11, // Rising trigger event configuration of line 11
-	EXTI_RTSR1_TR10 = 1UL<<10, // Rising trigger event configuration of line 10
-	EXTI_RTSR1_TR9 = 1UL<<9, // Rising trigger event configuration of line 9
-	EXTI_RTSR1_TR8 = 1UL<<8, // Rising trigger event configuration of line 8
-	EXTI_RTSR1_TR7 = 1UL<<7, // Rising trigger event configuration of line 7
-	EXTI_RTSR1_TR6 = 1UL<<6, // Rising trigger event configuration of line 6
-	EXTI_RTSR1_TR5 = 1UL<<5, // Rising trigger event configuration of line 5
-	EXTI_RTSR1_TR4 = 1UL<<4, // Rising trigger event configuration of line 4
-	EXTI_RTSR1_TR3 = 1UL<<3, // Rising trigger event configuration of line 3
-	EXTI_RTSR1_TR2 = 1UL<<2, // Rising trigger event configuration of line 2
-	EXTI_RTSR1_TR1 = 1UL<<1, // Rising trigger event configuration of line 1
-	EXTI_RTSR1_TR0 = 1UL<<0, // Rising trigger event configuration of line 0		
+	EXTI_RTSR1_TR22 = 1UL << 22,  // Rising trigger event configuration of line 22
+	EXTI_RTSR1_TR21 = 1UL << 21,  // Rising trigger event configuration of line 21
+	EXTI_RTSR1_TR20 = 1UL << 20,  // Rising trigger event configuration of line 20
+	EXTI_RTSR1_TR19 = 1UL << 19,  // Rising trigger event configuration of line 19
+	EXTI_RTSR1_TR18 = 1UL << 18,  // Rising trigger event configuration of line 18
+	EXTI_RTSR1_TR16 = 1UL << 16,  // Rising trigger event configuration of line 16
+	EXTI_RTSR1_TR15 = 1UL << 15,  // Rising trigger event configuration of line 15
+	EXTI_RTSR1_TR14 = 1UL << 14,  // Rising trigger event configuration of line 14
+	EXTI_RTSR1_TR13 = 1UL << 13,  // Rising trigger event configuration of line 13
+	EXTI_RTSR1_TR12 = 1UL << 12,  // Rising trigger event configuration of line 12
+	EXTI_RTSR1_TR11 = 1UL << 11,  // Rising trigger event configuration of line 11
+	EXTI_RTSR1_TR10 = 1UL << 10,  // Rising trigger event configuration of line 10
+	EXTI_RTSR1_TR9	= 1UL << 9,	  // Rising trigger event configuration of line 9
+	EXTI_RTSR1_TR8	= 1UL << 8,	  // Rising trigger event configuration of line 8
+	EXTI_RTSR1_TR7	= 1UL << 7,	  // Rising trigger event configuration of line 7
+	EXTI_RTSR1_TR6	= 1UL << 6,	  // Rising trigger event configuration of line 6
+	EXTI_RTSR1_TR5	= 1UL << 5,	  // Rising trigger event configuration of line 5
+	EXTI_RTSR1_TR4	= 1UL << 4,	  // Rising trigger event configuration of line 4
+	EXTI_RTSR1_TR3	= 1UL << 3,	  // Rising trigger event configuration of line 3
+	EXTI_RTSR1_TR2	= 1UL << 2,	  // Rising trigger event configuration of line 2
+	EXTI_RTSR1_TR1	= 1UL << 1,	  // Rising trigger event configuration of line 1
+	EXTI_RTSR1_TR0	= 1UL << 0,	  // Rising trigger event configuration of line 0
 };
 
 // EXTI->FTSR1 Falling Trigger selection register
 enum {
-	EXTI_FTSR1_TR22 = 1UL<<22, // Falling trigger event configuration of line 22
-	EXTI_FTSR1_TR21 = 1UL<<21, // Falling trigger event configuration of line 21
-	EXTI_FTSR1_TR20 = 1UL<<20, // Falling trigger event configuration of line 20
-	EXTI_FTSR1_TR19 = 1UL<<19, // Falling trigger event configuration of line 19
-	EXTI_FTSR1_TR18 = 1UL<<18, // Falling trigger event configuration of line 18
-	EXTI_FTSR1_TR16 = 1UL<<16, // Falling trigger event configuration of line 16
-	EXTI_FTSR1_TR15 = 1UL<<15, // Falling trigger event configuration of line 15
-	EXTI_FTSR1_TR14 = 1UL<<14, // Falling trigger event configuration of line 14
-	EXTI_FTSR1_TR13 = 1UL<<13, // Falling trigger event configuration of line 13
-	EXTI_FTSR1_TR12 = 1UL<<12, // Falling trigger event configuration of line 12
-	EXTI_FTSR1_TR11 = 1UL<<11, // Falling trigger event configuration of line 11
-	EXTI_FTSR1_TR10 = 1UL<<10, // Falling trigger event configuration of line 10
-	EXTI_FTSR1_TR9 = 1UL<<9, // Falling trigger event configuration of line 9
-	EXTI_FTSR1_TR8 = 1UL<<8, // Falling trigger event configuration of line 8
-	EXTI_FTSR1_TR7 = 1UL<<7, // Falling trigger event configuration of line 7
-	EXTI_FTSR1_TR6 = 1UL<<6, // Falling trigger event configuration of line 6
-	EXTI_FTSR1_TR5 = 1UL<<5, // Falling trigger event configuration of line 5
-	EXTI_FTSR1_TR4 = 1UL<<4, // Falling trigger event configuration of line 4
-	EXTI_FTSR1_TR3 = 1UL<<3, // Falling trigger event configuration of line 3
-	EXTI_FTSR1_TR2 = 1UL<<2, // Falling trigger event configuration of line 2
-	EXTI_FTSR1_TR1 = 1UL<<1, // Falling trigger event configuration of line 1
-	EXTI_FTSR1_TR0 = 1UL<<0, // Falling trigger event configuration of line 0		
+	EXTI_FTSR1_TR22 = 1UL << 22,  // Falling trigger event configuration of line 22
+	EXTI_FTSR1_TR21 = 1UL << 21,  // Falling trigger event configuration of line 21
+	EXTI_FTSR1_TR20 = 1UL << 20,  // Falling trigger event configuration of line 20
+	EXTI_FTSR1_TR19 = 1UL << 19,  // Falling trigger event configuration of line 19
+	EXTI_FTSR1_TR18 = 1UL << 18,  // Falling trigger event configuration of line 18
+	EXTI_FTSR1_TR16 = 1UL << 16,  // Falling trigger event configuration of line 16
+	EXTI_FTSR1_TR15 = 1UL << 15,  // Falling trigger event configuration of line 15
+	EXTI_FTSR1_TR14 = 1UL << 14,  // Falling trigger event configuration of line 14
+	EXTI_FTSR1_TR13 = 1UL << 13,  // Falling trigger event configuration of line 13
+	EXTI_FTSR1_TR12 = 1UL << 12,  // Falling trigger event configuration of line 12
+	EXTI_FTSR1_TR11 = 1UL << 11,  // Falling trigger event configuration of line 11
+	EXTI_FTSR1_TR10 = 1UL << 10,  // Falling trigger event configuration of line 10
+	EXTI_FTSR1_TR9	= 1UL << 9,	  // Falling trigger event configuration of line 9
+	EXTI_FTSR1_TR8	= 1UL << 8,	  // Falling trigger event configuration of line 8
+	EXTI_FTSR1_TR7	= 1UL << 7,	  // Falling trigger event configuration of line 7
+	EXTI_FTSR1_TR6	= 1UL << 6,	  // Falling trigger event configuration of line 6
+	EXTI_FTSR1_TR5	= 1UL << 5,	  // Falling trigger event configuration of line 5
+	EXTI_FTSR1_TR4	= 1UL << 4,	  // Falling trigger event configuration of line 4
+	EXTI_FTSR1_TR3	= 1UL << 3,	  // Falling trigger event configuration of line 3
+	EXTI_FTSR1_TR2	= 1UL << 2,	  // Falling trigger event configuration of line 2
+	EXTI_FTSR1_TR1	= 1UL << 1,	  // Falling trigger event configuration of line 1
+	EXTI_FTSR1_TR0	= 1UL << 0,	  // Falling trigger event configuration of line 0
 };
 
 // EXTI->SWIER1 Software interrupt event register
 enum {
-	EXTI_SWIER1_SWIER22 = 1UL<<22, // Software Interrupt on line 22
-	EXTI_SWIER1_SWIER21 = 1UL<<21, // Software Interrupt on line 21
-	EXTI_SWIER1_SWIER20 = 1UL<<20, // Software Interrupt on line 20
-	EXTI_SWIER1_SWIER19 = 1UL<<19, // Software Interrupt on line 19
-	EXTI_SWIER1_SWIER18 = 1UL<<18, // Software Interrupt on line 18
-	EXTI_SWIER1_SWIER16 = 1UL<<16, // Software Interrupt on line 16
-	EXTI_SWIER1_SWIER15 = 1UL<<15, // Software Interrupt on line 15
-	EXTI_SWIER1_SWIER14 = 1UL<<14, // Software Interrupt on line 14
-	EXTI_SWIER1_SWIER13 = 1UL<<13, // Software Interrupt on line 13
-	EXTI_SWIER1_SWIER12 = 1UL<<12, // Software Interrupt on line 12
-	EXTI_SWIER1_SWIER11 = 1UL<<11, // Software Interrupt on line 11
-	EXTI_SWIER1_SWIER10 = 1UL<<10, // Software Interrupt on line 10
-	EXTI_SWIER1_SWIER9 = 1UL<<9, // Software Interrupt on line 9
-	EXTI_SWIER1_SWIER8 = 1UL<<8, // Software Interrupt on line 8
-	EXTI_SWIER1_SWIER7 = 1UL<<7, // Software Interrupt on line 7
-	EXTI_SWIER1_SWIER6 = 1UL<<6, // Software Interrupt on line 6
-	EXTI_SWIER1_SWIER5 = 1UL<<5, // Software Interrupt on line 5
-	EXTI_SWIER1_SWIER4 = 1UL<<4, // Software Interrupt on line 4
-	EXTI_SWIER1_SWIER3 = 1UL<<3, // Software Interrupt on line 3
-	EXTI_SWIER1_SWIER2 = 1UL<<2, // Software Interrupt on line 2
-	EXTI_SWIER1_SWIER1 = 1UL<<1, // Software Interrupt on line 1
-	EXTI_SWIER1_SWIER0 = 1UL<<0, // Software Interrupt on line 0		
+	EXTI_SWIER1_SWIER22 = 1UL << 22,  // Software Interrupt on line 22
+	EXTI_SWIER1_SWIER21 = 1UL << 21,  // Software Interrupt on line 21
+	EXTI_SWIER1_SWIER20 = 1UL << 20,  // Software Interrupt on line 20
+	EXTI_SWIER1_SWIER19 = 1UL << 19,  // Software Interrupt on line 19
+	EXTI_SWIER1_SWIER18 = 1UL << 18,  // Software Interrupt on line 18
+	EXTI_SWIER1_SWIER16 = 1UL << 16,  // Software Interrupt on line 16
+	EXTI_SWIER1_SWIER15 = 1UL << 15,  // Software Interrupt on line 15
+	EXTI_SWIER1_SWIER14 = 1UL << 14,  // Software Interrupt on line 14
+	EXTI_SWIER1_SWIER13 = 1UL << 13,  // Software Interrupt on line 13
+	EXTI_SWIER1_SWIER12 = 1UL << 12,  // Software Interrupt on line 12
+	EXTI_SWIER1_SWIER11 = 1UL << 11,  // Software Interrupt on line 11
+	EXTI_SWIER1_SWIER10 = 1UL << 10,  // Software Interrupt on line 10
+	EXTI_SWIER1_SWIER9	= 1UL << 9,	  // Software Interrupt on line 9
+	EXTI_SWIER1_SWIER8	= 1UL << 8,	  // Software Interrupt on line 8
+	EXTI_SWIER1_SWIER7	= 1UL << 7,	  // Software Interrupt on line 7
+	EXTI_SWIER1_SWIER6	= 1UL << 6,	  // Software Interrupt on line 6
+	EXTI_SWIER1_SWIER5	= 1UL << 5,	  // Software Interrupt on line 5
+	EXTI_SWIER1_SWIER4	= 1UL << 4,	  // Software Interrupt on line 4
+	EXTI_SWIER1_SWIER3	= 1UL << 3,	  // Software Interrupt on line 3
+	EXTI_SWIER1_SWIER2	= 1UL << 2,	  // Software Interrupt on line 2
+	EXTI_SWIER1_SWIER1	= 1UL << 1,	  // Software Interrupt on line 1
+	EXTI_SWIER1_SWIER0	= 1UL << 0,	  // Software Interrupt on line 0
 };
 
 // EXTI->PR1 Pending register
 enum {
-	EXTI_PR1_PR22 = 1UL<<22, // Pending bit 22
-	EXTI_PR1_PR21 = 1UL<<21, // Pending bit 21
-	EXTI_PR1_PR20 = 1UL<<20, // Pending bit 20
-	EXTI_PR1_PR19 = 1UL<<19, // Pending bit 19
-	EXTI_PR1_PR18 = 1UL<<18, // Pending bit 18
-	EXTI_PR1_PR16 = 1UL<<16, // Pending bit 16
-	EXTI_PR1_PR15 = 1UL<<15, // Pending bit 15
-	EXTI_PR1_PR14 = 1UL<<14, // Pending bit 14
-	EXTI_PR1_PR13 = 1UL<<13, // Pending bit 13
-	EXTI_PR1_PR12 = 1UL<<12, // Pending bit 12
-	EXTI_PR1_PR11 = 1UL<<11, // Pending bit 11
-	EXTI_PR1_PR10 = 1UL<<10, // Pending bit 10
-	EXTI_PR1_PR9 = 1UL<<9, // Pending bit 9
-	EXTI_PR1_PR8 = 1UL<<8, // Pending bit 8
-	EXTI_PR1_PR7 = 1UL<<7, // Pending bit 7
-	EXTI_PR1_PR6 = 1UL<<6, // Pending bit 6
-	EXTI_PR1_PR5 = 1UL<<5, // Pending bit 5
-	EXTI_PR1_PR4 = 1UL<<4, // Pending bit 4
-	EXTI_PR1_PR3 = 1UL<<3, // Pending bit 3
-	EXTI_PR1_PR2 = 1UL<<2, // Pending bit 2
-	EXTI_PR1_PR1 = 1UL<<1, // Pending bit 1
-	EXTI_PR1_PR0 = 1UL<<0, // Pending bit 0		
+	EXTI_PR1_PR22 = 1UL << 22,	// Pending bit 22
+	EXTI_PR1_PR21 = 1UL << 21,	// Pending bit 21
+	EXTI_PR1_PR20 = 1UL << 20,	// Pending bit 20
+	EXTI_PR1_PR19 = 1UL << 19,	// Pending bit 19
+	EXTI_PR1_PR18 = 1UL << 18,	// Pending bit 18
+	EXTI_PR1_PR16 = 1UL << 16,	// Pending bit 16
+	EXTI_PR1_PR15 = 1UL << 15,	// Pending bit 15
+	EXTI_PR1_PR14 = 1UL << 14,	// Pending bit 14
+	EXTI_PR1_PR13 = 1UL << 13,	// Pending bit 13
+	EXTI_PR1_PR12 = 1UL << 12,	// Pending bit 12
+	EXTI_PR1_PR11 = 1UL << 11,	// Pending bit 11
+	EXTI_PR1_PR10 = 1UL << 10,	// Pending bit 10
+	EXTI_PR1_PR9  = 1UL << 9,	// Pending bit 9
+	EXTI_PR1_PR8  = 1UL << 8,	// Pending bit 8
+	EXTI_PR1_PR7  = 1UL << 7,	// Pending bit 7
+	EXTI_PR1_PR6  = 1UL << 6,	// Pending bit 6
+	EXTI_PR1_PR5  = 1UL << 5,	// Pending bit 5
+	EXTI_PR1_PR4  = 1UL << 4,	// Pending bit 4
+	EXTI_PR1_PR3  = 1UL << 3,	// Pending bit 3
+	EXTI_PR1_PR2  = 1UL << 2,	// Pending bit 2
+	EXTI_PR1_PR1  = 1UL << 1,	// Pending bit 1
+	EXTI_PR1_PR0  = 1UL << 0,	// Pending bit 0
 };
 
 // EXTI->RTSR2 Rising Trigger selection register
 enum {
-	EXTI_RTSR2_RT38 = 1UL<<6, // Rising trigger event configuration bit of line 38
-	EXTI_RTSR2_RT37 = 1UL<<5, // Rising trigger event configuration bit of line 37
-	EXTI_RTSR2_RT36 = 1UL<<4, // Rising trigger event configuration bit of line 36
-	EXTI_RTSR2_RT35 = 1UL<<3, // Rising trigger event configuration bit of line 35		
+	EXTI_RTSR2_RT38 = 1UL << 6,	 // Rising trigger event configuration bit of line 38
+	EXTI_RTSR2_RT37 = 1UL << 5,	 // Rising trigger event configuration bit of line 37
+	EXTI_RTSR2_RT36 = 1UL << 4,	 // Rising trigger event configuration bit of line 36
+	EXTI_RTSR2_RT35 = 1UL << 3,	 // Rising trigger event configuration bit of line 35
 };
 
 // EXTI->FTSR2 Falling Trigger selection register
 enum {
-	EXTI_FTSR2_FT38 = 1UL<<6, // Falling trigger event configuration bit of line 38
-	EXTI_FTSR2_FT37 = 1UL<<5, // Falling trigger event configuration bit of line 37
-	EXTI_FTSR2_FT36 = 1UL<<4, // Falling trigger event configuration bit of line 36
-	EXTI_FTSR2_FT35 = 1UL<<3, // Falling trigger event configuration bit of line 35		
+	EXTI_FTSR2_FT38 = 1UL << 6,	 // Falling trigger event configuration bit of line 38
+	EXTI_FTSR2_FT37 = 1UL << 5,	 // Falling trigger event configuration bit of line 37
+	EXTI_FTSR2_FT36 = 1UL << 4,	 // Falling trigger event configuration bit of line 36
+	EXTI_FTSR2_FT35 = 1UL << 3,	 // Falling trigger event configuration bit of line 35
 };
 
 // EXTI->SWIER2 Software interrupt event register
 enum {
-	EXTI_SWIER2_SWI38 = 1UL<<6, // Software interrupt on line 38
-	EXTI_SWIER2_SWI37 = 1UL<<5, // Software interrupt on line 37
-	EXTI_SWIER2_SWI36 = 1UL<<4, // Software interrupt on line 36
-	EXTI_SWIER2_SWI35 = 1UL<<3, // Software interrupt on line 35		
+	EXTI_SWIER2_SWI38 = 1UL << 6,  // Software interrupt on line 38
+	EXTI_SWIER2_SWI37 = 1UL << 5,  // Software interrupt on line 37
+	EXTI_SWIER2_SWI36 = 1UL << 4,  // Software interrupt on line 36
+	EXTI_SWIER2_SWI35 = 1UL << 3,  // Software interrupt on line 35
 };
 
 // EXTI->PR2 Pending register
 enum {
-	EXTI_PR2_PIF38 = 1UL<<6, // Pending interrupt flag on line 38
-	EXTI_PR2_PIF37 = 1UL<<5, // Pending interrupt flag on line 37
-	EXTI_PR2_PIF36 = 1UL<<4, // Pending interrupt flag on line 36
-	EXTI_PR2_PIF35 = 1UL<<3, // Pending interrupt flag on line 35		
+	EXTI_PR2_PIF38 = 1UL << 6,	// Pending interrupt flag on line 38
+	EXTI_PR2_PIF37 = 1UL << 5,	// Pending interrupt flag on line 37
+	EXTI_PR2_PIF36 = 1UL << 4,	// Pending interrupt flag on line 36
+	EXTI_PR2_PIF35 = 1UL << 3,	// Pending interrupt flag on line 35
 };
 
 /* Flash
 There is only one peripheral of type FLASH. */
 struct FLASH_Type {
-	__IO uint16_t ACR; // @0 Access control register
-	 uint8_t RESERVED0[2]; // @2 
-	__O uint32_t PDKEYR; // @4 Power down key register
-	__O uint32_t KEYR; // @8 Flash key register
-	__O uint32_t OPTKEYR; // @12 Option byte key register
-	__IO uint32_t SR; // @16 Status register
-	__IO uint32_t CR; // @20 Flash control register
-	__IO uint32_t ECCR; // @24 Flash ECC register
-	 uint8_t RESERVED1[4]; // @28 
-	__IO uint32_t OPTR; // @32 Flash option register
-	__IO uint16_t PCROP1SR; // @36 Flash Bank 1 PCROP Start address register
-	 uint8_t RESERVED2[2]; // @38 
-	__IO uint32_t PCROP1ER; // @40 Flash Bank 1 PCROP End address register
-	__IO uint32_t WRP1AR; // @44 Flash Bank 1 WRP area A address register
-	__IO uint32_t WRP1BR; // @48 Flash Bank 1 WRP area B address register
-	 uint8_t RESERVED3[16]; // @52 
-	__IO uint16_t PCROP2SR; // @68 Flash Bank 2 PCROP Start address register
-	 uint8_t RESERVED4[2]; // @70 
-	__IO uint16_t PCROP2ER; // @72 Flash Bank 2 PCROP End address register
-	 uint8_t RESERVED5[2]; // @74 
-	__IO uint32_t WRP2AR; // @76 Flash Bank 2 WRP area A address register
-	__IO uint32_t WRP2BR; // @80 Flash Bank 2 WRP area B address register
+	__IO uint16_t ACR;			  // @0 Access control register
+	uint8_t		  RESERVED0[2];	  // @2
+	__O uint32_t  PDKEYR;		  // @4 Power down key register
+	__O uint32_t  KEYR;			  // @8 Flash key register
+	__O uint32_t  OPTKEYR;		  // @12 Option byte key register
+	__IO uint32_t SR;			  // @16 Status register
+	__IO uint32_t CR;			  // @20 Flash control register
+	__IO uint32_t ECCR;			  // @24 Flash ECC register
+	uint8_t		  RESERVED1[4];	  // @28
+	__IO uint32_t OPTR;			  // @32 Flash option register
+	__IO uint16_t PCROP1SR;		  // @36 Flash Bank 1 PCROP Start address register
+	uint8_t		  RESERVED2[2];	  // @38
+	__IO uint32_t PCROP1ER;		  // @40 Flash Bank 1 PCROP End address register
+	__IO uint32_t WRP1AR;		  // @44 Flash Bank 1 WRP area A address register
+	__IO uint32_t WRP1BR;		  // @48 Flash Bank 1 WRP area B address register
+	uint8_t		  RESERVED3[16];  // @52
+	__IO uint16_t PCROP2SR;		  // @68 Flash Bank 2 PCROP Start address register
+	uint8_t		  RESERVED4[2];	  // @70
+	__IO uint16_t PCROP2ER;		  // @72 Flash Bank 2 PCROP End address register
+	uint8_t		  RESERVED5[2];	  // @74
+	__IO uint32_t WRP2AR;		  // @76 Flash Bank 2 WRP area A address register
+	__IO uint32_t WRP2BR;		  // @80 Flash Bank 2 WRP area B address register
 };
-extern struct FLASH_Type	FLASH;	// @0x40022000 
+extern struct FLASH_Type FLASH;	 // @0x40022000
 
 // FLASH->ACR Access control register
 enum {
-	FLASH_ACR_SLEEP_PD = 1UL<<14, // Flash Power-down mode during Low-power sleep mode
-	FLASH_ACR_RUN_PD = 1UL<<13, // Flash Power-down mode during Low-power run mode
-	FLASH_ACR_DCRST = 1UL<<12, // Data cache reset
-	FLASH_ACR_ICRST = 1UL<<11, // Instruction cache reset
-	FLASH_ACR_DCEN = 1UL<<10, // Data cache enable
-	FLASH_ACR_ICEN = 1UL<<9, // Instruction cache enable
-	FLASH_ACR_PRFTEN = 1UL<<8, // Prefetch enable
-	FLASH_ACR_LATENCY = ((1UL<<3)-1) << 0, // Latency		
+	FLASH_ACR_SLEEP_PD = 1UL << 14,				 // Flash Power-down mode during Low-power sleep mode
+	FLASH_ACR_RUN_PD   = 1UL << 13,				 // Flash Power-down mode during Low-power run mode
+	FLASH_ACR_DCRST	   = 1UL << 12,				 // Data cache reset
+	FLASH_ACR_ICRST	   = 1UL << 11,				 // Instruction cache reset
+	FLASH_ACR_DCEN	   = 1UL << 10,				 // Data cache enable
+	FLASH_ACR_ICEN	   = 1UL << 9,				 // Instruction cache enable
+	FLASH_ACR_PRFTEN   = 1UL << 8,				 // Prefetch enable
+	FLASH_ACR_LATENCY  = ((1UL << 3) - 1) << 0,	 // Latency
 };
-static inline void flash_acr_set_latency(uint32_t val) { FLASH.ACR = (FLASH.ACR & ~FLASH_ACR_LATENCY) | ((val<<0) & FLASH_ACR_LATENCY); }
-static inline uint32_t flash_acr_get_latency(void) { return (FLASH.ACR & FLASH_ACR_LATENCY) >> 0 ; }
+static inline void flash_acr_set_latency(uint32_t val) {
+	FLASH.ACR = (FLASH.ACR & ~FLASH_ACR_LATENCY) | ((val << 0) & FLASH_ACR_LATENCY);
+}
+static inline uint32_t flash_acr_get_latency(void) { return (FLASH.ACR & FLASH_ACR_LATENCY) >> 0; }
 
 // FLASH->SR Status register
 enum {
-	FLASH_SR_BSY = 1UL<<16, // Busy
-	FLASH_SR_OPTVERR = 1UL<<15, // Option validity error
-	FLASH_SR_RDERR = 1UL<<14, // PCROP read error
-	FLASH_SR_FASTERR = 1UL<<9, // Fast programming error
-	FLASH_SR_MISERR = 1UL<<8, // Fast programming data miss error
-	FLASH_SR_PGSERR = 1UL<<7, // Programming sequence error
-	FLASH_SR_SIZERR = 1UL<<6, // Size error
-	FLASH_SR_PGAERR = 1UL<<5, // Programming alignment error
-	FLASH_SR_WRPERR = 1UL<<4, // Write protected error
-	FLASH_SR_PROGERR = 1UL<<3, // Programming error
-	FLASH_SR_OPERR = 1UL<<1, // Operation error
-	FLASH_SR_EOP = 1UL<<0, // End of operation		
+	FLASH_SR_BSY	 = 1UL << 16,  // Busy
+	FLASH_SR_OPTVERR = 1UL << 15,  // Option validity error
+	FLASH_SR_RDERR	 = 1UL << 14,  // PCROP read error
+	FLASH_SR_FASTERR = 1UL << 9,   // Fast programming error
+	FLASH_SR_MISERR	 = 1UL << 8,   // Fast programming data miss error
+	FLASH_SR_PGSERR	 = 1UL << 7,   // Programming sequence error
+	FLASH_SR_SIZERR	 = 1UL << 6,   // Size error
+	FLASH_SR_PGAERR	 = 1UL << 5,   // Programming alignment error
+	FLASH_SR_WRPERR	 = 1UL << 4,   // Write protected error
+	FLASH_SR_PROGERR = 1UL << 3,   // Programming error
+	FLASH_SR_OPERR	 = 1UL << 1,   // Operation error
+	FLASH_SR_EOP	 = 1UL << 0,   // End of operation
 };
 
 // FLASH->CR Flash control register
 enum {
-	FLASH_CR_LOCK = 1UL<<31, // FLASH_CR Lock
-	FLASH_CR_OPTLOCK = 1UL<<30, // Options Lock
-	FLASH_CR_OBL_LAUNCH = 1UL<<27, // Force the option byte loading
-	FLASH_CR_RDERRIE = 1UL<<26, // PCROP read error interrupt enable
-	FLASH_CR_ERRIE = 1UL<<25, // Error interrupt enable
-	FLASH_CR_EOPIE = 1UL<<24, // End of operation interrupt enable
-	FLASH_CR_FSTPG = 1UL<<18, // Fast programming
-	FLASH_CR_OPTSTRT = 1UL<<17, // Options modification start
-	FLASH_CR_START = 1UL<<16, // Start
-	FLASH_CR_MER2 = 1UL<<15, // Bank 2 Mass erase
-	FLASH_CR_BKER = 1UL<<11, // Bank erase
-	FLASH_CR_PNB = ((1UL<<8)-1) << 3, // Page number
-	FLASH_CR_MER1 = 1UL<<2, // Bank 1 Mass erase
-	FLASH_CR_PER = 1UL<<1, // Page erase
-	FLASH_CR_PG = 1UL<<0, // Programming		
+	FLASH_CR_LOCK		= 1UL << 31,			  // FLASH_CR Lock
+	FLASH_CR_OPTLOCK	= 1UL << 30,			  // Options Lock
+	FLASH_CR_OBL_LAUNCH = 1UL << 27,			  // Force the option byte loading
+	FLASH_CR_RDERRIE	= 1UL << 26,			  // PCROP read error interrupt enable
+	FLASH_CR_ERRIE		= 1UL << 25,			  // Error interrupt enable
+	FLASH_CR_EOPIE		= 1UL << 24,			  // End of operation interrupt enable
+	FLASH_CR_FSTPG		= 1UL << 18,			  // Fast programming
+	FLASH_CR_OPTSTRT	= 1UL << 17,			  // Options modification start
+	FLASH_CR_START		= 1UL << 16,			  // Start
+	FLASH_CR_MER2		= 1UL << 15,			  // Bank 2 Mass erase
+	FLASH_CR_BKER		= 1UL << 11,			  // Bank erase
+	FLASH_CR_PNB		= ((1UL << 8) - 1) << 3,  // Page number
+	FLASH_CR_MER1		= 1UL << 2,				  // Bank 1 Mass erase
+	FLASH_CR_PER		= 1UL << 1,				  // Page erase
+	FLASH_CR_PG			= 1UL << 0,				  // Programming
 };
-static inline void flash_cr_set_pnb(uint32_t val) { FLASH.CR = (FLASH.CR & ~FLASH_CR_PNB) | ((val<<3) & FLASH_CR_PNB); }
-static inline uint32_t flash_cr_get_pnb(void) { return (FLASH.CR & FLASH_CR_PNB) >> 3 ; }
+static inline void	   flash_cr_set_pnb(uint32_t val) { FLASH.CR = (FLASH.CR & ~FLASH_CR_PNB) | ((val << 3) & FLASH_CR_PNB); }
+static inline uint32_t flash_cr_get_pnb(void) { return (FLASH.CR & FLASH_CR_PNB) >> 3; }
 
 // FLASH->ECCR Flash ECC register
 enum {
-	FLASH_ECCR_ECCD = 1UL<<31, // ECC detection
-	FLASH_ECCR_ECCC = 1UL<<30, // ECC correction
-	FLASH_ECCR_ECCIE = 1UL<<24, // ECC correction interrupt enable
-	FLASH_ECCR_SYSF_ECC = 1UL<<20, // System Flash ECC fail
-	FLASH_ECCR_BK_ECC = 1UL<<19, // ECC fail bank
-	FLASH_ECCR_ADDR_ECC = ((1UL<<19)-1) << 0, // ECC fail address		
+	FLASH_ECCR_ECCD		= 1UL << 31,			   // ECC detection
+	FLASH_ECCR_ECCC		= 1UL << 30,			   // ECC correction
+	FLASH_ECCR_ECCIE	= 1UL << 24,			   // ECC correction interrupt enable
+	FLASH_ECCR_SYSF_ECC = 1UL << 20,			   // System Flash ECC fail
+	FLASH_ECCR_BK_ECC	= 1UL << 19,			   // ECC fail bank
+	FLASH_ECCR_ADDR_ECC = ((1UL << 19) - 1) << 0,  // ECC fail address
 };
-static inline void flash_eccr_set_addr_ecc(uint32_t val) { FLASH.ECCR = (FLASH.ECCR & ~FLASH_ECCR_ADDR_ECC) | ((val<<0) & FLASH_ECCR_ADDR_ECC); }
-static inline uint32_t flash_eccr_get_addr_ecc(void) { return (FLASH.ECCR & FLASH_ECCR_ADDR_ECC) >> 0 ; }
+static inline void flash_eccr_set_addr_ecc(uint32_t val) {
+	FLASH.ECCR = (FLASH.ECCR & ~FLASH_ECCR_ADDR_ECC) | ((val << 0) & FLASH_ECCR_ADDR_ECC);
+}
+static inline uint32_t flash_eccr_get_addr_ecc(void) { return (FLASH.ECCR & FLASH_ECCR_ADDR_ECC) >> 0; }
 
 // FLASH->OPTR Flash option register
 enum {
-	FLASH_OPTR_SRAM2_RST = 1UL<<25, // SRAM2 Erase when system reset
-	FLASH_OPTR_SRAM2_PE = 1UL<<24, // SRAM2 parity check enable
-	FLASH_OPTR_NBOOT1 = 1UL<<23, // Boot configuration
-	FLASH_OPTR_DUALBANK = 1UL<<21, // Dual-Bank on 512 KB or 256 KB Flash memory devices
-	FLASH_OPTR_BFB2 = 1UL<<20, // Dual-bank boot
-	FLASH_OPTR_WWDG_SW = 1UL<<19, // Window watchdog selection
-	FLASH_OPTR_IWDG_STDBY = 1UL<<18, // Independent watchdog counter freeze in Standby mode
-	FLASH_OPTR_IWDG_STOP = 1UL<<17, // Independent watchdog counter freeze in Stop mode
-	FLASH_OPTR_IDWG_SW = 1UL<<16, // Independent watchdog selection
-	FLASH_OPTR_NRST_STDBY = 1UL<<13, // nRST_STDBY
-	FLASH_OPTR_NRST_STOP = 1UL<<12, // nRST_STOP
-	FLASH_OPTR_BOR_LEV = ((1UL<<3)-1) << 8, // BOR reset Level
-	FLASH_OPTR_RDP = ((1UL<<8)-1) << 0, // Read protection level		
+	FLASH_OPTR_SRAM2_RST  = 1UL << 25,				// SRAM2 Erase when system reset
+	FLASH_OPTR_SRAM2_PE	  = 1UL << 24,				// SRAM2 parity check enable
+	FLASH_OPTR_NBOOT1	  = 1UL << 23,				// Boot configuration
+	FLASH_OPTR_DUALBANK	  = 1UL << 21,				// Dual-Bank on 512 KB or 256 KB Flash memory devices
+	FLASH_OPTR_BFB2		  = 1UL << 20,				// Dual-bank boot
+	FLASH_OPTR_WWDG_SW	  = 1UL << 19,				// Window watchdog selection
+	FLASH_OPTR_IWDG_STDBY = 1UL << 18,				// Independent watchdog counter freeze in Standby mode
+	FLASH_OPTR_IWDG_STOP  = 1UL << 17,				// Independent watchdog counter freeze in Stop mode
+	FLASH_OPTR_IDWG_SW	  = 1UL << 16,				// Independent watchdog selection
+	FLASH_OPTR_NRST_STDBY = 1UL << 13,				// nRST_STDBY
+	FLASH_OPTR_NRST_STOP  = 1UL << 12,				// nRST_STOP
+	FLASH_OPTR_BOR_LEV	  = ((1UL << 3) - 1) << 8,	// BOR reset Level
+	FLASH_OPTR_RDP		  = ((1UL << 8) - 1) << 0,	// Read protection level
 };
-static inline void flash_optr_set_bor_lev(uint32_t val) { FLASH.OPTR = (FLASH.OPTR & ~FLASH_OPTR_BOR_LEV) | ((val<<8) & FLASH_OPTR_BOR_LEV); }
-static inline void flash_optr_set_rdp(uint32_t val) { FLASH.OPTR = (FLASH.OPTR & ~FLASH_OPTR_RDP) | ((val<<0) & FLASH_OPTR_RDP); }
-static inline uint32_t flash_optr_get_bor_lev(void) { return (FLASH.OPTR & FLASH_OPTR_BOR_LEV) >> 8 ; }
-static inline uint32_t flash_optr_get_rdp(void) { return (FLASH.OPTR & FLASH_OPTR_RDP) >> 0 ; }
+static inline void flash_optr_set_bor_lev(uint32_t val) {
+	FLASH.OPTR = (FLASH.OPTR & ~FLASH_OPTR_BOR_LEV) | ((val << 8) & FLASH_OPTR_BOR_LEV);
+}
+static inline void flash_optr_set_rdp(uint32_t val) { FLASH.OPTR = (FLASH.OPTR & ~FLASH_OPTR_RDP) | ((val << 0) & FLASH_OPTR_RDP); }
+static inline uint32_t flash_optr_get_bor_lev(void) { return (FLASH.OPTR & FLASH_OPTR_BOR_LEV) >> 8; }
+static inline uint32_t flash_optr_get_rdp(void) { return (FLASH.OPTR & FLASH_OPTR_RDP) >> 0; }
 
 // FLASH->PCROP1ER Flash Bank 1 PCROP End address register
 enum {
-	FLASH_PCROP1ER_PCROP_RDP = 1UL<<31, // PCROP area preserved when RDP level decreased
-	FLASH_PCROP1ER_PCROP1_END = ((1UL<<16)-1) << 0, // Bank 1 PCROP area end offset		
+	FLASH_PCROP1ER_PCROP_RDP  = 1UL << 31,				 // PCROP area preserved when RDP level decreased
+	FLASH_PCROP1ER_PCROP1_END = ((1UL << 16) - 1) << 0,	 // Bank 1 PCROP area end offset
 };
-static inline void flash_pcrop1er_set_pcrop1_end(uint32_t val) { FLASH.PCROP1ER = (FLASH.PCROP1ER & ~FLASH_PCROP1ER_PCROP1_END) | ((val<<0) & FLASH_PCROP1ER_PCROP1_END); }
-static inline uint32_t flash_pcrop1er_get_pcrop1_end(void) { return (FLASH.PCROP1ER & FLASH_PCROP1ER_PCROP1_END) >> 0 ; }
+static inline void flash_pcrop1er_set_pcrop1_end(uint32_t val) {
+	FLASH.PCROP1ER = (FLASH.PCROP1ER & ~FLASH_PCROP1ER_PCROP1_END) | ((val << 0) & FLASH_PCROP1ER_PCROP1_END);
+}
+static inline uint32_t flash_pcrop1er_get_pcrop1_end(void) { return (FLASH.PCROP1ER & FLASH_PCROP1ER_PCROP1_END) >> 0; }
 
 // FLASH->WRP1AR Flash Bank 1 WRP area A address register
 enum {
-	FLASH_WRP1AR_WRP1A_END = ((1UL<<8)-1) << 16, // Bank 1 WRP first area A end offset
-	FLASH_WRP1AR_WRP1A_STRT = ((1UL<<8)-1) << 0, // Bank 1 WRP first area tart offset		
+	FLASH_WRP1AR_WRP1A_END	= ((1UL << 8) - 1) << 16,  // Bank 1 WRP first area A end offset
+	FLASH_WRP1AR_WRP1A_STRT = ((1UL << 8) - 1) << 0,   // Bank 1 WRP first area tart offset
 };
-static inline void flash_wrp1ar_set_wrp1a_end(uint32_t val) { FLASH.WRP1AR = (FLASH.WRP1AR & ~FLASH_WRP1AR_WRP1A_END) | ((val<<16) & FLASH_WRP1AR_WRP1A_END); }
-static inline void flash_wrp1ar_set_wrp1a_strt(uint32_t val) { FLASH.WRP1AR = (FLASH.WRP1AR & ~FLASH_WRP1AR_WRP1A_STRT) | ((val<<0) & FLASH_WRP1AR_WRP1A_STRT); }
-static inline uint32_t flash_wrp1ar_get_wrp1a_end(void) { return (FLASH.WRP1AR & FLASH_WRP1AR_WRP1A_END) >> 16 ; }
-static inline uint32_t flash_wrp1ar_get_wrp1a_strt(void) { return (FLASH.WRP1AR & FLASH_WRP1AR_WRP1A_STRT) >> 0 ; }
+static inline void flash_wrp1ar_set_wrp1a_end(uint32_t val) {
+	FLASH.WRP1AR = (FLASH.WRP1AR & ~FLASH_WRP1AR_WRP1A_END) | ((val << 16) & FLASH_WRP1AR_WRP1A_END);
+}
+static inline void flash_wrp1ar_set_wrp1a_strt(uint32_t val) {
+	FLASH.WRP1AR = (FLASH.WRP1AR & ~FLASH_WRP1AR_WRP1A_STRT) | ((val << 0) & FLASH_WRP1AR_WRP1A_STRT);
+}
+static inline uint32_t flash_wrp1ar_get_wrp1a_end(void) { return (FLASH.WRP1AR & FLASH_WRP1AR_WRP1A_END) >> 16; }
+static inline uint32_t flash_wrp1ar_get_wrp1a_strt(void) { return (FLASH.WRP1AR & FLASH_WRP1AR_WRP1A_STRT) >> 0; }
 
 // FLASH->WRP1BR Flash Bank 1 WRP area B address register
 enum {
-	FLASH_WRP1BR_WRP1B_STRT = ((1UL<<8)-1) << 16, // Bank 1 WRP second area B end offset
-	FLASH_WRP1BR_WRP1B_END = ((1UL<<8)-1) << 0, // Bank 1 WRP second area B start offset		
+	FLASH_WRP1BR_WRP1B_STRT = ((1UL << 8) - 1) << 16,  // Bank 1 WRP second area B end offset
+	FLASH_WRP1BR_WRP1B_END	= ((1UL << 8) - 1) << 0,   // Bank 1 WRP second area B start offset
 };
-static inline void flash_wrp1br_set_wrp1b_strt(uint32_t val) { FLASH.WRP1BR = (FLASH.WRP1BR & ~FLASH_WRP1BR_WRP1B_STRT) | ((val<<16) & FLASH_WRP1BR_WRP1B_STRT); }
-static inline void flash_wrp1br_set_wrp1b_end(uint32_t val) { FLASH.WRP1BR = (FLASH.WRP1BR & ~FLASH_WRP1BR_WRP1B_END) | ((val<<0) & FLASH_WRP1BR_WRP1B_END); }
-static inline uint32_t flash_wrp1br_get_wrp1b_strt(void) { return (FLASH.WRP1BR & FLASH_WRP1BR_WRP1B_STRT) >> 16 ; }
-static inline uint32_t flash_wrp1br_get_wrp1b_end(void) { return (FLASH.WRP1BR & FLASH_WRP1BR_WRP1B_END) >> 0 ; }
+static inline void flash_wrp1br_set_wrp1b_strt(uint32_t val) {
+	FLASH.WRP1BR = (FLASH.WRP1BR & ~FLASH_WRP1BR_WRP1B_STRT) | ((val << 16) & FLASH_WRP1BR_WRP1B_STRT);
+}
+static inline void flash_wrp1br_set_wrp1b_end(uint32_t val) {
+	FLASH.WRP1BR = (FLASH.WRP1BR & ~FLASH_WRP1BR_WRP1B_END) | ((val << 0) & FLASH_WRP1BR_WRP1B_END);
+}
+static inline uint32_t flash_wrp1br_get_wrp1b_strt(void) { return (FLASH.WRP1BR & FLASH_WRP1BR_WRP1B_STRT) >> 16; }
+static inline uint32_t flash_wrp1br_get_wrp1b_end(void) { return (FLASH.WRP1BR & FLASH_WRP1BR_WRP1B_END) >> 0; }
 
 // FLASH->WRP2AR Flash Bank 2 WRP area A address register
 enum {
-	FLASH_WRP2AR_WRP2A_END = ((1UL<<8)-1) << 16, // Bank 2 WRP first area A end offset
-	FLASH_WRP2AR_WRP2A_STRT = ((1UL<<8)-1) << 0, // Bank 2 WRP first area A start offset		
+	FLASH_WRP2AR_WRP2A_END	= ((1UL << 8) - 1) << 16,  // Bank 2 WRP first area A end offset
+	FLASH_WRP2AR_WRP2A_STRT = ((1UL << 8) - 1) << 0,   // Bank 2 WRP first area A start offset
 };
-static inline void flash_wrp2ar_set_wrp2a_end(uint32_t val) { FLASH.WRP2AR = (FLASH.WRP2AR & ~FLASH_WRP2AR_WRP2A_END) | ((val<<16) & FLASH_WRP2AR_WRP2A_END); }
-static inline void flash_wrp2ar_set_wrp2a_strt(uint32_t val) { FLASH.WRP2AR = (FLASH.WRP2AR & ~FLASH_WRP2AR_WRP2A_STRT) | ((val<<0) & FLASH_WRP2AR_WRP2A_STRT); }
-static inline uint32_t flash_wrp2ar_get_wrp2a_end(void) { return (FLASH.WRP2AR & FLASH_WRP2AR_WRP2A_END) >> 16 ; }
-static inline uint32_t flash_wrp2ar_get_wrp2a_strt(void) { return (FLASH.WRP2AR & FLASH_WRP2AR_WRP2A_STRT) >> 0 ; }
+static inline void flash_wrp2ar_set_wrp2a_end(uint32_t val) {
+	FLASH.WRP2AR = (FLASH.WRP2AR & ~FLASH_WRP2AR_WRP2A_END) | ((val << 16) & FLASH_WRP2AR_WRP2A_END);
+}
+static inline void flash_wrp2ar_set_wrp2a_strt(uint32_t val) {
+	FLASH.WRP2AR = (FLASH.WRP2AR & ~FLASH_WRP2AR_WRP2A_STRT) | ((val << 0) & FLASH_WRP2AR_WRP2A_STRT);
+}
+static inline uint32_t flash_wrp2ar_get_wrp2a_end(void) { return (FLASH.WRP2AR & FLASH_WRP2AR_WRP2A_END) >> 16; }
+static inline uint32_t flash_wrp2ar_get_wrp2a_strt(void) { return (FLASH.WRP2AR & FLASH_WRP2AR_WRP2A_STRT) >> 0; }
 
 // FLASH->WRP2BR Flash Bank 2 WRP area B address register
 enum {
-	FLASH_WRP2BR_WRP2B_END = ((1UL<<8)-1) << 16, // Bank 2 WRP second area B end offset
-	FLASH_WRP2BR_WRP2B_STRT = ((1UL<<8)-1) << 0, // Bank 2 WRP second area B start offset		
+	FLASH_WRP2BR_WRP2B_END	= ((1UL << 8) - 1) << 16,  // Bank 2 WRP second area B end offset
+	FLASH_WRP2BR_WRP2B_STRT = ((1UL << 8) - 1) << 0,   // Bank 2 WRP second area B start offset
 };
-static inline void flash_wrp2br_set_wrp2b_end(uint32_t val) { FLASH.WRP2BR = (FLASH.WRP2BR & ~FLASH_WRP2BR_WRP2B_END) | ((val<<16) & FLASH_WRP2BR_WRP2B_END); }
-static inline void flash_wrp2br_set_wrp2b_strt(uint32_t val) { FLASH.WRP2BR = (FLASH.WRP2BR & ~FLASH_WRP2BR_WRP2B_STRT) | ((val<<0) & FLASH_WRP2BR_WRP2B_STRT); }
-static inline uint32_t flash_wrp2br_get_wrp2b_end(void) { return (FLASH.WRP2BR & FLASH_WRP2BR_WRP2B_END) >> 16 ; }
-static inline uint32_t flash_wrp2br_get_wrp2b_strt(void) { return (FLASH.WRP2BR & FLASH_WRP2BR_WRP2B_STRT) >> 0 ; }
+static inline void flash_wrp2br_set_wrp2b_end(uint32_t val) {
+	FLASH.WRP2BR = (FLASH.WRP2BR & ~FLASH_WRP2BR_WRP2B_END) | ((val << 16) & FLASH_WRP2BR_WRP2B_END);
+}
+static inline void flash_wrp2br_set_wrp2b_strt(uint32_t val) {
+	FLASH.WRP2BR = (FLASH.WRP2BR & ~FLASH_WRP2BR_WRP2B_STRT) | ((val << 0) & FLASH_WRP2BR_WRP2B_STRT);
+}
+static inline uint32_t flash_wrp2br_get_wrp2b_end(void) { return (FLASH.WRP2BR & FLASH_WRP2BR_WRP2B_END) >> 16; }
+static inline uint32_t flash_wrp2br_get_wrp2b_strt(void) { return (FLASH.WRP2BR & FLASH_WRP2BR_WRP2B_STRT) >> 0; }
 
 /* Floating point unit CPACR
 There is only one peripheral of type FPU_CPACR. */
 struct FPU_CPACR_Type {
-	__IO uint32_t CPACR; // @0 Coprocessor access control register
+	__IO uint32_t CPACR;  // @0 Coprocessor access control register
 };
-extern struct FPU_CPACR_Type	FPU_CPACR;	// @0xE000ED88 
+extern struct FPU_CPACR_Type FPU_CPACR;	 // @0xE000ED88
 
 // FPU_CPACR->CPACR Coprocessor access control register
 enum {
-	FPU_CPACR_CPACR_CP = ((1UL<<4)-1) << 20, // CP		
+	FPU_CPACR_CPACR_CP = ((1UL << 4) - 1) << 20,  // CP
 };
-static inline void fpu_cpacr_cpacr_set_cp(uint32_t val) { FPU_CPACR.CPACR = (FPU_CPACR.CPACR & ~FPU_CPACR_CPACR_CP) | ((val<<20) & FPU_CPACR_CPACR_CP); }
-static inline uint32_t fpu_cpacr_cpacr_get_cp(void) { return (FPU_CPACR.CPACR & FPU_CPACR_CPACR_CP) >> 20 ; }
+static inline void fpu_cpacr_cpacr_set_cp(uint32_t val) {
+	FPU_CPACR.CPACR = (FPU_CPACR.CPACR & ~FPU_CPACR_CPACR_CP) | ((val << 20) & FPU_CPACR_CPACR_CP);
+}
+static inline uint32_t fpu_cpacr_cpacr_get_cp(void) { return (FPU_CPACR.CPACR & FPU_CPACR_CPACR_CP) >> 20; }
 
 /* General-purpose I/Os */
 struct GPIOE_Type {
-	__IO uint32_t MODER; // @0 GPIO port mode register
-	__IO uint16_t OTYPER; // @4 GPIO port output type register
-	 uint8_t RESERVED0[2]; // @6 
-	__IO uint32_t OSPEEDR; // @8 GPIO port output speed register
-	__IO uint32_t PUPDR; // @12 GPIO port pull-up/pull-down register
-	__I uint16_t IDR; // @16 GPIO port input data register
-	 uint8_t RESERVED1[2]; // @18 
-	__IO uint16_t ODR; // @20 GPIO port output data register
-	 uint8_t RESERVED2[2]; // @22 
-	__O uint32_t BSRR; // @24 GPIO port bit set/reset register
-	__IO uint32_t LCKR; // @28 GPIO port configuration lock register
-	__IO uint32_t AFRL; // @32 GPIO alternate function low register
-	__IO uint32_t AFRH; // @36 GPIO alternate function high register
+	__IO uint32_t MODER;		 // @0 GPIO port mode register
+	__IO uint16_t OTYPER;		 // @4 GPIO port output type register
+	uint8_t		  RESERVED0[2];	 // @6
+	__IO uint32_t OSPEEDR;		 // @8 GPIO port output speed register
+	__IO uint32_t PUPDR;		 // @12 GPIO port pull-up/pull-down register
+	__I uint16_t  IDR;			 // @16 GPIO port input data register
+	uint8_t		  RESERVED1[2];	 // @18
+	__IO uint16_t ODR;			 // @20 GPIO port output data register
+	uint8_t		  RESERVED2[2];	 // @22
+	__O uint32_t  BSRR;			 // @24 GPIO port bit set/reset register
+	__IO uint32_t LCKR;			 // @28 GPIO port configuration lock register
+	__IO uint32_t AFRL;			 // @32 GPIO alternate function low register
+	__IO uint32_t AFRH;			 // @36 GPIO alternate function high register
 };
-extern struct GPIOE_Type	GPIOA;	// @0x48000000 
-extern struct GPIOE_Type 	GPIOB;	// @0x48000400
-extern struct GPIOE_Type 	GPIOC;	// @0x48000800
-extern struct GPIOE_Type 	GPIOD;	// @0x48000C00
-extern struct GPIOE_Type 	GPIOE;	// @0x48001000
-extern struct GPIOE_Type 	GPIOH;	// @0x48001C00
+extern struct GPIOE_Type GPIOA;	 // @0x48000000
+extern struct GPIOE_Type GPIOB;	 // @0x48000400
+extern struct GPIOE_Type GPIOC;	 // @0x48000800
+extern struct GPIOE_Type GPIOD;	 // @0x48000C00
+extern struct GPIOE_Type GPIOE;	 // @0x48001000
+extern struct GPIOE_Type GPIOH;	 // @0x48001C00
 
 // GPIOE->MODER GPIO port mode register
 enum {
-	GPIOE_MODER_MODER15 = ((1UL<<2)-1) << 30, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER14 = ((1UL<<2)-1) << 28, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER13 = ((1UL<<2)-1) << 26, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER12 = ((1UL<<2)-1) << 24, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER11 = ((1UL<<2)-1) << 22, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER10 = ((1UL<<2)-1) << 20, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER9 = ((1UL<<2)-1) << 18, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER8 = ((1UL<<2)-1) << 16, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER7 = ((1UL<<2)-1) << 14, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER6 = ((1UL<<2)-1) << 12, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER5 = ((1UL<<2)-1) << 10, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER4 = ((1UL<<2)-1) << 8, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER3 = ((1UL<<2)-1) << 6, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER2 = ((1UL<<2)-1) << 4, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER1 = ((1UL<<2)-1) << 2, // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER0 = ((1UL<<2)-1) << 0, // Port x configuration bits (y = 0..15)		
+	GPIOE_MODER_MODER15 = ((1UL << 2) - 1) << 30,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER14 = ((1UL << 2) - 1) << 28,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER13 = ((1UL << 2) - 1) << 26,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER12 = ((1UL << 2) - 1) << 24,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER11 = ((1UL << 2) - 1) << 22,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER10 = ((1UL << 2) - 1) << 20,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER9	= ((1UL << 2) - 1) << 18,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER8	= ((1UL << 2) - 1) << 16,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER7	= ((1UL << 2) - 1) << 14,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER6	= ((1UL << 2) - 1) << 12,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER5	= ((1UL << 2) - 1) << 10,  // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER4	= ((1UL << 2) - 1) << 8,   // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER3	= ((1UL << 2) - 1) << 6,   // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER2	= ((1UL << 2) - 1) << 4,   // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER1	= ((1UL << 2) - 1) << 2,   // Port x configuration bits (y = 0..15)
+	GPIOE_MODER_MODER0	= ((1UL << 2) - 1) << 0,   // Port x configuration bits (y = 0..15)
 };
-static inline void gpioe_moder_set_moder15(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER15) | ((val<<30) & GPIOE_MODER_MODER15); }
-static inline void gpioe_moder_set_moder14(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER14) | ((val<<28) & GPIOE_MODER_MODER14); }
-static inline void gpioe_moder_set_moder13(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER13) | ((val<<26) & GPIOE_MODER_MODER13); }
-static inline void gpioe_moder_set_moder12(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER12) | ((val<<24) & GPIOE_MODER_MODER12); }
-static inline void gpioe_moder_set_moder11(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER11) | ((val<<22) & GPIOE_MODER_MODER11); }
-static inline void gpioe_moder_set_moder10(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER10) | ((val<<20) & GPIOE_MODER_MODER10); }
-static inline void gpioe_moder_set_moder9(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER9) | ((val<<18) & GPIOE_MODER_MODER9); }
-static inline void gpioe_moder_set_moder8(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER8) | ((val<<16) & GPIOE_MODER_MODER8); }
-static inline void gpioe_moder_set_moder7(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER7) | ((val<<14) & GPIOE_MODER_MODER7); }
-static inline void gpioe_moder_set_moder6(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER6) | ((val<<12) & GPIOE_MODER_MODER6); }
-static inline void gpioe_moder_set_moder5(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER5) | ((val<<10) & GPIOE_MODER_MODER5); }
-static inline void gpioe_moder_set_moder4(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER4) | ((val<<8) & GPIOE_MODER_MODER4); }
-static inline void gpioe_moder_set_moder3(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER3) | ((val<<6) & GPIOE_MODER_MODER3); }
-static inline void gpioe_moder_set_moder2(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER2) | ((val<<4) & GPIOE_MODER_MODER2); }
-static inline void gpioe_moder_set_moder1(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER1) | ((val<<2) & GPIOE_MODER_MODER1); }
-static inline void gpioe_moder_set_moder0(struct GPIOE_Type* p, uint32_t val) { p->MODER = (p->MODER & ~GPIOE_MODER_MODER0) | ((val<<0) & GPIOE_MODER_MODER0); }
-static inline uint32_t gpioe_moder_get_moder15(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER15) >> 30 ; }
-static inline uint32_t gpioe_moder_get_moder14(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER14) >> 28 ; }
-static inline uint32_t gpioe_moder_get_moder13(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER13) >> 26 ; }
-static inline uint32_t gpioe_moder_get_moder12(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER12) >> 24 ; }
-static inline uint32_t gpioe_moder_get_moder11(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER11) >> 22 ; }
-static inline uint32_t gpioe_moder_get_moder10(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER10) >> 20 ; }
-static inline uint32_t gpioe_moder_get_moder9(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER9) >> 18 ; }
-static inline uint32_t gpioe_moder_get_moder8(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER8) >> 16 ; }
-static inline uint32_t gpioe_moder_get_moder7(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER7) >> 14 ; }
-static inline uint32_t gpioe_moder_get_moder6(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER6) >> 12 ; }
-static inline uint32_t gpioe_moder_get_moder5(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER5) >> 10 ; }
-static inline uint32_t gpioe_moder_get_moder4(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER4) >> 8 ; }
-static inline uint32_t gpioe_moder_get_moder3(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER3) >> 6 ; }
-static inline uint32_t gpioe_moder_get_moder2(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER2) >> 4 ; }
-static inline uint32_t gpioe_moder_get_moder1(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER1) >> 2 ; }
-static inline uint32_t gpioe_moder_get_moder0(struct GPIOE_Type* p) { return (p->MODER & GPIOE_MODER_MODER0) >> 0 ; }
+static inline void gpioe_moder_set_moder15(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER15) | ((val << 30) & GPIOE_MODER_MODER15);
+}
+static inline void gpioe_moder_set_moder14(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER14) | ((val << 28) & GPIOE_MODER_MODER14);
+}
+static inline void gpioe_moder_set_moder13(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER13) | ((val << 26) & GPIOE_MODER_MODER13);
+}
+static inline void gpioe_moder_set_moder12(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER12) | ((val << 24) & GPIOE_MODER_MODER12);
+}
+static inline void gpioe_moder_set_moder11(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER11) | ((val << 22) & GPIOE_MODER_MODER11);
+}
+static inline void gpioe_moder_set_moder10(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER10) | ((val << 20) & GPIOE_MODER_MODER10);
+}
+static inline void gpioe_moder_set_moder9(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER9) | ((val << 18) & GPIOE_MODER_MODER9);
+}
+static inline void gpioe_moder_set_moder8(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER8) | ((val << 16) & GPIOE_MODER_MODER8);
+}
+static inline void gpioe_moder_set_moder7(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER7) | ((val << 14) & GPIOE_MODER_MODER7);
+}
+static inline void gpioe_moder_set_moder6(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER6) | ((val << 12) & GPIOE_MODER_MODER6);
+}
+static inline void gpioe_moder_set_moder5(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER5) | ((val << 10) & GPIOE_MODER_MODER5);
+}
+static inline void gpioe_moder_set_moder4(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER4) | ((val << 8) & GPIOE_MODER_MODER4);
+}
+static inline void gpioe_moder_set_moder3(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER3) | ((val << 6) & GPIOE_MODER_MODER3);
+}
+static inline void gpioe_moder_set_moder2(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER2) | ((val << 4) & GPIOE_MODER_MODER2);
+}
+static inline void gpioe_moder_set_moder1(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER1) | ((val << 2) & GPIOE_MODER_MODER1);
+}
+static inline void gpioe_moder_set_moder0(struct GPIOE_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOE_MODER_MODER0) | ((val << 0) & GPIOE_MODER_MODER0);
+}
+static inline uint32_t gpioe_moder_get_moder15(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER15) >> 30; }
+static inline uint32_t gpioe_moder_get_moder14(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER14) >> 28; }
+static inline uint32_t gpioe_moder_get_moder13(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER13) >> 26; }
+static inline uint32_t gpioe_moder_get_moder12(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER12) >> 24; }
+static inline uint32_t gpioe_moder_get_moder11(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER11) >> 22; }
+static inline uint32_t gpioe_moder_get_moder10(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER10) >> 20; }
+static inline uint32_t gpioe_moder_get_moder9(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER9) >> 18; }
+static inline uint32_t gpioe_moder_get_moder8(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER8) >> 16; }
+static inline uint32_t gpioe_moder_get_moder7(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER7) >> 14; }
+static inline uint32_t gpioe_moder_get_moder6(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER6) >> 12; }
+static inline uint32_t gpioe_moder_get_moder5(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER5) >> 10; }
+static inline uint32_t gpioe_moder_get_moder4(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER4) >> 8; }
+static inline uint32_t gpioe_moder_get_moder3(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER3) >> 6; }
+static inline uint32_t gpioe_moder_get_moder2(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER2) >> 4; }
+static inline uint32_t gpioe_moder_get_moder1(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER1) >> 2; }
+static inline uint32_t gpioe_moder_get_moder0(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER0) >> 0; }
 
 // GPIOE->OSPEEDR GPIO port output speed register
 enum {
-	GPIOE_OSPEEDR_OSPEEDR15 = ((1UL<<2)-1) << 30, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR14 = ((1UL<<2)-1) << 28, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR13 = ((1UL<<2)-1) << 26, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR12 = ((1UL<<2)-1) << 24, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR11 = ((1UL<<2)-1) << 22, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR10 = ((1UL<<2)-1) << 20, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR9 = ((1UL<<2)-1) << 18, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR8 = ((1UL<<2)-1) << 16, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR7 = ((1UL<<2)-1) << 14, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR6 = ((1UL<<2)-1) << 12, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR5 = ((1UL<<2)-1) << 10, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR4 = ((1UL<<2)-1) << 8, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR3 = ((1UL<<2)-1) << 6, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR2 = ((1UL<<2)-1) << 4, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR1 = ((1UL<<2)-1) << 2, // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR0 = ((1UL<<2)-1) << 0, // Port x configuration bits (y = 0..15)		
+	GPIOE_OSPEEDR_OSPEEDR15 = ((1UL << 2) - 1) << 30,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR14 = ((1UL << 2) - 1) << 28,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR13 = ((1UL << 2) - 1) << 26,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR12 = ((1UL << 2) - 1) << 24,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR11 = ((1UL << 2) - 1) << 22,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR10 = ((1UL << 2) - 1) << 20,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR9	= ((1UL << 2) - 1) << 18,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR8	= ((1UL << 2) - 1) << 16,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR7	= ((1UL << 2) - 1) << 14,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR6	= ((1UL << 2) - 1) << 12,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR5	= ((1UL << 2) - 1) << 10,  // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR4	= ((1UL << 2) - 1) << 8,   // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR3	= ((1UL << 2) - 1) << 6,   // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR2	= ((1UL << 2) - 1) << 4,   // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR1	= ((1UL << 2) - 1) << 2,   // Port x configuration bits (y = 0..15)
+	GPIOE_OSPEEDR_OSPEEDR0	= ((1UL << 2) - 1) << 0,   // Port x configuration bits (y = 0..15)
 };
-static inline void gpioe_ospeedr_set_ospeedr15(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR15) | ((val<<30) & GPIOE_OSPEEDR_OSPEEDR15); }
-static inline void gpioe_ospeedr_set_ospeedr14(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR14) | ((val<<28) & GPIOE_OSPEEDR_OSPEEDR14); }
-static inline void gpioe_ospeedr_set_ospeedr13(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR13) | ((val<<26) & GPIOE_OSPEEDR_OSPEEDR13); }
-static inline void gpioe_ospeedr_set_ospeedr12(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR12) | ((val<<24) & GPIOE_OSPEEDR_OSPEEDR12); }
-static inline void gpioe_ospeedr_set_ospeedr11(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR11) | ((val<<22) & GPIOE_OSPEEDR_OSPEEDR11); }
-static inline void gpioe_ospeedr_set_ospeedr10(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR10) | ((val<<20) & GPIOE_OSPEEDR_OSPEEDR10); }
-static inline void gpioe_ospeedr_set_ospeedr9(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR9) | ((val<<18) & GPIOE_OSPEEDR_OSPEEDR9); }
-static inline void gpioe_ospeedr_set_ospeedr8(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR8) | ((val<<16) & GPIOE_OSPEEDR_OSPEEDR8); }
-static inline void gpioe_ospeedr_set_ospeedr7(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR7) | ((val<<14) & GPIOE_OSPEEDR_OSPEEDR7); }
-static inline void gpioe_ospeedr_set_ospeedr6(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR6) | ((val<<12) & GPIOE_OSPEEDR_OSPEEDR6); }
-static inline void gpioe_ospeedr_set_ospeedr5(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR5) | ((val<<10) & GPIOE_OSPEEDR_OSPEEDR5); }
-static inline void gpioe_ospeedr_set_ospeedr4(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR4) | ((val<<8) & GPIOE_OSPEEDR_OSPEEDR4); }
-static inline void gpioe_ospeedr_set_ospeedr3(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR3) | ((val<<6) & GPIOE_OSPEEDR_OSPEEDR3); }
-static inline void gpioe_ospeedr_set_ospeedr2(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR2) | ((val<<4) & GPIOE_OSPEEDR_OSPEEDR2); }
-static inline void gpioe_ospeedr_set_ospeedr1(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR1) | ((val<<2) & GPIOE_OSPEEDR_OSPEEDR1); }
-static inline void gpioe_ospeedr_set_ospeedr0(struct GPIOE_Type* p, uint32_t val) { p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR0) | ((val<<0) & GPIOE_OSPEEDR_OSPEEDR0); }
-static inline uint32_t gpioe_ospeedr_get_ospeedr15(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR15) >> 30 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr14(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR14) >> 28 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr13(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR13) >> 26 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr12(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR12) >> 24 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr11(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR11) >> 22 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr10(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR10) >> 20 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr9(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR9) >> 18 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr8(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR8) >> 16 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr7(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR7) >> 14 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr6(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR6) >> 12 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr5(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR5) >> 10 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr4(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR4) >> 8 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr3(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR3) >> 6 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr2(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR2) >> 4 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr1(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR1) >> 2 ; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr0(struct GPIOE_Type* p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR0) >> 0 ; }
+static inline void gpioe_ospeedr_set_ospeedr15(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR15) | ((val << 30) & GPIOE_OSPEEDR_OSPEEDR15);
+}
+static inline void gpioe_ospeedr_set_ospeedr14(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR14) | ((val << 28) & GPIOE_OSPEEDR_OSPEEDR14);
+}
+static inline void gpioe_ospeedr_set_ospeedr13(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR13) | ((val << 26) & GPIOE_OSPEEDR_OSPEEDR13);
+}
+static inline void gpioe_ospeedr_set_ospeedr12(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR12) | ((val << 24) & GPIOE_OSPEEDR_OSPEEDR12);
+}
+static inline void gpioe_ospeedr_set_ospeedr11(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR11) | ((val << 22) & GPIOE_OSPEEDR_OSPEEDR11);
+}
+static inline void gpioe_ospeedr_set_ospeedr10(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR10) | ((val << 20) & GPIOE_OSPEEDR_OSPEEDR10);
+}
+static inline void gpioe_ospeedr_set_ospeedr9(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR9) | ((val << 18) & GPIOE_OSPEEDR_OSPEEDR9);
+}
+static inline void gpioe_ospeedr_set_ospeedr8(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR8) | ((val << 16) & GPIOE_OSPEEDR_OSPEEDR8);
+}
+static inline void gpioe_ospeedr_set_ospeedr7(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR7) | ((val << 14) & GPIOE_OSPEEDR_OSPEEDR7);
+}
+static inline void gpioe_ospeedr_set_ospeedr6(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR6) | ((val << 12) & GPIOE_OSPEEDR_OSPEEDR6);
+}
+static inline void gpioe_ospeedr_set_ospeedr5(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR5) | ((val << 10) & GPIOE_OSPEEDR_OSPEEDR5);
+}
+static inline void gpioe_ospeedr_set_ospeedr4(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR4) | ((val << 8) & GPIOE_OSPEEDR_OSPEEDR4);
+}
+static inline void gpioe_ospeedr_set_ospeedr3(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR3) | ((val << 6) & GPIOE_OSPEEDR_OSPEEDR3);
+}
+static inline void gpioe_ospeedr_set_ospeedr2(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR2) | ((val << 4) & GPIOE_OSPEEDR_OSPEEDR2);
+}
+static inline void gpioe_ospeedr_set_ospeedr1(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR1) | ((val << 2) & GPIOE_OSPEEDR_OSPEEDR1);
+}
+static inline void gpioe_ospeedr_set_ospeedr0(struct GPIOE_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR0) | ((val << 0) & GPIOE_OSPEEDR_OSPEEDR0);
+}
+static inline uint32_t gpioe_ospeedr_get_ospeedr15(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR15) >> 30; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr14(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR14) >> 28; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr13(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR13) >> 26; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr12(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR12) >> 24; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr11(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR11) >> 22; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr10(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR10) >> 20; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr9(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR9) >> 18; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr8(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR8) >> 16; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr7(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR7) >> 14; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr6(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR6) >> 12; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr5(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR5) >> 10; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr4(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR4) >> 8; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr3(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR3) >> 6; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr2(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR2) >> 4; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr1(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR1) >> 2; }
+static inline uint32_t gpioe_ospeedr_get_ospeedr0(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR0) >> 0; }
 
 // GPIOE->PUPDR GPIO port pull-up/pull-down register
 enum {
-	GPIOE_PUPDR_PUPDR15 = ((1UL<<2)-1) << 30, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR14 = ((1UL<<2)-1) << 28, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR13 = ((1UL<<2)-1) << 26, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR12 = ((1UL<<2)-1) << 24, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR11 = ((1UL<<2)-1) << 22, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR10 = ((1UL<<2)-1) << 20, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR9 = ((1UL<<2)-1) << 18, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR8 = ((1UL<<2)-1) << 16, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR7 = ((1UL<<2)-1) << 14, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR6 = ((1UL<<2)-1) << 12, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR5 = ((1UL<<2)-1) << 10, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR4 = ((1UL<<2)-1) << 8, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR3 = ((1UL<<2)-1) << 6, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR2 = ((1UL<<2)-1) << 4, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR1 = ((1UL<<2)-1) << 2, // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR0 = ((1UL<<2)-1) << 0, // Port x configuration bits (y = 0..15)		
+	GPIOE_PUPDR_PUPDR15 = ((1UL << 2) - 1) << 30,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR14 = ((1UL << 2) - 1) << 28,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR13 = ((1UL << 2) - 1) << 26,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR12 = ((1UL << 2) - 1) << 24,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR11 = ((1UL << 2) - 1) << 22,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR10 = ((1UL << 2) - 1) << 20,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR9	= ((1UL << 2) - 1) << 18,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR8	= ((1UL << 2) - 1) << 16,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR7	= ((1UL << 2) - 1) << 14,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR6	= ((1UL << 2) - 1) << 12,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR5	= ((1UL << 2) - 1) << 10,  // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR4	= ((1UL << 2) - 1) << 8,   // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR3	= ((1UL << 2) - 1) << 6,   // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR2	= ((1UL << 2) - 1) << 4,   // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR1	= ((1UL << 2) - 1) << 2,   // Port x configuration bits (y = 0..15)
+	GPIOE_PUPDR_PUPDR0	= ((1UL << 2) - 1) << 0,   // Port x configuration bits (y = 0..15)
 };
-static inline void gpioe_pupdr_set_pupdr15(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR15) | ((val<<30) & GPIOE_PUPDR_PUPDR15); }
-static inline void gpioe_pupdr_set_pupdr14(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR14) | ((val<<28) & GPIOE_PUPDR_PUPDR14); }
-static inline void gpioe_pupdr_set_pupdr13(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR13) | ((val<<26) & GPIOE_PUPDR_PUPDR13); }
-static inline void gpioe_pupdr_set_pupdr12(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR12) | ((val<<24) & GPIOE_PUPDR_PUPDR12); }
-static inline void gpioe_pupdr_set_pupdr11(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR11) | ((val<<22) & GPIOE_PUPDR_PUPDR11); }
-static inline void gpioe_pupdr_set_pupdr10(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR10) | ((val<<20) & GPIOE_PUPDR_PUPDR10); }
-static inline void gpioe_pupdr_set_pupdr9(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR9) | ((val<<18) & GPIOE_PUPDR_PUPDR9); }
-static inline void gpioe_pupdr_set_pupdr8(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR8) | ((val<<16) & GPIOE_PUPDR_PUPDR8); }
-static inline void gpioe_pupdr_set_pupdr7(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR7) | ((val<<14) & GPIOE_PUPDR_PUPDR7); }
-static inline void gpioe_pupdr_set_pupdr6(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR6) | ((val<<12) & GPIOE_PUPDR_PUPDR6); }
-static inline void gpioe_pupdr_set_pupdr5(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR5) | ((val<<10) & GPIOE_PUPDR_PUPDR5); }
-static inline void gpioe_pupdr_set_pupdr4(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR4) | ((val<<8) & GPIOE_PUPDR_PUPDR4); }
-static inline void gpioe_pupdr_set_pupdr3(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR3) | ((val<<6) & GPIOE_PUPDR_PUPDR3); }
-static inline void gpioe_pupdr_set_pupdr2(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR2) | ((val<<4) & GPIOE_PUPDR_PUPDR2); }
-static inline void gpioe_pupdr_set_pupdr1(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR1) | ((val<<2) & GPIOE_PUPDR_PUPDR1); }
-static inline void gpioe_pupdr_set_pupdr0(struct GPIOE_Type* p, uint32_t val) { p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR0) | ((val<<0) & GPIOE_PUPDR_PUPDR0); }
-static inline uint32_t gpioe_pupdr_get_pupdr15(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR15) >> 30 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr14(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR14) >> 28 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr13(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR13) >> 26 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr12(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR12) >> 24 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr11(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR11) >> 22 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr10(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR10) >> 20 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr9(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR9) >> 18 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr8(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR8) >> 16 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr7(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR7) >> 14 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr6(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR6) >> 12 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr5(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR5) >> 10 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr4(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR4) >> 8 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr3(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR3) >> 6 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr2(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR2) >> 4 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr1(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR1) >> 2 ; }
-static inline uint32_t gpioe_pupdr_get_pupdr0(struct GPIOE_Type* p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR0) >> 0 ; }
+static inline void gpioe_pupdr_set_pupdr15(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR15) | ((val << 30) & GPIOE_PUPDR_PUPDR15);
+}
+static inline void gpioe_pupdr_set_pupdr14(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR14) | ((val << 28) & GPIOE_PUPDR_PUPDR14);
+}
+static inline void gpioe_pupdr_set_pupdr13(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR13) | ((val << 26) & GPIOE_PUPDR_PUPDR13);
+}
+static inline void gpioe_pupdr_set_pupdr12(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR12) | ((val << 24) & GPIOE_PUPDR_PUPDR12);
+}
+static inline void gpioe_pupdr_set_pupdr11(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR11) | ((val << 22) & GPIOE_PUPDR_PUPDR11);
+}
+static inline void gpioe_pupdr_set_pupdr10(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR10) | ((val << 20) & GPIOE_PUPDR_PUPDR10);
+}
+static inline void gpioe_pupdr_set_pupdr9(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR9) | ((val << 18) & GPIOE_PUPDR_PUPDR9);
+}
+static inline void gpioe_pupdr_set_pupdr8(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR8) | ((val << 16) & GPIOE_PUPDR_PUPDR8);
+}
+static inline void gpioe_pupdr_set_pupdr7(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR7) | ((val << 14) & GPIOE_PUPDR_PUPDR7);
+}
+static inline void gpioe_pupdr_set_pupdr6(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR6) | ((val << 12) & GPIOE_PUPDR_PUPDR6);
+}
+static inline void gpioe_pupdr_set_pupdr5(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR5) | ((val << 10) & GPIOE_PUPDR_PUPDR5);
+}
+static inline void gpioe_pupdr_set_pupdr4(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR4) | ((val << 8) & GPIOE_PUPDR_PUPDR4);
+}
+static inline void gpioe_pupdr_set_pupdr3(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR3) | ((val << 6) & GPIOE_PUPDR_PUPDR3);
+}
+static inline void gpioe_pupdr_set_pupdr2(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR2) | ((val << 4) & GPIOE_PUPDR_PUPDR2);
+}
+static inline void gpioe_pupdr_set_pupdr1(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR1) | ((val << 2) & GPIOE_PUPDR_PUPDR1);
+}
+static inline void gpioe_pupdr_set_pupdr0(struct GPIOE_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR0) | ((val << 0) & GPIOE_PUPDR_PUPDR0);
+}
+static inline uint32_t gpioe_pupdr_get_pupdr15(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR15) >> 30; }
+static inline uint32_t gpioe_pupdr_get_pupdr14(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR14) >> 28; }
+static inline uint32_t gpioe_pupdr_get_pupdr13(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR13) >> 26; }
+static inline uint32_t gpioe_pupdr_get_pupdr12(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR12) >> 24; }
+static inline uint32_t gpioe_pupdr_get_pupdr11(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR11) >> 22; }
+static inline uint32_t gpioe_pupdr_get_pupdr10(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR10) >> 20; }
+static inline uint32_t gpioe_pupdr_get_pupdr9(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR9) >> 18; }
+static inline uint32_t gpioe_pupdr_get_pupdr8(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR8) >> 16; }
+static inline uint32_t gpioe_pupdr_get_pupdr7(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR7) >> 14; }
+static inline uint32_t gpioe_pupdr_get_pupdr6(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR6) >> 12; }
+static inline uint32_t gpioe_pupdr_get_pupdr5(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR5) >> 10; }
+static inline uint32_t gpioe_pupdr_get_pupdr4(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR4) >> 8; }
+static inline uint32_t gpioe_pupdr_get_pupdr3(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR3) >> 6; }
+static inline uint32_t gpioe_pupdr_get_pupdr2(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR2) >> 4; }
+static inline uint32_t gpioe_pupdr_get_pupdr1(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR1) >> 2; }
+static inline uint32_t gpioe_pupdr_get_pupdr0(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR0) >> 0; }
 
 // GPIOE->BSRR GPIO port bit set/reset register
 enum {
-	GPIOE_BSRR_BR15 = 1UL<<31, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR14 = 1UL<<30, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR13 = 1UL<<29, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR12 = 1UL<<28, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR11 = 1UL<<27, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR10 = 1UL<<26, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR9 = 1UL<<25, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR8 = 1UL<<24, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR7 = 1UL<<23, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR6 = 1UL<<22, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR5 = 1UL<<21, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR4 = 1UL<<20, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR3 = 1UL<<19, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR2 = 1UL<<18, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR1 = 1UL<<17, // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR0 = 1UL<<16, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS15 = 1UL<<15, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS14 = 1UL<<14, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS13 = 1UL<<13, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS12 = 1UL<<12, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS11 = 1UL<<11, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS10 = 1UL<<10, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS9 = 1UL<<9, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS8 = 1UL<<8, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS7 = 1UL<<7, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS6 = 1UL<<6, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS5 = 1UL<<5, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS4 = 1UL<<4, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS3 = 1UL<<3, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS2 = 1UL<<2, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS1 = 1UL<<1, // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS0 = 1UL<<0, // Port x set bit y (y= 0..15)		
+	GPIOE_BSRR_BR15 = 1UL << 31,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR14 = 1UL << 30,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR13 = 1UL << 29,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR12 = 1UL << 28,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR11 = 1UL << 27,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR10 = 1UL << 26,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR9	= 1UL << 25,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR8	= 1UL << 24,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR7	= 1UL << 23,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR6	= 1UL << 22,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR5	= 1UL << 21,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR4	= 1UL << 20,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR3	= 1UL << 19,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR2	= 1UL << 18,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR1	= 1UL << 17,  // Port x reset bit y (y = 0..15)
+	GPIOE_BSRR_BR0	= 1UL << 16,  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS15 = 1UL << 15,  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS14 = 1UL << 14,  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS13 = 1UL << 13,  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS12 = 1UL << 12,  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS11 = 1UL << 11,  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS10 = 1UL << 10,  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS9	= 1UL << 9,	  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS8	= 1UL << 8,	  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS7	= 1UL << 7,	  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS6	= 1UL << 6,	  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS5	= 1UL << 5,	  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS4	= 1UL << 4,	  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS3	= 1UL << 3,	  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS2	= 1UL << 2,	  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS1	= 1UL << 1,	  // Port x set bit y (y= 0..15)
+	GPIOE_BSRR_BS0	= 1UL << 0,	  // Port x set bit y (y= 0..15)
 };
 
 // GPIOE->LCKR GPIO port configuration lock register
 enum {
-	GPIOE_LCKR_LCKK = 1UL<<16, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK15 = 1UL<<15, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK14 = 1UL<<14, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK13 = 1UL<<13, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK12 = 1UL<<12, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK11 = 1UL<<11, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK10 = 1UL<<10, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK9 = 1UL<<9, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK8 = 1UL<<8, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK7 = 1UL<<7, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK6 = 1UL<<6, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK5 = 1UL<<5, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK4 = 1UL<<4, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK3 = 1UL<<3, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK2 = 1UL<<2, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK1 = 1UL<<1, // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK0 = 1UL<<0, // Port x lock bit y (y= 0..15)		
+	GPIOE_LCKR_LCKK	 = 1UL << 16,  // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK15 = 1UL << 15,  // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK14 = 1UL << 14,  // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK13 = 1UL << 13,  // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK12 = 1UL << 12,  // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK11 = 1UL << 11,  // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK10 = 1UL << 10,  // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK9	 = 1UL << 9,   // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK8	 = 1UL << 8,   // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK7	 = 1UL << 7,   // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK6	 = 1UL << 6,   // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK5	 = 1UL << 5,   // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK4	 = 1UL << 4,   // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK3	 = 1UL << 3,   // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK2	 = 1UL << 2,   // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK1	 = 1UL << 1,   // Port x lock bit y (y= 0..15)
+	GPIOE_LCKR_LCK0	 = 1UL << 0,   // Port x lock bit y (y= 0..15)
 };
 
 // GPIOE->AFRL GPIO alternate function low register
 enum {
-	GPIOE_AFRL_AFRL7 = ((1UL<<4)-1) << 28, // Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL6 = ((1UL<<4)-1) << 24, // Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL5 = ((1UL<<4)-1) << 20, // Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL4 = ((1UL<<4)-1) << 16, // Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL3 = ((1UL<<4)-1) << 12, // Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL2 = ((1UL<<4)-1) << 8, // Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL1 = ((1UL<<4)-1) << 4, // Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL0 = ((1UL<<4)-1) << 0, // Alternate function selection for port x bit y (y = 0..7)		
+	GPIOE_AFRL_AFRL7 = ((1UL << 4) - 1) << 28,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOE_AFRL_AFRL6 = ((1UL << 4) - 1) << 24,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOE_AFRL_AFRL5 = ((1UL << 4) - 1) << 20,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOE_AFRL_AFRL4 = ((1UL << 4) - 1) << 16,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOE_AFRL_AFRL3 = ((1UL << 4) - 1) << 12,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOE_AFRL_AFRL2 = ((1UL << 4) - 1) << 8,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOE_AFRL_AFRL1 = ((1UL << 4) - 1) << 4,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOE_AFRL_AFRL0 = ((1UL << 4) - 1) << 0,	// Alternate function selection for port x bit y (y = 0..7)
 };
-static inline void gpioe_afrl_set_afrl7(struct GPIOE_Type* p, uint32_t val) { p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL7) | ((val<<28) & GPIOE_AFRL_AFRL7); }
-static inline void gpioe_afrl_set_afrl6(struct GPIOE_Type* p, uint32_t val) { p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL6) | ((val<<24) & GPIOE_AFRL_AFRL6); }
-static inline void gpioe_afrl_set_afrl5(struct GPIOE_Type* p, uint32_t val) { p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL5) | ((val<<20) & GPIOE_AFRL_AFRL5); }
-static inline void gpioe_afrl_set_afrl4(struct GPIOE_Type* p, uint32_t val) { p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL4) | ((val<<16) & GPIOE_AFRL_AFRL4); }
-static inline void gpioe_afrl_set_afrl3(struct GPIOE_Type* p, uint32_t val) { p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL3) | ((val<<12) & GPIOE_AFRL_AFRL3); }
-static inline void gpioe_afrl_set_afrl2(struct GPIOE_Type* p, uint32_t val) { p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL2) | ((val<<8) & GPIOE_AFRL_AFRL2); }
-static inline void gpioe_afrl_set_afrl1(struct GPIOE_Type* p, uint32_t val) { p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL1) | ((val<<4) & GPIOE_AFRL_AFRL1); }
-static inline void gpioe_afrl_set_afrl0(struct GPIOE_Type* p, uint32_t val) { p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL0) | ((val<<0) & GPIOE_AFRL_AFRL0); }
-static inline uint32_t gpioe_afrl_get_afrl7(struct GPIOE_Type* p) { return (p->AFRL & GPIOE_AFRL_AFRL7) >> 28 ; }
-static inline uint32_t gpioe_afrl_get_afrl6(struct GPIOE_Type* p) { return (p->AFRL & GPIOE_AFRL_AFRL6) >> 24 ; }
-static inline uint32_t gpioe_afrl_get_afrl5(struct GPIOE_Type* p) { return (p->AFRL & GPIOE_AFRL_AFRL5) >> 20 ; }
-static inline uint32_t gpioe_afrl_get_afrl4(struct GPIOE_Type* p) { return (p->AFRL & GPIOE_AFRL_AFRL4) >> 16 ; }
-static inline uint32_t gpioe_afrl_get_afrl3(struct GPIOE_Type* p) { return (p->AFRL & GPIOE_AFRL_AFRL3) >> 12 ; }
-static inline uint32_t gpioe_afrl_get_afrl2(struct GPIOE_Type* p) { return (p->AFRL & GPIOE_AFRL_AFRL2) >> 8 ; }
-static inline uint32_t gpioe_afrl_get_afrl1(struct GPIOE_Type* p) { return (p->AFRL & GPIOE_AFRL_AFRL1) >> 4 ; }
-static inline uint32_t gpioe_afrl_get_afrl0(struct GPIOE_Type* p) { return (p->AFRL & GPIOE_AFRL_AFRL0) >> 0 ; }
+static inline void gpioe_afrl_set_afrl7(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL7) | ((val << 28) & GPIOE_AFRL_AFRL7);
+}
+static inline void gpioe_afrl_set_afrl6(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL6) | ((val << 24) & GPIOE_AFRL_AFRL6);
+}
+static inline void gpioe_afrl_set_afrl5(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL5) | ((val << 20) & GPIOE_AFRL_AFRL5);
+}
+static inline void gpioe_afrl_set_afrl4(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL4) | ((val << 16) & GPIOE_AFRL_AFRL4);
+}
+static inline void gpioe_afrl_set_afrl3(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL3) | ((val << 12) & GPIOE_AFRL_AFRL3);
+}
+static inline void gpioe_afrl_set_afrl2(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL2) | ((val << 8) & GPIOE_AFRL_AFRL2);
+}
+static inline void gpioe_afrl_set_afrl1(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL1) | ((val << 4) & GPIOE_AFRL_AFRL1);
+}
+static inline void gpioe_afrl_set_afrl0(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL0) | ((val << 0) & GPIOE_AFRL_AFRL0);
+}
+static inline uint32_t gpioe_afrl_get_afrl7(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL7) >> 28; }
+static inline uint32_t gpioe_afrl_get_afrl6(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL6) >> 24; }
+static inline uint32_t gpioe_afrl_get_afrl5(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL5) >> 20; }
+static inline uint32_t gpioe_afrl_get_afrl4(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL4) >> 16; }
+static inline uint32_t gpioe_afrl_get_afrl3(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL3) >> 12; }
+static inline uint32_t gpioe_afrl_get_afrl2(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL2) >> 8; }
+static inline uint32_t gpioe_afrl_get_afrl1(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL1) >> 4; }
+static inline uint32_t gpioe_afrl_get_afrl0(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL0) >> 0; }
 
 // GPIOE->AFRH GPIO alternate function high register
 enum {
-	GPIOE_AFRH_AFRH15 = ((1UL<<4)-1) << 28, // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH14 = ((1UL<<4)-1) << 24, // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH13 = ((1UL<<4)-1) << 20, // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH12 = ((1UL<<4)-1) << 16, // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH11 = ((1UL<<4)-1) << 12, // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH10 = ((1UL<<4)-1) << 8, // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH9 = ((1UL<<4)-1) << 4, // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH8 = ((1UL<<4)-1) << 0, // Alternate function selection for port x bit y (y = 8..15)		
+	GPIOE_AFRH_AFRH15 = ((1UL << 4) - 1) << 28,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOE_AFRH_AFRH14 = ((1UL << 4) - 1) << 24,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOE_AFRH_AFRH13 = ((1UL << 4) - 1) << 20,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOE_AFRH_AFRH12 = ((1UL << 4) - 1) << 16,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOE_AFRH_AFRH11 = ((1UL << 4) - 1) << 12,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOE_AFRH_AFRH10 = ((1UL << 4) - 1) << 8,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOE_AFRH_AFRH9  = ((1UL << 4) - 1) << 4,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOE_AFRH_AFRH8  = ((1UL << 4) - 1) << 0,	 // Alternate function selection for port x bit y (y = 8..15)
 };
-static inline void gpioe_afrh_set_afrh15(struct GPIOE_Type* p, uint32_t val) { p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH15) | ((val<<28) & GPIOE_AFRH_AFRH15); }
-static inline void gpioe_afrh_set_afrh14(struct GPIOE_Type* p, uint32_t val) { p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH14) | ((val<<24) & GPIOE_AFRH_AFRH14); }
-static inline void gpioe_afrh_set_afrh13(struct GPIOE_Type* p, uint32_t val) { p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH13) | ((val<<20) & GPIOE_AFRH_AFRH13); }
-static inline void gpioe_afrh_set_afrh12(struct GPIOE_Type* p, uint32_t val) { p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH12) | ((val<<16) & GPIOE_AFRH_AFRH12); }
-static inline void gpioe_afrh_set_afrh11(struct GPIOE_Type* p, uint32_t val) { p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH11) | ((val<<12) & GPIOE_AFRH_AFRH11); }
-static inline void gpioe_afrh_set_afrh10(struct GPIOE_Type* p, uint32_t val) { p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH10) | ((val<<8) & GPIOE_AFRH_AFRH10); }
-static inline void gpioe_afrh_set_afrh9(struct GPIOE_Type* p, uint32_t val) { p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH9) | ((val<<4) & GPIOE_AFRH_AFRH9); }
-static inline void gpioe_afrh_set_afrh8(struct GPIOE_Type* p, uint32_t val) { p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH8) | ((val<<0) & GPIOE_AFRH_AFRH8); }
-static inline uint32_t gpioe_afrh_get_afrh15(struct GPIOE_Type* p) { return (p->AFRH & GPIOE_AFRH_AFRH15) >> 28 ; }
-static inline uint32_t gpioe_afrh_get_afrh14(struct GPIOE_Type* p) { return (p->AFRH & GPIOE_AFRH_AFRH14) >> 24 ; }
-static inline uint32_t gpioe_afrh_get_afrh13(struct GPIOE_Type* p) { return (p->AFRH & GPIOE_AFRH_AFRH13) >> 20 ; }
-static inline uint32_t gpioe_afrh_get_afrh12(struct GPIOE_Type* p) { return (p->AFRH & GPIOE_AFRH_AFRH12) >> 16 ; }
-static inline uint32_t gpioe_afrh_get_afrh11(struct GPIOE_Type* p) { return (p->AFRH & GPIOE_AFRH_AFRH11) >> 12 ; }
-static inline uint32_t gpioe_afrh_get_afrh10(struct GPIOE_Type* p) { return (p->AFRH & GPIOE_AFRH_AFRH10) >> 8 ; }
-static inline uint32_t gpioe_afrh_get_afrh9(struct GPIOE_Type* p) { return (p->AFRH & GPIOE_AFRH_AFRH9) >> 4 ; }
-static inline uint32_t gpioe_afrh_get_afrh8(struct GPIOE_Type* p) { return (p->AFRH & GPIOE_AFRH_AFRH8) >> 0 ; }
-
-
-
-
-
+static inline void gpioe_afrh_set_afrh15(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH15) | ((val << 28) & GPIOE_AFRH_AFRH15);
+}
+static inline void gpioe_afrh_set_afrh14(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH14) | ((val << 24) & GPIOE_AFRH_AFRH14);
+}
+static inline void gpioe_afrh_set_afrh13(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH13) | ((val << 20) & GPIOE_AFRH_AFRH13);
+}
+static inline void gpioe_afrh_set_afrh12(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH12) | ((val << 16) & GPIOE_AFRH_AFRH12);
+}
+static inline void gpioe_afrh_set_afrh11(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH11) | ((val << 12) & GPIOE_AFRH_AFRH11);
+}
+static inline void gpioe_afrh_set_afrh10(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH10) | ((val << 8) & GPIOE_AFRH_AFRH10);
+}
+static inline void gpioe_afrh_set_afrh9(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH9) | ((val << 4) & GPIOE_AFRH_AFRH9);
+}
+static inline void gpioe_afrh_set_afrh8(struct GPIOE_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH8) | ((val << 0) & GPIOE_AFRH_AFRH8);
+}
+static inline uint32_t gpioe_afrh_get_afrh15(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH15) >> 28; }
+static inline uint32_t gpioe_afrh_get_afrh14(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH14) >> 24; }
+static inline uint32_t gpioe_afrh_get_afrh13(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH13) >> 20; }
+static inline uint32_t gpioe_afrh_get_afrh12(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH12) >> 16; }
+static inline uint32_t gpioe_afrh_get_afrh11(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH11) >> 12; }
+static inline uint32_t gpioe_afrh_get_afrh10(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH10) >> 8; }
+static inline uint32_t gpioe_afrh_get_afrh9(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH9) >> 4; }
+static inline uint32_t gpioe_afrh_get_afrh8(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH8) >> 0; }
 
 /* Inter-integrated circuit */
 struct I2C_Type {
-	__IO uint32_t CR1; // @0 Control register 1
-	__IO uint32_t CR2; // @4 Control register 2
-	__IO uint16_t OAR1; // @8 Own address register 1
-	 uint8_t RESERVED0[2]; // @10 
-	__IO uint16_t OAR2; // @12 Own address register 2
-	 uint8_t RESERVED1[2]; // @14 
-	__IO uint32_t TIMINGR; // @16 Timing register
-	__IO uint32_t TIMEOUTR; // @20 Status register 1
-	__IO uint32_t ISR; // @24 Interrupt and Status register
-	__O uint16_t ICR; // @28 Interrupt clear register
-	 uint8_t RESERVED2[2]; // @30 
-	__I uint8_t PECR; // @32 PEC register
-	 uint8_t RESERVED3[3]; // @33 
-	__I uint8_t RXDR; // @36 Receive data register
-	 uint8_t RESERVED4[3]; // @37 
-	__IO uint8_t TXDR; // @40 Transmit data register
+	__IO uint32_t CR1;			 // @0 Control register 1
+	__IO uint32_t CR2;			 // @4 Control register 2
+	__IO uint16_t OAR1;			 // @8 Own address register 1
+	uint8_t		  RESERVED0[2];	 // @10
+	__IO uint16_t OAR2;			 // @12 Own address register 2
+	uint8_t		  RESERVED1[2];	 // @14
+	__IO uint32_t TIMINGR;		 // @16 Timing register
+	__IO uint32_t TIMEOUTR;		 // @20 Status register 1
+	__IO uint32_t ISR;			 // @24 Interrupt and Status register
+	__O uint16_t  ICR;			 // @28 Interrupt clear register
+	uint8_t		  RESERVED2[2];	 // @30
+	__I uint8_t	  PECR;			 // @32 PEC register
+	uint8_t		  RESERVED3[3];	 // @33
+	__I uint8_t	  RXDR;			 // @36 Receive data register
+	uint8_t		  RESERVED4[3];	 // @37
+	__IO uint8_t  TXDR;			 // @40 Transmit data register
 };
-extern struct I2C_Type	I2C1;	// @0x40005400 
-extern struct I2C_Type 	I2C2;	// @0x40005800
-extern struct I2C_Type 	I2C3;	// @0x40005C00
-extern struct I2C_Type 	I2C4;	// @0x40008400
+extern struct I2C_Type I2C1;  // @0x40005400
+extern struct I2C_Type I2C2;  // @0x40005800
+extern struct I2C_Type I2C3;  // @0x40005C00
+extern struct I2C_Type I2C4;  // @0x40008400
 
 // I2C->CR1 Control register 1
 enum {
-	I2C_CR1_PECEN = 1UL<<23, // PEC enable
-	I2C_CR1_ALERTEN = 1UL<<22, // SMBUS alert enable
-	I2C_CR1_SMBDEN = 1UL<<21, // SMBus Device Default address enable
-	I2C_CR1_SMBHEN = 1UL<<20, // SMBus Host address enable
-	I2C_CR1_GCEN = 1UL<<19, // General call enable
-	I2C_CR1_WUPEN = 1UL<<18, // Wakeup from STOP enable
-	I2C_CR1_NOSTRETCH = 1UL<<17, // Clock stretching disable
-	I2C_CR1_SBC = 1UL<<16, // Slave byte control
-	I2C_CR1_RXDMAEN = 1UL<<15, // DMA reception requests enable
-	I2C_CR1_TXDMAEN = 1UL<<14, // DMA transmission requests enable
-	I2C_CR1_ANFOFF = 1UL<<12, // Analog noise filter OFF
-	I2C_CR1_DNF = ((1UL<<4)-1) << 8, // Digital noise filter
-	I2C_CR1_ERRIE = 1UL<<7, // Error interrupts enable
-	I2C_CR1_TCIE = 1UL<<6, // Transfer Complete interrupt enable
-	I2C_CR1_STOPIE = 1UL<<5, // STOP detection Interrupt enable
-	I2C_CR1_NACKIE = 1UL<<4, // Not acknowledge received interrupt enable
-	I2C_CR1_ADDRIE = 1UL<<3, // Address match interrupt enable (slave only)
-	I2C_CR1_RXIE = 1UL<<2, // RX Interrupt enable
-	I2C_CR1_TXIE = 1UL<<1, // TX Interrupt enable
-	I2C_CR1_PE = 1UL<<0, // Peripheral enable		
+	I2C_CR1_PECEN	  = 1UL << 23,				// PEC enable
+	I2C_CR1_ALERTEN	  = 1UL << 22,				// SMBUS alert enable
+	I2C_CR1_SMBDEN	  = 1UL << 21,				// SMBus Device Default address enable
+	I2C_CR1_SMBHEN	  = 1UL << 20,				// SMBus Host address enable
+	I2C_CR1_GCEN	  = 1UL << 19,				// General call enable
+	I2C_CR1_WUPEN	  = 1UL << 18,				// Wakeup from STOP enable
+	I2C_CR1_NOSTRETCH = 1UL << 17,				// Clock stretching disable
+	I2C_CR1_SBC		  = 1UL << 16,				// Slave byte control
+	I2C_CR1_RXDMAEN	  = 1UL << 15,				// DMA reception requests enable
+	I2C_CR1_TXDMAEN	  = 1UL << 14,				// DMA transmission requests enable
+	I2C_CR1_ANFOFF	  = 1UL << 12,				// Analog noise filter OFF
+	I2C_CR1_DNF		  = ((1UL << 4) - 1) << 8,	// Digital noise filter
+	I2C_CR1_ERRIE	  = 1UL << 7,				// Error interrupts enable
+	I2C_CR1_TCIE	  = 1UL << 6,				// Transfer Complete interrupt enable
+	I2C_CR1_STOPIE	  = 1UL << 5,				// STOP detection Interrupt enable
+	I2C_CR1_NACKIE	  = 1UL << 4,				// Not acknowledge received interrupt enable
+	I2C_CR1_ADDRIE	  = 1UL << 3,				// Address match interrupt enable (slave only)
+	I2C_CR1_RXIE	  = 1UL << 2,				// RX Interrupt enable
+	I2C_CR1_TXIE	  = 1UL << 1,				// TX Interrupt enable
+	I2C_CR1_PE		  = 1UL << 0,				// Peripheral enable
 };
-static inline void i2c_cr1_set_dnf(struct I2C_Type* p, uint32_t val) { p->CR1 = (p->CR1 & ~I2C_CR1_DNF) | ((val<<8) & I2C_CR1_DNF); }
-static inline uint32_t i2c_cr1_get_dnf(struct I2C_Type* p) { return (p->CR1 & I2C_CR1_DNF) >> 8 ; }
+static inline void i2c_cr1_set_dnf(struct I2C_Type *p, uint32_t val) {
+	p->CR1 = (p->CR1 & ~I2C_CR1_DNF) | ((val << 8) & I2C_CR1_DNF);
+}
+static inline uint32_t i2c_cr1_get_dnf(struct I2C_Type *p) { return (p->CR1 & I2C_CR1_DNF) >> 8; }
 
 // I2C->CR2 Control register 2
 enum {
-	I2C_CR2_PECBYTE = 1UL<<26, // Packet error checking byte
-	I2C_CR2_AUTOEND = 1UL<<25, // Automatic end mode (master mode)
-	I2C_CR2_RELOAD = 1UL<<24, // NBYTES reload mode
-	I2C_CR2_NBYTES = ((1UL<<8)-1) << 16, // Number of bytes
-	I2C_CR2_NACK = 1UL<<15, // NACK generation (slave mode)
-	I2C_CR2_STOP = 1UL<<14, // Stop generation (master mode)
-	I2C_CR2_START = 1UL<<13, // Start generation
-	I2C_CR2_HEAD10R = 1UL<<12, // 10-bit address header only read direction (master receiver mode)
-	I2C_CR2_ADD10 = 1UL<<11, // 10-bit addressing mode (master mode)
-	I2C_CR2_RD_WRN = 1UL<<10, // Transfer direction (master mode)
-	I2C_CR2_SADD = ((1UL<<10)-1) << 0, // Slave address bit (master mode)		
+	I2C_CR2_PECBYTE = 1UL << 26,			   // Packet error checking byte
+	I2C_CR2_AUTOEND = 1UL << 25,			   // Automatic end mode (master mode)
+	I2C_CR2_RELOAD	= 1UL << 24,			   // NBYTES reload mode
+	I2C_CR2_NBYTES	= ((1UL << 8) - 1) << 16,  // Number of bytes
+	I2C_CR2_NACK	= 1UL << 15,			   // NACK generation (slave mode)
+	I2C_CR2_STOP	= 1UL << 14,			   // Stop generation (master mode)
+	I2C_CR2_START	= 1UL << 13,			   // Start generation
+	I2C_CR2_HEAD10R = 1UL << 12,			   // 10-bit address header only read direction (master receiver mode)
+	I2C_CR2_ADD10	= 1UL << 11,			   // 10-bit addressing mode (master mode)
+	I2C_CR2_RD_WRN	= 1UL << 10,			   // Transfer direction (master mode)
+	I2C_CR2_SADD	= ((1UL << 10) - 1) << 0,  // Slave address bit (master mode)
 };
-static inline void i2c_cr2_set_nbytes(struct I2C_Type* p, uint32_t val) { p->CR2 = (p->CR2 & ~I2C_CR2_NBYTES) | ((val<<16) & I2C_CR2_NBYTES); }
-static inline void i2c_cr2_set_sadd(struct I2C_Type* p, uint32_t val) { p->CR2 = (p->CR2 & ~I2C_CR2_SADD) | ((val<<0) & I2C_CR2_SADD); }
-static inline uint32_t i2c_cr2_get_nbytes(struct I2C_Type* p) { return (p->CR2 & I2C_CR2_NBYTES) >> 16 ; }
-static inline uint32_t i2c_cr2_get_sadd(struct I2C_Type* p) { return (p->CR2 & I2C_CR2_SADD) >> 0 ; }
+static inline void i2c_cr2_set_nbytes(struct I2C_Type *p, uint32_t val) {
+	p->CR2 = (p->CR2 & ~I2C_CR2_NBYTES) | ((val << 16) & I2C_CR2_NBYTES);
+}
+static inline void i2c_cr2_set_sadd(struct I2C_Type *p, uint32_t val) {
+	p->CR2 = (p->CR2 & ~I2C_CR2_SADD) | ((val << 0) & I2C_CR2_SADD);
+}
+static inline uint32_t i2c_cr2_get_nbytes(struct I2C_Type *p) { return (p->CR2 & I2C_CR2_NBYTES) >> 16; }
+static inline uint32_t i2c_cr2_get_sadd(struct I2C_Type *p) { return (p->CR2 & I2C_CR2_SADD) >> 0; }
 
 // I2C->OAR1 Own address register 1
 enum {
-	I2C_OAR1_OA1EN = 1UL<<15, // Own Address 1 enable
-	I2C_OAR1_OA1MODE = 1UL<<10, // Own Address 1 10-bit mode
-	I2C_OAR1_OA1 = ((1UL<<10)-1) << 0, // Interface address		
+	I2C_OAR1_OA1EN	 = 1UL << 15,				// Own Address 1 enable
+	I2C_OAR1_OA1MODE = 1UL << 10,				// Own Address 1 10-bit mode
+	I2C_OAR1_OA1	 = ((1UL << 10) - 1) << 0,	// Interface address
 };
-static inline void i2c_oar1_set_oa1(struct I2C_Type* p, uint32_t val) { p->OAR1 = (p->OAR1 & ~I2C_OAR1_OA1) | ((val<<0) & I2C_OAR1_OA1); }
-static inline uint32_t i2c_oar1_get_oa1(struct I2C_Type* p) { return (p->OAR1 & I2C_OAR1_OA1) >> 0 ; }
+static inline void i2c_oar1_set_oa1(struct I2C_Type *p, uint32_t val) {
+	p->OAR1 = (p->OAR1 & ~I2C_OAR1_OA1) | ((val << 0) & I2C_OAR1_OA1);
+}
+static inline uint32_t i2c_oar1_get_oa1(struct I2C_Type *p) { return (p->OAR1 & I2C_OAR1_OA1) >> 0; }
 
 // I2C->OAR2 Own address register 2
 enum {
-	I2C_OAR2_OA2EN = 1UL<<15, // Own Address 2 enable
-	I2C_OAR2_OA2MSK = ((1UL<<3)-1) << 8, // Own Address 2 masks
-	I2C_OAR2_OA2 = ((1UL<<7)-1) << 1, // Interface address		
+	I2C_OAR2_OA2EN	= 1UL << 15,			  // Own Address 2 enable
+	I2C_OAR2_OA2MSK = ((1UL << 3) - 1) << 8,  // Own Address 2 masks
+	I2C_OAR2_OA2	= ((1UL << 7) - 1) << 1,  // Interface address
 };
-static inline void i2c_oar2_set_oa2msk(struct I2C_Type* p, uint32_t val) { p->OAR2 = (p->OAR2 & ~I2C_OAR2_OA2MSK) | ((val<<8) & I2C_OAR2_OA2MSK); }
-static inline void i2c_oar2_set_oa2(struct I2C_Type* p, uint32_t val) { p->OAR2 = (p->OAR2 & ~I2C_OAR2_OA2) | ((val<<1) & I2C_OAR2_OA2); }
-static inline uint32_t i2c_oar2_get_oa2msk(struct I2C_Type* p) { return (p->OAR2 & I2C_OAR2_OA2MSK) >> 8 ; }
-static inline uint32_t i2c_oar2_get_oa2(struct I2C_Type* p) { return (p->OAR2 & I2C_OAR2_OA2) >> 1 ; }
+static inline void i2c_oar2_set_oa2msk(struct I2C_Type *p, uint32_t val) {
+	p->OAR2 = (p->OAR2 & ~I2C_OAR2_OA2MSK) | ((val << 8) & I2C_OAR2_OA2MSK);
+}
+static inline void i2c_oar2_set_oa2(struct I2C_Type *p, uint32_t val) {
+	p->OAR2 = (p->OAR2 & ~I2C_OAR2_OA2) | ((val << 1) & I2C_OAR2_OA2);
+}
+static inline uint32_t i2c_oar2_get_oa2msk(struct I2C_Type *p) { return (p->OAR2 & I2C_OAR2_OA2MSK) >> 8; }
+static inline uint32_t i2c_oar2_get_oa2(struct I2C_Type *p) { return (p->OAR2 & I2C_OAR2_OA2) >> 1; }
 
 // I2C->TIMINGR Timing register
 enum {
-	I2C_TIMINGR_PRESC = ((1UL<<4)-1) << 28, // Timing prescaler
-	I2C_TIMINGR_SCLDEL = ((1UL<<4)-1) << 20, // Data setup time
-	I2C_TIMINGR_SDADEL = ((1UL<<4)-1) << 16, // Data hold time
-	I2C_TIMINGR_SCLH = ((1UL<<8)-1) << 8, // SCL high period (master mode)
-	I2C_TIMINGR_SCLL = ((1UL<<8)-1) << 0, // SCL low period (master mode)		
+	I2C_TIMINGR_PRESC  = ((1UL << 4) - 1) << 28,  // Timing prescaler
+	I2C_TIMINGR_SCLDEL = ((1UL << 4) - 1) << 20,  // Data setup time
+	I2C_TIMINGR_SDADEL = ((1UL << 4) - 1) << 16,  // Data hold time
+	I2C_TIMINGR_SCLH   = ((1UL << 8) - 1) << 8,	  // SCL high period (master mode)
+	I2C_TIMINGR_SCLL   = ((1UL << 8) - 1) << 0,	  // SCL low period (master mode)
 };
-static inline void i2c_timingr_set_presc(struct I2C_Type* p, uint32_t val) { p->TIMINGR = (p->TIMINGR & ~I2C_TIMINGR_PRESC) | ((val<<28) & I2C_TIMINGR_PRESC); }
-static inline void i2c_timingr_set_scldel(struct I2C_Type* p, uint32_t val) { p->TIMINGR = (p->TIMINGR & ~I2C_TIMINGR_SCLDEL) | ((val<<20) & I2C_TIMINGR_SCLDEL); }
-static inline void i2c_timingr_set_sdadel(struct I2C_Type* p, uint32_t val) { p->TIMINGR = (p->TIMINGR & ~I2C_TIMINGR_SDADEL) | ((val<<16) & I2C_TIMINGR_SDADEL); }
-static inline void i2c_timingr_set_sclh(struct I2C_Type* p, uint32_t val) { p->TIMINGR = (p->TIMINGR & ~I2C_TIMINGR_SCLH) | ((val<<8) & I2C_TIMINGR_SCLH); }
-static inline void i2c_timingr_set_scll(struct I2C_Type* p, uint32_t val) { p->TIMINGR = (p->TIMINGR & ~I2C_TIMINGR_SCLL) | ((val<<0) & I2C_TIMINGR_SCLL); }
-static inline uint32_t i2c_timingr_get_presc(struct I2C_Type* p) { return (p->TIMINGR & I2C_TIMINGR_PRESC) >> 28 ; }
-static inline uint32_t i2c_timingr_get_scldel(struct I2C_Type* p) { return (p->TIMINGR & I2C_TIMINGR_SCLDEL) >> 20 ; }
-static inline uint32_t i2c_timingr_get_sdadel(struct I2C_Type* p) { return (p->TIMINGR & I2C_TIMINGR_SDADEL) >> 16 ; }
-static inline uint32_t i2c_timingr_get_sclh(struct I2C_Type* p) { return (p->TIMINGR & I2C_TIMINGR_SCLH) >> 8 ; }
-static inline uint32_t i2c_timingr_get_scll(struct I2C_Type* p) { return (p->TIMINGR & I2C_TIMINGR_SCLL) >> 0 ; }
+static inline void i2c_timingr_set_presc(struct I2C_Type *p, uint32_t val) {
+	p->TIMINGR = (p->TIMINGR & ~I2C_TIMINGR_PRESC) | ((val << 28) & I2C_TIMINGR_PRESC);
+}
+static inline void i2c_timingr_set_scldel(struct I2C_Type *p, uint32_t val) {
+	p->TIMINGR = (p->TIMINGR & ~I2C_TIMINGR_SCLDEL) | ((val << 20) & I2C_TIMINGR_SCLDEL);
+}
+static inline void i2c_timingr_set_sdadel(struct I2C_Type *p, uint32_t val) {
+	p->TIMINGR = (p->TIMINGR & ~I2C_TIMINGR_SDADEL) | ((val << 16) & I2C_TIMINGR_SDADEL);
+}
+static inline void i2c_timingr_set_sclh(struct I2C_Type *p, uint32_t val) {
+	p->TIMINGR = (p->TIMINGR & ~I2C_TIMINGR_SCLH) | ((val << 8) & I2C_TIMINGR_SCLH);
+}
+static inline void i2c_timingr_set_scll(struct I2C_Type *p, uint32_t val) {
+	p->TIMINGR = (p->TIMINGR & ~I2C_TIMINGR_SCLL) | ((val << 0) & I2C_TIMINGR_SCLL);
+}
+static inline uint32_t i2c_timingr_get_presc(struct I2C_Type *p) { return (p->TIMINGR & I2C_TIMINGR_PRESC) >> 28; }
+static inline uint32_t i2c_timingr_get_scldel(struct I2C_Type *p) { return (p->TIMINGR & I2C_TIMINGR_SCLDEL) >> 20; }
+static inline uint32_t i2c_timingr_get_sdadel(struct I2C_Type *p) { return (p->TIMINGR & I2C_TIMINGR_SDADEL) >> 16; }
+static inline uint32_t i2c_timingr_get_sclh(struct I2C_Type *p) { return (p->TIMINGR & I2C_TIMINGR_SCLH) >> 8; }
+static inline uint32_t i2c_timingr_get_scll(struct I2C_Type *p) { return (p->TIMINGR & I2C_TIMINGR_SCLL) >> 0; }
 
 // I2C->TIMEOUTR Status register 1
 enum {
-	I2C_TIMEOUTR_TEXTEN = 1UL<<31, // Extended clock timeout enable
-	I2C_TIMEOUTR_TIMEOUTB = ((1UL<<12)-1) << 16, // Bus timeout B
-	I2C_TIMEOUTR_TIMOUTEN = 1UL<<15, // Clock timeout enable
-	I2C_TIMEOUTR_TIDLE = 1UL<<12, // Idle clock timeout detection
-	I2C_TIMEOUTR_TIMEOUTA = ((1UL<<12)-1) << 0, // Bus timeout A		
+	I2C_TIMEOUTR_TEXTEN	  = 1UL << 31,				  // Extended clock timeout enable
+	I2C_TIMEOUTR_TIMEOUTB = ((1UL << 12) - 1) << 16,  // Bus timeout B
+	I2C_TIMEOUTR_TIMOUTEN = 1UL << 15,				  // Clock timeout enable
+	I2C_TIMEOUTR_TIDLE	  = 1UL << 12,				  // Idle clock timeout detection
+	I2C_TIMEOUTR_TIMEOUTA = ((1UL << 12) - 1) << 0,	  // Bus timeout A
 };
-static inline void i2c_timeoutr_set_timeoutb(struct I2C_Type* p, uint32_t val) { p->TIMEOUTR = (p->TIMEOUTR & ~I2C_TIMEOUTR_TIMEOUTB) | ((val<<16) & I2C_TIMEOUTR_TIMEOUTB); }
-static inline void i2c_timeoutr_set_timeouta(struct I2C_Type* p, uint32_t val) { p->TIMEOUTR = (p->TIMEOUTR & ~I2C_TIMEOUTR_TIMEOUTA) | ((val<<0) & I2C_TIMEOUTR_TIMEOUTA); }
-static inline uint32_t i2c_timeoutr_get_timeoutb(struct I2C_Type* p) { return (p->TIMEOUTR & I2C_TIMEOUTR_TIMEOUTB) >> 16 ; }
-static inline uint32_t i2c_timeoutr_get_timeouta(struct I2C_Type* p) { return (p->TIMEOUTR & I2C_TIMEOUTR_TIMEOUTA) >> 0 ; }
+static inline void i2c_timeoutr_set_timeoutb(struct I2C_Type *p, uint32_t val) {
+	p->TIMEOUTR = (p->TIMEOUTR & ~I2C_TIMEOUTR_TIMEOUTB) | ((val << 16) & I2C_TIMEOUTR_TIMEOUTB);
+}
+static inline void i2c_timeoutr_set_timeouta(struct I2C_Type *p, uint32_t val) {
+	p->TIMEOUTR = (p->TIMEOUTR & ~I2C_TIMEOUTR_TIMEOUTA) | ((val << 0) & I2C_TIMEOUTR_TIMEOUTA);
+}
+static inline uint32_t i2c_timeoutr_get_timeoutb(struct I2C_Type *p) { return (p->TIMEOUTR & I2C_TIMEOUTR_TIMEOUTB) >> 16; }
+static inline uint32_t i2c_timeoutr_get_timeouta(struct I2C_Type *p) { return (p->TIMEOUTR & I2C_TIMEOUTR_TIMEOUTA) >> 0; }
 
 // I2C->ISR Interrupt and Status register
 enum {
-	I2C_ISR_ADDCODE = ((1UL<<7)-1) << 17, // Address match code (Slave mode)
-	I2C_ISR_DIR = 1UL<<16, // Transfer direction (Slave mode)
-	I2C_ISR_BUSY = 1UL<<15, // Bus busy
-	I2C_ISR_ALERT = 1UL<<13, // SMBus alert
-	I2C_ISR_TIMEOUT = 1UL<<12, // Timeout or t_low detection flag
-	I2C_ISR_PECERR = 1UL<<11, // PEC Error in reception
-	I2C_ISR_OVR = 1UL<<10, // Overrun/Underrun (slave mode)
-	I2C_ISR_ARLO = 1UL<<9, // Arbitration lost
-	I2C_ISR_BERR = 1UL<<8, // Bus error
-	I2C_ISR_TCR = 1UL<<7, // Transfer Complete Reload
-	I2C_ISR_TC = 1UL<<6, // Transfer Complete (master mode)
-	I2C_ISR_STOPF = 1UL<<5, // Stop detection flag
-	I2C_ISR_NACKF = 1UL<<4, // Not acknowledge received flag
-	I2C_ISR_ADDR = 1UL<<3, // Address matched (slave mode)
-	I2C_ISR_RXNE = 1UL<<2, // Receive data register not empty (receivers)
-	I2C_ISR_TXIS = 1UL<<1, // Transmit interrupt status (transmitters)
-	I2C_ISR_TXE = 1UL<<0, // Transmit data register empty (transmitters)		
+	I2C_ISR_ADDCODE = ((1UL << 7) - 1) << 17,  // Address match code (Slave mode)
+	I2C_ISR_DIR		= 1UL << 16,			   // Transfer direction (Slave mode)
+	I2C_ISR_BUSY	= 1UL << 15,			   // Bus busy
+	I2C_ISR_ALERT	= 1UL << 13,			   // SMBus alert
+	I2C_ISR_TIMEOUT = 1UL << 12,			   // Timeout or t_low detection flag
+	I2C_ISR_PECERR	= 1UL << 11,			   // PEC Error in reception
+	I2C_ISR_OVR		= 1UL << 10,			   // Overrun/Underrun (slave mode)
+	I2C_ISR_ARLO	= 1UL << 9,				   // Arbitration lost
+	I2C_ISR_BERR	= 1UL << 8,				   // Bus error
+	I2C_ISR_TCR		= 1UL << 7,				   // Transfer Complete Reload
+	I2C_ISR_TC		= 1UL << 6,				   // Transfer Complete (master mode)
+	I2C_ISR_STOPF	= 1UL << 5,				   // Stop detection flag
+	I2C_ISR_NACKF	= 1UL << 4,				   // Not acknowledge received flag
+	I2C_ISR_ADDR	= 1UL << 3,				   // Address matched (slave mode)
+	I2C_ISR_RXNE	= 1UL << 2,				   // Receive data register not empty (receivers)
+	I2C_ISR_TXIS	= 1UL << 1,				   // Transmit interrupt status (transmitters)
+	I2C_ISR_TXE		= 1UL << 0,				   // Transmit data register empty (transmitters)
 };
-static inline void i2c_isr_set_addcode(struct I2C_Type* p, uint32_t val) { p->ISR = (p->ISR & ~I2C_ISR_ADDCODE) | ((val<<17) & I2C_ISR_ADDCODE); }
-static inline uint32_t i2c_isr_get_addcode(struct I2C_Type* p) { return (p->ISR & I2C_ISR_ADDCODE) >> 17 ; }
+static inline void i2c_isr_set_addcode(struct I2C_Type *p, uint32_t val) {
+	p->ISR = (p->ISR & ~I2C_ISR_ADDCODE) | ((val << 17) & I2C_ISR_ADDCODE);
+}
+static inline uint32_t i2c_isr_get_addcode(struct I2C_Type *p) { return (p->ISR & I2C_ISR_ADDCODE) >> 17; }
 
 // I2C->ICR Interrupt clear register
 enum {
-	I2C_ICR_ALERTCF = 1UL<<13, // Alert flag clear
-	I2C_ICR_TIMOUTCF = 1UL<<12, // Timeout detection flag clear
-	I2C_ICR_PECCF = 1UL<<11, // PEC Error flag clear
-	I2C_ICR_OVRCF = 1UL<<10, // Overrun/Underrun flag clear
-	I2C_ICR_ARLOCF = 1UL<<9, // Arbitration lost flag clear
-	I2C_ICR_BERRCF = 1UL<<8, // Bus error flag clear
-	I2C_ICR_STOPCF = 1UL<<5, // Stop detection flag clear
-	I2C_ICR_NACKCF = 1UL<<4, // Not Acknowledge flag clear
-	I2C_ICR_ADDRCF = 1UL<<3, // Address Matched flag clear		
+	I2C_ICR_ALERTCF	 = 1UL << 13,  // Alert flag clear
+	I2C_ICR_TIMOUTCF = 1UL << 12,  // Timeout detection flag clear
+	I2C_ICR_PECCF	 = 1UL << 11,  // PEC Error flag clear
+	I2C_ICR_OVRCF	 = 1UL << 10,  // Overrun/Underrun flag clear
+	I2C_ICR_ARLOCF	 = 1UL << 9,   // Arbitration lost flag clear
+	I2C_ICR_BERRCF	 = 1UL << 8,   // Bus error flag clear
+	I2C_ICR_STOPCF	 = 1UL << 5,   // Stop detection flag clear
+	I2C_ICR_NACKCF	 = 1UL << 4,   // Not Acknowledge flag clear
+	I2C_ICR_ADDRCF	 = 1UL << 3,   // Address Matched flag clear
 };
-
-
-
 
 /* Independent watchdog
 There is only one peripheral of type IWDG. */
 struct IWDG_Type {
-	__O uint16_t KR; // @0 Key register
-	 uint8_t RESERVED0[2]; // @2 
-	__IO uint8_t PR; // @4 Prescaler register
-	 uint8_t RESERVED1[3]; // @5 
-	__IO uint16_t RLR; // @8 Reload register
-	 uint8_t RESERVED2[2]; // @10 
-	__I uint8_t SR; // @12 Status register
-	 uint8_t RESERVED3[3]; // @13 
-	__IO uint16_t WINR; // @16 Window register
+	__O uint16_t  KR;			 // @0 Key register
+	uint8_t		  RESERVED0[2];	 // @2
+	__IO uint8_t  PR;			 // @4 Prescaler register
+	uint8_t		  RESERVED1[3];	 // @5
+	__IO uint16_t RLR;			 // @8 Reload register
+	uint8_t		  RESERVED2[2];	 // @10
+	__I uint8_t	  SR;			 // @12 Status register
+	uint8_t		  RESERVED3[3];	 // @13
+	__IO uint16_t WINR;			 // @16 Window register
 };
-extern struct IWDG_Type	IWDG;	// @0x40003000 
+extern struct IWDG_Type IWDG;  // @0x40003000
 
 // IWDG->PR Prescaler register
 enum {
-	IWDG_PR_PR = ((1UL<<3)-1) << 0, // Prescaler divider		
+	IWDG_PR_PR = ((1UL << 3) - 1) << 0,	 // Prescaler divider
 };
-static inline void iwdg_pr_set_pr(uint32_t val) { IWDG.PR = (IWDG.PR & ~IWDG_PR_PR) | ((val<<0) & IWDG_PR_PR); }
-static inline uint32_t iwdg_pr_get_pr(void) { return (IWDG.PR & IWDG_PR_PR) >> 0 ; }
+static inline void	   iwdg_pr_set_pr(uint32_t val) { IWDG.PR = (IWDG.PR & ~IWDG_PR_PR) | ((val << 0) & IWDG_PR_PR); }
+static inline uint32_t iwdg_pr_get_pr(void) { return (IWDG.PR & IWDG_PR_PR) >> 0; }
 
 // IWDG->RLR Reload register
 enum {
-	IWDG_RLR_RL = ((1UL<<12)-1) << 0, // Watchdog counter reload value		
+	IWDG_RLR_RL = ((1UL << 12) - 1) << 0,  // Watchdog counter reload value
 };
-static inline void iwdg_rlr_set_rl(uint32_t val) { IWDG.RLR = (IWDG.RLR & ~IWDG_RLR_RL) | ((val<<0) & IWDG_RLR_RL); }
-static inline uint32_t iwdg_rlr_get_rl(void) { return (IWDG.RLR & IWDG_RLR_RL) >> 0 ; }
+static inline void	   iwdg_rlr_set_rl(uint32_t val) { IWDG.RLR = (IWDG.RLR & ~IWDG_RLR_RL) | ((val << 0) & IWDG_RLR_RL); }
+static inline uint32_t iwdg_rlr_get_rl(void) { return (IWDG.RLR & IWDG_RLR_RL) >> 0; }
 
 // IWDG->SR Status register
 enum {
-	IWDG_SR_WVU = 1UL<<2, // Watchdog counter window value update
-	IWDG_SR_RVU = 1UL<<1, // Watchdog counter reload value update
-	IWDG_SR_PVU = 1UL<<0, // Watchdog prescaler value update		
+	IWDG_SR_WVU = 1UL << 2,	 // Watchdog counter window value update
+	IWDG_SR_RVU = 1UL << 1,	 // Watchdog counter reload value update
+	IWDG_SR_PVU = 1UL << 0,	 // Watchdog prescaler value update
 };
 
 // IWDG->WINR Window register
 enum {
-	IWDG_WINR_WIN = ((1UL<<12)-1) << 0, // Watchdog counter window value		
+	IWDG_WINR_WIN = ((1UL << 12) - 1) << 0,	 // Watchdog counter window value
 };
-static inline void iwdg_winr_set_win(uint32_t val) { IWDG.WINR = (IWDG.WINR & ~IWDG_WINR_WIN) | ((val<<0) & IWDG_WINR_WIN); }
-static inline uint32_t iwdg_winr_get_win(void) { return (IWDG.WINR & IWDG_WINR_WIN) >> 0 ; }
+static inline void	   iwdg_winr_set_win(uint32_t val) { IWDG.WINR = (IWDG.WINR & ~IWDG_WINR_WIN) | ((val << 0) & IWDG_WINR_WIN); }
+static inline uint32_t iwdg_winr_get_win(void) { return (IWDG.WINR & IWDG_WINR_WIN) >> 0; }
 
 /* Low power timer */
 struct LPTIM_Type {
-	__I uint8_t ISR; // @0 Interrupt and Status Register
-	 uint8_t RESERVED0[3]; // @1 
-	__O uint8_t ICR; // @4 Interrupt Clear Register
-	 uint8_t RESERVED1[3]; // @5 
-	__IO uint8_t IER; // @8 Interrupt Enable Register
-	 uint8_t RESERVED2[3]; // @9 
-	__IO uint32_t CFGR; // @12 Configuration Register
-	__IO uint8_t CR; // @16 Control Register
-	 uint8_t RESERVED3[3]; // @17 
-	__IO uint16_t CMP; // @20 Compare Register
-	 uint8_t RESERVED4[2]; // @22 
-	__IO uint16_t ARR; // @24 Autoreload Register
-	 uint8_t RESERVED5[2]; // @26 
-	__I uint16_t CNT; // @28 Counter Register
+	__I uint8_t	  ISR;			 // @0 Interrupt and Status Register
+	uint8_t		  RESERVED0[3];	 // @1
+	__O uint8_t	  ICR;			 // @4 Interrupt Clear Register
+	uint8_t		  RESERVED1[3];	 // @5
+	__IO uint8_t  IER;			 // @8 Interrupt Enable Register
+	uint8_t		  RESERVED2[3];	 // @9
+	__IO uint32_t CFGR;			 // @12 Configuration Register
+	__IO uint8_t  CR;			 // @16 Control Register
+	uint8_t		  RESERVED3[3];	 // @17
+	__IO uint16_t CMP;			 // @20 Compare Register
+	uint8_t		  RESERVED4[2];	 // @22
+	__IO uint16_t ARR;			 // @24 Autoreload Register
+	uint8_t		  RESERVED5[2];	 // @26
+	__I uint16_t  CNT;			 // @28 Counter Register
 };
-extern struct LPTIM_Type	LPTIM1;	// @0x40007C00 
-extern struct LPTIM_Type 	LPTIM2;	// @0x40009400
+extern struct LPTIM_Type LPTIM1;  // @0x40007C00
+extern struct LPTIM_Type LPTIM2;  // @0x40009400
 
 // LPTIM->ISR Interrupt and Status Register
 enum {
-	LPTIM_ISR_DOWN = 1UL<<6, // Counter direction change up to down
-	LPTIM_ISR_UP = 1UL<<5, // Counter direction change down to up
-	LPTIM_ISR_ARROK = 1UL<<4, // Autoreload register update OK
-	LPTIM_ISR_CMPOK = 1UL<<3, // Compare register update OK
-	LPTIM_ISR_EXTTRIG = 1UL<<2, // External trigger edge event
-	LPTIM_ISR_ARRM = 1UL<<1, // Autoreload match
-	LPTIM_ISR_CMPM = 1UL<<0, // Compare match		
+	LPTIM_ISR_DOWN	  = 1UL << 6,  // Counter direction change up to down
+	LPTIM_ISR_UP	  = 1UL << 5,  // Counter direction change down to up
+	LPTIM_ISR_ARROK	  = 1UL << 4,  // Autoreload register update OK
+	LPTIM_ISR_CMPOK	  = 1UL << 3,  // Compare register update OK
+	LPTIM_ISR_EXTTRIG = 1UL << 2,  // External trigger edge event
+	LPTIM_ISR_ARRM	  = 1UL << 1,  // Autoreload match
+	LPTIM_ISR_CMPM	  = 1UL << 0,  // Compare match
 };
 
 // LPTIM->ICR Interrupt Clear Register
 enum {
-	LPTIM_ICR_DOWNCF = 1UL<<6, // Direction change to down Clear Flag
-	LPTIM_ICR_UPCF = 1UL<<5, // Direction change to UP Clear Flag
-	LPTIM_ICR_ARROKCF = 1UL<<4, // Autoreload register update OK Clear Flag
-	LPTIM_ICR_CMPOKCF = 1UL<<3, // Compare register update OK Clear Flag
-	LPTIM_ICR_EXTTRIGCF = 1UL<<2, // External trigger valid edge Clear Flag
-	LPTIM_ICR_ARRMCF = 1UL<<1, // Autoreload match Clear Flag
-	LPTIM_ICR_CMPMCF = 1UL<<0, // compare match Clear Flag		
+	LPTIM_ICR_DOWNCF	= 1UL << 6,	 // Direction change to down Clear Flag
+	LPTIM_ICR_UPCF		= 1UL << 5,	 // Direction change to UP Clear Flag
+	LPTIM_ICR_ARROKCF	= 1UL << 4,	 // Autoreload register update OK Clear Flag
+	LPTIM_ICR_CMPOKCF	= 1UL << 3,	 // Compare register update OK Clear Flag
+	LPTIM_ICR_EXTTRIGCF = 1UL << 2,	 // External trigger valid edge Clear Flag
+	LPTIM_ICR_ARRMCF	= 1UL << 1,	 // Autoreload match Clear Flag
+	LPTIM_ICR_CMPMCF	= 1UL << 0,	 // compare match Clear Flag
 };
 
 // LPTIM->IER Interrupt Enable Register
 enum {
-	LPTIM_IER_DOWNIE = 1UL<<6, // Direction change to down Interrupt Enable
-	LPTIM_IER_UPIE = 1UL<<5, // Direction change to UP Interrupt Enable
-	LPTIM_IER_ARROKIE = 1UL<<4, // Autoreload register update OK Interrupt Enable
-	LPTIM_IER_CMPOKIE = 1UL<<3, // Compare register update OK Interrupt Enable
-	LPTIM_IER_EXTTRIGIE = 1UL<<2, // External trigger valid edge Interrupt Enable
-	LPTIM_IER_ARRMIE = 1UL<<1, // Autoreload match Interrupt Enable
-	LPTIM_IER_CMPMIE = 1UL<<0, // Compare match Interrupt Enable		
+	LPTIM_IER_DOWNIE	= 1UL << 6,	 // Direction change to down Interrupt Enable
+	LPTIM_IER_UPIE		= 1UL << 5,	 // Direction change to UP Interrupt Enable
+	LPTIM_IER_ARROKIE	= 1UL << 4,	 // Autoreload register update OK Interrupt Enable
+	LPTIM_IER_CMPOKIE	= 1UL << 3,	 // Compare register update OK Interrupt Enable
+	LPTIM_IER_EXTTRIGIE = 1UL << 2,	 // External trigger valid edge Interrupt Enable
+	LPTIM_IER_ARRMIE	= 1UL << 1,	 // Autoreload match Interrupt Enable
+	LPTIM_IER_CMPMIE	= 1UL << 0,	 // Compare match Interrupt Enable
 };
 
 // LPTIM->CFGR Configuration Register
 enum {
-	LPTIM_CFGR_ENC = 1UL<<24, // Encoder mode enable
-	LPTIM_CFGR_COUNTMODE = 1UL<<23, // counter mode enabled
-	LPTIM_CFGR_PRELOAD = 1UL<<22, // Registers update mode
-	LPTIM_CFGR_WAVPOL = 1UL<<21, // Waveform shape polarity
-	LPTIM_CFGR_WAVE = 1UL<<20, // Waveform shape
-	LPTIM_CFGR_TIMOUT = 1UL<<19, // Timeout enable
-	LPTIM_CFGR_TRIGEN = ((1UL<<2)-1) << 17, // Trigger enable and polarity
-	LPTIM_CFGR_TRIGSEL = ((1UL<<3)-1) << 13, // Trigger selector
-	LPTIM_CFGR_PRESC = ((1UL<<3)-1) << 9, // Clock prescaler
-	LPTIM_CFGR_TRGFLT = ((1UL<<2)-1) << 6, // Configurable digital filter for trigger
-	LPTIM_CFGR_CKFLT = ((1UL<<2)-1) << 3, // Configurable digital filter for external clock
-	LPTIM_CFGR_CKPOL = ((1UL<<2)-1) << 1, // Clock Polarity
-	LPTIM_CFGR_CKSEL = 1UL<<0, // Clock selector		
+	LPTIM_CFGR_ENC		 = 1UL << 24,				// Encoder mode enable
+	LPTIM_CFGR_COUNTMODE = 1UL << 23,				// counter mode enabled
+	LPTIM_CFGR_PRELOAD	 = 1UL << 22,				// Registers update mode
+	LPTIM_CFGR_WAVPOL	 = 1UL << 21,				// Waveform shape polarity
+	LPTIM_CFGR_WAVE		 = 1UL << 20,				// Waveform shape
+	LPTIM_CFGR_TIMOUT	 = 1UL << 19,				// Timeout enable
+	LPTIM_CFGR_TRIGEN	 = ((1UL << 2) - 1) << 17,	// Trigger enable and polarity
+	LPTIM_CFGR_TRIGSEL	 = ((1UL << 3) - 1) << 13,	// Trigger selector
+	LPTIM_CFGR_PRESC	 = ((1UL << 3) - 1) << 9,	// Clock prescaler
+	LPTIM_CFGR_TRGFLT	 = ((1UL << 2) - 1) << 6,	// Configurable digital filter for trigger
+	LPTIM_CFGR_CKFLT	 = ((1UL << 2) - 1) << 3,	// Configurable digital filter for external clock
+	LPTIM_CFGR_CKPOL	 = ((1UL << 2) - 1) << 1,	// Clock Polarity
+	LPTIM_CFGR_CKSEL	 = 1UL << 0,				// Clock selector
 };
-static inline void lptim_cfgr_set_trigen(struct LPTIM_Type* p, uint32_t val) { p->CFGR = (p->CFGR & ~LPTIM_CFGR_TRIGEN) | ((val<<17) & LPTIM_CFGR_TRIGEN); }
-static inline void lptim_cfgr_set_trigsel(struct LPTIM_Type* p, uint32_t val) { p->CFGR = (p->CFGR & ~LPTIM_CFGR_TRIGSEL) | ((val<<13) & LPTIM_CFGR_TRIGSEL); }
-static inline void lptim_cfgr_set_presc(struct LPTIM_Type* p, uint32_t val) { p->CFGR = (p->CFGR & ~LPTIM_CFGR_PRESC) | ((val<<9) & LPTIM_CFGR_PRESC); }
-static inline void lptim_cfgr_set_trgflt(struct LPTIM_Type* p, uint32_t val) { p->CFGR = (p->CFGR & ~LPTIM_CFGR_TRGFLT) | ((val<<6) & LPTIM_CFGR_TRGFLT); }
-static inline void lptim_cfgr_set_ckflt(struct LPTIM_Type* p, uint32_t val) { p->CFGR = (p->CFGR & ~LPTIM_CFGR_CKFLT) | ((val<<3) & LPTIM_CFGR_CKFLT); }
-static inline void lptim_cfgr_set_ckpol(struct LPTIM_Type* p, uint32_t val) { p->CFGR = (p->CFGR & ~LPTIM_CFGR_CKPOL) | ((val<<1) & LPTIM_CFGR_CKPOL); }
-static inline uint32_t lptim_cfgr_get_trigen(struct LPTIM_Type* p) { return (p->CFGR & LPTIM_CFGR_TRIGEN) >> 17 ; }
-static inline uint32_t lptim_cfgr_get_trigsel(struct LPTIM_Type* p) { return (p->CFGR & LPTIM_CFGR_TRIGSEL) >> 13 ; }
-static inline uint32_t lptim_cfgr_get_presc(struct LPTIM_Type* p) { return (p->CFGR & LPTIM_CFGR_PRESC) >> 9 ; }
-static inline uint32_t lptim_cfgr_get_trgflt(struct LPTIM_Type* p) { return (p->CFGR & LPTIM_CFGR_TRGFLT) >> 6 ; }
-static inline uint32_t lptim_cfgr_get_ckflt(struct LPTIM_Type* p) { return (p->CFGR & LPTIM_CFGR_CKFLT) >> 3 ; }
-static inline uint32_t lptim_cfgr_get_ckpol(struct LPTIM_Type* p) { return (p->CFGR & LPTIM_CFGR_CKPOL) >> 1 ; }
+static inline void lptim_cfgr_set_trigen(struct LPTIM_Type *p, uint32_t val) {
+	p->CFGR = (p->CFGR & ~LPTIM_CFGR_TRIGEN) | ((val << 17) & LPTIM_CFGR_TRIGEN);
+}
+static inline void lptim_cfgr_set_trigsel(struct LPTIM_Type *p, uint32_t val) {
+	p->CFGR = (p->CFGR & ~LPTIM_CFGR_TRIGSEL) | ((val << 13) & LPTIM_CFGR_TRIGSEL);
+}
+static inline void lptim_cfgr_set_presc(struct LPTIM_Type *p, uint32_t val) {
+	p->CFGR = (p->CFGR & ~LPTIM_CFGR_PRESC) | ((val << 9) & LPTIM_CFGR_PRESC);
+}
+static inline void lptim_cfgr_set_trgflt(struct LPTIM_Type *p, uint32_t val) {
+	p->CFGR = (p->CFGR & ~LPTIM_CFGR_TRGFLT) | ((val << 6) & LPTIM_CFGR_TRGFLT);
+}
+static inline void lptim_cfgr_set_ckflt(struct LPTIM_Type *p, uint32_t val) {
+	p->CFGR = (p->CFGR & ~LPTIM_CFGR_CKFLT) | ((val << 3) & LPTIM_CFGR_CKFLT);
+}
+static inline void lptim_cfgr_set_ckpol(struct LPTIM_Type *p, uint32_t val) {
+	p->CFGR = (p->CFGR & ~LPTIM_CFGR_CKPOL) | ((val << 1) & LPTIM_CFGR_CKPOL);
+}
+static inline uint32_t lptim_cfgr_get_trigen(struct LPTIM_Type *p) { return (p->CFGR & LPTIM_CFGR_TRIGEN) >> 17; }
+static inline uint32_t lptim_cfgr_get_trigsel(struct LPTIM_Type *p) { return (p->CFGR & LPTIM_CFGR_TRIGSEL) >> 13; }
+static inline uint32_t lptim_cfgr_get_presc(struct LPTIM_Type *p) { return (p->CFGR & LPTIM_CFGR_PRESC) >> 9; }
+static inline uint32_t lptim_cfgr_get_trgflt(struct LPTIM_Type *p) { return (p->CFGR & LPTIM_CFGR_TRGFLT) >> 6; }
+static inline uint32_t lptim_cfgr_get_ckflt(struct LPTIM_Type *p) { return (p->CFGR & LPTIM_CFGR_CKFLT) >> 3; }
+static inline uint32_t lptim_cfgr_get_ckpol(struct LPTIM_Type *p) { return (p->CFGR & LPTIM_CFGR_CKPOL) >> 1; }
 
 // LPTIM->CR Control Register
 enum {
-	LPTIM_CR_CNTSTRT = 1UL<<2, // Timer start in continuous mode
-	LPTIM_CR_SNGSTRT = 1UL<<1, // LPTIM start in single mode
-	LPTIM_CR_ENABLE = 1UL<<0, // LPTIM Enable		
+	LPTIM_CR_CNTSTRT = 1UL << 2,  // Timer start in continuous mode
+	LPTIM_CR_SNGSTRT = 1UL << 1,  // LPTIM start in single mode
+	LPTIM_CR_ENABLE	 = 1UL << 0,  // LPTIM Enable
 };
-
 
 /* Universal synchronous asynchronous receiver transmitter
 There is only one peripheral of type LPUART. */
 struct LPUART_Type {
-	__IO uint32_t CR1; // @0 Control register 1
-	__IO uint32_t CR2; // @4 Control register 2
-	__IO uint32_t CR3; // @8 Control register 3
-	__IO uint32_t BRR; // @12 Baud rate register
-	 uint8_t RESERVED0[8]; // @16 
-	__O uint8_t RQR; // @24 Request register
-	 uint8_t RESERVED1[3]; // @25 
-	__I uint32_t ISR; // @28 Interrupt & status register
-	__O uint32_t ICR; // @32 Interrupt flag clear register
-	__I uint16_t RDR; // @36 Receive data register
-	 uint8_t RESERVED2[2]; // @38 
-	__IO uint16_t TDR; // @40 Transmit data register
+	__IO uint32_t CR1;			 // @0 Control register 1
+	__IO uint32_t CR2;			 // @4 Control register 2
+	__IO uint32_t CR3;			 // @8 Control register 3
+	__IO uint32_t BRR;			 // @12 Baud rate register
+	uint8_t		  RESERVED0[8];	 // @16
+	__O uint8_t	  RQR;			 // @24 Request register
+	uint8_t		  RESERVED1[3];	 // @25
+	__I uint32_t  ISR;			 // @28 Interrupt & status register
+	__O uint32_t  ICR;			 // @32 Interrupt flag clear register
+	__I uint16_t  RDR;			 // @36 Receive data register
+	uint8_t		  RESERVED2[2];	 // @38
+	__IO uint16_t TDR;			 // @40 Transmit data register
 };
-extern struct LPUART_Type	LPUART1;	// @0x40008000 
+extern struct LPUART_Type LPUART1;	// @0x40008000
 
 // LPUART->CR1 Control register 1
 enum {
-	LPUART_CR1_M1 = 1UL<<28, // Word length
-	LPUART_CR1_DEAT4 = 1UL<<25, // Driver Enable assertion time
-	LPUART_CR1_DEAT3 = 1UL<<24, // DEAT3
-	LPUART_CR1_DEAT2 = 1UL<<23, // DEAT2
-	LPUART_CR1_DEAT1 = 1UL<<22, // DEAT1
-	LPUART_CR1_DEAT0 = 1UL<<21, // DEAT0
-	LPUART_CR1_DEDT4 = 1UL<<20, // Driver Enable de-assertion time
-	LPUART_CR1_DEDT3 = 1UL<<19, // DEDT3
-	LPUART_CR1_DEDT2 = 1UL<<18, // DEDT2
-	LPUART_CR1_DEDT1 = 1UL<<17, // DEDT1
-	LPUART_CR1_DEDT0 = 1UL<<16, // DEDT0
-	LPUART_CR1_CMIE = 1UL<<14, // Character match interrupt enable
-	LPUART_CR1_MME = 1UL<<13, // Mute mode enable
-	LPUART_CR1_M0 = 1UL<<12, // Word length
-	LPUART_CR1_WAKE = 1UL<<11, // Receiver wakeup method
-	LPUART_CR1_PCE = 1UL<<10, // Parity control enable
-	LPUART_CR1_PS = 1UL<<9, // Parity selection
-	LPUART_CR1_PEIE = 1UL<<8, // PE interrupt enable
-	LPUART_CR1_TXEIE = 1UL<<7, // interrupt enable
-	LPUART_CR1_TCIE = 1UL<<6, // Transmission complete interrupt enable
-	LPUART_CR1_RXNEIE = 1UL<<5, // RXNE interrupt enable
-	LPUART_CR1_IDLEIE = 1UL<<4, // IDLE interrupt enable
-	LPUART_CR1_TE = 1UL<<3, // Transmitter enable
-	LPUART_CR1_RE = 1UL<<2, // Receiver enable
-	LPUART_CR1_UESM = 1UL<<1, // USART enable in Stop mode
-	LPUART_CR1_UE = 1UL<<0, // USART enable		
+	LPUART_CR1_M1	  = 1UL << 28,	// Word length
+	LPUART_CR1_DEAT4  = 1UL << 25,	// Driver Enable assertion time
+	LPUART_CR1_DEAT3  = 1UL << 24,	// DEAT3
+	LPUART_CR1_DEAT2  = 1UL << 23,	// DEAT2
+	LPUART_CR1_DEAT1  = 1UL << 22,	// DEAT1
+	LPUART_CR1_DEAT0  = 1UL << 21,	// DEAT0
+	LPUART_CR1_DEDT4  = 1UL << 20,	// Driver Enable de-assertion time
+	LPUART_CR1_DEDT3  = 1UL << 19,	// DEDT3
+	LPUART_CR1_DEDT2  = 1UL << 18,	// DEDT2
+	LPUART_CR1_DEDT1  = 1UL << 17,	// DEDT1
+	LPUART_CR1_DEDT0  = 1UL << 16,	// DEDT0
+	LPUART_CR1_CMIE	  = 1UL << 14,	// Character match interrupt enable
+	LPUART_CR1_MME	  = 1UL << 13,	// Mute mode enable
+	LPUART_CR1_M0	  = 1UL << 12,	// Word length
+	LPUART_CR1_WAKE	  = 1UL << 11,	// Receiver wakeup method
+	LPUART_CR1_PCE	  = 1UL << 10,	// Parity control enable
+	LPUART_CR1_PS	  = 1UL << 9,	// Parity selection
+	LPUART_CR1_PEIE	  = 1UL << 8,	// PE interrupt enable
+	LPUART_CR1_TXEIE  = 1UL << 7,	// interrupt enable
+	LPUART_CR1_TCIE	  = 1UL << 6,	// Transmission complete interrupt enable
+	LPUART_CR1_RXNEIE = 1UL << 5,	// RXNE interrupt enable
+	LPUART_CR1_IDLEIE = 1UL << 4,	// IDLE interrupt enable
+	LPUART_CR1_TE	  = 1UL << 3,	// Transmitter enable
+	LPUART_CR1_RE	  = 1UL << 2,	// Receiver enable
+	LPUART_CR1_UESM	  = 1UL << 1,	// USART enable in Stop mode
+	LPUART_CR1_UE	  = 1UL << 0,	// USART enable
 };
 
 // LPUART->CR2 Control register 2
 enum {
-	LPUART_CR2_ADD4_7 = ((1UL<<4)-1) << 28, // Address of the USART node
-	LPUART_CR2_ADD0_3 = ((1UL<<4)-1) << 24, // Address of the USART node
-	LPUART_CR2_MSBFIRST = 1UL<<19, // Most significant bit first
-	LPUART_CR2_TAINV = 1UL<<18, // Binary data inversion
-	LPUART_CR2_TXINV = 1UL<<17, // TX pin active level inversion
-	LPUART_CR2_RXINV = 1UL<<16, // RX pin active level inversion
-	LPUART_CR2_SWAP = 1UL<<15, // Swap TX/RX pins
-	LPUART_CR2_STOP = ((1UL<<2)-1) << 12, // STOP bits
-	LPUART_CR2_CLKEN = 1UL<<11, // Clock enable
-	LPUART_CR2_ADDM7 = 1UL<<4, // 7-bit Address Detection/4-bit Address Detection		
+	LPUART_CR2_ADD4_7	= ((1UL << 4) - 1) << 28,  // Address of the USART node
+	LPUART_CR2_ADD0_3	= ((1UL << 4) - 1) << 24,  // Address of the USART node
+	LPUART_CR2_MSBFIRST = 1UL << 19,			   // Most significant bit first
+	LPUART_CR2_TAINV	= 1UL << 18,			   // Binary data inversion
+	LPUART_CR2_TXINV	= 1UL << 17,			   // TX pin active level inversion
+	LPUART_CR2_RXINV	= 1UL << 16,			   // RX pin active level inversion
+	LPUART_CR2_SWAP		= 1UL << 15,			   // Swap TX/RX pins
+	LPUART_CR2_STOP		= ((1UL << 2) - 1) << 12,  // STOP bits
+	LPUART_CR2_CLKEN	= 1UL << 11,			   // Clock enable
+	LPUART_CR2_ADDM7	= 1UL << 4,				   // 7-bit Address Detection/4-bit Address Detection
 };
-static inline void lpuart_cr2_set_add4_7(uint32_t val) { LPUART1.CR2 = (LPUART1.CR2 & ~LPUART_CR2_ADD4_7) | ((val<<28) & LPUART_CR2_ADD4_7); }
-static inline void lpuart_cr2_set_add0_3(uint32_t val) { LPUART1.CR2 = (LPUART1.CR2 & ~LPUART_CR2_ADD0_3) | ((val<<24) & LPUART_CR2_ADD0_3); }
-static inline void lpuart_cr2_set_stop(uint32_t val) { LPUART1.CR2 = (LPUART1.CR2 & ~LPUART_CR2_STOP) | ((val<<12) & LPUART_CR2_STOP); }
-static inline uint32_t lpuart_cr2_get_add4_7(void) { return (LPUART1.CR2 & LPUART_CR2_ADD4_7) >> 28 ; }
-static inline uint32_t lpuart_cr2_get_add0_3(void) { return (LPUART1.CR2 & LPUART_CR2_ADD0_3) >> 24 ; }
-static inline uint32_t lpuart_cr2_get_stop(void) { return (LPUART1.CR2 & LPUART_CR2_STOP) >> 12 ; }
+static inline void lpuart_cr2_set_add4_7(uint32_t val) {
+	LPUART1.CR2 = (LPUART1.CR2 & ~LPUART_CR2_ADD4_7) | ((val << 28) & LPUART_CR2_ADD4_7);
+}
+static inline void lpuart_cr2_set_add0_3(uint32_t val) {
+	LPUART1.CR2 = (LPUART1.CR2 & ~LPUART_CR2_ADD0_3) | ((val << 24) & LPUART_CR2_ADD0_3);
+}
+static inline void lpuart_cr2_set_stop(uint32_t val) {
+	LPUART1.CR2 = (LPUART1.CR2 & ~LPUART_CR2_STOP) | ((val << 12) & LPUART_CR2_STOP);
+}
+static inline uint32_t lpuart_cr2_get_add4_7(void) { return (LPUART1.CR2 & LPUART_CR2_ADD4_7) >> 28; }
+static inline uint32_t lpuart_cr2_get_add0_3(void) { return (LPUART1.CR2 & LPUART_CR2_ADD0_3) >> 24; }
+static inline uint32_t lpuart_cr2_get_stop(void) { return (LPUART1.CR2 & LPUART_CR2_STOP) >> 12; }
 
 // LPUART->CR3 Control register 3
 enum {
-	LPUART_CR3_WUFIE = 1UL<<22, // Wakeup from Stop mode interrupt enable
-	LPUART_CR3_WUS = ((1UL<<2)-1) << 20, // Wakeup from Stop mode interrupt flag selection
-	LPUART_CR3_DEP = 1UL<<15, // Driver enable polarity selection
-	LPUART_CR3_DEM = 1UL<<14, // Driver enable mode
-	LPUART_CR3_DDRE = 1UL<<13, // DMA Disable on Reception Error
-	LPUART_CR3_OVRDIS = 1UL<<12, // Overrun Disable
-	LPUART_CR3_CTSIE = 1UL<<10, // CTS interrupt enable
-	LPUART_CR3_CTSE = 1UL<<9, // CTS enable
-	LPUART_CR3_RTSE = 1UL<<8, // RTS enable
-	LPUART_CR3_DMAT = 1UL<<7, // DMA enable transmitter
-	LPUART_CR3_DMAR = 1UL<<6, // DMA enable receiver
-	LPUART_CR3_HDSEL = 1UL<<3, // Half-duplex selection
-	LPUART_CR3_EIE = 1UL<<0, // Error interrupt enable		
+	LPUART_CR3_WUFIE  = 1UL << 22,				 // Wakeup from Stop mode interrupt enable
+	LPUART_CR3_WUS	  = ((1UL << 2) - 1) << 20,	 // Wakeup from Stop mode interrupt flag selection
+	LPUART_CR3_DEP	  = 1UL << 15,				 // Driver enable polarity selection
+	LPUART_CR3_DEM	  = 1UL << 14,				 // Driver enable mode
+	LPUART_CR3_DDRE	  = 1UL << 13,				 // DMA Disable on Reception Error
+	LPUART_CR3_OVRDIS = 1UL << 12,				 // Overrun Disable
+	LPUART_CR3_CTSIE  = 1UL << 10,				 // CTS interrupt enable
+	LPUART_CR3_CTSE	  = 1UL << 9,				 // CTS enable
+	LPUART_CR3_RTSE	  = 1UL << 8,				 // RTS enable
+	LPUART_CR3_DMAT	  = 1UL << 7,				 // DMA enable transmitter
+	LPUART_CR3_DMAR	  = 1UL << 6,				 // DMA enable receiver
+	LPUART_CR3_HDSEL  = 1UL << 3,				 // Half-duplex selection
+	LPUART_CR3_EIE	  = 1UL << 0,				 // Error interrupt enable
 };
-static inline void lpuart_cr3_set_wus(uint32_t val) { LPUART1.CR3 = (LPUART1.CR3 & ~LPUART_CR3_WUS) | ((val<<20) & LPUART_CR3_WUS); }
-static inline uint32_t lpuart_cr3_get_wus(void) { return (LPUART1.CR3 & LPUART_CR3_WUS) >> 20 ; }
+static inline void lpuart_cr3_set_wus(uint32_t val) {
+	LPUART1.CR3 = (LPUART1.CR3 & ~LPUART_CR3_WUS) | ((val << 20) & LPUART_CR3_WUS);
+}
+static inline uint32_t lpuart_cr3_get_wus(void) { return (LPUART1.CR3 & LPUART_CR3_WUS) >> 20; }
 
 // LPUART->BRR Baud rate register
 enum {
-	LPUART_BRR_BRR = ((1UL<<20)-1) << 0, // BRR		
+	LPUART_BRR_BRR = ((1UL << 20) - 1) << 0,  // BRR
 };
-static inline void lpuart_brr_set_brr(uint32_t val) { LPUART1.BRR = (LPUART1.BRR & ~LPUART_BRR_BRR) | ((val<<0) & LPUART_BRR_BRR); }
-static inline uint32_t lpuart_brr_get_brr(void) { return (LPUART1.BRR & LPUART_BRR_BRR) >> 0 ; }
+static inline void lpuart_brr_set_brr(uint32_t val) {
+	LPUART1.BRR = (LPUART1.BRR & ~LPUART_BRR_BRR) | ((val << 0) & LPUART_BRR_BRR);
+}
+static inline uint32_t lpuart_brr_get_brr(void) { return (LPUART1.BRR & LPUART_BRR_BRR) >> 0; }
 
 // LPUART->RQR Request register
 enum {
-	LPUART_RQR_RXFRQ = 1UL<<3, // Receive data flush request
-	LPUART_RQR_MMRQ = 1UL<<2, // Mute mode request
-	LPUART_RQR_SBKRQ = 1UL<<1, // Send break request		
+	LPUART_RQR_RXFRQ = 1UL << 3,  // Receive data flush request
+	LPUART_RQR_MMRQ	 = 1UL << 2,  // Mute mode request
+	LPUART_RQR_SBKRQ = 1UL << 1,  // Send break request
 };
 
 // LPUART->ISR Interrupt & status register
 enum {
-	LPUART_ISR_REACK = 1UL<<22, // REACK
-	LPUART_ISR_TEACK = 1UL<<21, // TEACK
-	LPUART_ISR_WUF = 1UL<<20, // WUF
-	LPUART_ISR_RWU = 1UL<<19, // RWU
-	LPUART_ISR_SBKF = 1UL<<18, // SBKF
-	LPUART_ISR_CMF = 1UL<<17, // CMF
-	LPUART_ISR_BUSY = 1UL<<16, // BUSY
-	LPUART_ISR_CTS = 1UL<<10, // CTS
-	LPUART_ISR_CTSIF = 1UL<<9, // CTSIF
-	LPUART_ISR_TXE = 1UL<<7, // TXE
-	LPUART_ISR_TC = 1UL<<6, // TC
-	LPUART_ISR_RXNE = 1UL<<5, // RXNE
-	LPUART_ISR_IDLE = 1UL<<4, // IDLE
-	LPUART_ISR_ORE = 1UL<<3, // ORE
-	LPUART_ISR_NF = 1UL<<2, // NF
-	LPUART_ISR_FE = 1UL<<1, // FE
-	LPUART_ISR_PE = 1UL<<0, // PE		
+	LPUART_ISR_REACK = 1UL << 22,  // REACK
+	LPUART_ISR_TEACK = 1UL << 21,  // TEACK
+	LPUART_ISR_WUF	 = 1UL << 20,  // WUF
+	LPUART_ISR_RWU	 = 1UL << 19,  // RWU
+	LPUART_ISR_SBKF	 = 1UL << 18,  // SBKF
+	LPUART_ISR_CMF	 = 1UL << 17,  // CMF
+	LPUART_ISR_BUSY	 = 1UL << 16,  // BUSY
+	LPUART_ISR_CTS	 = 1UL << 10,  // CTS
+	LPUART_ISR_CTSIF = 1UL << 9,   // CTSIF
+	LPUART_ISR_TXE	 = 1UL << 7,   // TXE
+	LPUART_ISR_TC	 = 1UL << 6,   // TC
+	LPUART_ISR_RXNE	 = 1UL << 5,   // RXNE
+	LPUART_ISR_IDLE	 = 1UL << 4,   // IDLE
+	LPUART_ISR_ORE	 = 1UL << 3,   // ORE
+	LPUART_ISR_NF	 = 1UL << 2,   // NF
+	LPUART_ISR_FE	 = 1UL << 1,   // FE
+	LPUART_ISR_PE	 = 1UL << 0,   // PE
 };
 
 // LPUART->ICR Interrupt flag clear register
 enum {
-	LPUART_ICR_WUCF = 1UL<<20, // Wakeup from Stop mode clear flag
-	LPUART_ICR_CMCF = 1UL<<17, // Character match clear flag
-	LPUART_ICR_CTSCF = 1UL<<9, // CTS clear flag
-	LPUART_ICR_TCCF = 1UL<<6, // Transmission complete clear flag
-	LPUART_ICR_IDLECF = 1UL<<4, // Idle line detected clear flag
-	LPUART_ICR_ORECF = 1UL<<3, // Overrun error clear flag
-	LPUART_ICR_NCF = 1UL<<2, // Noise detected clear flag
-	LPUART_ICR_FECF = 1UL<<1, // Framing error clear flag
-	LPUART_ICR_PECF = 1UL<<0, // Parity error clear flag		
+	LPUART_ICR_WUCF	  = 1UL << 20,	// Wakeup from Stop mode clear flag
+	LPUART_ICR_CMCF	  = 1UL << 17,	// Character match clear flag
+	LPUART_ICR_CTSCF  = 1UL << 9,	// CTS clear flag
+	LPUART_ICR_TCCF	  = 1UL << 6,	// Transmission complete clear flag
+	LPUART_ICR_IDLECF = 1UL << 4,	// Idle line detected clear flag
+	LPUART_ICR_ORECF  = 1UL << 3,	// Overrun error clear flag
+	LPUART_ICR_NCF	  = 1UL << 2,	// Noise detected clear flag
+	LPUART_ICR_FECF	  = 1UL << 1,	// Framing error clear flag
+	LPUART_ICR_PECF	  = 1UL << 0,	// Parity error clear flag
 };
 
 // LPUART->RDR Receive data register
 enum {
-	LPUART_RDR_RDR = ((1UL<<9)-1) << 0, // Receive data value		
+	LPUART_RDR_RDR = ((1UL << 9) - 1) << 0,	 // Receive data value
 };
-static inline uint32_t lpuart_rdr_get_rdr(void) { return (LPUART1.RDR & LPUART_RDR_RDR) >> 0 ; }
+static inline uint32_t lpuart_rdr_get_rdr(void) { return (LPUART1.RDR & LPUART_RDR_RDR) >> 0; }
 
 // LPUART->TDR Transmit data register
 enum {
-	LPUART_TDR_TDR = ((1UL<<9)-1) << 0, // Transmit data value		
+	LPUART_TDR_TDR = ((1UL << 9) - 1) << 0,	 // Transmit data value
 };
-static inline void lpuart_tdr_set_tdr(uint32_t val) { LPUART1.TDR = (LPUART1.TDR & ~LPUART_TDR_TDR) | ((val<<0) & LPUART_TDR_TDR); }
-static inline uint32_t lpuart_tdr_get_tdr(void) { return (LPUART1.TDR & LPUART_TDR_TDR) >> 0 ; }
+static inline void lpuart_tdr_set_tdr(uint32_t val) {
+	LPUART1.TDR = (LPUART1.TDR & ~LPUART_TDR_TDR) | ((val << 0) & LPUART_TDR_TDR);
+}
+static inline uint32_t lpuart_tdr_get_tdr(void) { return (LPUART1.TDR & LPUART_TDR_TDR) >> 0; }
 
 /* Nested Vectored Interrupt Controller
 There is only one peripheral of type NVIC. */
 struct NVIC_Type {
-	__IO uint32_t ISER0; // @0 Interrupt Set-Enable Register
-	__IO uint32_t ISER1; // @4 Interrupt Set-Enable Register
-	__IO uint32_t ISER2; // @8 Interrupt Set-Enable Register
-	 uint8_t RESERVED0[116]; // @12 
-	__IO uint32_t ICER0; // @128 Interrupt Clear-Enable Register
-	__IO uint32_t ICER1; // @132 Interrupt Clear-Enable Register
-	__IO uint32_t ICER2; // @136 Interrupt Clear-Enable Register
-	 uint8_t RESERVED1[116]; // @140 
-	__IO uint32_t ISPR0; // @256 Interrupt Set-Pending Register
-	__IO uint32_t ISPR1; // @260 Interrupt Set-Pending Register
-	__IO uint32_t ISPR2; // @264 Interrupt Set-Pending Register
-	 uint8_t RESERVED2[116]; // @268 
-	__IO uint32_t ICPR0; // @384 Interrupt Clear-Pending Register
-	__IO uint32_t ICPR1; // @388 Interrupt Clear-Pending Register
-	__IO uint32_t ICPR2; // @392 Interrupt Clear-Pending Register
-	 uint8_t RESERVED3[116]; // @396 
-	__I uint32_t IABR0; // @512 Interrupt Active Bit Register
-	__I uint32_t IABR1; // @516 Interrupt Active Bit Register
-	__I uint32_t IABR2; // @520 Interrupt Active Bit Register
-	 uint8_t RESERVED4[244]; // @524 
-	__IO uint32_t IPR0; // @768 Interrupt Priority Register
-	__IO uint32_t IPR1; // @772 Interrupt Priority Register
-	__IO uint32_t IPR2; // @776 Interrupt Priority Register
-	__IO uint32_t IPR3; // @780 Interrupt Priority Register
-	__IO uint32_t IPR4; // @784 Interrupt Priority Register
-	__IO uint32_t IPR5; // @788 Interrupt Priority Register
-	__IO uint32_t IPR6; // @792 Interrupt Priority Register
-	__IO uint32_t IPR7; // @796 Interrupt Priority Register
-	__IO uint32_t IPR8; // @800 Interrupt Priority Register
-	__IO uint32_t IPR9; // @804 Interrupt Priority Register
-	__IO uint32_t IPR10; // @808 Interrupt Priority Register
-	__IO uint32_t IPR11; // @812 Interrupt Priority Register
-	__IO uint32_t IPR12; // @816 Interrupt Priority Register
-	__IO uint32_t IPR13; // @820 Interrupt Priority Register
-	__IO uint32_t IPR14; // @824 Interrupt Priority Register
-	__IO uint32_t IPR15; // @828 Interrupt Priority Register
-	__IO uint32_t IPR16; // @832 Interrupt Priority Register
-	__IO uint32_t IPR17; // @836 Interrupt Priority Register
-	__IO uint32_t IPR18; // @840 Interrupt Priority Register
-	__IO uint32_t IPR19; // @844 Interrupt Priority Register
-	__IO uint32_t IPR20; // @848 Interrupt Priority Register
+	__IO uint32_t ISER0;		   // @0 Interrupt Set-Enable Register
+	__IO uint32_t ISER1;		   // @4 Interrupt Set-Enable Register
+	__IO uint32_t ISER2;		   // @8 Interrupt Set-Enable Register
+	uint8_t		  RESERVED0[116];  // @12
+	__IO uint32_t ICER0;		   // @128 Interrupt Clear-Enable Register
+	__IO uint32_t ICER1;		   // @132 Interrupt Clear-Enable Register
+	__IO uint32_t ICER2;		   // @136 Interrupt Clear-Enable Register
+	uint8_t		  RESERVED1[116];  // @140
+	__IO uint32_t ISPR0;		   // @256 Interrupt Set-Pending Register
+	__IO uint32_t ISPR1;		   // @260 Interrupt Set-Pending Register
+	__IO uint32_t ISPR2;		   // @264 Interrupt Set-Pending Register
+	uint8_t		  RESERVED2[116];  // @268
+	__IO uint32_t ICPR0;		   // @384 Interrupt Clear-Pending Register
+	__IO uint32_t ICPR1;		   // @388 Interrupt Clear-Pending Register
+	__IO uint32_t ICPR2;		   // @392 Interrupt Clear-Pending Register
+	uint8_t		  RESERVED3[116];  // @396
+	__I uint32_t  IABR0;		   // @512 Interrupt Active Bit Register
+	__I uint32_t  IABR1;		   // @516 Interrupt Active Bit Register
+	__I uint32_t  IABR2;		   // @520 Interrupt Active Bit Register
+	uint8_t		  RESERVED4[244];  // @524
+	__IO uint32_t IPR0;			   // @768 Interrupt Priority Register
+	__IO uint32_t IPR1;			   // @772 Interrupt Priority Register
+	__IO uint32_t IPR2;			   // @776 Interrupt Priority Register
+	__IO uint32_t IPR3;			   // @780 Interrupt Priority Register
+	__IO uint32_t IPR4;			   // @784 Interrupt Priority Register
+	__IO uint32_t IPR5;			   // @788 Interrupt Priority Register
+	__IO uint32_t IPR6;			   // @792 Interrupt Priority Register
+	__IO uint32_t IPR7;			   // @796 Interrupt Priority Register
+	__IO uint32_t IPR8;			   // @800 Interrupt Priority Register
+	__IO uint32_t IPR9;			   // @804 Interrupt Priority Register
+	__IO uint32_t IPR10;		   // @808 Interrupt Priority Register
+	__IO uint32_t IPR11;		   // @812 Interrupt Priority Register
+	__IO uint32_t IPR12;		   // @816 Interrupt Priority Register
+	__IO uint32_t IPR13;		   // @820 Interrupt Priority Register
+	__IO uint32_t IPR14;		   // @824 Interrupt Priority Register
+	__IO uint32_t IPR15;		   // @828 Interrupt Priority Register
+	__IO uint32_t IPR16;		   // @832 Interrupt Priority Register
+	__IO uint32_t IPR17;		   // @836 Interrupt Priority Register
+	__IO uint32_t IPR18;		   // @840 Interrupt Priority Register
+	__IO uint32_t IPR19;		   // @844 Interrupt Priority Register
+	__IO uint32_t IPR20;		   // @848 Interrupt Priority Register
 };
-extern struct NVIC_Type	NVIC;	// @0xE000E100 
+extern struct NVIC_Type NVIC;  // @0xE000E100
 
 // NVIC->IPR0 Interrupt Priority Register
 enum {
-	NVIC_IPR0_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR0_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR0_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR0_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR0_IPR_N3 = ((1UL << 8) - 1) << 24,	// IPR_N3
+	NVIC_IPR0_IPR_N2 = ((1UL << 8) - 1) << 16,	// IPR_N2
+	NVIC_IPR0_IPR_N1 = ((1UL << 8) - 1) << 8,	// IPR_N1
+	NVIC_IPR0_IPR_N0 = ((1UL << 8) - 1) << 0,	// IPR_N0
 };
-static inline void nvic_ipr0_set_ipr_n3(uint32_t val) { NVIC.IPR0 = (NVIC.IPR0 & ~NVIC_IPR0_IPR_N3) | ((val<<24) & NVIC_IPR0_IPR_N3); }
-static inline void nvic_ipr0_set_ipr_n2(uint32_t val) { NVIC.IPR0 = (NVIC.IPR0 & ~NVIC_IPR0_IPR_N2) | ((val<<16) & NVIC_IPR0_IPR_N2); }
-static inline void nvic_ipr0_set_ipr_n1(uint32_t val) { NVIC.IPR0 = (NVIC.IPR0 & ~NVIC_IPR0_IPR_N1) | ((val<<8) & NVIC_IPR0_IPR_N1); }
-static inline void nvic_ipr0_set_ipr_n0(uint32_t val) { NVIC.IPR0 = (NVIC.IPR0 & ~NVIC_IPR0_IPR_N0) | ((val<<0) & NVIC_IPR0_IPR_N0); }
-static inline uint32_t nvic_ipr0_get_ipr_n3(void) { return (NVIC.IPR0 & NVIC_IPR0_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr0_get_ipr_n2(void) { return (NVIC.IPR0 & NVIC_IPR0_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr0_get_ipr_n1(void) { return (NVIC.IPR0 & NVIC_IPR0_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr0_get_ipr_n0(void) { return (NVIC.IPR0 & NVIC_IPR0_IPR_N0) >> 0 ; }
+static inline void nvic_ipr0_set_ipr_n3(uint32_t val) {
+	NVIC.IPR0 = (NVIC.IPR0 & ~NVIC_IPR0_IPR_N3) | ((val << 24) & NVIC_IPR0_IPR_N3);
+}
+static inline void nvic_ipr0_set_ipr_n2(uint32_t val) {
+	NVIC.IPR0 = (NVIC.IPR0 & ~NVIC_IPR0_IPR_N2) | ((val << 16) & NVIC_IPR0_IPR_N2);
+}
+static inline void nvic_ipr0_set_ipr_n1(uint32_t val) {
+	NVIC.IPR0 = (NVIC.IPR0 & ~NVIC_IPR0_IPR_N1) | ((val << 8) & NVIC_IPR0_IPR_N1);
+}
+static inline void nvic_ipr0_set_ipr_n0(uint32_t val) {
+	NVIC.IPR0 = (NVIC.IPR0 & ~NVIC_IPR0_IPR_N0) | ((val << 0) & NVIC_IPR0_IPR_N0);
+}
+static inline uint32_t nvic_ipr0_get_ipr_n3(void) { return (NVIC.IPR0 & NVIC_IPR0_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr0_get_ipr_n2(void) { return (NVIC.IPR0 & NVIC_IPR0_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr0_get_ipr_n1(void) { return (NVIC.IPR0 & NVIC_IPR0_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr0_get_ipr_n0(void) { return (NVIC.IPR0 & NVIC_IPR0_IPR_N0) >> 0; }
 
 // NVIC->IPR1 Interrupt Priority Register
 enum {
-	NVIC_IPR1_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR1_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR1_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR1_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR1_IPR_N3 = ((1UL << 8) - 1) << 24,	// IPR_N3
+	NVIC_IPR1_IPR_N2 = ((1UL << 8) - 1) << 16,	// IPR_N2
+	NVIC_IPR1_IPR_N1 = ((1UL << 8) - 1) << 8,	// IPR_N1
+	NVIC_IPR1_IPR_N0 = ((1UL << 8) - 1) << 0,	// IPR_N0
 };
-static inline void nvic_ipr1_set_ipr_n3(uint32_t val) { NVIC.IPR1 = (NVIC.IPR1 & ~NVIC_IPR1_IPR_N3) | ((val<<24) & NVIC_IPR1_IPR_N3); }
-static inline void nvic_ipr1_set_ipr_n2(uint32_t val) { NVIC.IPR1 = (NVIC.IPR1 & ~NVIC_IPR1_IPR_N2) | ((val<<16) & NVIC_IPR1_IPR_N2); }
-static inline void nvic_ipr1_set_ipr_n1(uint32_t val) { NVIC.IPR1 = (NVIC.IPR1 & ~NVIC_IPR1_IPR_N1) | ((val<<8) & NVIC_IPR1_IPR_N1); }
-static inline void nvic_ipr1_set_ipr_n0(uint32_t val) { NVIC.IPR1 = (NVIC.IPR1 & ~NVIC_IPR1_IPR_N0) | ((val<<0) & NVIC_IPR1_IPR_N0); }
-static inline uint32_t nvic_ipr1_get_ipr_n3(void) { return (NVIC.IPR1 & NVIC_IPR1_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr1_get_ipr_n2(void) { return (NVIC.IPR1 & NVIC_IPR1_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr1_get_ipr_n1(void) { return (NVIC.IPR1 & NVIC_IPR1_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr1_get_ipr_n0(void) { return (NVIC.IPR1 & NVIC_IPR1_IPR_N0) >> 0 ; }
+static inline void nvic_ipr1_set_ipr_n3(uint32_t val) {
+	NVIC.IPR1 = (NVIC.IPR1 & ~NVIC_IPR1_IPR_N3) | ((val << 24) & NVIC_IPR1_IPR_N3);
+}
+static inline void nvic_ipr1_set_ipr_n2(uint32_t val) {
+	NVIC.IPR1 = (NVIC.IPR1 & ~NVIC_IPR1_IPR_N2) | ((val << 16) & NVIC_IPR1_IPR_N2);
+}
+static inline void nvic_ipr1_set_ipr_n1(uint32_t val) {
+	NVIC.IPR1 = (NVIC.IPR1 & ~NVIC_IPR1_IPR_N1) | ((val << 8) & NVIC_IPR1_IPR_N1);
+}
+static inline void nvic_ipr1_set_ipr_n0(uint32_t val) {
+	NVIC.IPR1 = (NVIC.IPR1 & ~NVIC_IPR1_IPR_N0) | ((val << 0) & NVIC_IPR1_IPR_N0);
+}
+static inline uint32_t nvic_ipr1_get_ipr_n3(void) { return (NVIC.IPR1 & NVIC_IPR1_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr1_get_ipr_n2(void) { return (NVIC.IPR1 & NVIC_IPR1_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr1_get_ipr_n1(void) { return (NVIC.IPR1 & NVIC_IPR1_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr1_get_ipr_n0(void) { return (NVIC.IPR1 & NVIC_IPR1_IPR_N0) >> 0; }
 
 // NVIC->IPR2 Interrupt Priority Register
 enum {
-	NVIC_IPR2_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR2_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR2_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR2_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR2_IPR_N3 = ((1UL << 8) - 1) << 24,	// IPR_N3
+	NVIC_IPR2_IPR_N2 = ((1UL << 8) - 1) << 16,	// IPR_N2
+	NVIC_IPR2_IPR_N1 = ((1UL << 8) - 1) << 8,	// IPR_N1
+	NVIC_IPR2_IPR_N0 = ((1UL << 8) - 1) << 0,	// IPR_N0
 };
-static inline void nvic_ipr2_set_ipr_n3(uint32_t val) { NVIC.IPR2 = (NVIC.IPR2 & ~NVIC_IPR2_IPR_N3) | ((val<<24) & NVIC_IPR2_IPR_N3); }
-static inline void nvic_ipr2_set_ipr_n2(uint32_t val) { NVIC.IPR2 = (NVIC.IPR2 & ~NVIC_IPR2_IPR_N2) | ((val<<16) & NVIC_IPR2_IPR_N2); }
-static inline void nvic_ipr2_set_ipr_n1(uint32_t val) { NVIC.IPR2 = (NVIC.IPR2 & ~NVIC_IPR2_IPR_N1) | ((val<<8) & NVIC_IPR2_IPR_N1); }
-static inline void nvic_ipr2_set_ipr_n0(uint32_t val) { NVIC.IPR2 = (NVIC.IPR2 & ~NVIC_IPR2_IPR_N0) | ((val<<0) & NVIC_IPR2_IPR_N0); }
-static inline uint32_t nvic_ipr2_get_ipr_n3(void) { return (NVIC.IPR2 & NVIC_IPR2_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr2_get_ipr_n2(void) { return (NVIC.IPR2 & NVIC_IPR2_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr2_get_ipr_n1(void) { return (NVIC.IPR2 & NVIC_IPR2_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr2_get_ipr_n0(void) { return (NVIC.IPR2 & NVIC_IPR2_IPR_N0) >> 0 ; }
+static inline void nvic_ipr2_set_ipr_n3(uint32_t val) {
+	NVIC.IPR2 = (NVIC.IPR2 & ~NVIC_IPR2_IPR_N3) | ((val << 24) & NVIC_IPR2_IPR_N3);
+}
+static inline void nvic_ipr2_set_ipr_n2(uint32_t val) {
+	NVIC.IPR2 = (NVIC.IPR2 & ~NVIC_IPR2_IPR_N2) | ((val << 16) & NVIC_IPR2_IPR_N2);
+}
+static inline void nvic_ipr2_set_ipr_n1(uint32_t val) {
+	NVIC.IPR2 = (NVIC.IPR2 & ~NVIC_IPR2_IPR_N1) | ((val << 8) & NVIC_IPR2_IPR_N1);
+}
+static inline void nvic_ipr2_set_ipr_n0(uint32_t val) {
+	NVIC.IPR2 = (NVIC.IPR2 & ~NVIC_IPR2_IPR_N0) | ((val << 0) & NVIC_IPR2_IPR_N0);
+}
+static inline uint32_t nvic_ipr2_get_ipr_n3(void) { return (NVIC.IPR2 & NVIC_IPR2_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr2_get_ipr_n2(void) { return (NVIC.IPR2 & NVIC_IPR2_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr2_get_ipr_n1(void) { return (NVIC.IPR2 & NVIC_IPR2_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr2_get_ipr_n0(void) { return (NVIC.IPR2 & NVIC_IPR2_IPR_N0) >> 0; }
 
 // NVIC->IPR3 Interrupt Priority Register
 enum {
-	NVIC_IPR3_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR3_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR3_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR3_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR3_IPR_N3 = ((1UL << 8) - 1) << 24,	// IPR_N3
+	NVIC_IPR3_IPR_N2 = ((1UL << 8) - 1) << 16,	// IPR_N2
+	NVIC_IPR3_IPR_N1 = ((1UL << 8) - 1) << 8,	// IPR_N1
+	NVIC_IPR3_IPR_N0 = ((1UL << 8) - 1) << 0,	// IPR_N0
 };
-static inline void nvic_ipr3_set_ipr_n3(uint32_t val) { NVIC.IPR3 = (NVIC.IPR3 & ~NVIC_IPR3_IPR_N3) | ((val<<24) & NVIC_IPR3_IPR_N3); }
-static inline void nvic_ipr3_set_ipr_n2(uint32_t val) { NVIC.IPR3 = (NVIC.IPR3 & ~NVIC_IPR3_IPR_N2) | ((val<<16) & NVIC_IPR3_IPR_N2); }
-static inline void nvic_ipr3_set_ipr_n1(uint32_t val) { NVIC.IPR3 = (NVIC.IPR3 & ~NVIC_IPR3_IPR_N1) | ((val<<8) & NVIC_IPR3_IPR_N1); }
-static inline void nvic_ipr3_set_ipr_n0(uint32_t val) { NVIC.IPR3 = (NVIC.IPR3 & ~NVIC_IPR3_IPR_N0) | ((val<<0) & NVIC_IPR3_IPR_N0); }
-static inline uint32_t nvic_ipr3_get_ipr_n3(void) { return (NVIC.IPR3 & NVIC_IPR3_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr3_get_ipr_n2(void) { return (NVIC.IPR3 & NVIC_IPR3_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr3_get_ipr_n1(void) { return (NVIC.IPR3 & NVIC_IPR3_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr3_get_ipr_n0(void) { return (NVIC.IPR3 & NVIC_IPR3_IPR_N0) >> 0 ; }
+static inline void nvic_ipr3_set_ipr_n3(uint32_t val) {
+	NVIC.IPR3 = (NVIC.IPR3 & ~NVIC_IPR3_IPR_N3) | ((val << 24) & NVIC_IPR3_IPR_N3);
+}
+static inline void nvic_ipr3_set_ipr_n2(uint32_t val) {
+	NVIC.IPR3 = (NVIC.IPR3 & ~NVIC_IPR3_IPR_N2) | ((val << 16) & NVIC_IPR3_IPR_N2);
+}
+static inline void nvic_ipr3_set_ipr_n1(uint32_t val) {
+	NVIC.IPR3 = (NVIC.IPR3 & ~NVIC_IPR3_IPR_N1) | ((val << 8) & NVIC_IPR3_IPR_N1);
+}
+static inline void nvic_ipr3_set_ipr_n0(uint32_t val) {
+	NVIC.IPR3 = (NVIC.IPR3 & ~NVIC_IPR3_IPR_N0) | ((val << 0) & NVIC_IPR3_IPR_N0);
+}
+static inline uint32_t nvic_ipr3_get_ipr_n3(void) { return (NVIC.IPR3 & NVIC_IPR3_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr3_get_ipr_n2(void) { return (NVIC.IPR3 & NVIC_IPR3_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr3_get_ipr_n1(void) { return (NVIC.IPR3 & NVIC_IPR3_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr3_get_ipr_n0(void) { return (NVIC.IPR3 & NVIC_IPR3_IPR_N0) >> 0; }
 
 // NVIC->IPR4 Interrupt Priority Register
 enum {
-	NVIC_IPR4_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR4_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR4_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR4_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR4_IPR_N3 = ((1UL << 8) - 1) << 24,	// IPR_N3
+	NVIC_IPR4_IPR_N2 = ((1UL << 8) - 1) << 16,	// IPR_N2
+	NVIC_IPR4_IPR_N1 = ((1UL << 8) - 1) << 8,	// IPR_N1
+	NVIC_IPR4_IPR_N0 = ((1UL << 8) - 1) << 0,	// IPR_N0
 };
-static inline void nvic_ipr4_set_ipr_n3(uint32_t val) { NVIC.IPR4 = (NVIC.IPR4 & ~NVIC_IPR4_IPR_N3) | ((val<<24) & NVIC_IPR4_IPR_N3); }
-static inline void nvic_ipr4_set_ipr_n2(uint32_t val) { NVIC.IPR4 = (NVIC.IPR4 & ~NVIC_IPR4_IPR_N2) | ((val<<16) & NVIC_IPR4_IPR_N2); }
-static inline void nvic_ipr4_set_ipr_n1(uint32_t val) { NVIC.IPR4 = (NVIC.IPR4 & ~NVIC_IPR4_IPR_N1) | ((val<<8) & NVIC_IPR4_IPR_N1); }
-static inline void nvic_ipr4_set_ipr_n0(uint32_t val) { NVIC.IPR4 = (NVIC.IPR4 & ~NVIC_IPR4_IPR_N0) | ((val<<0) & NVIC_IPR4_IPR_N0); }
-static inline uint32_t nvic_ipr4_get_ipr_n3(void) { return (NVIC.IPR4 & NVIC_IPR4_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr4_get_ipr_n2(void) { return (NVIC.IPR4 & NVIC_IPR4_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr4_get_ipr_n1(void) { return (NVIC.IPR4 & NVIC_IPR4_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr4_get_ipr_n0(void) { return (NVIC.IPR4 & NVIC_IPR4_IPR_N0) >> 0 ; }
+static inline void nvic_ipr4_set_ipr_n3(uint32_t val) {
+	NVIC.IPR4 = (NVIC.IPR4 & ~NVIC_IPR4_IPR_N3) | ((val << 24) & NVIC_IPR4_IPR_N3);
+}
+static inline void nvic_ipr4_set_ipr_n2(uint32_t val) {
+	NVIC.IPR4 = (NVIC.IPR4 & ~NVIC_IPR4_IPR_N2) | ((val << 16) & NVIC_IPR4_IPR_N2);
+}
+static inline void nvic_ipr4_set_ipr_n1(uint32_t val) {
+	NVIC.IPR4 = (NVIC.IPR4 & ~NVIC_IPR4_IPR_N1) | ((val << 8) & NVIC_IPR4_IPR_N1);
+}
+static inline void nvic_ipr4_set_ipr_n0(uint32_t val) {
+	NVIC.IPR4 = (NVIC.IPR4 & ~NVIC_IPR4_IPR_N0) | ((val << 0) & NVIC_IPR4_IPR_N0);
+}
+static inline uint32_t nvic_ipr4_get_ipr_n3(void) { return (NVIC.IPR4 & NVIC_IPR4_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr4_get_ipr_n2(void) { return (NVIC.IPR4 & NVIC_IPR4_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr4_get_ipr_n1(void) { return (NVIC.IPR4 & NVIC_IPR4_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr4_get_ipr_n0(void) { return (NVIC.IPR4 & NVIC_IPR4_IPR_N0) >> 0; }
 
 // NVIC->IPR5 Interrupt Priority Register
 enum {
-	NVIC_IPR5_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR5_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR5_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR5_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR5_IPR_N3 = ((1UL << 8) - 1) << 24,	// IPR_N3
+	NVIC_IPR5_IPR_N2 = ((1UL << 8) - 1) << 16,	// IPR_N2
+	NVIC_IPR5_IPR_N1 = ((1UL << 8) - 1) << 8,	// IPR_N1
+	NVIC_IPR5_IPR_N0 = ((1UL << 8) - 1) << 0,	// IPR_N0
 };
-static inline void nvic_ipr5_set_ipr_n3(uint32_t val) { NVIC.IPR5 = (NVIC.IPR5 & ~NVIC_IPR5_IPR_N3) | ((val<<24) & NVIC_IPR5_IPR_N3); }
-static inline void nvic_ipr5_set_ipr_n2(uint32_t val) { NVIC.IPR5 = (NVIC.IPR5 & ~NVIC_IPR5_IPR_N2) | ((val<<16) & NVIC_IPR5_IPR_N2); }
-static inline void nvic_ipr5_set_ipr_n1(uint32_t val) { NVIC.IPR5 = (NVIC.IPR5 & ~NVIC_IPR5_IPR_N1) | ((val<<8) & NVIC_IPR5_IPR_N1); }
-static inline void nvic_ipr5_set_ipr_n0(uint32_t val) { NVIC.IPR5 = (NVIC.IPR5 & ~NVIC_IPR5_IPR_N0) | ((val<<0) & NVIC_IPR5_IPR_N0); }
-static inline uint32_t nvic_ipr5_get_ipr_n3(void) { return (NVIC.IPR5 & NVIC_IPR5_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr5_get_ipr_n2(void) { return (NVIC.IPR5 & NVIC_IPR5_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr5_get_ipr_n1(void) { return (NVIC.IPR5 & NVIC_IPR5_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr5_get_ipr_n0(void) { return (NVIC.IPR5 & NVIC_IPR5_IPR_N0) >> 0 ; }
+static inline void nvic_ipr5_set_ipr_n3(uint32_t val) {
+	NVIC.IPR5 = (NVIC.IPR5 & ~NVIC_IPR5_IPR_N3) | ((val << 24) & NVIC_IPR5_IPR_N3);
+}
+static inline void nvic_ipr5_set_ipr_n2(uint32_t val) {
+	NVIC.IPR5 = (NVIC.IPR5 & ~NVIC_IPR5_IPR_N2) | ((val << 16) & NVIC_IPR5_IPR_N2);
+}
+static inline void nvic_ipr5_set_ipr_n1(uint32_t val) {
+	NVIC.IPR5 = (NVIC.IPR5 & ~NVIC_IPR5_IPR_N1) | ((val << 8) & NVIC_IPR5_IPR_N1);
+}
+static inline void nvic_ipr5_set_ipr_n0(uint32_t val) {
+	NVIC.IPR5 = (NVIC.IPR5 & ~NVIC_IPR5_IPR_N0) | ((val << 0) & NVIC_IPR5_IPR_N0);
+}
+static inline uint32_t nvic_ipr5_get_ipr_n3(void) { return (NVIC.IPR5 & NVIC_IPR5_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr5_get_ipr_n2(void) { return (NVIC.IPR5 & NVIC_IPR5_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr5_get_ipr_n1(void) { return (NVIC.IPR5 & NVIC_IPR5_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr5_get_ipr_n0(void) { return (NVIC.IPR5 & NVIC_IPR5_IPR_N0) >> 0; }
 
 // NVIC->IPR6 Interrupt Priority Register
 enum {
-	NVIC_IPR6_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR6_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR6_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR6_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR6_IPR_N3 = ((1UL << 8) - 1) << 24,	// IPR_N3
+	NVIC_IPR6_IPR_N2 = ((1UL << 8) - 1) << 16,	// IPR_N2
+	NVIC_IPR6_IPR_N1 = ((1UL << 8) - 1) << 8,	// IPR_N1
+	NVIC_IPR6_IPR_N0 = ((1UL << 8) - 1) << 0,	// IPR_N0
 };
-static inline void nvic_ipr6_set_ipr_n3(uint32_t val) { NVIC.IPR6 = (NVIC.IPR6 & ~NVIC_IPR6_IPR_N3) | ((val<<24) & NVIC_IPR6_IPR_N3); }
-static inline void nvic_ipr6_set_ipr_n2(uint32_t val) { NVIC.IPR6 = (NVIC.IPR6 & ~NVIC_IPR6_IPR_N2) | ((val<<16) & NVIC_IPR6_IPR_N2); }
-static inline void nvic_ipr6_set_ipr_n1(uint32_t val) { NVIC.IPR6 = (NVIC.IPR6 & ~NVIC_IPR6_IPR_N1) | ((val<<8) & NVIC_IPR6_IPR_N1); }
-static inline void nvic_ipr6_set_ipr_n0(uint32_t val) { NVIC.IPR6 = (NVIC.IPR6 & ~NVIC_IPR6_IPR_N0) | ((val<<0) & NVIC_IPR6_IPR_N0); }
-static inline uint32_t nvic_ipr6_get_ipr_n3(void) { return (NVIC.IPR6 & NVIC_IPR6_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr6_get_ipr_n2(void) { return (NVIC.IPR6 & NVIC_IPR6_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr6_get_ipr_n1(void) { return (NVIC.IPR6 & NVIC_IPR6_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr6_get_ipr_n0(void) { return (NVIC.IPR6 & NVIC_IPR6_IPR_N0) >> 0 ; }
+static inline void nvic_ipr6_set_ipr_n3(uint32_t val) {
+	NVIC.IPR6 = (NVIC.IPR6 & ~NVIC_IPR6_IPR_N3) | ((val << 24) & NVIC_IPR6_IPR_N3);
+}
+static inline void nvic_ipr6_set_ipr_n2(uint32_t val) {
+	NVIC.IPR6 = (NVIC.IPR6 & ~NVIC_IPR6_IPR_N2) | ((val << 16) & NVIC_IPR6_IPR_N2);
+}
+static inline void nvic_ipr6_set_ipr_n1(uint32_t val) {
+	NVIC.IPR6 = (NVIC.IPR6 & ~NVIC_IPR6_IPR_N1) | ((val << 8) & NVIC_IPR6_IPR_N1);
+}
+static inline void nvic_ipr6_set_ipr_n0(uint32_t val) {
+	NVIC.IPR6 = (NVIC.IPR6 & ~NVIC_IPR6_IPR_N0) | ((val << 0) & NVIC_IPR6_IPR_N0);
+}
+static inline uint32_t nvic_ipr6_get_ipr_n3(void) { return (NVIC.IPR6 & NVIC_IPR6_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr6_get_ipr_n2(void) { return (NVIC.IPR6 & NVIC_IPR6_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr6_get_ipr_n1(void) { return (NVIC.IPR6 & NVIC_IPR6_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr6_get_ipr_n0(void) { return (NVIC.IPR6 & NVIC_IPR6_IPR_N0) >> 0; }
 
 // NVIC->IPR7 Interrupt Priority Register
 enum {
-	NVIC_IPR7_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR7_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR7_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR7_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR7_IPR_N3 = ((1UL << 8) - 1) << 24,	// IPR_N3
+	NVIC_IPR7_IPR_N2 = ((1UL << 8) - 1) << 16,	// IPR_N2
+	NVIC_IPR7_IPR_N1 = ((1UL << 8) - 1) << 8,	// IPR_N1
+	NVIC_IPR7_IPR_N0 = ((1UL << 8) - 1) << 0,	// IPR_N0
 };
-static inline void nvic_ipr7_set_ipr_n3(uint32_t val) { NVIC.IPR7 = (NVIC.IPR7 & ~NVIC_IPR7_IPR_N3) | ((val<<24) & NVIC_IPR7_IPR_N3); }
-static inline void nvic_ipr7_set_ipr_n2(uint32_t val) { NVIC.IPR7 = (NVIC.IPR7 & ~NVIC_IPR7_IPR_N2) | ((val<<16) & NVIC_IPR7_IPR_N2); }
-static inline void nvic_ipr7_set_ipr_n1(uint32_t val) { NVIC.IPR7 = (NVIC.IPR7 & ~NVIC_IPR7_IPR_N1) | ((val<<8) & NVIC_IPR7_IPR_N1); }
-static inline void nvic_ipr7_set_ipr_n0(uint32_t val) { NVIC.IPR7 = (NVIC.IPR7 & ~NVIC_IPR7_IPR_N0) | ((val<<0) & NVIC_IPR7_IPR_N0); }
-static inline uint32_t nvic_ipr7_get_ipr_n3(void) { return (NVIC.IPR7 & NVIC_IPR7_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr7_get_ipr_n2(void) { return (NVIC.IPR7 & NVIC_IPR7_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr7_get_ipr_n1(void) { return (NVIC.IPR7 & NVIC_IPR7_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr7_get_ipr_n0(void) { return (NVIC.IPR7 & NVIC_IPR7_IPR_N0) >> 0 ; }
+static inline void nvic_ipr7_set_ipr_n3(uint32_t val) {
+	NVIC.IPR7 = (NVIC.IPR7 & ~NVIC_IPR7_IPR_N3) | ((val << 24) & NVIC_IPR7_IPR_N3);
+}
+static inline void nvic_ipr7_set_ipr_n2(uint32_t val) {
+	NVIC.IPR7 = (NVIC.IPR7 & ~NVIC_IPR7_IPR_N2) | ((val << 16) & NVIC_IPR7_IPR_N2);
+}
+static inline void nvic_ipr7_set_ipr_n1(uint32_t val) {
+	NVIC.IPR7 = (NVIC.IPR7 & ~NVIC_IPR7_IPR_N1) | ((val << 8) & NVIC_IPR7_IPR_N1);
+}
+static inline void nvic_ipr7_set_ipr_n0(uint32_t val) {
+	NVIC.IPR7 = (NVIC.IPR7 & ~NVIC_IPR7_IPR_N0) | ((val << 0) & NVIC_IPR7_IPR_N0);
+}
+static inline uint32_t nvic_ipr7_get_ipr_n3(void) { return (NVIC.IPR7 & NVIC_IPR7_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr7_get_ipr_n2(void) { return (NVIC.IPR7 & NVIC_IPR7_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr7_get_ipr_n1(void) { return (NVIC.IPR7 & NVIC_IPR7_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr7_get_ipr_n0(void) { return (NVIC.IPR7 & NVIC_IPR7_IPR_N0) >> 0; }
 
 // NVIC->IPR8 Interrupt Priority Register
 enum {
-	NVIC_IPR8_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR8_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR8_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR8_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR8_IPR_N3 = ((1UL << 8) - 1) << 24,	// IPR_N3
+	NVIC_IPR8_IPR_N2 = ((1UL << 8) - 1) << 16,	// IPR_N2
+	NVIC_IPR8_IPR_N1 = ((1UL << 8) - 1) << 8,	// IPR_N1
+	NVIC_IPR8_IPR_N0 = ((1UL << 8) - 1) << 0,	// IPR_N0
 };
-static inline void nvic_ipr8_set_ipr_n3(uint32_t val) { NVIC.IPR8 = (NVIC.IPR8 & ~NVIC_IPR8_IPR_N3) | ((val<<24) & NVIC_IPR8_IPR_N3); }
-static inline void nvic_ipr8_set_ipr_n2(uint32_t val) { NVIC.IPR8 = (NVIC.IPR8 & ~NVIC_IPR8_IPR_N2) | ((val<<16) & NVIC_IPR8_IPR_N2); }
-static inline void nvic_ipr8_set_ipr_n1(uint32_t val) { NVIC.IPR8 = (NVIC.IPR8 & ~NVIC_IPR8_IPR_N1) | ((val<<8) & NVIC_IPR8_IPR_N1); }
-static inline void nvic_ipr8_set_ipr_n0(uint32_t val) { NVIC.IPR8 = (NVIC.IPR8 & ~NVIC_IPR8_IPR_N0) | ((val<<0) & NVIC_IPR8_IPR_N0); }
-static inline uint32_t nvic_ipr8_get_ipr_n3(void) { return (NVIC.IPR8 & NVIC_IPR8_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr8_get_ipr_n2(void) { return (NVIC.IPR8 & NVIC_IPR8_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr8_get_ipr_n1(void) { return (NVIC.IPR8 & NVIC_IPR8_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr8_get_ipr_n0(void) { return (NVIC.IPR8 & NVIC_IPR8_IPR_N0) >> 0 ; }
+static inline void nvic_ipr8_set_ipr_n3(uint32_t val) {
+	NVIC.IPR8 = (NVIC.IPR8 & ~NVIC_IPR8_IPR_N3) | ((val << 24) & NVIC_IPR8_IPR_N3);
+}
+static inline void nvic_ipr8_set_ipr_n2(uint32_t val) {
+	NVIC.IPR8 = (NVIC.IPR8 & ~NVIC_IPR8_IPR_N2) | ((val << 16) & NVIC_IPR8_IPR_N2);
+}
+static inline void nvic_ipr8_set_ipr_n1(uint32_t val) {
+	NVIC.IPR8 = (NVIC.IPR8 & ~NVIC_IPR8_IPR_N1) | ((val << 8) & NVIC_IPR8_IPR_N1);
+}
+static inline void nvic_ipr8_set_ipr_n0(uint32_t val) {
+	NVIC.IPR8 = (NVIC.IPR8 & ~NVIC_IPR8_IPR_N0) | ((val << 0) & NVIC_IPR8_IPR_N0);
+}
+static inline uint32_t nvic_ipr8_get_ipr_n3(void) { return (NVIC.IPR8 & NVIC_IPR8_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr8_get_ipr_n2(void) { return (NVIC.IPR8 & NVIC_IPR8_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr8_get_ipr_n1(void) { return (NVIC.IPR8 & NVIC_IPR8_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr8_get_ipr_n0(void) { return (NVIC.IPR8 & NVIC_IPR8_IPR_N0) >> 0; }
 
 // NVIC->IPR9 Interrupt Priority Register
 enum {
-	NVIC_IPR9_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR9_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR9_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR9_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR9_IPR_N3 = ((1UL << 8) - 1) << 24,	// IPR_N3
+	NVIC_IPR9_IPR_N2 = ((1UL << 8) - 1) << 16,	// IPR_N2
+	NVIC_IPR9_IPR_N1 = ((1UL << 8) - 1) << 8,	// IPR_N1
+	NVIC_IPR9_IPR_N0 = ((1UL << 8) - 1) << 0,	// IPR_N0
 };
-static inline void nvic_ipr9_set_ipr_n3(uint32_t val) { NVIC.IPR9 = (NVIC.IPR9 & ~NVIC_IPR9_IPR_N3) | ((val<<24) & NVIC_IPR9_IPR_N3); }
-static inline void nvic_ipr9_set_ipr_n2(uint32_t val) { NVIC.IPR9 = (NVIC.IPR9 & ~NVIC_IPR9_IPR_N2) | ((val<<16) & NVIC_IPR9_IPR_N2); }
-static inline void nvic_ipr9_set_ipr_n1(uint32_t val) { NVIC.IPR9 = (NVIC.IPR9 & ~NVIC_IPR9_IPR_N1) | ((val<<8) & NVIC_IPR9_IPR_N1); }
-static inline void nvic_ipr9_set_ipr_n0(uint32_t val) { NVIC.IPR9 = (NVIC.IPR9 & ~NVIC_IPR9_IPR_N0) | ((val<<0) & NVIC_IPR9_IPR_N0); }
-static inline uint32_t nvic_ipr9_get_ipr_n3(void) { return (NVIC.IPR9 & NVIC_IPR9_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr9_get_ipr_n2(void) { return (NVIC.IPR9 & NVIC_IPR9_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr9_get_ipr_n1(void) { return (NVIC.IPR9 & NVIC_IPR9_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr9_get_ipr_n0(void) { return (NVIC.IPR9 & NVIC_IPR9_IPR_N0) >> 0 ; }
+static inline void nvic_ipr9_set_ipr_n3(uint32_t val) {
+	NVIC.IPR9 = (NVIC.IPR9 & ~NVIC_IPR9_IPR_N3) | ((val << 24) & NVIC_IPR9_IPR_N3);
+}
+static inline void nvic_ipr9_set_ipr_n2(uint32_t val) {
+	NVIC.IPR9 = (NVIC.IPR9 & ~NVIC_IPR9_IPR_N2) | ((val << 16) & NVIC_IPR9_IPR_N2);
+}
+static inline void nvic_ipr9_set_ipr_n1(uint32_t val) {
+	NVIC.IPR9 = (NVIC.IPR9 & ~NVIC_IPR9_IPR_N1) | ((val << 8) & NVIC_IPR9_IPR_N1);
+}
+static inline void nvic_ipr9_set_ipr_n0(uint32_t val) {
+	NVIC.IPR9 = (NVIC.IPR9 & ~NVIC_IPR9_IPR_N0) | ((val << 0) & NVIC_IPR9_IPR_N0);
+}
+static inline uint32_t nvic_ipr9_get_ipr_n3(void) { return (NVIC.IPR9 & NVIC_IPR9_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr9_get_ipr_n2(void) { return (NVIC.IPR9 & NVIC_IPR9_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr9_get_ipr_n1(void) { return (NVIC.IPR9 & NVIC_IPR9_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr9_get_ipr_n0(void) { return (NVIC.IPR9 & NVIC_IPR9_IPR_N0) >> 0; }
 
 // NVIC->IPR10 Interrupt Priority Register
 enum {
-	NVIC_IPR10_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR10_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR10_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR10_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR10_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR10_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR10_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR10_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr10_set_ipr_n3(uint32_t val) { NVIC.IPR10 = (NVIC.IPR10 & ~NVIC_IPR10_IPR_N3) | ((val<<24) & NVIC_IPR10_IPR_N3); }
-static inline void nvic_ipr10_set_ipr_n2(uint32_t val) { NVIC.IPR10 = (NVIC.IPR10 & ~NVIC_IPR10_IPR_N2) | ((val<<16) & NVIC_IPR10_IPR_N2); }
-static inline void nvic_ipr10_set_ipr_n1(uint32_t val) { NVIC.IPR10 = (NVIC.IPR10 & ~NVIC_IPR10_IPR_N1) | ((val<<8) & NVIC_IPR10_IPR_N1); }
-static inline void nvic_ipr10_set_ipr_n0(uint32_t val) { NVIC.IPR10 = (NVIC.IPR10 & ~NVIC_IPR10_IPR_N0) | ((val<<0) & NVIC_IPR10_IPR_N0); }
-static inline uint32_t nvic_ipr10_get_ipr_n3(void) { return (NVIC.IPR10 & NVIC_IPR10_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr10_get_ipr_n2(void) { return (NVIC.IPR10 & NVIC_IPR10_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr10_get_ipr_n1(void) { return (NVIC.IPR10 & NVIC_IPR10_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr10_get_ipr_n0(void) { return (NVIC.IPR10 & NVIC_IPR10_IPR_N0) >> 0 ; }
+static inline void nvic_ipr10_set_ipr_n3(uint32_t val) {
+	NVIC.IPR10 = (NVIC.IPR10 & ~NVIC_IPR10_IPR_N3) | ((val << 24) & NVIC_IPR10_IPR_N3);
+}
+static inline void nvic_ipr10_set_ipr_n2(uint32_t val) {
+	NVIC.IPR10 = (NVIC.IPR10 & ~NVIC_IPR10_IPR_N2) | ((val << 16) & NVIC_IPR10_IPR_N2);
+}
+static inline void nvic_ipr10_set_ipr_n1(uint32_t val) {
+	NVIC.IPR10 = (NVIC.IPR10 & ~NVIC_IPR10_IPR_N1) | ((val << 8) & NVIC_IPR10_IPR_N1);
+}
+static inline void nvic_ipr10_set_ipr_n0(uint32_t val) {
+	NVIC.IPR10 = (NVIC.IPR10 & ~NVIC_IPR10_IPR_N0) | ((val << 0) & NVIC_IPR10_IPR_N0);
+}
+static inline uint32_t nvic_ipr10_get_ipr_n3(void) { return (NVIC.IPR10 & NVIC_IPR10_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr10_get_ipr_n2(void) { return (NVIC.IPR10 & NVIC_IPR10_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr10_get_ipr_n1(void) { return (NVIC.IPR10 & NVIC_IPR10_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr10_get_ipr_n0(void) { return (NVIC.IPR10 & NVIC_IPR10_IPR_N0) >> 0; }
 
 // NVIC->IPR11 Interrupt Priority Register
 enum {
-	NVIC_IPR11_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR11_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR11_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR11_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR11_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR11_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR11_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR11_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr11_set_ipr_n3(uint32_t val) { NVIC.IPR11 = (NVIC.IPR11 & ~NVIC_IPR11_IPR_N3) | ((val<<24) & NVIC_IPR11_IPR_N3); }
-static inline void nvic_ipr11_set_ipr_n2(uint32_t val) { NVIC.IPR11 = (NVIC.IPR11 & ~NVIC_IPR11_IPR_N2) | ((val<<16) & NVIC_IPR11_IPR_N2); }
-static inline void nvic_ipr11_set_ipr_n1(uint32_t val) { NVIC.IPR11 = (NVIC.IPR11 & ~NVIC_IPR11_IPR_N1) | ((val<<8) & NVIC_IPR11_IPR_N1); }
-static inline void nvic_ipr11_set_ipr_n0(uint32_t val) { NVIC.IPR11 = (NVIC.IPR11 & ~NVIC_IPR11_IPR_N0) | ((val<<0) & NVIC_IPR11_IPR_N0); }
-static inline uint32_t nvic_ipr11_get_ipr_n3(void) { return (NVIC.IPR11 & NVIC_IPR11_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr11_get_ipr_n2(void) { return (NVIC.IPR11 & NVIC_IPR11_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr11_get_ipr_n1(void) { return (NVIC.IPR11 & NVIC_IPR11_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr11_get_ipr_n0(void) { return (NVIC.IPR11 & NVIC_IPR11_IPR_N0) >> 0 ; }
+static inline void nvic_ipr11_set_ipr_n3(uint32_t val) {
+	NVIC.IPR11 = (NVIC.IPR11 & ~NVIC_IPR11_IPR_N3) | ((val << 24) & NVIC_IPR11_IPR_N3);
+}
+static inline void nvic_ipr11_set_ipr_n2(uint32_t val) {
+	NVIC.IPR11 = (NVIC.IPR11 & ~NVIC_IPR11_IPR_N2) | ((val << 16) & NVIC_IPR11_IPR_N2);
+}
+static inline void nvic_ipr11_set_ipr_n1(uint32_t val) {
+	NVIC.IPR11 = (NVIC.IPR11 & ~NVIC_IPR11_IPR_N1) | ((val << 8) & NVIC_IPR11_IPR_N1);
+}
+static inline void nvic_ipr11_set_ipr_n0(uint32_t val) {
+	NVIC.IPR11 = (NVIC.IPR11 & ~NVIC_IPR11_IPR_N0) | ((val << 0) & NVIC_IPR11_IPR_N0);
+}
+static inline uint32_t nvic_ipr11_get_ipr_n3(void) { return (NVIC.IPR11 & NVIC_IPR11_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr11_get_ipr_n2(void) { return (NVIC.IPR11 & NVIC_IPR11_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr11_get_ipr_n1(void) { return (NVIC.IPR11 & NVIC_IPR11_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr11_get_ipr_n0(void) { return (NVIC.IPR11 & NVIC_IPR11_IPR_N0) >> 0; }
 
 // NVIC->IPR12 Interrupt Priority Register
 enum {
-	NVIC_IPR12_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR12_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR12_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR12_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR12_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR12_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR12_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR12_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr12_set_ipr_n3(uint32_t val) { NVIC.IPR12 = (NVIC.IPR12 & ~NVIC_IPR12_IPR_N3) | ((val<<24) & NVIC_IPR12_IPR_N3); }
-static inline void nvic_ipr12_set_ipr_n2(uint32_t val) { NVIC.IPR12 = (NVIC.IPR12 & ~NVIC_IPR12_IPR_N2) | ((val<<16) & NVIC_IPR12_IPR_N2); }
-static inline void nvic_ipr12_set_ipr_n1(uint32_t val) { NVIC.IPR12 = (NVIC.IPR12 & ~NVIC_IPR12_IPR_N1) | ((val<<8) & NVIC_IPR12_IPR_N1); }
-static inline void nvic_ipr12_set_ipr_n0(uint32_t val) { NVIC.IPR12 = (NVIC.IPR12 & ~NVIC_IPR12_IPR_N0) | ((val<<0) & NVIC_IPR12_IPR_N0); }
-static inline uint32_t nvic_ipr12_get_ipr_n3(void) { return (NVIC.IPR12 & NVIC_IPR12_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr12_get_ipr_n2(void) { return (NVIC.IPR12 & NVIC_IPR12_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr12_get_ipr_n1(void) { return (NVIC.IPR12 & NVIC_IPR12_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr12_get_ipr_n0(void) { return (NVIC.IPR12 & NVIC_IPR12_IPR_N0) >> 0 ; }
+static inline void nvic_ipr12_set_ipr_n3(uint32_t val) {
+	NVIC.IPR12 = (NVIC.IPR12 & ~NVIC_IPR12_IPR_N3) | ((val << 24) & NVIC_IPR12_IPR_N3);
+}
+static inline void nvic_ipr12_set_ipr_n2(uint32_t val) {
+	NVIC.IPR12 = (NVIC.IPR12 & ~NVIC_IPR12_IPR_N2) | ((val << 16) & NVIC_IPR12_IPR_N2);
+}
+static inline void nvic_ipr12_set_ipr_n1(uint32_t val) {
+	NVIC.IPR12 = (NVIC.IPR12 & ~NVIC_IPR12_IPR_N1) | ((val << 8) & NVIC_IPR12_IPR_N1);
+}
+static inline void nvic_ipr12_set_ipr_n0(uint32_t val) {
+	NVIC.IPR12 = (NVIC.IPR12 & ~NVIC_IPR12_IPR_N0) | ((val << 0) & NVIC_IPR12_IPR_N0);
+}
+static inline uint32_t nvic_ipr12_get_ipr_n3(void) { return (NVIC.IPR12 & NVIC_IPR12_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr12_get_ipr_n2(void) { return (NVIC.IPR12 & NVIC_IPR12_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr12_get_ipr_n1(void) { return (NVIC.IPR12 & NVIC_IPR12_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr12_get_ipr_n0(void) { return (NVIC.IPR12 & NVIC_IPR12_IPR_N0) >> 0; }
 
 // NVIC->IPR13 Interrupt Priority Register
 enum {
-	NVIC_IPR13_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR13_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR13_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR13_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR13_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR13_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR13_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR13_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr13_set_ipr_n3(uint32_t val) { NVIC.IPR13 = (NVIC.IPR13 & ~NVIC_IPR13_IPR_N3) | ((val<<24) & NVIC_IPR13_IPR_N3); }
-static inline void nvic_ipr13_set_ipr_n2(uint32_t val) { NVIC.IPR13 = (NVIC.IPR13 & ~NVIC_IPR13_IPR_N2) | ((val<<16) & NVIC_IPR13_IPR_N2); }
-static inline void nvic_ipr13_set_ipr_n1(uint32_t val) { NVIC.IPR13 = (NVIC.IPR13 & ~NVIC_IPR13_IPR_N1) | ((val<<8) & NVIC_IPR13_IPR_N1); }
-static inline void nvic_ipr13_set_ipr_n0(uint32_t val) { NVIC.IPR13 = (NVIC.IPR13 & ~NVIC_IPR13_IPR_N0) | ((val<<0) & NVIC_IPR13_IPR_N0); }
-static inline uint32_t nvic_ipr13_get_ipr_n3(void) { return (NVIC.IPR13 & NVIC_IPR13_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr13_get_ipr_n2(void) { return (NVIC.IPR13 & NVIC_IPR13_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr13_get_ipr_n1(void) { return (NVIC.IPR13 & NVIC_IPR13_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr13_get_ipr_n0(void) { return (NVIC.IPR13 & NVIC_IPR13_IPR_N0) >> 0 ; }
+static inline void nvic_ipr13_set_ipr_n3(uint32_t val) {
+	NVIC.IPR13 = (NVIC.IPR13 & ~NVIC_IPR13_IPR_N3) | ((val << 24) & NVIC_IPR13_IPR_N3);
+}
+static inline void nvic_ipr13_set_ipr_n2(uint32_t val) {
+	NVIC.IPR13 = (NVIC.IPR13 & ~NVIC_IPR13_IPR_N2) | ((val << 16) & NVIC_IPR13_IPR_N2);
+}
+static inline void nvic_ipr13_set_ipr_n1(uint32_t val) {
+	NVIC.IPR13 = (NVIC.IPR13 & ~NVIC_IPR13_IPR_N1) | ((val << 8) & NVIC_IPR13_IPR_N1);
+}
+static inline void nvic_ipr13_set_ipr_n0(uint32_t val) {
+	NVIC.IPR13 = (NVIC.IPR13 & ~NVIC_IPR13_IPR_N0) | ((val << 0) & NVIC_IPR13_IPR_N0);
+}
+static inline uint32_t nvic_ipr13_get_ipr_n3(void) { return (NVIC.IPR13 & NVIC_IPR13_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr13_get_ipr_n2(void) { return (NVIC.IPR13 & NVIC_IPR13_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr13_get_ipr_n1(void) { return (NVIC.IPR13 & NVIC_IPR13_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr13_get_ipr_n0(void) { return (NVIC.IPR13 & NVIC_IPR13_IPR_N0) >> 0; }
 
 // NVIC->IPR14 Interrupt Priority Register
 enum {
-	NVIC_IPR14_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR14_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR14_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR14_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR14_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR14_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR14_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR14_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr14_set_ipr_n3(uint32_t val) { NVIC.IPR14 = (NVIC.IPR14 & ~NVIC_IPR14_IPR_N3) | ((val<<24) & NVIC_IPR14_IPR_N3); }
-static inline void nvic_ipr14_set_ipr_n2(uint32_t val) { NVIC.IPR14 = (NVIC.IPR14 & ~NVIC_IPR14_IPR_N2) | ((val<<16) & NVIC_IPR14_IPR_N2); }
-static inline void nvic_ipr14_set_ipr_n1(uint32_t val) { NVIC.IPR14 = (NVIC.IPR14 & ~NVIC_IPR14_IPR_N1) | ((val<<8) & NVIC_IPR14_IPR_N1); }
-static inline void nvic_ipr14_set_ipr_n0(uint32_t val) { NVIC.IPR14 = (NVIC.IPR14 & ~NVIC_IPR14_IPR_N0) | ((val<<0) & NVIC_IPR14_IPR_N0); }
-static inline uint32_t nvic_ipr14_get_ipr_n3(void) { return (NVIC.IPR14 & NVIC_IPR14_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr14_get_ipr_n2(void) { return (NVIC.IPR14 & NVIC_IPR14_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr14_get_ipr_n1(void) { return (NVIC.IPR14 & NVIC_IPR14_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr14_get_ipr_n0(void) { return (NVIC.IPR14 & NVIC_IPR14_IPR_N0) >> 0 ; }
+static inline void nvic_ipr14_set_ipr_n3(uint32_t val) {
+	NVIC.IPR14 = (NVIC.IPR14 & ~NVIC_IPR14_IPR_N3) | ((val << 24) & NVIC_IPR14_IPR_N3);
+}
+static inline void nvic_ipr14_set_ipr_n2(uint32_t val) {
+	NVIC.IPR14 = (NVIC.IPR14 & ~NVIC_IPR14_IPR_N2) | ((val << 16) & NVIC_IPR14_IPR_N2);
+}
+static inline void nvic_ipr14_set_ipr_n1(uint32_t val) {
+	NVIC.IPR14 = (NVIC.IPR14 & ~NVIC_IPR14_IPR_N1) | ((val << 8) & NVIC_IPR14_IPR_N1);
+}
+static inline void nvic_ipr14_set_ipr_n0(uint32_t val) {
+	NVIC.IPR14 = (NVIC.IPR14 & ~NVIC_IPR14_IPR_N0) | ((val << 0) & NVIC_IPR14_IPR_N0);
+}
+static inline uint32_t nvic_ipr14_get_ipr_n3(void) { return (NVIC.IPR14 & NVIC_IPR14_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr14_get_ipr_n2(void) { return (NVIC.IPR14 & NVIC_IPR14_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr14_get_ipr_n1(void) { return (NVIC.IPR14 & NVIC_IPR14_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr14_get_ipr_n0(void) { return (NVIC.IPR14 & NVIC_IPR14_IPR_N0) >> 0; }
 
 // NVIC->IPR15 Interrupt Priority Register
 enum {
-	NVIC_IPR15_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR15_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR15_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR15_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR15_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR15_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR15_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR15_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr15_set_ipr_n3(uint32_t val) { NVIC.IPR15 = (NVIC.IPR15 & ~NVIC_IPR15_IPR_N3) | ((val<<24) & NVIC_IPR15_IPR_N3); }
-static inline void nvic_ipr15_set_ipr_n2(uint32_t val) { NVIC.IPR15 = (NVIC.IPR15 & ~NVIC_IPR15_IPR_N2) | ((val<<16) & NVIC_IPR15_IPR_N2); }
-static inline void nvic_ipr15_set_ipr_n1(uint32_t val) { NVIC.IPR15 = (NVIC.IPR15 & ~NVIC_IPR15_IPR_N1) | ((val<<8) & NVIC_IPR15_IPR_N1); }
-static inline void nvic_ipr15_set_ipr_n0(uint32_t val) { NVIC.IPR15 = (NVIC.IPR15 & ~NVIC_IPR15_IPR_N0) | ((val<<0) & NVIC_IPR15_IPR_N0); }
-static inline uint32_t nvic_ipr15_get_ipr_n3(void) { return (NVIC.IPR15 & NVIC_IPR15_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr15_get_ipr_n2(void) { return (NVIC.IPR15 & NVIC_IPR15_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr15_get_ipr_n1(void) { return (NVIC.IPR15 & NVIC_IPR15_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr15_get_ipr_n0(void) { return (NVIC.IPR15 & NVIC_IPR15_IPR_N0) >> 0 ; }
+static inline void nvic_ipr15_set_ipr_n3(uint32_t val) {
+	NVIC.IPR15 = (NVIC.IPR15 & ~NVIC_IPR15_IPR_N3) | ((val << 24) & NVIC_IPR15_IPR_N3);
+}
+static inline void nvic_ipr15_set_ipr_n2(uint32_t val) {
+	NVIC.IPR15 = (NVIC.IPR15 & ~NVIC_IPR15_IPR_N2) | ((val << 16) & NVIC_IPR15_IPR_N2);
+}
+static inline void nvic_ipr15_set_ipr_n1(uint32_t val) {
+	NVIC.IPR15 = (NVIC.IPR15 & ~NVIC_IPR15_IPR_N1) | ((val << 8) & NVIC_IPR15_IPR_N1);
+}
+static inline void nvic_ipr15_set_ipr_n0(uint32_t val) {
+	NVIC.IPR15 = (NVIC.IPR15 & ~NVIC_IPR15_IPR_N0) | ((val << 0) & NVIC_IPR15_IPR_N0);
+}
+static inline uint32_t nvic_ipr15_get_ipr_n3(void) { return (NVIC.IPR15 & NVIC_IPR15_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr15_get_ipr_n2(void) { return (NVIC.IPR15 & NVIC_IPR15_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr15_get_ipr_n1(void) { return (NVIC.IPR15 & NVIC_IPR15_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr15_get_ipr_n0(void) { return (NVIC.IPR15 & NVIC_IPR15_IPR_N0) >> 0; }
 
 // NVIC->IPR16 Interrupt Priority Register
 enum {
-	NVIC_IPR16_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR16_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR16_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR16_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR16_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR16_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR16_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR16_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr16_set_ipr_n3(uint32_t val) { NVIC.IPR16 = (NVIC.IPR16 & ~NVIC_IPR16_IPR_N3) | ((val<<24) & NVIC_IPR16_IPR_N3); }
-static inline void nvic_ipr16_set_ipr_n2(uint32_t val) { NVIC.IPR16 = (NVIC.IPR16 & ~NVIC_IPR16_IPR_N2) | ((val<<16) & NVIC_IPR16_IPR_N2); }
-static inline void nvic_ipr16_set_ipr_n1(uint32_t val) { NVIC.IPR16 = (NVIC.IPR16 & ~NVIC_IPR16_IPR_N1) | ((val<<8) & NVIC_IPR16_IPR_N1); }
-static inline void nvic_ipr16_set_ipr_n0(uint32_t val) { NVIC.IPR16 = (NVIC.IPR16 & ~NVIC_IPR16_IPR_N0) | ((val<<0) & NVIC_IPR16_IPR_N0); }
-static inline uint32_t nvic_ipr16_get_ipr_n3(void) { return (NVIC.IPR16 & NVIC_IPR16_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr16_get_ipr_n2(void) { return (NVIC.IPR16 & NVIC_IPR16_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr16_get_ipr_n1(void) { return (NVIC.IPR16 & NVIC_IPR16_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr16_get_ipr_n0(void) { return (NVIC.IPR16 & NVIC_IPR16_IPR_N0) >> 0 ; }
+static inline void nvic_ipr16_set_ipr_n3(uint32_t val) {
+	NVIC.IPR16 = (NVIC.IPR16 & ~NVIC_IPR16_IPR_N3) | ((val << 24) & NVIC_IPR16_IPR_N3);
+}
+static inline void nvic_ipr16_set_ipr_n2(uint32_t val) {
+	NVIC.IPR16 = (NVIC.IPR16 & ~NVIC_IPR16_IPR_N2) | ((val << 16) & NVIC_IPR16_IPR_N2);
+}
+static inline void nvic_ipr16_set_ipr_n1(uint32_t val) {
+	NVIC.IPR16 = (NVIC.IPR16 & ~NVIC_IPR16_IPR_N1) | ((val << 8) & NVIC_IPR16_IPR_N1);
+}
+static inline void nvic_ipr16_set_ipr_n0(uint32_t val) {
+	NVIC.IPR16 = (NVIC.IPR16 & ~NVIC_IPR16_IPR_N0) | ((val << 0) & NVIC_IPR16_IPR_N0);
+}
+static inline uint32_t nvic_ipr16_get_ipr_n3(void) { return (NVIC.IPR16 & NVIC_IPR16_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr16_get_ipr_n2(void) { return (NVIC.IPR16 & NVIC_IPR16_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr16_get_ipr_n1(void) { return (NVIC.IPR16 & NVIC_IPR16_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr16_get_ipr_n0(void) { return (NVIC.IPR16 & NVIC_IPR16_IPR_N0) >> 0; }
 
 // NVIC->IPR17 Interrupt Priority Register
 enum {
-	NVIC_IPR17_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR17_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR17_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR17_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR17_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR17_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR17_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR17_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr17_set_ipr_n3(uint32_t val) { NVIC.IPR17 = (NVIC.IPR17 & ~NVIC_IPR17_IPR_N3) | ((val<<24) & NVIC_IPR17_IPR_N3); }
-static inline void nvic_ipr17_set_ipr_n2(uint32_t val) { NVIC.IPR17 = (NVIC.IPR17 & ~NVIC_IPR17_IPR_N2) | ((val<<16) & NVIC_IPR17_IPR_N2); }
-static inline void nvic_ipr17_set_ipr_n1(uint32_t val) { NVIC.IPR17 = (NVIC.IPR17 & ~NVIC_IPR17_IPR_N1) | ((val<<8) & NVIC_IPR17_IPR_N1); }
-static inline void nvic_ipr17_set_ipr_n0(uint32_t val) { NVIC.IPR17 = (NVIC.IPR17 & ~NVIC_IPR17_IPR_N0) | ((val<<0) & NVIC_IPR17_IPR_N0); }
-static inline uint32_t nvic_ipr17_get_ipr_n3(void) { return (NVIC.IPR17 & NVIC_IPR17_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr17_get_ipr_n2(void) { return (NVIC.IPR17 & NVIC_IPR17_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr17_get_ipr_n1(void) { return (NVIC.IPR17 & NVIC_IPR17_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr17_get_ipr_n0(void) { return (NVIC.IPR17 & NVIC_IPR17_IPR_N0) >> 0 ; }
+static inline void nvic_ipr17_set_ipr_n3(uint32_t val) {
+	NVIC.IPR17 = (NVIC.IPR17 & ~NVIC_IPR17_IPR_N3) | ((val << 24) & NVIC_IPR17_IPR_N3);
+}
+static inline void nvic_ipr17_set_ipr_n2(uint32_t val) {
+	NVIC.IPR17 = (NVIC.IPR17 & ~NVIC_IPR17_IPR_N2) | ((val << 16) & NVIC_IPR17_IPR_N2);
+}
+static inline void nvic_ipr17_set_ipr_n1(uint32_t val) {
+	NVIC.IPR17 = (NVIC.IPR17 & ~NVIC_IPR17_IPR_N1) | ((val << 8) & NVIC_IPR17_IPR_N1);
+}
+static inline void nvic_ipr17_set_ipr_n0(uint32_t val) {
+	NVIC.IPR17 = (NVIC.IPR17 & ~NVIC_IPR17_IPR_N0) | ((val << 0) & NVIC_IPR17_IPR_N0);
+}
+static inline uint32_t nvic_ipr17_get_ipr_n3(void) { return (NVIC.IPR17 & NVIC_IPR17_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr17_get_ipr_n2(void) { return (NVIC.IPR17 & NVIC_IPR17_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr17_get_ipr_n1(void) { return (NVIC.IPR17 & NVIC_IPR17_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr17_get_ipr_n0(void) { return (NVIC.IPR17 & NVIC_IPR17_IPR_N0) >> 0; }
 
 // NVIC->IPR18 Interrupt Priority Register
 enum {
-	NVIC_IPR18_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR18_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR18_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR18_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR18_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR18_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR18_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR18_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr18_set_ipr_n3(uint32_t val) { NVIC.IPR18 = (NVIC.IPR18 & ~NVIC_IPR18_IPR_N3) | ((val<<24) & NVIC_IPR18_IPR_N3); }
-static inline void nvic_ipr18_set_ipr_n2(uint32_t val) { NVIC.IPR18 = (NVIC.IPR18 & ~NVIC_IPR18_IPR_N2) | ((val<<16) & NVIC_IPR18_IPR_N2); }
-static inline void nvic_ipr18_set_ipr_n1(uint32_t val) { NVIC.IPR18 = (NVIC.IPR18 & ~NVIC_IPR18_IPR_N1) | ((val<<8) & NVIC_IPR18_IPR_N1); }
-static inline void nvic_ipr18_set_ipr_n0(uint32_t val) { NVIC.IPR18 = (NVIC.IPR18 & ~NVIC_IPR18_IPR_N0) | ((val<<0) & NVIC_IPR18_IPR_N0); }
-static inline uint32_t nvic_ipr18_get_ipr_n3(void) { return (NVIC.IPR18 & NVIC_IPR18_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr18_get_ipr_n2(void) { return (NVIC.IPR18 & NVIC_IPR18_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr18_get_ipr_n1(void) { return (NVIC.IPR18 & NVIC_IPR18_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr18_get_ipr_n0(void) { return (NVIC.IPR18 & NVIC_IPR18_IPR_N0) >> 0 ; }
+static inline void nvic_ipr18_set_ipr_n3(uint32_t val) {
+	NVIC.IPR18 = (NVIC.IPR18 & ~NVIC_IPR18_IPR_N3) | ((val << 24) & NVIC_IPR18_IPR_N3);
+}
+static inline void nvic_ipr18_set_ipr_n2(uint32_t val) {
+	NVIC.IPR18 = (NVIC.IPR18 & ~NVIC_IPR18_IPR_N2) | ((val << 16) & NVIC_IPR18_IPR_N2);
+}
+static inline void nvic_ipr18_set_ipr_n1(uint32_t val) {
+	NVIC.IPR18 = (NVIC.IPR18 & ~NVIC_IPR18_IPR_N1) | ((val << 8) & NVIC_IPR18_IPR_N1);
+}
+static inline void nvic_ipr18_set_ipr_n0(uint32_t val) {
+	NVIC.IPR18 = (NVIC.IPR18 & ~NVIC_IPR18_IPR_N0) | ((val << 0) & NVIC_IPR18_IPR_N0);
+}
+static inline uint32_t nvic_ipr18_get_ipr_n3(void) { return (NVIC.IPR18 & NVIC_IPR18_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr18_get_ipr_n2(void) { return (NVIC.IPR18 & NVIC_IPR18_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr18_get_ipr_n1(void) { return (NVIC.IPR18 & NVIC_IPR18_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr18_get_ipr_n0(void) { return (NVIC.IPR18 & NVIC_IPR18_IPR_N0) >> 0; }
 
 // NVIC->IPR19 Interrupt Priority Register
 enum {
-	NVIC_IPR19_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR19_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR19_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR19_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR19_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR19_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR19_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR19_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr19_set_ipr_n3(uint32_t val) { NVIC.IPR19 = (NVIC.IPR19 & ~NVIC_IPR19_IPR_N3) | ((val<<24) & NVIC_IPR19_IPR_N3); }
-static inline void nvic_ipr19_set_ipr_n2(uint32_t val) { NVIC.IPR19 = (NVIC.IPR19 & ~NVIC_IPR19_IPR_N2) | ((val<<16) & NVIC_IPR19_IPR_N2); }
-static inline void nvic_ipr19_set_ipr_n1(uint32_t val) { NVIC.IPR19 = (NVIC.IPR19 & ~NVIC_IPR19_IPR_N1) | ((val<<8) & NVIC_IPR19_IPR_N1); }
-static inline void nvic_ipr19_set_ipr_n0(uint32_t val) { NVIC.IPR19 = (NVIC.IPR19 & ~NVIC_IPR19_IPR_N0) | ((val<<0) & NVIC_IPR19_IPR_N0); }
-static inline uint32_t nvic_ipr19_get_ipr_n3(void) { return (NVIC.IPR19 & NVIC_IPR19_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr19_get_ipr_n2(void) { return (NVIC.IPR19 & NVIC_IPR19_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr19_get_ipr_n1(void) { return (NVIC.IPR19 & NVIC_IPR19_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr19_get_ipr_n0(void) { return (NVIC.IPR19 & NVIC_IPR19_IPR_N0) >> 0 ; }
+static inline void nvic_ipr19_set_ipr_n3(uint32_t val) {
+	NVIC.IPR19 = (NVIC.IPR19 & ~NVIC_IPR19_IPR_N3) | ((val << 24) & NVIC_IPR19_IPR_N3);
+}
+static inline void nvic_ipr19_set_ipr_n2(uint32_t val) {
+	NVIC.IPR19 = (NVIC.IPR19 & ~NVIC_IPR19_IPR_N2) | ((val << 16) & NVIC_IPR19_IPR_N2);
+}
+static inline void nvic_ipr19_set_ipr_n1(uint32_t val) {
+	NVIC.IPR19 = (NVIC.IPR19 & ~NVIC_IPR19_IPR_N1) | ((val << 8) & NVIC_IPR19_IPR_N1);
+}
+static inline void nvic_ipr19_set_ipr_n0(uint32_t val) {
+	NVIC.IPR19 = (NVIC.IPR19 & ~NVIC_IPR19_IPR_N0) | ((val << 0) & NVIC_IPR19_IPR_N0);
+}
+static inline uint32_t nvic_ipr19_get_ipr_n3(void) { return (NVIC.IPR19 & NVIC_IPR19_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr19_get_ipr_n2(void) { return (NVIC.IPR19 & NVIC_IPR19_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr19_get_ipr_n1(void) { return (NVIC.IPR19 & NVIC_IPR19_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr19_get_ipr_n0(void) { return (NVIC.IPR19 & NVIC_IPR19_IPR_N0) >> 0; }
 
 // NVIC->IPR20 Interrupt Priority Register
 enum {
-	NVIC_IPR20_IPR_N3 = ((1UL<<8)-1) << 24, // IPR_N3
-	NVIC_IPR20_IPR_N2 = ((1UL<<8)-1) << 16, // IPR_N2
-	NVIC_IPR20_IPR_N1 = ((1UL<<8)-1) << 8, // IPR_N1
-	NVIC_IPR20_IPR_N0 = ((1UL<<8)-1) << 0, // IPR_N0		
+	NVIC_IPR20_IPR_N3 = ((1UL << 8) - 1) << 24,	 // IPR_N3
+	NVIC_IPR20_IPR_N2 = ((1UL << 8) - 1) << 16,	 // IPR_N2
+	NVIC_IPR20_IPR_N1 = ((1UL << 8) - 1) << 8,	 // IPR_N1
+	NVIC_IPR20_IPR_N0 = ((1UL << 8) - 1) << 0,	 // IPR_N0
 };
-static inline void nvic_ipr20_set_ipr_n3(uint32_t val) { NVIC.IPR20 = (NVIC.IPR20 & ~NVIC_IPR20_IPR_N3) | ((val<<24) & NVIC_IPR20_IPR_N3); }
-static inline void nvic_ipr20_set_ipr_n2(uint32_t val) { NVIC.IPR20 = (NVIC.IPR20 & ~NVIC_IPR20_IPR_N2) | ((val<<16) & NVIC_IPR20_IPR_N2); }
-static inline void nvic_ipr20_set_ipr_n1(uint32_t val) { NVIC.IPR20 = (NVIC.IPR20 & ~NVIC_IPR20_IPR_N1) | ((val<<8) & NVIC_IPR20_IPR_N1); }
-static inline void nvic_ipr20_set_ipr_n0(uint32_t val) { NVIC.IPR20 = (NVIC.IPR20 & ~NVIC_IPR20_IPR_N0) | ((val<<0) & NVIC_IPR20_IPR_N0); }
-static inline uint32_t nvic_ipr20_get_ipr_n3(void) { return (NVIC.IPR20 & NVIC_IPR20_IPR_N3) >> 24 ; }
-static inline uint32_t nvic_ipr20_get_ipr_n2(void) { return (NVIC.IPR20 & NVIC_IPR20_IPR_N2) >> 16 ; }
-static inline uint32_t nvic_ipr20_get_ipr_n1(void) { return (NVIC.IPR20 & NVIC_IPR20_IPR_N1) >> 8 ; }
-static inline uint32_t nvic_ipr20_get_ipr_n0(void) { return (NVIC.IPR20 & NVIC_IPR20_IPR_N0) >> 0 ; }
+static inline void nvic_ipr20_set_ipr_n3(uint32_t val) {
+	NVIC.IPR20 = (NVIC.IPR20 & ~NVIC_IPR20_IPR_N3) | ((val << 24) & NVIC_IPR20_IPR_N3);
+}
+static inline void nvic_ipr20_set_ipr_n2(uint32_t val) {
+	NVIC.IPR20 = (NVIC.IPR20 & ~NVIC_IPR20_IPR_N2) | ((val << 16) & NVIC_IPR20_IPR_N2);
+}
+static inline void nvic_ipr20_set_ipr_n1(uint32_t val) {
+	NVIC.IPR20 = (NVIC.IPR20 & ~NVIC_IPR20_IPR_N1) | ((val << 8) & NVIC_IPR20_IPR_N1);
+}
+static inline void nvic_ipr20_set_ipr_n0(uint32_t val) {
+	NVIC.IPR20 = (NVIC.IPR20 & ~NVIC_IPR20_IPR_N0) | ((val << 0) & NVIC_IPR20_IPR_N0);
+}
+static inline uint32_t nvic_ipr20_get_ipr_n3(void) { return (NVIC.IPR20 & NVIC_IPR20_IPR_N3) >> 24; }
+static inline uint32_t nvic_ipr20_get_ipr_n2(void) { return (NVIC.IPR20 & NVIC_IPR20_IPR_N2) >> 16; }
+static inline uint32_t nvic_ipr20_get_ipr_n1(void) { return (NVIC.IPR20 & NVIC_IPR20_IPR_N1) >> 8; }
+static inline uint32_t nvic_ipr20_get_ipr_n0(void) { return (NVIC.IPR20 & NVIC_IPR20_IPR_N0) >> 0; }
 
 /* Nested vectored interrupt controller
 There is only one peripheral of type NVIC_STIR. */
 struct NVIC_STIR_Type {
-	__IO uint16_t STIR; // @0 Software trigger interrupt register
+	__IO uint16_t STIR;	 // @0 Software trigger interrupt register
 };
-extern struct NVIC_STIR_Type	NVIC_STIR;	// @0xE000EF00 
+extern struct NVIC_STIR_Type NVIC_STIR;	 // @0xE000EF00
 
 // NVIC_STIR->STIR Software trigger interrupt register
 enum {
-	NVIC_STIR_STIR_INTID = ((1UL<<9)-1) << 0, // Software generated interrupt ID		
+	NVIC_STIR_STIR_INTID = ((1UL << 9) - 1) << 0,  // Software generated interrupt ID
 };
-static inline void nvic_stir_stir_set_intid(uint32_t val) { NVIC_STIR.STIR = (NVIC_STIR.STIR & ~NVIC_STIR_STIR_INTID) | ((val<<0) & NVIC_STIR_STIR_INTID); }
-static inline uint32_t nvic_stir_stir_get_intid(void) { return (NVIC_STIR.STIR & NVIC_STIR_STIR_INTID) >> 0 ; }
+static inline void nvic_stir_stir_set_intid(uint32_t val) {
+	NVIC_STIR.STIR = (NVIC_STIR.STIR & ~NVIC_STIR_STIR_INTID) | ((val << 0) & NVIC_STIR_STIR_INTID);
+}
+static inline uint32_t nvic_stir_stir_get_intid(void) { return (NVIC_STIR.STIR & NVIC_STIR_STIR_INTID) >> 0; }
 
 /* Power control
 There is only one peripheral of type PWR. */
 struct PWR_Type {
-	__IO uint16_t CR1; // @0 Power control register 1
-	 uint8_t RESERVED0[2]; // @2 
-	__IO uint16_t CR2; // @4 Power control register 2
-	 uint8_t RESERVED1[2]; // @6 
-	__IO uint16_t CR3; // @8 Power control register 3
-	 uint8_t RESERVED2[2]; // @10 
-	__IO uint16_t CR4; // @12 Power control register 4
-	 uint8_t RESERVED3[2]; // @14 
-	__I uint16_t SR1; // @16 Power status register 1
-	 uint8_t RESERVED4[2]; // @18 
-	__I uint16_t SR2; // @20 Power status register 2
-	 uint8_t RESERVED5[2]; // @22 
-	__O uint16_t SCR; // @24 Power status clear register
-	 uint8_t RESERVED6[6]; // @26 
-	__IO uint16_t PUCRA; // @32 Power Port A pull-up control register
-	 uint8_t RESERVED7[2]; // @34 
-	__IO uint16_t PDCRA; // @36 Power Port A pull-down control register
-	 uint8_t RESERVED8[2]; // @38 
-	__IO uint16_t PUCRB; // @40 Power Port B pull-up control register
-	 uint8_t RESERVED9[2]; // @42 
-	__IO uint16_t PDCRB; // @44 Power Port B pull-down control register
-	 uint8_t RESERVED10[2]; // @46 
-	__IO uint16_t PUCRC; // @48 Power Port C pull-up control register
-	 uint8_t RESERVED11[2]; // @50 
-	__IO uint16_t PDCRC; // @52 Power Port C pull-down control register
-	 uint8_t RESERVED12[2]; // @54 
-	__IO uint16_t PUCRD; // @56 Power Port D pull-up control register
-	 uint8_t RESERVED13[2]; // @58 
-	__IO uint16_t PDCRD; // @60 Power Port D pull-down control register
-	 uint8_t RESERVED14[2]; // @62 
-	__IO uint16_t PUCRE; // @64 Power Port E pull-up control register
-	 uint8_t RESERVED15[2]; // @66 
-	__IO uint16_t PDCRE; // @68 Power Port E pull-down control register
-	 uint8_t RESERVED16[2]; // @70 
-	__IO uint16_t PUCRF; // @72 Power Port F pull-up control register
-	 uint8_t RESERVED17[2]; // @74 
-	__IO uint16_t PDCRF; // @76 Power Port F pull-down control register
-	 uint8_t RESERVED18[2]; // @78 
-	__IO uint16_t PUCRG; // @80 Power Port G pull-up control register
-	 uint8_t RESERVED19[2]; // @82 
-	__IO uint16_t PDCRG; // @84 Power Port G pull-down control register
-	 uint8_t RESERVED20[2]; // @86 
-	__IO uint8_t PUCRH; // @88 Power Port H pull-up control register
-	 uint8_t RESERVED21[3]; // @89 
-	__IO uint8_t PDCRH; // @92 Power Port H pull-down control register
+	__IO uint16_t CR1;			  // @0 Power control register 1
+	uint8_t		  RESERVED0[2];	  // @2
+	__IO uint16_t CR2;			  // @4 Power control register 2
+	uint8_t		  RESERVED1[2];	  // @6
+	__IO uint16_t CR3;			  // @8 Power control register 3
+	uint8_t		  RESERVED2[2];	  // @10
+	__IO uint16_t CR4;			  // @12 Power control register 4
+	uint8_t		  RESERVED3[2];	  // @14
+	__I uint16_t  SR1;			  // @16 Power status register 1
+	uint8_t		  RESERVED4[2];	  // @18
+	__I uint16_t  SR2;			  // @20 Power status register 2
+	uint8_t		  RESERVED5[2];	  // @22
+	__O uint16_t  SCR;			  // @24 Power status clear register
+	uint8_t		  RESERVED6[6];	  // @26
+	__IO uint16_t PUCRA;		  // @32 Power Port A pull-up control register
+	uint8_t		  RESERVED7[2];	  // @34
+	__IO uint16_t PDCRA;		  // @36 Power Port A pull-down control register
+	uint8_t		  RESERVED8[2];	  // @38
+	__IO uint16_t PUCRB;		  // @40 Power Port B pull-up control register
+	uint8_t		  RESERVED9[2];	  // @42
+	__IO uint16_t PDCRB;		  // @44 Power Port B pull-down control register
+	uint8_t		  RESERVED10[2];  // @46
+	__IO uint16_t PUCRC;		  // @48 Power Port C pull-up control register
+	uint8_t		  RESERVED11[2];  // @50
+	__IO uint16_t PDCRC;		  // @52 Power Port C pull-down control register
+	uint8_t		  RESERVED12[2];  // @54
+	__IO uint16_t PUCRD;		  // @56 Power Port D pull-up control register
+	uint8_t		  RESERVED13[2];  // @58
+	__IO uint16_t PDCRD;		  // @60 Power Port D pull-down control register
+	uint8_t		  RESERVED14[2];  // @62
+	__IO uint16_t PUCRE;		  // @64 Power Port E pull-up control register
+	uint8_t		  RESERVED15[2];  // @66
+	__IO uint16_t PDCRE;		  // @68 Power Port E pull-down control register
+	uint8_t		  RESERVED16[2];  // @70
+	__IO uint16_t PUCRF;		  // @72 Power Port F pull-up control register
+	uint8_t		  RESERVED17[2];  // @74
+	__IO uint16_t PDCRF;		  // @76 Power Port F pull-down control register
+	uint8_t		  RESERVED18[2];  // @78
+	__IO uint16_t PUCRG;		  // @80 Power Port G pull-up control register
+	uint8_t		  RESERVED19[2];  // @82
+	__IO uint16_t PDCRG;		  // @84 Power Port G pull-down control register
+	uint8_t		  RESERVED20[2];  // @86
+	__IO uint8_t  PUCRH;		  // @88 Power Port H pull-up control register
+	uint8_t		  RESERVED21[3];  // @89
+	__IO uint8_t  PDCRH;		  // @92 Power Port H pull-down control register
 };
-extern struct PWR_Type	PWR;	// @0x40007000 
+extern struct PWR_Type PWR;	 // @0x40007000
 
 // PWR->CR1 Power control register 1
 enum {
-	PWR_CR1_LPR = 1UL<<14, // Low-power run
-	PWR_CR1_VOS = ((1UL<<2)-1) << 9, // Voltage scaling range selection
-	PWR_CR1_DBP = 1UL<<8, // Disable backup domain write protection
-	PWR_CR1_LPMS = ((1UL<<3)-1) << 0, // Low-power mode selection		
+	PWR_CR1_LPR	 = 1UL << 14,			   // Low-power run
+	PWR_CR1_VOS	 = ((1UL << 2) - 1) << 9,  // Voltage scaling range selection
+	PWR_CR1_DBP	 = 1UL << 8,			   // Disable backup domain write protection
+	PWR_CR1_LPMS = ((1UL << 3) - 1) << 0,  // Low-power mode selection
 };
-static inline void pwr_cr1_set_vos(uint32_t val) { PWR.CR1 = (PWR.CR1 & ~PWR_CR1_VOS) | ((val<<9) & PWR_CR1_VOS); }
-static inline void pwr_cr1_set_lpms(uint32_t val) { PWR.CR1 = (PWR.CR1 & ~PWR_CR1_LPMS) | ((val<<0) & PWR_CR1_LPMS); }
-static inline uint32_t pwr_cr1_get_vos(void) { return (PWR.CR1 & PWR_CR1_VOS) >> 9 ; }
-static inline uint32_t pwr_cr1_get_lpms(void) { return (PWR.CR1 & PWR_CR1_LPMS) >> 0 ; }
+static inline void	   pwr_cr1_set_vos(uint32_t val) { PWR.CR1 = (PWR.CR1 & ~PWR_CR1_VOS) | ((val << 9) & PWR_CR1_VOS); }
+static inline void	   pwr_cr1_set_lpms(uint32_t val) { PWR.CR1 = (PWR.CR1 & ~PWR_CR1_LPMS) | ((val << 0) & PWR_CR1_LPMS); }
+static inline uint32_t pwr_cr1_get_vos(void) { return (PWR.CR1 & PWR_CR1_VOS) >> 9; }
+static inline uint32_t pwr_cr1_get_lpms(void) { return (PWR.CR1 & PWR_CR1_LPMS) >> 0; }
 
 // PWR->CR2 Power control register 2
 enum {
-	PWR_CR2_USV = 1UL<<10, // VDDUSB USB supply valid
-	PWR_CR2_IOSV = 1UL<<9, // VDDIO2 Independent I/Os supply valid
-	PWR_CR2_PVME4 = 1UL<<7, // Peripheral voltage monitoring 4 enable: VDDA vs. 2.2V
-	PWR_CR2_PVME3 = 1UL<<6, // Peripheral voltage monitoring 3 enable: VDDA vs. 1.62V
-	PWR_CR2_PVME2 = 1UL<<5, // Peripheral voltage monitoring 2 enable: VDDIO2 vs. 0.9V
-	PWR_CR2_PVME1 = 1UL<<4, // Peripheral voltage monitoring 1 enable: VDDUSB vs. 1.2V
-	PWR_CR2_PLS = ((1UL<<3)-1) << 1, // Power voltage detector level selection
-	PWR_CR2_PVDE = 1UL<<0, // Power voltage detector enable		
+	PWR_CR2_USV	  = 1UL << 10,				// VDDUSB USB supply valid
+	PWR_CR2_IOSV  = 1UL << 9,				// VDDIO2 Independent I/Os supply valid
+	PWR_CR2_PVME4 = 1UL << 7,				// Peripheral voltage monitoring 4 enable: VDDA vs. 2.2V
+	PWR_CR2_PVME3 = 1UL << 6,				// Peripheral voltage monitoring 3 enable: VDDA vs. 1.62V
+	PWR_CR2_PVME2 = 1UL << 5,				// Peripheral voltage monitoring 2 enable: VDDIO2 vs. 0.9V
+	PWR_CR2_PVME1 = 1UL << 4,				// Peripheral voltage monitoring 1 enable: VDDUSB vs. 1.2V
+	PWR_CR2_PLS	  = ((1UL << 3) - 1) << 1,	// Power voltage detector level selection
+	PWR_CR2_PVDE  = 1UL << 0,				// Power voltage detector enable
 };
-static inline void pwr_cr2_set_pls(uint32_t val) { PWR.CR2 = (PWR.CR2 & ~PWR_CR2_PLS) | ((val<<1) & PWR_CR2_PLS); }
-static inline uint32_t pwr_cr2_get_pls(void) { return (PWR.CR2 & PWR_CR2_PLS) >> 1 ; }
+static inline void	   pwr_cr2_set_pls(uint32_t val) { PWR.CR2 = (PWR.CR2 & ~PWR_CR2_PLS) | ((val << 1) & PWR_CR2_PLS); }
+static inline uint32_t pwr_cr2_get_pls(void) { return (PWR.CR2 & PWR_CR2_PLS) >> 1; }
 
 // PWR->CR3 Power control register 3
 enum {
-	PWR_CR3_EWF = 1UL<<15, // Enable internal wakeup line
-	PWR_CR3_APC = 1UL<<10, // Apply pull-up and pull-down configuration
-	PWR_CR3_RRS = 1UL<<8, // SRAM2 retention in Standby mode
-	PWR_CR3_EWUP5 = 1UL<<4, // Enable Wakeup pin WKUP5
-	PWR_CR3_EWUP4 = 1UL<<3, // Enable Wakeup pin WKUP4
-	PWR_CR3_EWUP3 = 1UL<<2, // Enable Wakeup pin WKUP3
-	PWR_CR3_EWUP2 = 1UL<<1, // Enable Wakeup pin WKUP2
-	PWR_CR3_EWUP1 = 1UL<<0, // Enable Wakeup pin WKUP1		
+	PWR_CR3_EWF	  = 1UL << 15,	// Enable internal wakeup line
+	PWR_CR3_APC	  = 1UL << 10,	// Apply pull-up and pull-down configuration
+	PWR_CR3_RRS	  = 1UL << 8,	// SRAM2 retention in Standby mode
+	PWR_CR3_EWUP5 = 1UL << 4,	// Enable Wakeup pin WKUP5
+	PWR_CR3_EWUP4 = 1UL << 3,	// Enable Wakeup pin WKUP4
+	PWR_CR3_EWUP3 = 1UL << 2,	// Enable Wakeup pin WKUP3
+	PWR_CR3_EWUP2 = 1UL << 1,	// Enable Wakeup pin WKUP2
+	PWR_CR3_EWUP1 = 1UL << 0,	// Enable Wakeup pin WKUP1
 };
 
 // PWR->CR4 Power control register 4
 enum {
-	PWR_CR4_VBRS = 1UL<<9, // VBAT battery charging resistor selection
-	PWR_CR4_VBE = 1UL<<8, // VBAT battery charging enable
-	PWR_CR4_WP5 = 1UL<<4, // Wakeup pin WKUP5 polarity
-	PWR_CR4_WP4 = 1UL<<3, // Wakeup pin WKUP4 polarity
-	PWR_CR4_WP3 = 1UL<<2, // Wakeup pin WKUP3 polarity
-	PWR_CR4_WP2 = 1UL<<1, // Wakeup pin WKUP2 polarity
-	PWR_CR4_WP1 = 1UL<<0, // Wakeup pin WKUP1 polarity		
+	PWR_CR4_VBRS = 1UL << 9,  // VBAT battery charging resistor selection
+	PWR_CR4_VBE	 = 1UL << 8,  // VBAT battery charging enable
+	PWR_CR4_WP5	 = 1UL << 4,  // Wakeup pin WKUP5 polarity
+	PWR_CR4_WP4	 = 1UL << 3,  // Wakeup pin WKUP4 polarity
+	PWR_CR4_WP3	 = 1UL << 2,  // Wakeup pin WKUP3 polarity
+	PWR_CR4_WP2	 = 1UL << 1,  // Wakeup pin WKUP2 polarity
+	PWR_CR4_WP1	 = 1UL << 0,  // Wakeup pin WKUP1 polarity
 };
 
 // PWR->SR1 Power status register 1
 enum {
-	PWR_SR1_WUFI = 1UL<<15, // Wakeup flag internal
-	PWR_SR1_CSBF = 1UL<<8, // Standby flag
-	PWR_SR1_CWUF5 = 1UL<<4, // Wakeup flag 5
-	PWR_SR1_CWUF4 = 1UL<<3, // Wakeup flag 4
-	PWR_SR1_CWUF3 = 1UL<<2, // Wakeup flag 3
-	PWR_SR1_CWUF2 = 1UL<<1, // Wakeup flag 2
-	PWR_SR1_CWUF1 = 1UL<<0, // Wakeup flag 1		
+	PWR_SR1_WUFI  = 1UL << 15,	// Wakeup flag internal
+	PWR_SR1_CSBF  = 1UL << 8,	// Standby flag
+	PWR_SR1_CWUF5 = 1UL << 4,	// Wakeup flag 5
+	PWR_SR1_CWUF4 = 1UL << 3,	// Wakeup flag 4
+	PWR_SR1_CWUF3 = 1UL << 2,	// Wakeup flag 3
+	PWR_SR1_CWUF2 = 1UL << 1,	// Wakeup flag 2
+	PWR_SR1_CWUF1 = 1UL << 0,	// Wakeup flag 1
 };
 
 // PWR->SR2 Power status register 2
 enum {
-	PWR_SR2_PVMO4 = 1UL<<15, // Peripheral voltage monitoring output: VDDA vs. 2.2 V
-	PWR_SR2_PVMO3 = 1UL<<14, // Peripheral voltage monitoring output: VDDA vs. 1.62 V
-	PWR_SR2_PVMO2 = 1UL<<13, // Peripheral voltage monitoring output: VDDIO2 vs. 0.9 V
-	PWR_SR2_PVMO1 = 1UL<<12, // Peripheral voltage monitoring output: VDDUSB vs. 1.2 V
-	PWR_SR2_PVDO = 1UL<<11, // Power voltage detector output
-	PWR_SR2_VOSF = 1UL<<10, // Voltage scaling flag
-	PWR_SR2_REGLPF = 1UL<<9, // Low-power regulator flag
-	PWR_SR2_REGLPS = 1UL<<8, // Low-power regulator started		
+	PWR_SR2_PVMO4  = 1UL << 15,	 // Peripheral voltage monitoring output: VDDA vs. 2.2 V
+	PWR_SR2_PVMO3  = 1UL << 14,	 // Peripheral voltage monitoring output: VDDA vs. 1.62 V
+	PWR_SR2_PVMO2  = 1UL << 13,	 // Peripheral voltage monitoring output: VDDIO2 vs. 0.9 V
+	PWR_SR2_PVMO1  = 1UL << 12,	 // Peripheral voltage monitoring output: VDDUSB vs. 1.2 V
+	PWR_SR2_PVDO   = 1UL << 11,	 // Power voltage detector output
+	PWR_SR2_VOSF   = 1UL << 10,	 // Voltage scaling flag
+	PWR_SR2_REGLPF = 1UL << 9,	 // Low-power regulator flag
+	PWR_SR2_REGLPS = 1UL << 8,	 // Low-power regulator started
 };
 
 // PWR->SCR Power status clear register
 enum {
-	PWR_SCR_SBF = 1UL<<8, // Clear standby flag
-	PWR_SCR_WUF5 = 1UL<<4, // Clear wakeup flag 5
-	PWR_SCR_WUF4 = 1UL<<3, // Clear wakeup flag 4
-	PWR_SCR_WUF3 = 1UL<<2, // Clear wakeup flag 3
-	PWR_SCR_WUF2 = 1UL<<1, // Clear wakeup flag 2
-	PWR_SCR_WUF1 = 1UL<<0, // Clear wakeup flag 1		
+	PWR_SCR_SBF	 = 1UL << 8,  // Clear standby flag
+	PWR_SCR_WUF5 = 1UL << 4,  // Clear wakeup flag 5
+	PWR_SCR_WUF4 = 1UL << 3,  // Clear wakeup flag 4
+	PWR_SCR_WUF3 = 1UL << 2,  // Clear wakeup flag 3
+	PWR_SCR_WUF2 = 1UL << 1,  // Clear wakeup flag 2
+	PWR_SCR_WUF1 = 1UL << 0,  // Clear wakeup flag 1
 };
 
 // PWR->PUCRH Power Port H pull-up control register
 enum {
-	PWR_PUCRH_PUX  = ((1UL<<2)-1) << 0, // Merged Port H pull-up bit y (y=0..1)		
+	PWR_PUCRH_PUX = ((1UL << 2) - 1) << 0,	// Merged Port H pull-up bit y (y=0..1)
 };
-static inline void pwr_pucrh_set_pux (uint32_t val) { PWR.PUCRH = (PWR.PUCRH & ~PWR_PUCRH_PUX ) | ((val<<0) & PWR_PUCRH_PUX ); }
-static inline uint32_t pwr_pucrh_get_pux (void) { return (PWR.PUCRH & PWR_PUCRH_PUX ) >> 0 ; }
+static inline void	   pwr_pucrh_set_pux(uint32_t val) { PWR.PUCRH = (PWR.PUCRH & ~PWR_PUCRH_PUX) | ((val << 0) & PWR_PUCRH_PUX); }
+static inline uint32_t pwr_pucrh_get_pux(void) { return (PWR.PUCRH & PWR_PUCRH_PUX) >> 0; }
 
 // PWR->PDCRH Power Port H pull-down control register
 enum {
-	PWR_PDCRH_PDX  = ((1UL<<2)-1) << 0, // Merged Port H pull-down bit y (y=0..1)		
+	PWR_PDCRH_PDX = ((1UL << 2) - 1) << 0,	// Merged Port H pull-down bit y (y=0..1)
 };
-static inline void pwr_pdcrh_set_pdx (uint32_t val) { PWR.PDCRH = (PWR.PDCRH & ~PWR_PDCRH_PDX ) | ((val<<0) & PWR_PDCRH_PDX ); }
-static inline uint32_t pwr_pdcrh_get_pdx (void) { return (PWR.PDCRH & PWR_PDCRH_PDX ) >> 0 ; }
+static inline void	   pwr_pdcrh_set_pdx(uint32_t val) { PWR.PDCRH = (PWR.PDCRH & ~PWR_PDCRH_PDX) | ((val << 0) & PWR_PDCRH_PDX); }
+static inline uint32_t pwr_pdcrh_get_pdx(void) { return (PWR.PDCRH & PWR_PDCRH_PDX) >> 0; }
 
 /* Reset and clock control
 There is only one peripheral of type RCC. */
 struct RCC_Type {
-	__IO uint32_t CR; // @0 Clock control register
-	__IO uint32_t ICSCR; // @4 Internal clock sources calibration register
-	__IO uint32_t CFGR; // @8 Clock configuration register
-	__IO uint32_t PLLCFGR; // @12 PLL configuration register
-	__IO uint32_t PLLSAI1CFGR; // @16 PLLSAI1 configuration register
-	 uint8_t RESERVED0[4]; // @20 
-	__IO uint16_t CIER; // @24 Clock interrupt enable register
-	 uint8_t RESERVED1[2]; // @26 
-	__I uint16_t CIFR; // @28 Clock interrupt flag register
-	 uint8_t RESERVED2[2]; // @30 
-	__O uint16_t CICR; // @32 Clock interrupt clear register
-	 uint8_t RESERVED3[6]; // @34 
-	__IO uint32_t AHB1RSTR; // @40 AHB1 peripheral reset register
-	__IO uint32_t AHB2RSTR; // @44 AHB2 peripheral reset register
-	__IO uint16_t AHB3RSTR; // @48 AHB3 peripheral reset register
-	 uint8_t RESERVED4[6]; // @50 
-	__IO uint32_t APB1RSTR1; // @56 APB1 peripheral reset register 1
-	__IO uint8_t APB1RSTR2; // @60 APB1 peripheral reset register 2
-	 uint8_t RESERVED5[3]; // @61 
-	__IO uint32_t APB2RSTR; // @64 APB2 peripheral reset register
-	 uint8_t RESERVED6[4]; // @68 
-	__IO uint32_t AHB1ENR; // @72 AHB1 peripheral clock enable register
-	__IO uint32_t AHB2ENR; // @76 AHB2 peripheral clock enable register
-	__IO uint16_t AHB3ENR; // @80 AHB3 peripheral clock enable register
-	 uint8_t RESERVED7[6]; // @82 
-	__IO uint32_t APB1ENR1; // @88 APB1ENR1
-	__IO uint32_t APB1ENR2; // @92 APB1 peripheral clock enable register 2
-	__IO uint32_t APB2ENR; // @96 APB2ENR
-	 uint8_t RESERVED8[4]; // @100 
-	__IO uint32_t AHB1SMENR; // @104 AHB1 peripheral clocks enable in Sleep and Stop modes register
-	__IO uint32_t AHB2SMENR; // @108 AHB2 peripheral clocks enable in Sleep and Stop modes register
-	__IO uint16_t AHB3SMENR; // @112 AHB3 peripheral clocks enable in Sleep and Stop modes register
-	 uint8_t RESERVED9[6]; // @114 
-	__IO uint32_t APB1SMENR1; // @120 APB1SMENR1
-	__IO uint8_t APB1SMENR2; // @124 APB1 peripheral clocks enable in Sleep and Stop modes register 2
-	 uint8_t RESERVED10[3]; // @125 
-	__IO uint32_t APB2SMENR; // @128 APB2SMENR
-	 uint8_t RESERVED11[4]; // @132 
-	__IO uint32_t CCIPR; // @136 CCIPR
-	 uint8_t RESERVED12[4]; // @140 
-	__IO uint32_t BDCR; // @144 BDCR
-	__IO uint32_t CSR; // @148 CSR
-	__IO uint16_t CRRCR; // @152 Clock recovery RC register
+	__IO uint32_t CR;			  // @0 Clock control register
+	__IO uint32_t ICSCR;		  // @4 Internal clock sources calibration register
+	__IO uint32_t CFGR;			  // @8 Clock configuration register
+	__IO uint32_t PLLCFGR;		  // @12 PLL configuration register
+	__IO uint32_t PLLSAI1CFGR;	  // @16 PLLSAI1 configuration register
+	uint8_t		  RESERVED0[4];	  // @20
+	__IO uint16_t CIER;			  // @24 Clock interrupt enable register
+	uint8_t		  RESERVED1[2];	  // @26
+	__I uint16_t  CIFR;			  // @28 Clock interrupt flag register
+	uint8_t		  RESERVED2[2];	  // @30
+	__O uint16_t  CICR;			  // @32 Clock interrupt clear register
+	uint8_t		  RESERVED3[6];	  // @34
+	__IO uint32_t AHB1RSTR;		  // @40 AHB1 peripheral reset register
+	__IO uint32_t AHB2RSTR;		  // @44 AHB2 peripheral reset register
+	__IO uint16_t AHB3RSTR;		  // @48 AHB3 peripheral reset register
+	uint8_t		  RESERVED4[6];	  // @50
+	__IO uint32_t APB1RSTR1;	  // @56 APB1 peripheral reset register 1
+	__IO uint8_t  APB1RSTR2;	  // @60 APB1 peripheral reset register 2
+	uint8_t		  RESERVED5[3];	  // @61
+	__IO uint32_t APB2RSTR;		  // @64 APB2 peripheral reset register
+	uint8_t		  RESERVED6[4];	  // @68
+	__IO uint32_t AHB1ENR;		  // @72 AHB1 peripheral clock enable register
+	__IO uint32_t AHB2ENR;		  // @76 AHB2 peripheral clock enable register
+	__IO uint16_t AHB3ENR;		  // @80 AHB3 peripheral clock enable register
+	uint8_t		  RESERVED7[6];	  // @82
+	__IO uint32_t APB1ENR1;		  // @88 APB1ENR1
+	__IO uint32_t APB1ENR2;		  // @92 APB1 peripheral clock enable register 2
+	__IO uint32_t APB2ENR;		  // @96 APB2ENR
+	uint8_t		  RESERVED8[4];	  // @100
+	__IO uint32_t AHB1SMENR;	  // @104 AHB1 peripheral clocks enable in Sleep and Stop modes register
+	__IO uint32_t AHB2SMENR;	  // @108 AHB2 peripheral clocks enable in Sleep and Stop modes register
+	__IO uint16_t AHB3SMENR;	  // @112 AHB3 peripheral clocks enable in Sleep and Stop modes register
+	uint8_t		  RESERVED9[6];	  // @114
+	__IO uint32_t APB1SMENR1;	  // @120 APB1SMENR1
+	__IO uint8_t  APB1SMENR2;	  // @124 APB1 peripheral clocks enable in Sleep and Stop modes register 2
+	uint8_t		  RESERVED10[3];  // @125
+	__IO uint32_t APB2SMENR;	  // @128 APB2SMENR
+	uint8_t		  RESERVED11[4];  // @132
+	__IO uint32_t CCIPR;		  // @136 CCIPR
+	uint8_t		  RESERVED12[4];  // @140
+	__IO uint32_t BDCR;			  // @144 BDCR
+	__IO uint32_t CSR;			  // @148 CSR
+	__IO uint16_t CRRCR;		  // @152 Clock recovery RC register
 };
-extern struct RCC_Type	RCC;	// @0x40021000 
+extern struct RCC_Type RCC;	 // @0x40021000
 
 // RCC->CR Clock control register
 enum {
-	RCC_CR_PLLSAI1RDY = 1UL<<27, // SAI1 PLL clock ready flag
-	RCC_CR_PLLSAI1ON = 1UL<<26, // SAI1 PLL enable
-	RCC_CR_PLLRDY = 1UL<<25, // Main PLL clock ready flag
-	RCC_CR_PLLON = 1UL<<24, // Main PLL enable
-	RCC_CR_CSSON = 1UL<<19, // Clock security system enable
-	RCC_CR_HSEBYP = 1UL<<18, // HSE crystal oscillator bypass
-	RCC_CR_HSERDY = 1UL<<17, // HSE clock ready flag
-	RCC_CR_HSEON = 1UL<<16, // HSE clock enable
-	RCC_CR_HSIASFS = 1UL<<11, // HSI automatic start from Stop
-	RCC_CR_HSIRDY = 1UL<<10, // HSI clock ready flag
-	RCC_CR_HSIKERON = 1UL<<9, // HSI always enable for peripheral kernels
-	RCC_CR_HSION = 1UL<<8, // HSI clock enable
-	RCC_CR_MSIRANGE = ((1UL<<4)-1) << 4, // MSI clock ranges
-	RCC_CR_MSIRGSEL = 1UL<<3, // MSI clock range selection
-	RCC_CR_MSIPLLEN = 1UL<<2, // MSI clock PLL enable
-	RCC_CR_MSIRDY = 1UL<<1, // MSI clock ready flag
-	RCC_CR_MSION = 1UL<<0, // MSI clock enable		
+	RCC_CR_PLLSAI1RDY = 1UL << 27,				// SAI1 PLL clock ready flag
+	RCC_CR_PLLSAI1ON  = 1UL << 26,				// SAI1 PLL enable
+	RCC_CR_PLLRDY	  = 1UL << 25,				// Main PLL clock ready flag
+	RCC_CR_PLLON	  = 1UL << 24,				// Main PLL enable
+	RCC_CR_CSSON	  = 1UL << 19,				// Clock security system enable
+	RCC_CR_HSEBYP	  = 1UL << 18,				// HSE crystal oscillator bypass
+	RCC_CR_HSERDY	  = 1UL << 17,				// HSE clock ready flag
+	RCC_CR_HSEON	  = 1UL << 16,				// HSE clock enable
+	RCC_CR_HSIASFS	  = 1UL << 11,				// HSI automatic start from Stop
+	RCC_CR_HSIRDY	  = 1UL << 10,				// HSI clock ready flag
+	RCC_CR_HSIKERON	  = 1UL << 9,				// HSI always enable for peripheral kernels
+	RCC_CR_HSION	  = 1UL << 8,				// HSI clock enable
+	RCC_CR_MSIRANGE	  = ((1UL << 4) - 1) << 4,	// MSI clock ranges
+	RCC_CR_MSIRGSEL	  = 1UL << 3,				// MSI clock range selection
+	RCC_CR_MSIPLLEN	  = 1UL << 2,				// MSI clock PLL enable
+	RCC_CR_MSIRDY	  = 1UL << 1,				// MSI clock ready flag
+	RCC_CR_MSION	  = 1UL << 0,				// MSI clock enable
 };
-static inline void rcc_cr_set_msirange(uint32_t val) { RCC.CR = (RCC.CR & ~RCC_CR_MSIRANGE) | ((val<<4) & RCC_CR_MSIRANGE); }
-static inline uint32_t rcc_cr_get_msirange(void) { return (RCC.CR & RCC_CR_MSIRANGE) >> 4 ; }
+static inline void	   rcc_cr_set_msirange(uint32_t val) { RCC.CR = (RCC.CR & ~RCC_CR_MSIRANGE) | ((val << 4) & RCC_CR_MSIRANGE); }
+static inline uint32_t rcc_cr_get_msirange(void) { return (RCC.CR & RCC_CR_MSIRANGE) >> 4; }
 
 // RCC->ICSCR Internal clock sources calibration register
 enum {
-	RCC_ICSCR_HSITRIM = ((1UL<<5)-1) << 24, // HSI clock trimming
-	RCC_ICSCR_HSICAL = ((1UL<<8)-1) << 16, // HSI clock calibration
-	RCC_ICSCR_MSITRIM = ((1UL<<8)-1) << 8, // MSI clock trimming
-	RCC_ICSCR_MSICAL = ((1UL<<8)-1) << 0, // MSI clock calibration		
+	RCC_ICSCR_HSITRIM = ((1UL << 5) - 1) << 24,	 // HSI clock trimming
+	RCC_ICSCR_HSICAL  = ((1UL << 8) - 1) << 16,	 // HSI clock calibration
+	RCC_ICSCR_MSITRIM = ((1UL << 8) - 1) << 8,	 // MSI clock trimming
+	RCC_ICSCR_MSICAL  = ((1UL << 8) - 1) << 0,	 // MSI clock calibration
 };
-static inline void rcc_icscr_set_hsitrim(uint32_t val) { RCC.ICSCR = (RCC.ICSCR & ~RCC_ICSCR_HSITRIM) | ((val<<24) & RCC_ICSCR_HSITRIM); }
-static inline void rcc_icscr_set_hsical(uint32_t val) { RCC.ICSCR = (RCC.ICSCR & ~RCC_ICSCR_HSICAL) | ((val<<16) & RCC_ICSCR_HSICAL); }
-static inline void rcc_icscr_set_msitrim(uint32_t val) { RCC.ICSCR = (RCC.ICSCR & ~RCC_ICSCR_MSITRIM) | ((val<<8) & RCC_ICSCR_MSITRIM); }
-static inline void rcc_icscr_set_msical(uint32_t val) { RCC.ICSCR = (RCC.ICSCR & ~RCC_ICSCR_MSICAL) | ((val<<0) & RCC_ICSCR_MSICAL); }
-static inline uint32_t rcc_icscr_get_hsitrim(void) { return (RCC.ICSCR & RCC_ICSCR_HSITRIM) >> 24 ; }
-static inline uint32_t rcc_icscr_get_hsical(void) { return (RCC.ICSCR & RCC_ICSCR_HSICAL) >> 16 ; }
-static inline uint32_t rcc_icscr_get_msitrim(void) { return (RCC.ICSCR & RCC_ICSCR_MSITRIM) >> 8 ; }
-static inline uint32_t rcc_icscr_get_msical(void) { return (RCC.ICSCR & RCC_ICSCR_MSICAL) >> 0 ; }
+static inline void rcc_icscr_set_hsitrim(uint32_t val) {
+	RCC.ICSCR = (RCC.ICSCR & ~RCC_ICSCR_HSITRIM) | ((val << 24) & RCC_ICSCR_HSITRIM);
+}
+static inline void rcc_icscr_set_hsical(uint32_t val) {
+	RCC.ICSCR = (RCC.ICSCR & ~RCC_ICSCR_HSICAL) | ((val << 16) & RCC_ICSCR_HSICAL);
+}
+static inline void rcc_icscr_set_msitrim(uint32_t val) {
+	RCC.ICSCR = (RCC.ICSCR & ~RCC_ICSCR_MSITRIM) | ((val << 8) & RCC_ICSCR_MSITRIM);
+}
+static inline void rcc_icscr_set_msical(uint32_t val) {
+	RCC.ICSCR = (RCC.ICSCR & ~RCC_ICSCR_MSICAL) | ((val << 0) & RCC_ICSCR_MSICAL);
+}
+static inline uint32_t rcc_icscr_get_hsitrim(void) { return (RCC.ICSCR & RCC_ICSCR_HSITRIM) >> 24; }
+static inline uint32_t rcc_icscr_get_hsical(void) { return (RCC.ICSCR & RCC_ICSCR_HSICAL) >> 16; }
+static inline uint32_t rcc_icscr_get_msitrim(void) { return (RCC.ICSCR & RCC_ICSCR_MSITRIM) >> 8; }
+static inline uint32_t rcc_icscr_get_msical(void) { return (RCC.ICSCR & RCC_ICSCR_MSICAL) >> 0; }
 
 // RCC->CFGR Clock configuration register
 enum {
-	RCC_CFGR_MCOPRE = ((1UL<<3)-1) << 28, // Microcontroller clock output prescaler
-	RCC_CFGR_MCOSEL = ((1UL<<3)-1) << 24, // Microcontroller clock output
-	RCC_CFGR_STOPWUCK = 1UL<<15, // Wakeup from Stop and CSS backup clock selection
-	RCC_CFGR_PPRE2 = ((1UL<<3)-1) << 11, // APB high-speed prescaler (APB2)
-	RCC_CFGR_PPRE1 = ((1UL<<3)-1) << 8, // PB low-speed prescaler (APB1)
-	RCC_CFGR_HPRE = ((1UL<<4)-1) << 4, // AHB prescaler
-	RCC_CFGR_SWS = ((1UL<<2)-1) << 2, // System clock switch status
-	RCC_CFGR_SW = ((1UL<<2)-1) << 0, // System clock switch		
+	RCC_CFGR_MCOPRE	  = ((1UL << 3) - 1) << 28,	 // Microcontroller clock output prescaler
+	RCC_CFGR_MCOSEL	  = ((1UL << 3) - 1) << 24,	 // Microcontroller clock output
+	RCC_CFGR_STOPWUCK = 1UL << 15,				 // Wakeup from Stop and CSS backup clock selection
+	RCC_CFGR_PPRE2	  = ((1UL << 3) - 1) << 11,	 // APB high-speed prescaler (APB2)
+	RCC_CFGR_PPRE1	  = ((1UL << 3) - 1) << 8,	 // PB low-speed prescaler (APB1)
+	RCC_CFGR_HPRE	  = ((1UL << 4) - 1) << 4,	 // AHB prescaler
+	RCC_CFGR_SWS	  = ((1UL << 2) - 1) << 2,	 // System clock switch status
+	RCC_CFGR_SW		  = ((1UL << 2) - 1) << 0,	 // System clock switch
 };
-static inline void rcc_cfgr_set_mcopre(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_MCOPRE) | ((val<<28) & RCC_CFGR_MCOPRE); }
-static inline void rcc_cfgr_set_mcosel(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_MCOSEL) | ((val<<24) & RCC_CFGR_MCOSEL); }
-static inline void rcc_cfgr_set_ppre2(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_PPRE2) | ((val<<11) & RCC_CFGR_PPRE2); }
-static inline void rcc_cfgr_set_ppre1(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_PPRE1) | ((val<<8) & RCC_CFGR_PPRE1); }
-static inline void rcc_cfgr_set_hpre(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_HPRE) | ((val<<4) & RCC_CFGR_HPRE); }
-static inline void rcc_cfgr_set_sws(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_SWS) | ((val<<2) & RCC_CFGR_SWS); }
-static inline void rcc_cfgr_set_sw(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_SW) | ((val<<0) & RCC_CFGR_SW); }
-static inline uint32_t rcc_cfgr_get_mcopre(void) { return (RCC.CFGR & RCC_CFGR_MCOPRE) >> 28 ; }
-static inline uint32_t rcc_cfgr_get_mcosel(void) { return (RCC.CFGR & RCC_CFGR_MCOSEL) >> 24 ; }
-static inline uint32_t rcc_cfgr_get_ppre2(void) { return (RCC.CFGR & RCC_CFGR_PPRE2) >> 11 ; }
-static inline uint32_t rcc_cfgr_get_ppre1(void) { return (RCC.CFGR & RCC_CFGR_PPRE1) >> 8 ; }
-static inline uint32_t rcc_cfgr_get_hpre(void) { return (RCC.CFGR & RCC_CFGR_HPRE) >> 4 ; }
-static inline uint32_t rcc_cfgr_get_sws(void) { return (RCC.CFGR & RCC_CFGR_SWS) >> 2 ; }
-static inline uint32_t rcc_cfgr_get_sw(void) { return (RCC.CFGR & RCC_CFGR_SW) >> 0 ; }
+static inline void rcc_cfgr_set_mcopre(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_MCOPRE) | ((val << 28) & RCC_CFGR_MCOPRE); }
+static inline void rcc_cfgr_set_mcosel(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_MCOSEL) | ((val << 24) & RCC_CFGR_MCOSEL); }
+static inline void rcc_cfgr_set_ppre2(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_PPRE2) | ((val << 11) & RCC_CFGR_PPRE2); }
+static inline void rcc_cfgr_set_ppre1(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_PPRE1) | ((val << 8) & RCC_CFGR_PPRE1); }
+static inline void rcc_cfgr_set_hpre(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_HPRE) | ((val << 4) & RCC_CFGR_HPRE); }
+static inline void rcc_cfgr_set_sws(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_SWS) | ((val << 2) & RCC_CFGR_SWS); }
+static inline void rcc_cfgr_set_sw(uint32_t val) { RCC.CFGR = (RCC.CFGR & ~RCC_CFGR_SW) | ((val << 0) & RCC_CFGR_SW); }
+static inline uint32_t rcc_cfgr_get_mcopre(void) { return (RCC.CFGR & RCC_CFGR_MCOPRE) >> 28; }
+static inline uint32_t rcc_cfgr_get_mcosel(void) { return (RCC.CFGR & RCC_CFGR_MCOSEL) >> 24; }
+static inline uint32_t rcc_cfgr_get_ppre2(void) { return (RCC.CFGR & RCC_CFGR_PPRE2) >> 11; }
+static inline uint32_t rcc_cfgr_get_ppre1(void) { return (RCC.CFGR & RCC_CFGR_PPRE1) >> 8; }
+static inline uint32_t rcc_cfgr_get_hpre(void) { return (RCC.CFGR & RCC_CFGR_HPRE) >> 4; }
+static inline uint32_t rcc_cfgr_get_sws(void) { return (RCC.CFGR & RCC_CFGR_SWS) >> 2; }
+static inline uint32_t rcc_cfgr_get_sw(void) { return (RCC.CFGR & RCC_CFGR_SW) >> 0; }
 
 // RCC->PLLCFGR PLL configuration register
 enum {
-	RCC_PLLCFGR_PLLPDIV = ((1UL<<5)-1) << 27, // Main PLL division factor for PLLSAI2CLK
-	RCC_PLLCFGR_PLLR = ((1UL<<2)-1) << 25, // Main PLL division factor for PLLCLK (system clock)
-	RCC_PLLCFGR_PLLREN = 1UL<<24, // Main PLL PLLCLK output enable
-	RCC_PLLCFGR_PLLQ = ((1UL<<2)-1) << 21, // Main PLL division factor for PLLUSB1CLK(48 MHz clock)
-	RCC_PLLCFGR_PLLQEN = 1UL<<20, // Main PLL PLLUSB1CLK output enable
-	RCC_PLLCFGR_PLLP = 1UL<<17, // Main PLL division factor for PLLSAI3CLK (SAI1 and SAI2 clock)
-	RCC_PLLCFGR_PLLPEN = 1UL<<16, // Main PLL PLLSAI3CLK output enable
-	RCC_PLLCFGR_PLLN = ((1UL<<7)-1) << 8, // Main PLL multiplication factor for VCO
-	RCC_PLLCFGR_PLLM = ((1UL<<3)-1) << 4, // Division factor for the main PLL and audio PLL (PLLSAI1 and PLLSAI2) input clock
-	RCC_PLLCFGR_PLLSRC = ((1UL<<2)-1) << 0, // Main PLL, PLLSAI1 and PLLSAI2 entry clock source		
+	RCC_PLLCFGR_PLLPDIV = ((1UL << 5) - 1) << 27,  // Main PLL division factor for PLLSAI2CLK
+	RCC_PLLCFGR_PLLR	= ((1UL << 2) - 1) << 25,  // Main PLL division factor for PLLCLK (system clock)
+	RCC_PLLCFGR_PLLREN	= 1UL << 24,			   // Main PLL PLLCLK output enable
+	RCC_PLLCFGR_PLLQ	= ((1UL << 2) - 1) << 21,  // Main PLL division factor for PLLUSB1CLK(48 MHz clock)
+	RCC_PLLCFGR_PLLQEN	= 1UL << 20,			   // Main PLL PLLUSB1CLK output enable
+	RCC_PLLCFGR_PLLP	= 1UL << 17,			   // Main PLL division factor for PLLSAI3CLK (SAI1 and SAI2 clock)
+	RCC_PLLCFGR_PLLPEN	= 1UL << 16,			   // Main PLL PLLSAI3CLK output enable
+	RCC_PLLCFGR_PLLN	= ((1UL << 7) - 1) << 8,   // Main PLL multiplication factor for VCO
+	RCC_PLLCFGR_PLLM   = ((1UL << 3) - 1) << 4,	 // Division factor for the main PLL and audio PLL (PLLSAI1 and PLLSAI2) input clock
+	RCC_PLLCFGR_PLLSRC = ((1UL << 2) - 1) << 0,	 // Main PLL, PLLSAI1 and PLLSAI2 entry clock source
 };
-static inline void rcc_pllcfgr_set_pllpdiv(uint32_t val) { RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLPDIV) | ((val<<27) & RCC_PLLCFGR_PLLPDIV); }
-static inline void rcc_pllcfgr_set_pllr(uint32_t val) { RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLR) | ((val<<25) & RCC_PLLCFGR_PLLR); }
-static inline void rcc_pllcfgr_set_pllq(uint32_t val) { RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLQ) | ((val<<21) & RCC_PLLCFGR_PLLQ); }
-static inline void rcc_pllcfgr_set_plln(uint32_t val) { RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLN) | ((val<<8) & RCC_PLLCFGR_PLLN); }
-static inline void rcc_pllcfgr_set_pllm(uint32_t val) { RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLM) | ((val<<4) & RCC_PLLCFGR_PLLM); }
-static inline void rcc_pllcfgr_set_pllsrc(uint32_t val) { RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLSRC) | ((val<<0) & RCC_PLLCFGR_PLLSRC); }
-static inline uint32_t rcc_pllcfgr_get_pllpdiv(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLPDIV) >> 27 ; }
-static inline uint32_t rcc_pllcfgr_get_pllr(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLR) >> 25 ; }
-static inline uint32_t rcc_pllcfgr_get_pllq(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLQ) >> 21 ; }
-static inline uint32_t rcc_pllcfgr_get_plln(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLN) >> 8 ; }
-static inline uint32_t rcc_pllcfgr_get_pllm(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLM) >> 4 ; }
-static inline uint32_t rcc_pllcfgr_get_pllsrc(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLSRC) >> 0 ; }
+static inline void rcc_pllcfgr_set_pllpdiv(uint32_t val) {
+	RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLPDIV) | ((val << 27) & RCC_PLLCFGR_PLLPDIV);
+}
+static inline void rcc_pllcfgr_set_pllr(uint32_t val) {
+	RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLR) | ((val << 25) & RCC_PLLCFGR_PLLR);
+}
+static inline void rcc_pllcfgr_set_pllq(uint32_t val) {
+	RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLQ) | ((val << 21) & RCC_PLLCFGR_PLLQ);
+}
+static inline void rcc_pllcfgr_set_plln(uint32_t val) {
+	RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLN) | ((val << 8) & RCC_PLLCFGR_PLLN);
+}
+static inline void rcc_pllcfgr_set_pllm(uint32_t val) {
+	RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLM) | ((val << 4) & RCC_PLLCFGR_PLLM);
+}
+static inline void rcc_pllcfgr_set_pllsrc(uint32_t val) {
+	RCC.PLLCFGR = (RCC.PLLCFGR & ~RCC_PLLCFGR_PLLSRC) | ((val << 0) & RCC_PLLCFGR_PLLSRC);
+}
+static inline uint32_t rcc_pllcfgr_get_pllpdiv(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLPDIV) >> 27; }
+static inline uint32_t rcc_pllcfgr_get_pllr(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLR) >> 25; }
+static inline uint32_t rcc_pllcfgr_get_pllq(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLQ) >> 21; }
+static inline uint32_t rcc_pllcfgr_get_plln(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLN) >> 8; }
+static inline uint32_t rcc_pllcfgr_get_pllm(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLM) >> 4; }
+static inline uint32_t rcc_pllcfgr_get_pllsrc(void) { return (RCC.PLLCFGR & RCC_PLLCFGR_PLLSRC) >> 0; }
 
 // RCC->PLLSAI1CFGR PLLSAI1 configuration register
 enum {
-	RCC_PLLSAI1CFGR_PLLSAI1PDIV = ((1UL<<5)-1) << 27, // PLLSAI1 division factor for PLLSAI1CLK
-	RCC_PLLSAI1CFGR_PLLSAI1R = ((1UL<<2)-1) << 25, // PLLSAI1 division factor for PLLADC1CLK (ADC clock)
-	RCC_PLLSAI1CFGR_PLLSAI1REN = 1UL<<24, // PLLSAI1 PLLADC1CLK output enable
-	RCC_PLLSAI1CFGR_PLLSAI1Q = ((1UL<<2)-1) << 21, // SAI1PLL division factor for PLLUSB2CLK (48 MHz clock)
-	RCC_PLLSAI1CFGR_PLLSAI1QEN = 1UL<<20, // SAI1PLL PLLUSB2CLK output enable
-	RCC_PLLSAI1CFGR_PLLSAI1P = 1UL<<17, // SAI1PLL division factor for PLLSAI1CLK (SAI1 or SAI2 clock)
-	RCC_PLLSAI1CFGR_PLLSAI1PEN = 1UL<<16, // SAI1PLL PLLSAI1CLK output enable
-	RCC_PLLSAI1CFGR_PLLSAI1N = ((1UL<<7)-1) << 8, // SAI1PLL multiplication factor for VCO		
+	RCC_PLLSAI1CFGR_PLLSAI1PDIV = ((1UL << 5) - 1) << 27,  // PLLSAI1 division factor for PLLSAI1CLK
+	RCC_PLLSAI1CFGR_PLLSAI1R	= ((1UL << 2) - 1) << 25,  // PLLSAI1 division factor for PLLADC1CLK (ADC clock)
+	RCC_PLLSAI1CFGR_PLLSAI1REN	= 1UL << 24,			   // PLLSAI1 PLLADC1CLK output enable
+	RCC_PLLSAI1CFGR_PLLSAI1Q	= ((1UL << 2) - 1) << 21,  // SAI1PLL division factor for PLLUSB2CLK (48 MHz clock)
+	RCC_PLLSAI1CFGR_PLLSAI1QEN	= 1UL << 20,			   // SAI1PLL PLLUSB2CLK output enable
+	RCC_PLLSAI1CFGR_PLLSAI1P	= 1UL << 17,			   // SAI1PLL division factor for PLLSAI1CLK (SAI1 or SAI2 clock)
+	RCC_PLLSAI1CFGR_PLLSAI1PEN	= 1UL << 16,			   // SAI1PLL PLLSAI1CLK output enable
+	RCC_PLLSAI1CFGR_PLLSAI1N	= ((1UL << 7) - 1) << 8,   // SAI1PLL multiplication factor for VCO
 };
-static inline void rcc_pllsai1cfgr_set_pllsai1pdiv(uint32_t val) { RCC.PLLSAI1CFGR = (RCC.PLLSAI1CFGR & ~RCC_PLLSAI1CFGR_PLLSAI1PDIV) | ((val<<27) & RCC_PLLSAI1CFGR_PLLSAI1PDIV); }
-static inline void rcc_pllsai1cfgr_set_pllsai1r(uint32_t val) { RCC.PLLSAI1CFGR = (RCC.PLLSAI1CFGR & ~RCC_PLLSAI1CFGR_PLLSAI1R) | ((val<<25) & RCC_PLLSAI1CFGR_PLLSAI1R); }
-static inline void rcc_pllsai1cfgr_set_pllsai1q(uint32_t val) { RCC.PLLSAI1CFGR = (RCC.PLLSAI1CFGR & ~RCC_PLLSAI1CFGR_PLLSAI1Q) | ((val<<21) & RCC_PLLSAI1CFGR_PLLSAI1Q); }
-static inline void rcc_pllsai1cfgr_set_pllsai1n(uint32_t val) { RCC.PLLSAI1CFGR = (RCC.PLLSAI1CFGR & ~RCC_PLLSAI1CFGR_PLLSAI1N) | ((val<<8) & RCC_PLLSAI1CFGR_PLLSAI1N); }
-static inline uint32_t rcc_pllsai1cfgr_get_pllsai1pdiv(void) { return (RCC.PLLSAI1CFGR & RCC_PLLSAI1CFGR_PLLSAI1PDIV) >> 27 ; }
-static inline uint32_t rcc_pllsai1cfgr_get_pllsai1r(void) { return (RCC.PLLSAI1CFGR & RCC_PLLSAI1CFGR_PLLSAI1R) >> 25 ; }
-static inline uint32_t rcc_pllsai1cfgr_get_pllsai1q(void) { return (RCC.PLLSAI1CFGR & RCC_PLLSAI1CFGR_PLLSAI1Q) >> 21 ; }
-static inline uint32_t rcc_pllsai1cfgr_get_pllsai1n(void) { return (RCC.PLLSAI1CFGR & RCC_PLLSAI1CFGR_PLLSAI1N) >> 8 ; }
+static inline void rcc_pllsai1cfgr_set_pllsai1pdiv(uint32_t val) {
+	RCC.PLLSAI1CFGR = (RCC.PLLSAI1CFGR & ~RCC_PLLSAI1CFGR_PLLSAI1PDIV) | ((val << 27) & RCC_PLLSAI1CFGR_PLLSAI1PDIV);
+}
+static inline void rcc_pllsai1cfgr_set_pllsai1r(uint32_t val) {
+	RCC.PLLSAI1CFGR = (RCC.PLLSAI1CFGR & ~RCC_PLLSAI1CFGR_PLLSAI1R) | ((val << 25) & RCC_PLLSAI1CFGR_PLLSAI1R);
+}
+static inline void rcc_pllsai1cfgr_set_pllsai1q(uint32_t val) {
+	RCC.PLLSAI1CFGR = (RCC.PLLSAI1CFGR & ~RCC_PLLSAI1CFGR_PLLSAI1Q) | ((val << 21) & RCC_PLLSAI1CFGR_PLLSAI1Q);
+}
+static inline void rcc_pllsai1cfgr_set_pllsai1n(uint32_t val) {
+	RCC.PLLSAI1CFGR = (RCC.PLLSAI1CFGR & ~RCC_PLLSAI1CFGR_PLLSAI1N) | ((val << 8) & RCC_PLLSAI1CFGR_PLLSAI1N);
+}
+static inline uint32_t rcc_pllsai1cfgr_get_pllsai1pdiv(void) { return (RCC.PLLSAI1CFGR & RCC_PLLSAI1CFGR_PLLSAI1PDIV) >> 27; }
+static inline uint32_t rcc_pllsai1cfgr_get_pllsai1r(void) { return (RCC.PLLSAI1CFGR & RCC_PLLSAI1CFGR_PLLSAI1R) >> 25; }
+static inline uint32_t rcc_pllsai1cfgr_get_pllsai1q(void) { return (RCC.PLLSAI1CFGR & RCC_PLLSAI1CFGR_PLLSAI1Q) >> 21; }
+static inline uint32_t rcc_pllsai1cfgr_get_pllsai1n(void) { return (RCC.PLLSAI1CFGR & RCC_PLLSAI1CFGR_PLLSAI1N) >> 8; }
 
 // RCC->CIER Clock interrupt enable register
 enum {
-	RCC_CIER_HSI48RDYIE = 1UL<<10, // HSI48 ready interrupt enable
-	RCC_CIER_LSECSSIE = 1UL<<9, // LSE clock security system interrupt enable
-	RCC_CIER_PLLSAI1RDYIE = 1UL<<6, // PLLSAI1 ready interrupt enable
-	RCC_CIER_PLLRDYIE = 1UL<<5, // PLL ready interrupt enable
-	RCC_CIER_HSERDYIE = 1UL<<4, // HSE ready interrupt enable
-	RCC_CIER_HSIRDYIE = 1UL<<3, // HSI ready interrupt enable
-	RCC_CIER_MSIRDYIE = 1UL<<2, // MSI ready interrupt enable
-	RCC_CIER_LSERDYIE = 1UL<<1, // LSE ready interrupt enable
-	RCC_CIER_LSIRDYIE = 1UL<<0, // LSI ready interrupt enable		
+	RCC_CIER_HSI48RDYIE	  = 1UL << 10,	// HSI48 ready interrupt enable
+	RCC_CIER_LSECSSIE	  = 1UL << 9,	// LSE clock security system interrupt enable
+	RCC_CIER_PLLSAI1RDYIE = 1UL << 6,	// PLLSAI1 ready interrupt enable
+	RCC_CIER_PLLRDYIE	  = 1UL << 5,	// PLL ready interrupt enable
+	RCC_CIER_HSERDYIE	  = 1UL << 4,	// HSE ready interrupt enable
+	RCC_CIER_HSIRDYIE	  = 1UL << 3,	// HSI ready interrupt enable
+	RCC_CIER_MSIRDYIE	  = 1UL << 2,	// MSI ready interrupt enable
+	RCC_CIER_LSERDYIE	  = 1UL << 1,	// LSE ready interrupt enable
+	RCC_CIER_LSIRDYIE	  = 1UL << 0,	// LSI ready interrupt enable
 };
 
 // RCC->CIFR Clock interrupt flag register
 enum {
-	RCC_CIFR_HSI48RDYF = 1UL<<10, // HSI48 ready interrupt flag
-	RCC_CIFR_LSECSSF = 1UL<<9, // LSE Clock security system interrupt flag
-	RCC_CIFR_CSSF = 1UL<<8, // Clock security system interrupt flag
-	RCC_CIFR_PLLSAI1RDYF = 1UL<<6, // PLLSAI1 ready interrupt flag
-	RCC_CIFR_PLLRDYF = 1UL<<5, // PLL ready interrupt flag
-	RCC_CIFR_HSERDYF = 1UL<<4, // HSE ready interrupt flag
-	RCC_CIFR_HSIRDYF = 1UL<<3, // HSI ready interrupt flag
-	RCC_CIFR_MSIRDYF = 1UL<<2, // MSI ready interrupt flag
-	RCC_CIFR_LSERDYF = 1UL<<1, // LSE ready interrupt flag
-	RCC_CIFR_LSIRDYF = 1UL<<0, // LSI ready interrupt flag		
+	RCC_CIFR_HSI48RDYF	 = 1UL << 10,  // HSI48 ready interrupt flag
+	RCC_CIFR_LSECSSF	 = 1UL << 9,   // LSE Clock security system interrupt flag
+	RCC_CIFR_CSSF		 = 1UL << 8,   // Clock security system interrupt flag
+	RCC_CIFR_PLLSAI1RDYF = 1UL << 6,   // PLLSAI1 ready interrupt flag
+	RCC_CIFR_PLLRDYF	 = 1UL << 5,   // PLL ready interrupt flag
+	RCC_CIFR_HSERDYF	 = 1UL << 4,   // HSE ready interrupt flag
+	RCC_CIFR_HSIRDYF	 = 1UL << 3,   // HSI ready interrupt flag
+	RCC_CIFR_MSIRDYF	 = 1UL << 2,   // MSI ready interrupt flag
+	RCC_CIFR_LSERDYF	 = 1UL << 1,   // LSE ready interrupt flag
+	RCC_CIFR_LSIRDYF	 = 1UL << 0,   // LSI ready interrupt flag
 };
 
 // RCC->CICR Clock interrupt clear register
 enum {
-	RCC_CICR_HSI48RDYC = 1UL<<10, // HSI48 oscillator ready interrupt clear
-	RCC_CICR_LSECSSC = 1UL<<9, // LSE Clock security system interrupt clear
-	RCC_CICR_CSSC = 1UL<<8, // Clock security system interrupt clear
-	RCC_CICR_PLLSAI1RDYC = 1UL<<6, // PLLSAI1 ready interrupt clear
-	RCC_CICR_PLLRDYC = 1UL<<5, // PLL ready interrupt clear
-	RCC_CICR_HSERDYC = 1UL<<4, // HSE ready interrupt clear
-	RCC_CICR_HSIRDYC = 1UL<<3, // HSI ready interrupt clear
-	RCC_CICR_MSIRDYC = 1UL<<2, // MSI ready interrupt clear
-	RCC_CICR_LSERDYC = 1UL<<1, // LSE ready interrupt clear
-	RCC_CICR_LSIRDYC = 1UL<<0, // LSI ready interrupt clear		
+	RCC_CICR_HSI48RDYC	 = 1UL << 10,  // HSI48 oscillator ready interrupt clear
+	RCC_CICR_LSECSSC	 = 1UL << 9,   // LSE Clock security system interrupt clear
+	RCC_CICR_CSSC		 = 1UL << 8,   // Clock security system interrupt clear
+	RCC_CICR_PLLSAI1RDYC = 1UL << 6,   // PLLSAI1 ready interrupt clear
+	RCC_CICR_PLLRDYC	 = 1UL << 5,   // PLL ready interrupt clear
+	RCC_CICR_HSERDYC	 = 1UL << 4,   // HSE ready interrupt clear
+	RCC_CICR_HSIRDYC	 = 1UL << 3,   // HSI ready interrupt clear
+	RCC_CICR_MSIRDYC	 = 1UL << 2,   // MSI ready interrupt clear
+	RCC_CICR_LSERDYC	 = 1UL << 1,   // LSE ready interrupt clear
+	RCC_CICR_LSIRDYC	 = 1UL << 0,   // LSI ready interrupt clear
 };
 
 // RCC->AHB1RSTR AHB1 peripheral reset register
 enum {
-	RCC_AHB1RSTR_TSCRST = 1UL<<16, // Touch Sensing Controller reset
-	RCC_AHB1RSTR_CRCRST = 1UL<<11, // CRC reset
-	RCC_AHB1RSTR_FLASHRST = 1UL<<8, // Flash memory interface reset
-	RCC_AHB1RSTR_DMA2RST = 1UL<<1, // DMA2 reset
-	RCC_AHB1RSTR_DMA1RST = 1UL<<0, // DMA1 reset		
+	RCC_AHB1RSTR_TSCRST	  = 1UL << 16,	// Touch Sensing Controller reset
+	RCC_AHB1RSTR_CRCRST	  = 1UL << 11,	// CRC reset
+	RCC_AHB1RSTR_FLASHRST = 1UL << 8,	// Flash memory interface reset
+	RCC_AHB1RSTR_DMA2RST  = 1UL << 1,	// DMA2 reset
+	RCC_AHB1RSTR_DMA1RST  = 1UL << 0,	// DMA1 reset
 };
 
 // RCC->AHB2RSTR AHB2 peripheral reset register
 enum {
-	RCC_AHB2RSTR_RNGRST = 1UL<<18, // Random number generator reset
-	RCC_AHB2RSTR_AESRST = 1UL<<16, // AES hardware accelerator reset
-	RCC_AHB2RSTR_ADCRST = 1UL<<13, // ADC reset
-	RCC_AHB2RSTR_GPIOHRST = 1UL<<7, // IO port H reset
-	RCC_AHB2RSTR_GPIOERST = 1UL<<4, // IO port E reset
-	RCC_AHB2RSTR_GPIODRST = 1UL<<3, // IO port D reset
-	RCC_AHB2RSTR_GPIOCRST = 1UL<<2, // IO port C reset
-	RCC_AHB2RSTR_GPIOBRST = 1UL<<1, // IO port B reset
-	RCC_AHB2RSTR_GPIOARST = 1UL<<0, // IO port A reset		
+	RCC_AHB2RSTR_RNGRST	  = 1UL << 18,	// Random number generator reset
+	RCC_AHB2RSTR_AESRST	  = 1UL << 16,	// AES hardware accelerator reset
+	RCC_AHB2RSTR_ADCRST	  = 1UL << 13,	// ADC reset
+	RCC_AHB2RSTR_GPIOHRST = 1UL << 7,	// IO port H reset
+	RCC_AHB2RSTR_GPIOERST = 1UL << 4,	// IO port E reset
+	RCC_AHB2RSTR_GPIODRST = 1UL << 3,	// IO port D reset
+	RCC_AHB2RSTR_GPIOCRST = 1UL << 2,	// IO port C reset
+	RCC_AHB2RSTR_GPIOBRST = 1UL << 1,	// IO port B reset
+	RCC_AHB2RSTR_GPIOARST = 1UL << 0,	// IO port A reset
 };
 
 // RCC->AHB3RSTR AHB3 peripheral reset register
 enum {
-	RCC_AHB3RSTR_QSPIRST = 1UL<<8, // Quad SPI memory interface reset		
+	RCC_AHB3RSTR_QSPIRST = 1UL << 8,  // Quad SPI memory interface reset
 };
 
 // RCC->APB1RSTR1 APB1 peripheral reset register 1
 enum {
-	RCC_APB1RSTR1_LPTIM1RST = 1UL<<31, // Low Power Timer 1 reset
-	RCC_APB1RSTR1_OPAMPRST = 1UL<<30, // OPAMP interface reset
-	RCC_APB1RSTR1_DAC1RST = 1UL<<29, // DAC1 interface reset
-	RCC_APB1RSTR1_PWRRST = 1UL<<28, // Power interface reset
-	RCC_APB1RSTR1_USBFSRST = 1UL<<26, // USB FS reset
-	RCC_APB1RSTR1_CAN1RST = 1UL<<25, // CAN1 reset
-	RCC_APB1RSTR1_CRSRST = 1UL<<24, // CRS reset
-	RCC_APB1RSTR1_I2C3RST = 1UL<<23, // I2C3 reset
-	RCC_APB1RSTR1_I2C2RST = 1UL<<22, // I2C2 reset
-	RCC_APB1RSTR1_I2C1RST = 1UL<<21, // I2C1 reset
-	RCC_APB1RSTR1_USART4RST = 1UL<<19, // USART4 reset.
-	RCC_APB1RSTR1_USART1RST = 1UL<<18, // USART1 reset
-	RCC_APB1RSTR1_USART2RST = 1UL<<17, // USART2 reset
-	RCC_APB1RSTR1_SPI3RST = 1UL<<15, // SPI3 reset
-	RCC_APB1RSTR1_SPI2RST = 1UL<<14, // SPI2 reset
-	RCC_APB1RSTR1_LCDRST = 1UL<<9, // LCD interface reset
-	RCC_APB1RSTR1_TIM7RST = 1UL<<5, // TIM7 timer reset
-	RCC_APB1RSTR1_TIM6RST = 1UL<<4, // TIM6 timer reset
-	RCC_APB1RSTR1_TIM2RST = 1UL<<0, // TIM2 timer reset		
+	RCC_APB1RSTR1_LPTIM1RST = 1UL << 31,  // Low Power Timer 1 reset
+	RCC_APB1RSTR1_OPAMPRST	= 1UL << 30,  // OPAMP interface reset
+	RCC_APB1RSTR1_DAC1RST	= 1UL << 29,  // DAC1 interface reset
+	RCC_APB1RSTR1_PWRRST	= 1UL << 28,  // Power interface reset
+	RCC_APB1RSTR1_USBFSRST	= 1UL << 26,  // USB FS reset
+	RCC_APB1RSTR1_CAN1RST	= 1UL << 25,  // CAN1 reset
+	RCC_APB1RSTR1_CRSRST	= 1UL << 24,  // CRS reset
+	RCC_APB1RSTR1_I2C3RST	= 1UL << 23,  // I2C3 reset
+	RCC_APB1RSTR1_I2C2RST	= 1UL << 22,  // I2C2 reset
+	RCC_APB1RSTR1_I2C1RST	= 1UL << 21,  // I2C1 reset
+	RCC_APB1RSTR1_USART4RST = 1UL << 19,  // USART4 reset.
+	RCC_APB1RSTR1_USART1RST = 1UL << 18,  // USART1 reset
+	RCC_APB1RSTR1_USART2RST = 1UL << 17,  // USART2 reset
+	RCC_APB1RSTR1_SPI3RST	= 1UL << 15,  // SPI3 reset
+	RCC_APB1RSTR1_SPI2RST	= 1UL << 14,  // SPI2 reset
+	RCC_APB1RSTR1_LCDRST	= 1UL << 9,	  // LCD interface reset
+	RCC_APB1RSTR1_TIM7RST	= 1UL << 5,	  // TIM7 timer reset
+	RCC_APB1RSTR1_TIM6RST	= 1UL << 4,	  // TIM6 timer reset
+	RCC_APB1RSTR1_TIM2RST	= 1UL << 0,	  // TIM2 timer reset
 };
 
 // RCC->APB1RSTR2 APB1 peripheral reset register 2
 enum {
-	RCC_APB1RSTR2_LPTIM2RST = 1UL<<5, // Low-power timer 2 reset
-	RCC_APB1RSTR2_SWPMI1RST = 1UL<<2, // Single wire protocol reset
-	RCC_APB1RSTR2_I2C4RST = 1UL<<1, // I2C4 reset
-	RCC_APB1RSTR2_LPUART1RST = 1UL<<0, // Low-power UART 1 reset		
+	RCC_APB1RSTR2_LPTIM2RST	 = 1UL << 5,  // Low-power timer 2 reset
+	RCC_APB1RSTR2_SWPMI1RST	 = 1UL << 2,  // Single wire protocol reset
+	RCC_APB1RSTR2_I2C4RST	 = 1UL << 1,  // I2C4 reset
+	RCC_APB1RSTR2_LPUART1RST = 1UL << 0,  // Low-power UART 1 reset
 };
 
 // RCC->APB2RSTR APB2 peripheral reset register
 enum {
-	RCC_APB2RSTR_DFSDMRST = 1UL<<24, // DFSDM filter reset
-	RCC_APB2RSTR_SAI1RST = 1UL<<21, // Serial audio interface 1 (SAI1) reset
-	RCC_APB2RSTR_TIM16RST = 1UL<<17, // TIM16 timer reset
-	RCC_APB2RSTR_TIM15RST = 1UL<<16, // TIM15 timer reset
-	RCC_APB2RSTR_USART1RST = 1UL<<14, // USART1 reset
-	RCC_APB2RSTR_SPI1RST = 1UL<<12, // SPI1 reset
-	RCC_APB2RSTR_TIM1RST = 1UL<<11, // TIM1 timer reset
-	RCC_APB2RSTR_SDMMCRST = 1UL<<10, // SDMMC reset
-	RCC_APB2RSTR_SYSCFGRST = 1UL<<0, // System configuration (SYSCFG) reset		
+	RCC_APB2RSTR_DFSDMRST  = 1UL << 24,	 // DFSDM filter reset
+	RCC_APB2RSTR_SAI1RST   = 1UL << 21,	 // Serial audio interface 1 (SAI1) reset
+	RCC_APB2RSTR_TIM16RST  = 1UL << 17,	 // TIM16 timer reset
+	RCC_APB2RSTR_TIM15RST  = 1UL << 16,	 // TIM15 timer reset
+	RCC_APB2RSTR_USART1RST = 1UL << 14,	 // USART1 reset
+	RCC_APB2RSTR_SPI1RST   = 1UL << 12,	 // SPI1 reset
+	RCC_APB2RSTR_TIM1RST   = 1UL << 11,	 // TIM1 timer reset
+	RCC_APB2RSTR_SDMMCRST  = 1UL << 10,	 // SDMMC reset
+	RCC_APB2RSTR_SYSCFGRST = 1UL << 0,	 // System configuration (SYSCFG) reset
 };
 
 // RCC->AHB1ENR AHB1 peripheral clock enable register
 enum {
-	RCC_AHB1ENR_TSCEN = 1UL<<16, // Touch Sensing Controller clock enable
-	RCC_AHB1ENR_CRCEN = 1UL<<12, // CRC clock enable
-	RCC_AHB1ENR_FLASHEN = 1UL<<8, // Flash memory interface clock enable
-	RCC_AHB1ENR_DMA2EN = 1UL<<1, // DMA2 clock enable
-	RCC_AHB1ENR_DMA1EN = 1UL<<0, // DMA1 clock enable		
+	RCC_AHB1ENR_TSCEN	= 1UL << 16,  // Touch Sensing Controller clock enable
+	RCC_AHB1ENR_CRCEN	= 1UL << 12,  // CRC clock enable
+	RCC_AHB1ENR_FLASHEN = 1UL << 8,	  // Flash memory interface clock enable
+	RCC_AHB1ENR_DMA2EN	= 1UL << 1,	  // DMA2 clock enable
+	RCC_AHB1ENR_DMA1EN	= 1UL << 0,	  // DMA1 clock enable
 };
 
 // RCC->AHB2ENR AHB2 peripheral clock enable register
 enum {
-	RCC_AHB2ENR_RNGEN = 1UL<<18, // Random Number Generator clock enable
-	RCC_AHB2ENR_AESEN = 1UL<<16, // AES accelerator clock enable
-	RCC_AHB2ENR_ADCEN = 1UL<<13, // ADC clock enable
-	RCC_AHB2ENR_GPIOHEN = 1UL<<7, // IO port H clock enable
-	RCC_AHB2ENR_GPIOEEN = 1UL<<4, // IO port E clock enable
-	RCC_AHB2ENR_GPIODEN = 1UL<<3, // IO port D clock enable
-	RCC_AHB2ENR_GPIOCEN = 1UL<<2, // IO port C clock enable
-	RCC_AHB2ENR_GPIOBEN = 1UL<<1, // IO port B clock enable
-	RCC_AHB2ENR_GPIOAEN = 1UL<<0, // IO port A clock enable		
+	RCC_AHB2ENR_RNGEN	= 1UL << 18,  // Random Number Generator clock enable
+	RCC_AHB2ENR_AESEN	= 1UL << 16,  // AES accelerator clock enable
+	RCC_AHB2ENR_ADCEN	= 1UL << 13,  // ADC clock enable
+	RCC_AHB2ENR_GPIOHEN = 1UL << 7,	  // IO port H clock enable
+	RCC_AHB2ENR_GPIOEEN = 1UL << 4,	  // IO port E clock enable
+	RCC_AHB2ENR_GPIODEN = 1UL << 3,	  // IO port D clock enable
+	RCC_AHB2ENR_GPIOCEN = 1UL << 2,	  // IO port C clock enable
+	RCC_AHB2ENR_GPIOBEN = 1UL << 1,	  // IO port B clock enable
+	RCC_AHB2ENR_GPIOAEN = 1UL << 0,	  // IO port A clock enable
 };
 
 // RCC->AHB3ENR AHB3 peripheral clock enable register
 enum {
-	RCC_AHB3ENR_QSPIEN = 1UL<<8, // QSPIEN		
+	RCC_AHB3ENR_QSPIEN = 1UL << 8,	// QSPIEN
 };
 
 // RCC->APB1ENR1 APB1ENR1
 enum {
-	RCC_APB1ENR1_LPTIM1EN = 1UL<<31, // Low power timer 1 clock enable
-	RCC_APB1ENR1_OPAMPEN = 1UL<<30, // OPAMP interface clock enable
-	RCC_APB1ENR1_DAC1EN = 1UL<<29, // DAC1 interface clock enable
-	RCC_APB1ENR1_PWREN = 1UL<<28, // Power interface clock enable
-	RCC_APB1ENR1_USBF = 1UL<<26, // USB FS clock enable
-	RCC_APB1ENR1_CAN1EN = 1UL<<25, // CAN1 clock enable
-	RCC_APB1ENR1_CRSEN = 1UL<<24, // CRS clock enable
-	RCC_APB1ENR1_I2C3EN = 1UL<<23, // I2C3 clock enable
-	RCC_APB1ENR1_I2C2EN = 1UL<<22, // I2C2 clock enable
-	RCC_APB1ENR1_I2C1EN = 1UL<<21, // I2C1 clock enable
-	RCC_APB1ENR1_UART4EN = 1UL<<19, // UART4 clock enable
-	RCC_APB1ENR1_USART3EN = 1UL<<18, // USART3 clock enable
-	RCC_APB1ENR1_USART2EN = 1UL<<17, // USART2 clock enable
-	RCC_APB1ENR1_SPI3EN = 1UL<<15, // SPI3 clock enable
-	RCC_APB1ENR1_SPI2EN = 1UL<<14, // SPI2 clock enable
-	RCC_APB1ENR1_WWDGEN = 1UL<<11, // Window watchdog clock enable
-	RCC_APB1ENR1_RTCAPBEN = 1UL<<10, // RTC APB clock enable
-	RCC_APB1ENR1_LCDEN = 1UL<<9, // LCD clock enable
-	RCC_APB1ENR1_TIM7EN = 1UL<<5, // TIM7 timer clock enable
-	RCC_APB1ENR1_TIM6EN = 1UL<<4, // TIM6 timer clock enable
-	RCC_APB1ENR1_TIM3EN = 1UL<<1, // TIM3 timer clock enable
-	RCC_APB1ENR1_TIM2EN = 1UL<<0, // TIM2 timer clock enable		
+	RCC_APB1ENR1_LPTIM1EN = 1UL << 31,	// Low power timer 1 clock enable
+	RCC_APB1ENR1_OPAMPEN  = 1UL << 30,	// OPAMP interface clock enable
+	RCC_APB1ENR1_DAC1EN	  = 1UL << 29,	// DAC1 interface clock enable
+	RCC_APB1ENR1_PWREN	  = 1UL << 28,	// Power interface clock enable
+	RCC_APB1ENR1_USBF	  = 1UL << 26,	// USB FS clock enable
+	RCC_APB1ENR1_CAN1EN	  = 1UL << 25,	// CAN1 clock enable
+	RCC_APB1ENR1_CRSEN	  = 1UL << 24,	// CRS clock enable
+	RCC_APB1ENR1_I2C3EN	  = 1UL << 23,	// I2C3 clock enable
+	RCC_APB1ENR1_I2C2EN	  = 1UL << 22,	// I2C2 clock enable
+	RCC_APB1ENR1_I2C1EN	  = 1UL << 21,	// I2C1 clock enable
+	RCC_APB1ENR1_UART4EN  = 1UL << 19,	// UART4 clock enable
+	RCC_APB1ENR1_USART3EN = 1UL << 18,	// USART3 clock enable
+	RCC_APB1ENR1_USART2EN = 1UL << 17,	// USART2 clock enable
+	RCC_APB1ENR1_SPI3EN	  = 1UL << 15,	// SPI3 clock enable
+	RCC_APB1ENR1_SPI2EN	  = 1UL << 14,	// SPI2 clock enable
+	RCC_APB1ENR1_WWDGEN	  = 1UL << 11,	// Window watchdog clock enable
+	RCC_APB1ENR1_RTCAPBEN = 1UL << 10,	// RTC APB clock enable
+	RCC_APB1ENR1_LCDEN	  = 1UL << 9,	// LCD clock enable
+	RCC_APB1ENR1_TIM7EN	  = 1UL << 5,	// TIM7 timer clock enable
+	RCC_APB1ENR1_TIM6EN	  = 1UL << 4,	// TIM6 timer clock enable
+	RCC_APB1ENR1_TIM3EN	  = 1UL << 1,	// TIM3 timer clock enable
+	RCC_APB1ENR1_TIM2EN	  = 1UL << 0,	// TIM2 timer clock enable
 };
 
 // RCC->APB1ENR2 APB1 peripheral clock enable register 2
 enum {
-	RCC_APB1ENR2_DFSDMEN = 1UL<<24, // DFSDMEN enable
-	RCC_APB1ENR2_LPTIM2EN = 1UL<<5, // LPTIM2EN
-	RCC_APB1ENR2_SWPMI1EN = 1UL<<2, // Single wire protocol clock enable
-	RCC_APB1ENR2_I2C4EN = 1UL<<1, // I2C4 clock enable
-	RCC_APB1ENR2_LPUART1EN = 1UL<<0, // Low power UART 1 clock enable		
+	RCC_APB1ENR2_DFSDMEN   = 1UL << 24,	 // DFSDMEN enable
+	RCC_APB1ENR2_LPTIM2EN  = 1UL << 5,	 // LPTIM2EN
+	RCC_APB1ENR2_SWPMI1EN  = 1UL << 2,	 // Single wire protocol clock enable
+	RCC_APB1ENR2_I2C4EN	   = 1UL << 1,	 // I2C4 clock enable
+	RCC_APB1ENR2_LPUART1EN = 1UL << 0,	 // Low power UART 1 clock enable
 };
 
 // RCC->APB2ENR APB2ENR
 enum {
-	RCC_APB2ENR_SAI1EN = 1UL<<21, // SAI1 clock enable
-	RCC_APB2ENR_TIM16EN = 1UL<<17, // TIM16 timer clock enable
-	RCC_APB2ENR_TIM15EN = 1UL<<16, // TIM15 timer clock enable
-	RCC_APB2ENR_USART1EN = 1UL<<14, // USART1clock enable
-	RCC_APB2ENR_SPI1EN = 1UL<<12, // SPI1 clock enable
-	RCC_APB2ENR_TIM1EN = 1UL<<11, // TIM1 timer clock enable
-	RCC_APB2ENR_SDMMCEN = 1UL<<10, // SDMMC clock enable
-	RCC_APB2ENR_FIREWALLEN = 1UL<<7, // Firewall clock enable
-	RCC_APB2ENR_SYSCFGEN = 1UL<<0, // SYSCFG clock enable		
+	RCC_APB2ENR_SAI1EN	   = 1UL << 21,	 // SAI1 clock enable
+	RCC_APB2ENR_TIM16EN	   = 1UL << 17,	 // TIM16 timer clock enable
+	RCC_APB2ENR_TIM15EN	   = 1UL << 16,	 // TIM15 timer clock enable
+	RCC_APB2ENR_USART1EN   = 1UL << 14,	 // USART1clock enable
+	RCC_APB2ENR_SPI1EN	   = 1UL << 12,	 // SPI1 clock enable
+	RCC_APB2ENR_TIM1EN	   = 1UL << 11,	 // TIM1 timer clock enable
+	RCC_APB2ENR_SDMMCEN	   = 1UL << 10,	 // SDMMC clock enable
+	RCC_APB2ENR_FIREWALLEN = 1UL << 7,	 // Firewall clock enable
+	RCC_APB2ENR_SYSCFGEN   = 1UL << 0,	 // SYSCFG clock enable
 };
 
 // RCC->AHB1SMENR AHB1 peripheral clocks enable in Sleep and Stop modes register
 enum {
-	RCC_AHB1SMENR_TSCSMEN = 1UL<<16, // Touch Sensing Controller clocks enable during Sleep and Stop modes
-	RCC_AHB1SMENR_CRCSMEN = 1UL<<12, // CRCSMEN
-	RCC_AHB1SMENR_SRAM1SMEN = 1UL<<9, // SRAM1 interface clocks enable during Sleep and Stop modes
-	RCC_AHB1SMENR_FLASHSMEN = 1UL<<8, // Flash memory interface clocks enable during Sleep and Stop modes
-	RCC_AHB1SMENR_DMA2SMEN = 1UL<<1, // DMA2 clocks enable during Sleep and Stop modes
-	RCC_AHB1SMENR_DMA1SMEN = 1UL<<0, // DMA1 clocks enable during Sleep and Stop modes		
+	RCC_AHB1SMENR_TSCSMEN	= 1UL << 16,  // Touch Sensing Controller clocks enable during Sleep and Stop modes
+	RCC_AHB1SMENR_CRCSMEN	= 1UL << 12,  // CRCSMEN
+	RCC_AHB1SMENR_SRAM1SMEN = 1UL << 9,	  // SRAM1 interface clocks enable during Sleep and Stop modes
+	RCC_AHB1SMENR_FLASHSMEN = 1UL << 8,	  // Flash memory interface clocks enable during Sleep and Stop modes
+	RCC_AHB1SMENR_DMA2SMEN	= 1UL << 1,	  // DMA2 clocks enable during Sleep and Stop modes
+	RCC_AHB1SMENR_DMA1SMEN	= 1UL << 0,	  // DMA1 clocks enable during Sleep and Stop modes
 };
 
 // RCC->AHB2SMENR AHB2 peripheral clocks enable in Sleep and Stop modes register
 enum {
-	RCC_AHB2SMENR_RNGSMEN = 1UL<<18, // Random Number Generator clocks enable during Sleep and Stop modes
-	RCC_AHB2SMENR_AESSMEN = 1UL<<16, // AES accelerator clocks enable during Sleep and Stop modes
-	RCC_AHB2SMENR_ADCFSSMEN = 1UL<<13, // ADC clocks enable during Sleep and Stop modes
-	RCC_AHB2SMENR_SRAM2SMEN = 1UL<<9, // SRAM2 interface clocks enable during Sleep and Stop modes
-	RCC_AHB2SMENR_GPIOHSMEN = 1UL<<7, // IO port H clocks enable during Sleep and Stop modes
-	RCC_AHB2SMENR_GPIOESMEN = 1UL<<4, // IO port E clocks enable during Sleep and Stop modes
-	RCC_AHB2SMENR_GPIODSMEN = 1UL<<3, // IO port D clocks enable during Sleep and Stop modes
-	RCC_AHB2SMENR_GPIOCSMEN = 1UL<<2, // IO port C clocks enable during Sleep and Stop modes
-	RCC_AHB2SMENR_GPIOBSMEN = 1UL<<1, // IO port B clocks enable during Sleep and Stop modes
-	RCC_AHB2SMENR_GPIOASMEN = 1UL<<0, // IO port A clocks enable during Sleep and Stop modes		
+	RCC_AHB2SMENR_RNGSMEN	= 1UL << 18,  // Random Number Generator clocks enable during Sleep and Stop modes
+	RCC_AHB2SMENR_AESSMEN	= 1UL << 16,  // AES accelerator clocks enable during Sleep and Stop modes
+	RCC_AHB2SMENR_ADCFSSMEN = 1UL << 13,  // ADC clocks enable during Sleep and Stop modes
+	RCC_AHB2SMENR_SRAM2SMEN = 1UL << 9,	  // SRAM2 interface clocks enable during Sleep and Stop modes
+	RCC_AHB2SMENR_GPIOHSMEN = 1UL << 7,	  // IO port H clocks enable during Sleep and Stop modes
+	RCC_AHB2SMENR_GPIOESMEN = 1UL << 4,	  // IO port E clocks enable during Sleep and Stop modes
+	RCC_AHB2SMENR_GPIODSMEN = 1UL << 3,	  // IO port D clocks enable during Sleep and Stop modes
+	RCC_AHB2SMENR_GPIOCSMEN = 1UL << 2,	  // IO port C clocks enable during Sleep and Stop modes
+	RCC_AHB2SMENR_GPIOBSMEN = 1UL << 1,	  // IO port B clocks enable during Sleep and Stop modes
+	RCC_AHB2SMENR_GPIOASMEN = 1UL << 0,	  // IO port A clocks enable during Sleep and Stop modes
 };
 
 // RCC->AHB3SMENR AHB3 peripheral clocks enable in Sleep and Stop modes register
 enum {
-	RCC_AHB3SMENR_QSPISMEN = 1UL<<8, // QSPISMEN		
+	RCC_AHB3SMENR_QSPISMEN = 1UL << 8,	// QSPISMEN
 };
 
 // RCC->APB1SMENR1 APB1SMENR1
 enum {
-	RCC_APB1SMENR1_LPTIM1SMEN = 1UL<<31, // Low power timer 1 clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_OPAMPSMEN = 1UL<<30, // OPAMP interface clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_DAC1SMEN = 1UL<<29, // DAC1 interface clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_PWRSMEN = 1UL<<28, // Power interface clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_USBFSSMEN = 1UL<<26, // USB FS clock enable during Sleep and Stop modes
-	RCC_APB1SMENR1_CAN1SMEN = 1UL<<25, // CAN1 clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_CRSSMEN = 1UL<<24, // CRS clock enable during Sleep and Stop modes
-	RCC_APB1SMENR1_I2C3SMEN = 1UL<<23, // I2C3 clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_I2C2SMEN = 1UL<<22, // I2C2 clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_I2C1SMEN = 1UL<<21, // I2C1 clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_USART2SMEN = 1UL<<18, // USART2 clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_USART1SMEN = 1UL<<17, // USART1 clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_SPI3SMEN = 1UL<<15, // SPI3 clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_SPI2SMEN = 1UL<<14, // SPI2 clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_WWDGSMEN = 1UL<<11, // Window watchdog clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_RTCAPBSMEN = 1UL<<10, // RTC APB clock enable during Sleep and Stop modes
-	RCC_APB1SMENR1_LCDSMEN = 1UL<<9, // LCD clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_TIM7SMEN = 1UL<<5, // TIM7 timer clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_TIM6SMEN = 1UL<<4, // TIM6 timer clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR1_TIM2SMEN = 1UL<<0, // TIM2 timer clocks enable during Sleep and Stop modes		
+	RCC_APB1SMENR1_LPTIM1SMEN = 1UL << 31,	// Low power timer 1 clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_OPAMPSMEN  = 1UL << 30,	// OPAMP interface clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_DAC1SMEN	  = 1UL << 29,	// DAC1 interface clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_PWRSMEN	  = 1UL << 28,	// Power interface clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_USBFSSMEN  = 1UL << 26,	// USB FS clock enable during Sleep and Stop modes
+	RCC_APB1SMENR1_CAN1SMEN	  = 1UL << 25,	// CAN1 clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_CRSSMEN	  = 1UL << 24,	// CRS clock enable during Sleep and Stop modes
+	RCC_APB1SMENR1_I2C3SMEN	  = 1UL << 23,	// I2C3 clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_I2C2SMEN	  = 1UL << 22,	// I2C2 clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_I2C1SMEN	  = 1UL << 21,	// I2C1 clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_USART2SMEN = 1UL << 18,	// USART2 clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_USART1SMEN = 1UL << 17,	// USART1 clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_SPI3SMEN	  = 1UL << 15,	// SPI3 clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_SPI2SMEN	  = 1UL << 14,	// SPI2 clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_WWDGSMEN	  = 1UL << 11,	// Window watchdog clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_RTCAPBSMEN = 1UL << 10,	// RTC APB clock enable during Sleep and Stop modes
+	RCC_APB1SMENR1_LCDSMEN	  = 1UL << 9,	// LCD clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_TIM7SMEN	  = 1UL << 5,	// TIM7 timer clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_TIM6SMEN	  = 1UL << 4,	// TIM6 timer clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR1_TIM2SMEN	  = 1UL << 0,	// TIM2 timer clocks enable during Sleep and Stop modes
 };
 
 // RCC->APB1SMENR2 APB1 peripheral clocks enable in Sleep and Stop modes register 2
 enum {
-	RCC_APB1SMENR2_LPTIM2SMEN = 1UL<<5, // LPTIM2SMEN
-	RCC_APB1SMENR2_SWPMI1SMEN = 1UL<<2, // Single wire protocol clocks enable during Sleep and Stop modes
-	RCC_APB1SMENR2_LPUART1SMEN = 1UL<<0, // Low power UART 1 clocks enable during Sleep and Stop modes		
+	RCC_APB1SMENR2_LPTIM2SMEN  = 1UL << 5,	// LPTIM2SMEN
+	RCC_APB1SMENR2_SWPMI1SMEN  = 1UL << 2,	// Single wire protocol clocks enable during Sleep and Stop modes
+	RCC_APB1SMENR2_LPUART1SMEN = 1UL << 0,	// Low power UART 1 clocks enable during Sleep and Stop modes
 };
 
 // RCC->APB2SMENR APB2SMENR
 enum {
-	RCC_APB2SMENR_SAI1SMEN = 1UL<<21, // SAI1 clocks enable during Sleep and Stop modes
-	RCC_APB2SMENR_TIM16SMEN = 1UL<<17, // TIM16 timer clocks enable during Sleep and Stop modes
-	RCC_APB2SMENR_TIM15SMEN = 1UL<<16, // TIM15 timer clocks enable during Sleep and Stop modes
-	RCC_APB2SMENR_USART1SMEN = 1UL<<14, // USART1clocks enable during Sleep and Stop modes
-	RCC_APB2SMENR_SPI1SMEN = 1UL<<12, // SPI1 clocks enable during Sleep and Stop modes
-	RCC_APB2SMENR_TIM1SMEN = 1UL<<11, // TIM1 timer clocks enable during Sleep and Stop modes
-	RCC_APB2SMENR_SDMMCSMEN = 1UL<<10, // SDMMC clocks enable during Sleep and Stop modes
-	RCC_APB2SMENR_SYSCFGSMEN = 1UL<<0, // SYSCFG clocks enable during Sleep and Stop modes		
+	RCC_APB2SMENR_SAI1SMEN	 = 1UL << 21,  // SAI1 clocks enable during Sleep and Stop modes
+	RCC_APB2SMENR_TIM16SMEN	 = 1UL << 17,  // TIM16 timer clocks enable during Sleep and Stop modes
+	RCC_APB2SMENR_TIM15SMEN	 = 1UL << 16,  // TIM15 timer clocks enable during Sleep and Stop modes
+	RCC_APB2SMENR_USART1SMEN = 1UL << 14,  // USART1clocks enable during Sleep and Stop modes
+	RCC_APB2SMENR_SPI1SMEN	 = 1UL << 12,  // SPI1 clocks enable during Sleep and Stop modes
+	RCC_APB2SMENR_TIM1SMEN	 = 1UL << 11,  // TIM1 timer clocks enable during Sleep and Stop modes
+	RCC_APB2SMENR_SDMMCSMEN	 = 1UL << 10,  // SDMMC clocks enable during Sleep and Stop modes
+	RCC_APB2SMENR_SYSCFGSMEN = 1UL << 0,   // SYSCFG clocks enable during Sleep and Stop modes
 };
 
 // RCC->CCIPR CCIPR
 enum {
-	RCC_CCIPR_SWPMI1SEL = 1UL<<30, // SWPMI1 clock source selection
-	RCC_CCIPR_ADCSEL = ((1UL<<2)-1) << 28, // ADCs clock source selection
-	RCC_CCIPR_CLK48SEL = ((1UL<<2)-1) << 26, // 48 MHz clock source selection
-	RCC_CCIPR_SAI1SEL = ((1UL<<2)-1) << 22, // SAI1 clock source selection
-	RCC_CCIPR_LPTIM2SEL = ((1UL<<2)-1) << 20, // Low power timer 2 clock source selection
-	RCC_CCIPR_LPTIM1SEL = ((1UL<<2)-1) << 18, // Low power timer 1 clock source selection
-	RCC_CCIPR_I2C3SEL = ((1UL<<2)-1) << 16, // I2C3 clock source selection
-	RCC_CCIPR_I2C2SEL = ((1UL<<2)-1) << 14, // I2C2 clock source selection
-	RCC_CCIPR_I2C1SEL = ((1UL<<2)-1) << 12, // I2C1 clock source selection
-	RCC_CCIPR_LPUART1SEL = ((1UL<<2)-1) << 10, // LPUART1 clock source selection
-	RCC_CCIPR_USART4SEL = ((1UL<<2)-1) << 6, // USART4 clock source selection
-	RCC_CCIPR_USART3SEL = ((1UL<<2)-1) << 4, // USART3 clock source selection
-	RCC_CCIPR_USART2SEL = ((1UL<<2)-1) << 2, // USART2 clock source selection
-	RCC_CCIPR_USART1SEL = ((1UL<<2)-1) << 0, // USART1 clock source selection		
+	RCC_CCIPR_SWPMI1SEL	 = 1UL << 30,				// SWPMI1 clock source selection
+	RCC_CCIPR_ADCSEL	 = ((1UL << 2) - 1) << 28,	// ADCs clock source selection
+	RCC_CCIPR_CLK48SEL	 = ((1UL << 2) - 1) << 26,	// 48 MHz clock source selection
+	RCC_CCIPR_SAI1SEL	 = ((1UL << 2) - 1) << 22,	// SAI1 clock source selection
+	RCC_CCIPR_LPTIM2SEL	 = ((1UL << 2) - 1) << 20,	// Low power timer 2 clock source selection
+	RCC_CCIPR_LPTIM1SEL	 = ((1UL << 2) - 1) << 18,	// Low power timer 1 clock source selection
+	RCC_CCIPR_I2C3SEL	 = ((1UL << 2) - 1) << 16,	// I2C3 clock source selection
+	RCC_CCIPR_I2C2SEL	 = ((1UL << 2) - 1) << 14,	// I2C2 clock source selection
+	RCC_CCIPR_I2C1SEL	 = ((1UL << 2) - 1) << 12,	// I2C1 clock source selection
+	RCC_CCIPR_LPUART1SEL = ((1UL << 2) - 1) << 10,	// LPUART1 clock source selection
+	RCC_CCIPR_USART4SEL	 = ((1UL << 2) - 1) << 6,	// USART4 clock source selection
+	RCC_CCIPR_USART3SEL	 = ((1UL << 2) - 1) << 4,	// USART3 clock source selection
+	RCC_CCIPR_USART2SEL	 = ((1UL << 2) - 1) << 2,	// USART2 clock source selection
+	RCC_CCIPR_USART1SEL	 = ((1UL << 2) - 1) << 0,	// USART1 clock source selection
 };
-static inline void rcc_ccipr_set_adcsel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_ADCSEL) | ((val<<28) & RCC_CCIPR_ADCSEL); }
-static inline void rcc_ccipr_set_clk48sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_CLK48SEL) | ((val<<26) & RCC_CCIPR_CLK48SEL); }
-static inline void rcc_ccipr_set_sai1sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_SAI1SEL) | ((val<<22) & RCC_CCIPR_SAI1SEL); }
-static inline void rcc_ccipr_set_lptim2sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_LPTIM2SEL) | ((val<<20) & RCC_CCIPR_LPTIM2SEL); }
-static inline void rcc_ccipr_set_lptim1sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_LPTIM1SEL) | ((val<<18) & RCC_CCIPR_LPTIM1SEL); }
-static inline void rcc_ccipr_set_i2c3sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_I2C3SEL) | ((val<<16) & RCC_CCIPR_I2C3SEL); }
-static inline void rcc_ccipr_set_i2c2sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_I2C2SEL) | ((val<<14) & RCC_CCIPR_I2C2SEL); }
-static inline void rcc_ccipr_set_i2c1sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_I2C1SEL) | ((val<<12) & RCC_CCIPR_I2C1SEL); }
-static inline void rcc_ccipr_set_lpuart1sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_LPUART1SEL) | ((val<<10) & RCC_CCIPR_LPUART1SEL); }
-static inline void rcc_ccipr_set_usart4sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_USART4SEL) | ((val<<6) & RCC_CCIPR_USART4SEL); }
-static inline void rcc_ccipr_set_usart3sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_USART3SEL) | ((val<<4) & RCC_CCIPR_USART3SEL); }
-static inline void rcc_ccipr_set_usart2sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_USART2SEL) | ((val<<2) & RCC_CCIPR_USART2SEL); }
-static inline void rcc_ccipr_set_usart1sel(uint32_t val) { RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_USART1SEL) | ((val<<0) & RCC_CCIPR_USART1SEL); }
-static inline uint32_t rcc_ccipr_get_adcsel(void) { return (RCC.CCIPR & RCC_CCIPR_ADCSEL) >> 28 ; }
-static inline uint32_t rcc_ccipr_get_clk48sel(void) { return (RCC.CCIPR & RCC_CCIPR_CLK48SEL) >> 26 ; }
-static inline uint32_t rcc_ccipr_get_sai1sel(void) { return (RCC.CCIPR & RCC_CCIPR_SAI1SEL) >> 22 ; }
-static inline uint32_t rcc_ccipr_get_lptim2sel(void) { return (RCC.CCIPR & RCC_CCIPR_LPTIM2SEL) >> 20 ; }
-static inline uint32_t rcc_ccipr_get_lptim1sel(void) { return (RCC.CCIPR & RCC_CCIPR_LPTIM1SEL) >> 18 ; }
-static inline uint32_t rcc_ccipr_get_i2c3sel(void) { return (RCC.CCIPR & RCC_CCIPR_I2C3SEL) >> 16 ; }
-static inline uint32_t rcc_ccipr_get_i2c2sel(void) { return (RCC.CCIPR & RCC_CCIPR_I2C2SEL) >> 14 ; }
-static inline uint32_t rcc_ccipr_get_i2c1sel(void) { return (RCC.CCIPR & RCC_CCIPR_I2C1SEL) >> 12 ; }
-static inline uint32_t rcc_ccipr_get_lpuart1sel(void) { return (RCC.CCIPR & RCC_CCIPR_LPUART1SEL) >> 10 ; }
-static inline uint32_t rcc_ccipr_get_usart4sel(void) { return (RCC.CCIPR & RCC_CCIPR_USART4SEL) >> 6 ; }
-static inline uint32_t rcc_ccipr_get_usart3sel(void) { return (RCC.CCIPR & RCC_CCIPR_USART3SEL) >> 4 ; }
-static inline uint32_t rcc_ccipr_get_usart2sel(void) { return (RCC.CCIPR & RCC_CCIPR_USART2SEL) >> 2 ; }
-static inline uint32_t rcc_ccipr_get_usart1sel(void) { return (RCC.CCIPR & RCC_CCIPR_USART1SEL) >> 0 ; }
+static inline void rcc_ccipr_set_adcsel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_ADCSEL) | ((val << 28) & RCC_CCIPR_ADCSEL);
+}
+static inline void rcc_ccipr_set_clk48sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_CLK48SEL) | ((val << 26) & RCC_CCIPR_CLK48SEL);
+}
+static inline void rcc_ccipr_set_sai1sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_SAI1SEL) | ((val << 22) & RCC_CCIPR_SAI1SEL);
+}
+static inline void rcc_ccipr_set_lptim2sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_LPTIM2SEL) | ((val << 20) & RCC_CCIPR_LPTIM2SEL);
+}
+static inline void rcc_ccipr_set_lptim1sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_LPTIM1SEL) | ((val << 18) & RCC_CCIPR_LPTIM1SEL);
+}
+static inline void rcc_ccipr_set_i2c3sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_I2C3SEL) | ((val << 16) & RCC_CCIPR_I2C3SEL);
+}
+static inline void rcc_ccipr_set_i2c2sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_I2C2SEL) | ((val << 14) & RCC_CCIPR_I2C2SEL);
+}
+static inline void rcc_ccipr_set_i2c1sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_I2C1SEL) | ((val << 12) & RCC_CCIPR_I2C1SEL);
+}
+static inline void rcc_ccipr_set_lpuart1sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_LPUART1SEL) | ((val << 10) & RCC_CCIPR_LPUART1SEL);
+}
+static inline void rcc_ccipr_set_usart4sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_USART4SEL) | ((val << 6) & RCC_CCIPR_USART4SEL);
+}
+static inline void rcc_ccipr_set_usart3sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_USART3SEL) | ((val << 4) & RCC_CCIPR_USART3SEL);
+}
+static inline void rcc_ccipr_set_usart2sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_USART2SEL) | ((val << 2) & RCC_CCIPR_USART2SEL);
+}
+static inline void rcc_ccipr_set_usart1sel(uint32_t val) {
+	RCC.CCIPR = (RCC.CCIPR & ~RCC_CCIPR_USART1SEL) | ((val << 0) & RCC_CCIPR_USART1SEL);
+}
+static inline uint32_t rcc_ccipr_get_adcsel(void) { return (RCC.CCIPR & RCC_CCIPR_ADCSEL) >> 28; }
+static inline uint32_t rcc_ccipr_get_clk48sel(void) { return (RCC.CCIPR & RCC_CCIPR_CLK48SEL) >> 26; }
+static inline uint32_t rcc_ccipr_get_sai1sel(void) { return (RCC.CCIPR & RCC_CCIPR_SAI1SEL) >> 22; }
+static inline uint32_t rcc_ccipr_get_lptim2sel(void) { return (RCC.CCIPR & RCC_CCIPR_LPTIM2SEL) >> 20; }
+static inline uint32_t rcc_ccipr_get_lptim1sel(void) { return (RCC.CCIPR & RCC_CCIPR_LPTIM1SEL) >> 18; }
+static inline uint32_t rcc_ccipr_get_i2c3sel(void) { return (RCC.CCIPR & RCC_CCIPR_I2C3SEL) >> 16; }
+static inline uint32_t rcc_ccipr_get_i2c2sel(void) { return (RCC.CCIPR & RCC_CCIPR_I2C2SEL) >> 14; }
+static inline uint32_t rcc_ccipr_get_i2c1sel(void) { return (RCC.CCIPR & RCC_CCIPR_I2C1SEL) >> 12; }
+static inline uint32_t rcc_ccipr_get_lpuart1sel(void) { return (RCC.CCIPR & RCC_CCIPR_LPUART1SEL) >> 10; }
+static inline uint32_t rcc_ccipr_get_usart4sel(void) { return (RCC.CCIPR & RCC_CCIPR_USART4SEL) >> 6; }
+static inline uint32_t rcc_ccipr_get_usart3sel(void) { return (RCC.CCIPR & RCC_CCIPR_USART3SEL) >> 4; }
+static inline uint32_t rcc_ccipr_get_usart2sel(void) { return (RCC.CCIPR & RCC_CCIPR_USART2SEL) >> 2; }
+static inline uint32_t rcc_ccipr_get_usart1sel(void) { return (RCC.CCIPR & RCC_CCIPR_USART1SEL) >> 0; }
 
 // RCC->BDCR BDCR
 enum {
-	RCC_BDCR_LSCOSEL = 1UL<<25, // Low speed clock output selection
-	RCC_BDCR_LSCOEN = 1UL<<24, // Low speed clock output enable
-	RCC_BDCR_BDRST = 1UL<<16, // Backup domain software reset
-	RCC_BDCR_RTCEN = 1UL<<15, // RTC clock enable
-	RCC_BDCR_RTCSEL = ((1UL<<2)-1) << 8, // RTC clock source selection
-	RCC_BDCR_LSECSSD = 1UL<<6, // LSECSSD
-	RCC_BDCR_LSECSSON = 1UL<<5, // LSECSSON
-	RCC_BDCR_LSEDRV = ((1UL<<2)-1) << 3, // SE oscillator drive capability
-	RCC_BDCR_LSEBYP = 1UL<<2, // LSE oscillator bypass
-	RCC_BDCR_LSERDY = 1UL<<1, // LSE oscillator ready
-	RCC_BDCR_LSEON = 1UL<<0, // LSE oscillator enable		
+	RCC_BDCR_LSCOSEL  = 1UL << 25,				// Low speed clock output selection
+	RCC_BDCR_LSCOEN	  = 1UL << 24,				// Low speed clock output enable
+	RCC_BDCR_BDRST	  = 1UL << 16,				// Backup domain software reset
+	RCC_BDCR_RTCEN	  = 1UL << 15,				// RTC clock enable
+	RCC_BDCR_RTCSEL	  = ((1UL << 2) - 1) << 8,	// RTC clock source selection
+	RCC_BDCR_LSECSSD  = 1UL << 6,				// LSECSSD
+	RCC_BDCR_LSECSSON = 1UL << 5,				// LSECSSON
+	RCC_BDCR_LSEDRV	  = ((1UL << 2) - 1) << 3,	// SE oscillator drive capability
+	RCC_BDCR_LSEBYP	  = 1UL << 2,				// LSE oscillator bypass
+	RCC_BDCR_LSERDY	  = 1UL << 1,				// LSE oscillator ready
+	RCC_BDCR_LSEON	  = 1UL << 0,				// LSE oscillator enable
 };
-static inline void rcc_bdcr_set_rtcsel(uint32_t val) { RCC.BDCR = (RCC.BDCR & ~RCC_BDCR_RTCSEL) | ((val<<8) & RCC_BDCR_RTCSEL); }
-static inline void rcc_bdcr_set_lsedrv(uint32_t val) { RCC.BDCR = (RCC.BDCR & ~RCC_BDCR_LSEDRV) | ((val<<3) & RCC_BDCR_LSEDRV); }
-static inline uint32_t rcc_bdcr_get_rtcsel(void) { return (RCC.BDCR & RCC_BDCR_RTCSEL) >> 8 ; }
-static inline uint32_t rcc_bdcr_get_lsedrv(void) { return (RCC.BDCR & RCC_BDCR_LSEDRV) >> 3 ; }
+static inline void rcc_bdcr_set_rtcsel(uint32_t val) { RCC.BDCR = (RCC.BDCR & ~RCC_BDCR_RTCSEL) | ((val << 8) & RCC_BDCR_RTCSEL); }
+static inline void rcc_bdcr_set_lsedrv(uint32_t val) { RCC.BDCR = (RCC.BDCR & ~RCC_BDCR_LSEDRV) | ((val << 3) & RCC_BDCR_LSEDRV); }
+static inline uint32_t rcc_bdcr_get_rtcsel(void) { return (RCC.BDCR & RCC_BDCR_RTCSEL) >> 8; }
+static inline uint32_t rcc_bdcr_get_lsedrv(void) { return (RCC.BDCR & RCC_BDCR_LSEDRV) >> 3; }
 
 // RCC->CSR CSR
 enum {
-	RCC_CSR_LPWRSTF = 1UL<<31, // Low-power reset flag
-	RCC_CSR_WWDGRSTF = 1UL<<30, // Window watchdog reset flag
-	RCC_CSR_IWDGRSTF = 1UL<<29, // Independent window watchdog reset flag
-	RCC_CSR_SFTRSTF = 1UL<<28, // Software reset flag
-	RCC_CSR_BORRSTF = 1UL<<27, // BOR flag
-	RCC_CSR_PINRSTF = 1UL<<26, // Pin reset flag
-	RCC_CSR_OBLRSTF = 1UL<<25, // Option byte loader reset flag
-	RCC_CSR_FIREWALLRSTF = 1UL<<24, // Firewall reset flag
-	RCC_CSR_RMVF = 1UL<<23, // Remove reset flag
-	RCC_CSR_MSISRANGE = ((1UL<<4)-1) << 8, // SI range after Standby mode
-	RCC_CSR_LSIRDY = 1UL<<1, // LSI oscillator ready
-	RCC_CSR_LSION = 1UL<<0, // LSI oscillator enable		
+	RCC_CSR_LPWRSTF		 = 1UL << 31,			   // Low-power reset flag
+	RCC_CSR_WWDGRSTF	 = 1UL << 30,			   // Window watchdog reset flag
+	RCC_CSR_IWDGRSTF	 = 1UL << 29,			   // Independent window watchdog reset flag
+	RCC_CSR_SFTRSTF		 = 1UL << 28,			   // Software reset flag
+	RCC_CSR_BORRSTF		 = 1UL << 27,			   // BOR flag
+	RCC_CSR_PINRSTF		 = 1UL << 26,			   // Pin reset flag
+	RCC_CSR_OBLRSTF		 = 1UL << 25,			   // Option byte loader reset flag
+	RCC_CSR_FIREWALLRSTF = 1UL << 24,			   // Firewall reset flag
+	RCC_CSR_RMVF		 = 1UL << 23,			   // Remove reset flag
+	RCC_CSR_MSISRANGE	 = ((1UL << 4) - 1) << 8,  // SI range after Standby mode
+	RCC_CSR_LSIRDY		 = 1UL << 1,			   // LSI oscillator ready
+	RCC_CSR_LSION		 = 1UL << 0,			   // LSI oscillator enable
 };
-static inline void rcc_csr_set_msisrange(uint32_t val) { RCC.CSR = (RCC.CSR & ~RCC_CSR_MSISRANGE) | ((val<<8) & RCC_CSR_MSISRANGE); }
-static inline uint32_t rcc_csr_get_msisrange(void) { return (RCC.CSR & RCC_CSR_MSISRANGE) >> 8 ; }
+static inline void rcc_csr_set_msisrange(uint32_t val) {
+	RCC.CSR = (RCC.CSR & ~RCC_CSR_MSISRANGE) | ((val << 8) & RCC_CSR_MSISRANGE);
+}
+static inline uint32_t rcc_csr_get_msisrange(void) { return (RCC.CSR & RCC_CSR_MSISRANGE) >> 8; }
 
 // RCC->CRRCR Clock recovery RC register
 enum {
-	RCC_CRRCR_HSI48CAL = ((1UL<<9)-1) << 7, // HSI48 clock calibration
-	RCC_CRRCR_HSI48RDY = 1UL<<1, // HSI48 clock ready flag
-	RCC_CRRCR_HSI48ON = 1UL<<0, // HSI48 clock enable		
+	RCC_CRRCR_HSI48CAL = ((1UL << 9) - 1) << 7,	 // HSI48 clock calibration
+	RCC_CRRCR_HSI48RDY = 1UL << 1,				 // HSI48 clock ready flag
+	RCC_CRRCR_HSI48ON  = 1UL << 0,				 // HSI48 clock enable
 };
-static inline void rcc_crrcr_set_hsi48cal(uint32_t val) { RCC.CRRCR = (RCC.CRRCR & ~RCC_CRRCR_HSI48CAL) | ((val<<7) & RCC_CRRCR_HSI48CAL); }
-static inline uint32_t rcc_crrcr_get_hsi48cal(void) { return (RCC.CRRCR & RCC_CRRCR_HSI48CAL) >> 7 ; }
+static inline void rcc_crrcr_set_hsi48cal(uint32_t val) {
+	RCC.CRRCR = (RCC.CRRCR & ~RCC_CRRCR_HSI48CAL) | ((val << 7) & RCC_CRRCR_HSI48CAL);
+}
+static inline uint32_t rcc_crrcr_get_hsi48cal(void) { return (RCC.CRRCR & RCC_CRRCR_HSI48CAL) >> 7; }
 
 /* Real-time clock
 There is only one peripheral of type RTC. */
 struct RTC_Type {
-	__IO uint32_t TR; // @0 time register
-	__IO uint32_t DR; // @4 date register
-	__IO uint32_t CR; // @8 control register
-	__IO uint32_t ISR; // @12 initialization and status register
-	__IO uint32_t PRER; // @16 prescaler register
-	__IO uint16_t WUTR; // @20 wakeup timer register
-	 uint8_t RESERVED0[6]; // @22 
-	__IO uint32_t ALRMAR; // @28 alarm A register
-	__IO uint32_t ALRMBR; // @32 alarm B register
-	__O uint8_t WPR; // @36 write protection register
-	 uint8_t RESERVED1[3]; // @37 
-	__I uint16_t SSR; // @40 sub second register
-	 uint8_t RESERVED2[2]; // @42 
-	__O uint32_t SHIFTR; // @44 shift control register
-	__I uint32_t TSTR; // @48 time stamp time register
-	__I uint16_t TSDR; // @52 time stamp date register
-	 uint8_t RESERVED3[2]; // @54 
-	__I uint16_t TSSSR; // @56 timestamp sub second register
-	 uint8_t RESERVED4[2]; // @58 
-	__IO uint16_t CALR; // @60 calibration register
-	 uint8_t RESERVED5[2]; // @62 
-	__IO uint32_t TAMPCR; // @64 tamper configuration register
-	__IO uint32_t ALRMASSR; // @68 alarm A sub second register
-	__IO uint32_t ALRMBSSR; // @72 alarm B sub second register
-	__IO uint8_t OR; // @76 option register
-	 uint8_t RESERVED6[3]; // @77 
-	__IO uint32_t BKP0R; // @80 backup register
-	__IO uint32_t BKP1R; // @84 backup register
-	__IO uint32_t BKP2R; // @88 backup register
-	__IO uint32_t BKP3R; // @92 backup register
-	__IO uint32_t BKP4R; // @96 backup register
-	__IO uint32_t BKP5R; // @100 backup register
-	__IO uint32_t BKP6R; // @104 backup register
-	__IO uint32_t BKP7R; // @108 backup register
-	__IO uint32_t BKP8R; // @112 backup register
-	__IO uint32_t BKP9R; // @116 backup register
-	__IO uint32_t BKP10R; // @120 backup register
-	__IO uint32_t BKP11R; // @124 backup register
-	__IO uint32_t BKP12R; // @128 backup register
-	__IO uint32_t BKP13R; // @132 backup register
-	__IO uint32_t BKP14R; // @136 backup register
-	__IO uint32_t BKP15R; // @140 backup register
-	__IO uint32_t BKP16R; // @144 backup register
-	__IO uint32_t BKP17R; // @148 backup register
-	__IO uint32_t BKP18R; // @152 backup register
-	__IO uint32_t BKP19R; // @156 backup register
-	__IO uint32_t BKP20R; // @160 backup register
-	__IO uint32_t BKP21R; // @164 backup register
-	__IO uint32_t BKP22R; // @168 backup register
-	__IO uint32_t BKP23R; // @172 backup register
-	__IO uint32_t BKP24R; // @176 backup register
-	__IO uint32_t BKP25R; // @180 backup register
-	__IO uint32_t BKP26R; // @184 backup register
-	__IO uint32_t BKP27R; // @188 backup register
-	__IO uint32_t BKP28R; // @192 backup register
-	__IO uint32_t BKP29R; // @196 backup register
-	__IO uint32_t BKP30R; // @200 backup register
-	__IO uint32_t BKP31R; // @204 backup register
+	__IO uint32_t TR;			 // @0 time register
+	__IO uint32_t DR;			 // @4 date register
+	__IO uint32_t CR;			 // @8 control register
+	__IO uint32_t ISR;			 // @12 initialization and status register
+	__IO uint32_t PRER;			 // @16 prescaler register
+	__IO uint16_t WUTR;			 // @20 wakeup timer register
+	uint8_t		  RESERVED0[6];	 // @22
+	__IO uint32_t ALRMAR;		 // @28 alarm A register
+	__IO uint32_t ALRMBR;		 // @32 alarm B register
+	__O uint8_t	  WPR;			 // @36 write protection register
+	uint8_t		  RESERVED1[3];	 // @37
+	__I uint16_t  SSR;			 // @40 sub second register
+	uint8_t		  RESERVED2[2];	 // @42
+	__O uint32_t  SHIFTR;		 // @44 shift control register
+	__I uint32_t  TSTR;			 // @48 time stamp time register
+	__I uint16_t  TSDR;			 // @52 time stamp date register
+	uint8_t		  RESERVED3[2];	 // @54
+	__I uint16_t  TSSSR;		 // @56 timestamp sub second register
+	uint8_t		  RESERVED4[2];	 // @58
+	__IO uint16_t CALR;			 // @60 calibration register
+	uint8_t		  RESERVED5[2];	 // @62
+	__IO uint32_t TAMPCR;		 // @64 tamper configuration register
+	__IO uint32_t ALRMASSR;		 // @68 alarm A sub second register
+	__IO uint32_t ALRMBSSR;		 // @72 alarm B sub second register
+	__IO uint8_t  OR;			 // @76 option register
+	uint8_t		  RESERVED6[3];	 // @77
+	__IO uint32_t BKP0R;		 // @80 backup register
+	__IO uint32_t BKP1R;		 // @84 backup register
+	__IO uint32_t BKP2R;		 // @88 backup register
+	__IO uint32_t BKP3R;		 // @92 backup register
+	__IO uint32_t BKP4R;		 // @96 backup register
+	__IO uint32_t BKP5R;		 // @100 backup register
+	__IO uint32_t BKP6R;		 // @104 backup register
+	__IO uint32_t BKP7R;		 // @108 backup register
+	__IO uint32_t BKP8R;		 // @112 backup register
+	__IO uint32_t BKP9R;		 // @116 backup register
+	__IO uint32_t BKP10R;		 // @120 backup register
+	__IO uint32_t BKP11R;		 // @124 backup register
+	__IO uint32_t BKP12R;		 // @128 backup register
+	__IO uint32_t BKP13R;		 // @132 backup register
+	__IO uint32_t BKP14R;		 // @136 backup register
+	__IO uint32_t BKP15R;		 // @140 backup register
+	__IO uint32_t BKP16R;		 // @144 backup register
+	__IO uint32_t BKP17R;		 // @148 backup register
+	__IO uint32_t BKP18R;		 // @152 backup register
+	__IO uint32_t BKP19R;		 // @156 backup register
+	__IO uint32_t BKP20R;		 // @160 backup register
+	__IO uint32_t BKP21R;		 // @164 backup register
+	__IO uint32_t BKP22R;		 // @168 backup register
+	__IO uint32_t BKP23R;		 // @172 backup register
+	__IO uint32_t BKP24R;		 // @176 backup register
+	__IO uint32_t BKP25R;		 // @180 backup register
+	__IO uint32_t BKP26R;		 // @184 backup register
+	__IO uint32_t BKP27R;		 // @188 backup register
+	__IO uint32_t BKP28R;		 // @192 backup register
+	__IO uint32_t BKP29R;		 // @196 backup register
+	__IO uint32_t BKP30R;		 // @200 backup register
+	__IO uint32_t BKP31R;		 // @204 backup register
 };
-extern struct RTC_Type	RTC;	// @0x40002800 
+extern struct RTC_Type RTC;	 // @0x40002800
 
 // RTC->TR time register
 enum {
-	RTC_TR_PM = 1UL<<22, // AM/PM notation
-	RTC_TR_HT = ((1UL<<2)-1) << 20, // Hour tens in BCD format
-	RTC_TR_HU = ((1UL<<4)-1) << 16, // Hour units in BCD format
-	RTC_TR_MNT = ((1UL<<3)-1) << 12, // Minute tens in BCD format
-	RTC_TR_MNU = ((1UL<<4)-1) << 8, // Minute units in BCD format
-	RTC_TR_ST = ((1UL<<3)-1) << 4, // Second tens in BCD format
-	RTC_TR_SU = ((1UL<<4)-1) << 0, // Second units in BCD format		
+	RTC_TR_PM  = 1UL << 22,				  // AM/PM notation
+	RTC_TR_HT  = ((1UL << 2) - 1) << 20,  // Hour tens in BCD format
+	RTC_TR_HU  = ((1UL << 4) - 1) << 16,  // Hour units in BCD format
+	RTC_TR_MNT = ((1UL << 3) - 1) << 12,  // Minute tens in BCD format
+	RTC_TR_MNU = ((1UL << 4) - 1) << 8,	  // Minute units in BCD format
+	RTC_TR_ST  = ((1UL << 3) - 1) << 4,	  // Second tens in BCD format
+	RTC_TR_SU  = ((1UL << 4) - 1) << 0,	  // Second units in BCD format
 };
-static inline void rtc_tr_set_ht(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_HT) | ((val<<20) & RTC_TR_HT); }
-static inline void rtc_tr_set_hu(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_HU) | ((val<<16) & RTC_TR_HU); }
-static inline void rtc_tr_set_mnt(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_MNT) | ((val<<12) & RTC_TR_MNT); }
-static inline void rtc_tr_set_mnu(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_MNU) | ((val<<8) & RTC_TR_MNU); }
-static inline void rtc_tr_set_st(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_ST) | ((val<<4) & RTC_TR_ST); }
-static inline void rtc_tr_set_su(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_SU) | ((val<<0) & RTC_TR_SU); }
-static inline uint32_t rtc_tr_get_ht(void) { return (RTC.TR & RTC_TR_HT) >> 20 ; }
-static inline uint32_t rtc_tr_get_hu(void) { return (RTC.TR & RTC_TR_HU) >> 16 ; }
-static inline uint32_t rtc_tr_get_mnt(void) { return (RTC.TR & RTC_TR_MNT) >> 12 ; }
-static inline uint32_t rtc_tr_get_mnu(void) { return (RTC.TR & RTC_TR_MNU) >> 8 ; }
-static inline uint32_t rtc_tr_get_st(void) { return (RTC.TR & RTC_TR_ST) >> 4 ; }
-static inline uint32_t rtc_tr_get_su(void) { return (RTC.TR & RTC_TR_SU) >> 0 ; }
+static inline void	   rtc_tr_set_ht(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_HT) | ((val << 20) & RTC_TR_HT); }
+static inline void	   rtc_tr_set_hu(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_HU) | ((val << 16) & RTC_TR_HU); }
+static inline void	   rtc_tr_set_mnt(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_MNT) | ((val << 12) & RTC_TR_MNT); }
+static inline void	   rtc_tr_set_mnu(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_MNU) | ((val << 8) & RTC_TR_MNU); }
+static inline void	   rtc_tr_set_st(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_ST) | ((val << 4) & RTC_TR_ST); }
+static inline void	   rtc_tr_set_su(uint32_t val) { RTC.TR = (RTC.TR & ~RTC_TR_SU) | ((val << 0) & RTC_TR_SU); }
+static inline uint32_t rtc_tr_get_ht(void) { return (RTC.TR & RTC_TR_HT) >> 20; }
+static inline uint32_t rtc_tr_get_hu(void) { return (RTC.TR & RTC_TR_HU) >> 16; }
+static inline uint32_t rtc_tr_get_mnt(void) { return (RTC.TR & RTC_TR_MNT) >> 12; }
+static inline uint32_t rtc_tr_get_mnu(void) { return (RTC.TR & RTC_TR_MNU) >> 8; }
+static inline uint32_t rtc_tr_get_st(void) { return (RTC.TR & RTC_TR_ST) >> 4; }
+static inline uint32_t rtc_tr_get_su(void) { return (RTC.TR & RTC_TR_SU) >> 0; }
 
 // RTC->DR date register
 enum {
-	RTC_DR_YT = ((1UL<<4)-1) << 20, // Year tens in BCD format
-	RTC_DR_YU = ((1UL<<4)-1) << 16, // Year units in BCD format
-	RTC_DR_WDU = ((1UL<<3)-1) << 13, // Week day units
-	RTC_DR_MT = 1UL<<12, // Month tens in BCD format
-	RTC_DR_MU = ((1UL<<4)-1) << 8, // Month units in BCD format
-	RTC_DR_DT = ((1UL<<2)-1) << 4, // Date tens in BCD format
-	RTC_DR_DU = ((1UL<<4)-1) << 0, // Date units in BCD format		
+	RTC_DR_YT  = ((1UL << 4) - 1) << 20,  // Year tens in BCD format
+	RTC_DR_YU  = ((1UL << 4) - 1) << 16,  // Year units in BCD format
+	RTC_DR_WDU = ((1UL << 3) - 1) << 13,  // Week day units
+	RTC_DR_MT  = 1UL << 12,				  // Month tens in BCD format
+	RTC_DR_MU  = ((1UL << 4) - 1) << 8,	  // Month units in BCD format
+	RTC_DR_DT  = ((1UL << 2) - 1) << 4,	  // Date tens in BCD format
+	RTC_DR_DU  = ((1UL << 4) - 1) << 0,	  // Date units in BCD format
 };
-static inline void rtc_dr_set_yt(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_YT) | ((val<<20) & RTC_DR_YT); }
-static inline void rtc_dr_set_yu(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_YU) | ((val<<16) & RTC_DR_YU); }
-static inline void rtc_dr_set_wdu(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_WDU) | ((val<<13) & RTC_DR_WDU); }
-static inline void rtc_dr_set_mu(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_MU) | ((val<<8) & RTC_DR_MU); }
-static inline void rtc_dr_set_dt(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_DT) | ((val<<4) & RTC_DR_DT); }
-static inline void rtc_dr_set_du(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_DU) | ((val<<0) & RTC_DR_DU); }
-static inline uint32_t rtc_dr_get_yt(void) { return (RTC.DR & RTC_DR_YT) >> 20 ; }
-static inline uint32_t rtc_dr_get_yu(void) { return (RTC.DR & RTC_DR_YU) >> 16 ; }
-static inline uint32_t rtc_dr_get_wdu(void) { return (RTC.DR & RTC_DR_WDU) >> 13 ; }
-static inline uint32_t rtc_dr_get_mu(void) { return (RTC.DR & RTC_DR_MU) >> 8 ; }
-static inline uint32_t rtc_dr_get_dt(void) { return (RTC.DR & RTC_DR_DT) >> 4 ; }
-static inline uint32_t rtc_dr_get_du(void) { return (RTC.DR & RTC_DR_DU) >> 0 ; }
+static inline void	   rtc_dr_set_yt(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_YT) | ((val << 20) & RTC_DR_YT); }
+static inline void	   rtc_dr_set_yu(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_YU) | ((val << 16) & RTC_DR_YU); }
+static inline void	   rtc_dr_set_wdu(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_WDU) | ((val << 13) & RTC_DR_WDU); }
+static inline void	   rtc_dr_set_mu(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_MU) | ((val << 8) & RTC_DR_MU); }
+static inline void	   rtc_dr_set_dt(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_DT) | ((val << 4) & RTC_DR_DT); }
+static inline void	   rtc_dr_set_du(uint32_t val) { RTC.DR = (RTC.DR & ~RTC_DR_DU) | ((val << 0) & RTC_DR_DU); }
+static inline uint32_t rtc_dr_get_yt(void) { return (RTC.DR & RTC_DR_YT) >> 20; }
+static inline uint32_t rtc_dr_get_yu(void) { return (RTC.DR & RTC_DR_YU) >> 16; }
+static inline uint32_t rtc_dr_get_wdu(void) { return (RTC.DR & RTC_DR_WDU) >> 13; }
+static inline uint32_t rtc_dr_get_mu(void) { return (RTC.DR & RTC_DR_MU) >> 8; }
+static inline uint32_t rtc_dr_get_dt(void) { return (RTC.DR & RTC_DR_DT) >> 4; }
+static inline uint32_t rtc_dr_get_du(void) { return (RTC.DR & RTC_DR_DU) >> 0; }
 
 // RTC->CR control register
 enum {
-	RTC_CR_ITSE = 1UL<<24, // timestamp on internal event enable
-	RTC_CR_COE = 1UL<<23, // Calibration output enable
-	RTC_CR_OSEL = ((1UL<<2)-1) << 21, // Output selection
-	RTC_CR_POL = 1UL<<20, // Output polarity
-	RTC_CR_COSEL = 1UL<<19, // Calibration output selection
-	RTC_CR_BKP = 1UL<<18, // Backup
-	RTC_CR_SUB1H = 1UL<<17, // Subtract 1 hour (winter time change)
-	RTC_CR_ADD1H = 1UL<<16, // Add 1 hour (summer time change)
-	RTC_CR_TSIE = 1UL<<15, // Time-stamp interrupt enable
-	RTC_CR_WUTIE = 1UL<<14, // Wakeup timer interrupt enable
-	RTC_CR_ALRBIE = 1UL<<13, // Alarm B interrupt enable
-	RTC_CR_ALRAIE = 1UL<<12, // Alarm A interrupt enable
-	RTC_CR_TSE = 1UL<<11, // Time stamp enable
-	RTC_CR_WUTE = 1UL<<10, // Wakeup timer enable
-	RTC_CR_ALRBE = 1UL<<9, // Alarm B enable
-	RTC_CR_ALRAE = 1UL<<8, // Alarm A enable
-	RTC_CR_FMT = 1UL<<6, // Hour format
-	RTC_CR_BYPSHAD = 1UL<<5, // Bypass the shadow registers
-	RTC_CR_REFCKON = 1UL<<4, // Reference clock detection enable (50 or 60 Hz)
-	RTC_CR_TSEDGE = 1UL<<3, // Time-stamp event active edge
-	RTC_CR_WCKSEL = ((1UL<<3)-1) << 0, // Wakeup clock selection		
+	RTC_CR_ITSE	   = 1UL << 24,				  // timestamp on internal event enable
+	RTC_CR_COE	   = 1UL << 23,				  // Calibration output enable
+	RTC_CR_OSEL	   = ((1UL << 2) - 1) << 21,  // Output selection
+	RTC_CR_POL	   = 1UL << 20,				  // Output polarity
+	RTC_CR_COSEL   = 1UL << 19,				  // Calibration output selection
+	RTC_CR_BKP	   = 1UL << 18,				  // Backup
+	RTC_CR_SUB1H   = 1UL << 17,				  // Subtract 1 hour (winter time change)
+	RTC_CR_ADD1H   = 1UL << 16,				  // Add 1 hour (summer time change)
+	RTC_CR_TSIE	   = 1UL << 15,				  // Time-stamp interrupt enable
+	RTC_CR_WUTIE   = 1UL << 14,				  // Wakeup timer interrupt enable
+	RTC_CR_ALRBIE  = 1UL << 13,				  // Alarm B interrupt enable
+	RTC_CR_ALRAIE  = 1UL << 12,				  // Alarm A interrupt enable
+	RTC_CR_TSE	   = 1UL << 11,				  // Time stamp enable
+	RTC_CR_WUTE	   = 1UL << 10,				  // Wakeup timer enable
+	RTC_CR_ALRBE   = 1UL << 9,				  // Alarm B enable
+	RTC_CR_ALRAE   = 1UL << 8,				  // Alarm A enable
+	RTC_CR_FMT	   = 1UL << 6,				  // Hour format
+	RTC_CR_BYPSHAD = 1UL << 5,				  // Bypass the shadow registers
+	RTC_CR_REFCKON = 1UL << 4,				  // Reference clock detection enable (50 or 60 Hz)
+	RTC_CR_TSEDGE  = 1UL << 3,				  // Time-stamp event active edge
+	RTC_CR_WCKSEL  = ((1UL << 3) - 1) << 0,	  // Wakeup clock selection
 };
-static inline void rtc_cr_set_osel(uint32_t val) { RTC.CR = (RTC.CR & ~RTC_CR_OSEL) | ((val<<21) & RTC_CR_OSEL); }
-static inline void rtc_cr_set_wcksel(uint32_t val) { RTC.CR = (RTC.CR & ~RTC_CR_WCKSEL) | ((val<<0) & RTC_CR_WCKSEL); }
-static inline uint32_t rtc_cr_get_osel(void) { return (RTC.CR & RTC_CR_OSEL) >> 21 ; }
-static inline uint32_t rtc_cr_get_wcksel(void) { return (RTC.CR & RTC_CR_WCKSEL) >> 0 ; }
+static inline void	   rtc_cr_set_osel(uint32_t val) { RTC.CR = (RTC.CR & ~RTC_CR_OSEL) | ((val << 21) & RTC_CR_OSEL); }
+static inline void	   rtc_cr_set_wcksel(uint32_t val) { RTC.CR = (RTC.CR & ~RTC_CR_WCKSEL) | ((val << 0) & RTC_CR_WCKSEL); }
+static inline uint32_t rtc_cr_get_osel(void) { return (RTC.CR & RTC_CR_OSEL) >> 21; }
+static inline uint32_t rtc_cr_get_wcksel(void) { return (RTC.CR & RTC_CR_WCKSEL) >> 0; }
 
 // RTC->ISR initialization and status register
 enum {
-	RTC_ISR_RECALPF = 1UL<<16, // Recalibration pending Flag
-	RTC_ISR_TAMP3F = 1UL<<15, // RTC_TAMP3 detection flag
-	RTC_ISR_TAMP2F = 1UL<<14, // RTC_TAMP2 detection flag
-	RTC_ISR_TAMP1F = 1UL<<13, // Tamper detection flag
-	RTC_ISR_TSOVF = 1UL<<12, // Time-stamp overflow flag
-	RTC_ISR_TSF = 1UL<<11, // Time-stamp flag
-	RTC_ISR_WUTF = 1UL<<10, // Wakeup timer flag
-	RTC_ISR_ALRBF = 1UL<<9, // Alarm B flag
-	RTC_ISR_ALRAF = 1UL<<8, // Alarm A flag
-	RTC_ISR_INIT = 1UL<<7, // Initialization mode
-	RTC_ISR_INITF = 1UL<<6, // Initialization flag
-	RTC_ISR_RSF = 1UL<<5, // Registers synchronization flag
-	RTC_ISR_INITS = 1UL<<4, // Initialization status flag
-	RTC_ISR_SHPF = 1UL<<3, // Shift operation pending
-	RTC_ISR_WUTWF = 1UL<<2, // Wakeup timer write flag
-	RTC_ISR_ALRBWF = 1UL<<1, // Alarm B write flag
-	RTC_ISR_ALRAWF = 1UL<<0, // Alarm A write flag		
+	RTC_ISR_RECALPF = 1UL << 16,  // Recalibration pending Flag
+	RTC_ISR_TAMP3F	= 1UL << 15,  // RTC_TAMP3 detection flag
+	RTC_ISR_TAMP2F	= 1UL << 14,  // RTC_TAMP2 detection flag
+	RTC_ISR_TAMP1F	= 1UL << 13,  // Tamper detection flag
+	RTC_ISR_TSOVF	= 1UL << 12,  // Time-stamp overflow flag
+	RTC_ISR_TSF		= 1UL << 11,  // Time-stamp flag
+	RTC_ISR_WUTF	= 1UL << 10,  // Wakeup timer flag
+	RTC_ISR_ALRBF	= 1UL << 9,	  // Alarm B flag
+	RTC_ISR_ALRAF	= 1UL << 8,	  // Alarm A flag
+	RTC_ISR_INIT	= 1UL << 7,	  // Initialization mode
+	RTC_ISR_INITF	= 1UL << 6,	  // Initialization flag
+	RTC_ISR_RSF		= 1UL << 5,	  // Registers synchronization flag
+	RTC_ISR_INITS	= 1UL << 4,	  // Initialization status flag
+	RTC_ISR_SHPF	= 1UL << 3,	  // Shift operation pending
+	RTC_ISR_WUTWF	= 1UL << 2,	  // Wakeup timer write flag
+	RTC_ISR_ALRBWF	= 1UL << 1,	  // Alarm B write flag
+	RTC_ISR_ALRAWF	= 1UL << 0,	  // Alarm A write flag
 };
 
 // RTC->PRER prescaler register
 enum {
-	RTC_PRER_PREDIV_A = ((1UL<<7)-1) << 16, // Asynchronous prescaler factor
-	RTC_PRER_PREDIV_S = ((1UL<<15)-1) << 0, // Synchronous prescaler factor		
+	RTC_PRER_PREDIV_A = ((1UL << 7) - 1) << 16,	 // Asynchronous prescaler factor
+	RTC_PRER_PREDIV_S = ((1UL << 15) - 1) << 0,	 // Synchronous prescaler factor
 };
-static inline void rtc_prer_set_prediv_a(uint32_t val) { RTC.PRER = (RTC.PRER & ~RTC_PRER_PREDIV_A) | ((val<<16) & RTC_PRER_PREDIV_A); }
-static inline void rtc_prer_set_prediv_s(uint32_t val) { RTC.PRER = (RTC.PRER & ~RTC_PRER_PREDIV_S) | ((val<<0) & RTC_PRER_PREDIV_S); }
-static inline uint32_t rtc_prer_get_prediv_a(void) { return (RTC.PRER & RTC_PRER_PREDIV_A) >> 16 ; }
-static inline uint32_t rtc_prer_get_prediv_s(void) { return (RTC.PRER & RTC_PRER_PREDIV_S) >> 0 ; }
+static inline void rtc_prer_set_prediv_a(uint32_t val) {
+	RTC.PRER = (RTC.PRER & ~RTC_PRER_PREDIV_A) | ((val << 16) & RTC_PRER_PREDIV_A);
+}
+static inline void rtc_prer_set_prediv_s(uint32_t val) {
+	RTC.PRER = (RTC.PRER & ~RTC_PRER_PREDIV_S) | ((val << 0) & RTC_PRER_PREDIV_S);
+}
+static inline uint32_t rtc_prer_get_prediv_a(void) { return (RTC.PRER & RTC_PRER_PREDIV_A) >> 16; }
+static inline uint32_t rtc_prer_get_prediv_s(void) { return (RTC.PRER & RTC_PRER_PREDIV_S) >> 0; }
 
 // RTC->ALRMAR alarm A register
 enum {
-	RTC_ALRMAR_MSK4 = 1UL<<31, // Alarm A date mask
-	RTC_ALRMAR_WDSEL = 1UL<<30, // Week day selection
-	RTC_ALRMAR_DT = ((1UL<<2)-1) << 28, // Date tens in BCD format
-	RTC_ALRMAR_DU = ((1UL<<4)-1) << 24, // Date units or day in BCD format
-	RTC_ALRMAR_MSK3 = 1UL<<23, // Alarm A hours mask
-	RTC_ALRMAR_PM = 1UL<<22, // AM/PM notation
-	RTC_ALRMAR_HT = ((1UL<<2)-1) << 20, // Hour tens in BCD format
-	RTC_ALRMAR_HU = ((1UL<<4)-1) << 16, // Hour units in BCD format
-	RTC_ALRMAR_MSK2 = 1UL<<15, // Alarm A minutes mask
-	RTC_ALRMAR_MNT = ((1UL<<3)-1) << 12, // Minute tens in BCD format
-	RTC_ALRMAR_MNU = ((1UL<<4)-1) << 8, // Minute units in BCD format
-	RTC_ALRMAR_MSK1 = 1UL<<7, // Alarm A seconds mask
-	RTC_ALRMAR_ST = ((1UL<<3)-1) << 4, // Second tens in BCD format
-	RTC_ALRMAR_SU = ((1UL<<4)-1) << 0, // Second units in BCD format		
+	RTC_ALRMAR_MSK4	 = 1UL << 31,				// Alarm A date mask
+	RTC_ALRMAR_WDSEL = 1UL << 30,				// Week day selection
+	RTC_ALRMAR_DT	 = ((1UL << 2) - 1) << 28,	// Date tens in BCD format
+	RTC_ALRMAR_DU	 = ((1UL << 4) - 1) << 24,	// Date units or day in BCD format
+	RTC_ALRMAR_MSK3	 = 1UL << 23,				// Alarm A hours mask
+	RTC_ALRMAR_PM	 = 1UL << 22,				// AM/PM notation
+	RTC_ALRMAR_HT	 = ((1UL << 2) - 1) << 20,	// Hour tens in BCD format
+	RTC_ALRMAR_HU	 = ((1UL << 4) - 1) << 16,	// Hour units in BCD format
+	RTC_ALRMAR_MSK2	 = 1UL << 15,				// Alarm A minutes mask
+	RTC_ALRMAR_MNT	 = ((1UL << 3) - 1) << 12,	// Minute tens in BCD format
+	RTC_ALRMAR_MNU	 = ((1UL << 4) - 1) << 8,	// Minute units in BCD format
+	RTC_ALRMAR_MSK1	 = 1UL << 7,				// Alarm A seconds mask
+	RTC_ALRMAR_ST	 = ((1UL << 3) - 1) << 4,	// Second tens in BCD format
+	RTC_ALRMAR_SU	 = ((1UL << 4) - 1) << 0,	// Second units in BCD format
 };
-static inline void rtc_alrmar_set_dt(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_DT) | ((val<<28) & RTC_ALRMAR_DT); }
-static inline void rtc_alrmar_set_du(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_DU) | ((val<<24) & RTC_ALRMAR_DU); }
-static inline void rtc_alrmar_set_ht(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_HT) | ((val<<20) & RTC_ALRMAR_HT); }
-static inline void rtc_alrmar_set_hu(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_HU) | ((val<<16) & RTC_ALRMAR_HU); }
-static inline void rtc_alrmar_set_mnt(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_MNT) | ((val<<12) & RTC_ALRMAR_MNT); }
-static inline void rtc_alrmar_set_mnu(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_MNU) | ((val<<8) & RTC_ALRMAR_MNU); }
-static inline void rtc_alrmar_set_st(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_ST) | ((val<<4) & RTC_ALRMAR_ST); }
-static inline void rtc_alrmar_set_su(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_SU) | ((val<<0) & RTC_ALRMAR_SU); }
-static inline uint32_t rtc_alrmar_get_dt(void) { return (RTC.ALRMAR & RTC_ALRMAR_DT) >> 28 ; }
-static inline uint32_t rtc_alrmar_get_du(void) { return (RTC.ALRMAR & RTC_ALRMAR_DU) >> 24 ; }
-static inline uint32_t rtc_alrmar_get_ht(void) { return (RTC.ALRMAR & RTC_ALRMAR_HT) >> 20 ; }
-static inline uint32_t rtc_alrmar_get_hu(void) { return (RTC.ALRMAR & RTC_ALRMAR_HU) >> 16 ; }
-static inline uint32_t rtc_alrmar_get_mnt(void) { return (RTC.ALRMAR & RTC_ALRMAR_MNT) >> 12 ; }
-static inline uint32_t rtc_alrmar_get_mnu(void) { return (RTC.ALRMAR & RTC_ALRMAR_MNU) >> 8 ; }
-static inline uint32_t rtc_alrmar_get_st(void) { return (RTC.ALRMAR & RTC_ALRMAR_ST) >> 4 ; }
-static inline uint32_t rtc_alrmar_get_su(void) { return (RTC.ALRMAR & RTC_ALRMAR_SU) >> 0 ; }
+static inline void rtc_alrmar_set_dt(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_DT) | ((val << 28) & RTC_ALRMAR_DT); }
+static inline void rtc_alrmar_set_du(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_DU) | ((val << 24) & RTC_ALRMAR_DU); }
+static inline void rtc_alrmar_set_ht(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_HT) | ((val << 20) & RTC_ALRMAR_HT); }
+static inline void rtc_alrmar_set_hu(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_HU) | ((val << 16) & RTC_ALRMAR_HU); }
+static inline void rtc_alrmar_set_mnt(uint32_t val) {
+	RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_MNT) | ((val << 12) & RTC_ALRMAR_MNT);
+}
+static inline void rtc_alrmar_set_mnu(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_MNU) | ((val << 8) & RTC_ALRMAR_MNU); }
+static inline void rtc_alrmar_set_st(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_ST) | ((val << 4) & RTC_ALRMAR_ST); }
+static inline void rtc_alrmar_set_su(uint32_t val) { RTC.ALRMAR = (RTC.ALRMAR & ~RTC_ALRMAR_SU) | ((val << 0) & RTC_ALRMAR_SU); }
+static inline uint32_t rtc_alrmar_get_dt(void) { return (RTC.ALRMAR & RTC_ALRMAR_DT) >> 28; }
+static inline uint32_t rtc_alrmar_get_du(void) { return (RTC.ALRMAR & RTC_ALRMAR_DU) >> 24; }
+static inline uint32_t rtc_alrmar_get_ht(void) { return (RTC.ALRMAR & RTC_ALRMAR_HT) >> 20; }
+static inline uint32_t rtc_alrmar_get_hu(void) { return (RTC.ALRMAR & RTC_ALRMAR_HU) >> 16; }
+static inline uint32_t rtc_alrmar_get_mnt(void) { return (RTC.ALRMAR & RTC_ALRMAR_MNT) >> 12; }
+static inline uint32_t rtc_alrmar_get_mnu(void) { return (RTC.ALRMAR & RTC_ALRMAR_MNU) >> 8; }
+static inline uint32_t rtc_alrmar_get_st(void) { return (RTC.ALRMAR & RTC_ALRMAR_ST) >> 4; }
+static inline uint32_t rtc_alrmar_get_su(void) { return (RTC.ALRMAR & RTC_ALRMAR_SU) >> 0; }
 
 // RTC->ALRMBR alarm B register
 enum {
-	RTC_ALRMBR_MSK4 = 1UL<<31, // Alarm B date mask
-	RTC_ALRMBR_WDSEL = 1UL<<30, // Week day selection
-	RTC_ALRMBR_DT = ((1UL<<2)-1) << 28, // Date tens in BCD format
-	RTC_ALRMBR_DU = ((1UL<<4)-1) << 24, // Date units or day in BCD format
-	RTC_ALRMBR_MSK3 = 1UL<<23, // Alarm B hours mask
-	RTC_ALRMBR_PM = 1UL<<22, // AM/PM notation
-	RTC_ALRMBR_HT = ((1UL<<2)-1) << 20, // Hour tens in BCD format
-	RTC_ALRMBR_HU = ((1UL<<4)-1) << 16, // Hour units in BCD format
-	RTC_ALRMBR_MSK2 = 1UL<<15, // Alarm B minutes mask
-	RTC_ALRMBR_MNT = ((1UL<<3)-1) << 12, // Minute tens in BCD format
-	RTC_ALRMBR_MNU = ((1UL<<4)-1) << 8, // Minute units in BCD format
-	RTC_ALRMBR_MSK1 = 1UL<<7, // Alarm B seconds mask
-	RTC_ALRMBR_ST = ((1UL<<3)-1) << 4, // Second tens in BCD format
-	RTC_ALRMBR_SU = ((1UL<<4)-1) << 0, // Second units in BCD format		
+	RTC_ALRMBR_MSK4	 = 1UL << 31,				// Alarm B date mask
+	RTC_ALRMBR_WDSEL = 1UL << 30,				// Week day selection
+	RTC_ALRMBR_DT	 = ((1UL << 2) - 1) << 28,	// Date tens in BCD format
+	RTC_ALRMBR_DU	 = ((1UL << 4) - 1) << 24,	// Date units or day in BCD format
+	RTC_ALRMBR_MSK3	 = 1UL << 23,				// Alarm B hours mask
+	RTC_ALRMBR_PM	 = 1UL << 22,				// AM/PM notation
+	RTC_ALRMBR_HT	 = ((1UL << 2) - 1) << 20,	// Hour tens in BCD format
+	RTC_ALRMBR_HU	 = ((1UL << 4) - 1) << 16,	// Hour units in BCD format
+	RTC_ALRMBR_MSK2	 = 1UL << 15,				// Alarm B minutes mask
+	RTC_ALRMBR_MNT	 = ((1UL << 3) - 1) << 12,	// Minute tens in BCD format
+	RTC_ALRMBR_MNU	 = ((1UL << 4) - 1) << 8,	// Minute units in BCD format
+	RTC_ALRMBR_MSK1	 = 1UL << 7,				// Alarm B seconds mask
+	RTC_ALRMBR_ST	 = ((1UL << 3) - 1) << 4,	// Second tens in BCD format
+	RTC_ALRMBR_SU	 = ((1UL << 4) - 1) << 0,	// Second units in BCD format
 };
-static inline void rtc_alrmbr_set_dt(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_DT) | ((val<<28) & RTC_ALRMBR_DT); }
-static inline void rtc_alrmbr_set_du(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_DU) | ((val<<24) & RTC_ALRMBR_DU); }
-static inline void rtc_alrmbr_set_ht(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_HT) | ((val<<20) & RTC_ALRMBR_HT); }
-static inline void rtc_alrmbr_set_hu(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_HU) | ((val<<16) & RTC_ALRMBR_HU); }
-static inline void rtc_alrmbr_set_mnt(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_MNT) | ((val<<12) & RTC_ALRMBR_MNT); }
-static inline void rtc_alrmbr_set_mnu(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_MNU) | ((val<<8) & RTC_ALRMBR_MNU); }
-static inline void rtc_alrmbr_set_st(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_ST) | ((val<<4) & RTC_ALRMBR_ST); }
-static inline void rtc_alrmbr_set_su(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_SU) | ((val<<0) & RTC_ALRMBR_SU); }
-static inline uint32_t rtc_alrmbr_get_dt(void) { return (RTC.ALRMBR & RTC_ALRMBR_DT) >> 28 ; }
-static inline uint32_t rtc_alrmbr_get_du(void) { return (RTC.ALRMBR & RTC_ALRMBR_DU) >> 24 ; }
-static inline uint32_t rtc_alrmbr_get_ht(void) { return (RTC.ALRMBR & RTC_ALRMBR_HT) >> 20 ; }
-static inline uint32_t rtc_alrmbr_get_hu(void) { return (RTC.ALRMBR & RTC_ALRMBR_HU) >> 16 ; }
-static inline uint32_t rtc_alrmbr_get_mnt(void) { return (RTC.ALRMBR & RTC_ALRMBR_MNT) >> 12 ; }
-static inline uint32_t rtc_alrmbr_get_mnu(void) { return (RTC.ALRMBR & RTC_ALRMBR_MNU) >> 8 ; }
-static inline uint32_t rtc_alrmbr_get_st(void) { return (RTC.ALRMBR & RTC_ALRMBR_ST) >> 4 ; }
-static inline uint32_t rtc_alrmbr_get_su(void) { return (RTC.ALRMBR & RTC_ALRMBR_SU) >> 0 ; }
+static inline void rtc_alrmbr_set_dt(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_DT) | ((val << 28) & RTC_ALRMBR_DT); }
+static inline void rtc_alrmbr_set_du(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_DU) | ((val << 24) & RTC_ALRMBR_DU); }
+static inline void rtc_alrmbr_set_ht(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_HT) | ((val << 20) & RTC_ALRMBR_HT); }
+static inline void rtc_alrmbr_set_hu(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_HU) | ((val << 16) & RTC_ALRMBR_HU); }
+static inline void rtc_alrmbr_set_mnt(uint32_t val) {
+	RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_MNT) | ((val << 12) & RTC_ALRMBR_MNT);
+}
+static inline void rtc_alrmbr_set_mnu(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_MNU) | ((val << 8) & RTC_ALRMBR_MNU); }
+static inline void rtc_alrmbr_set_st(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_ST) | ((val << 4) & RTC_ALRMBR_ST); }
+static inline void rtc_alrmbr_set_su(uint32_t val) { RTC.ALRMBR = (RTC.ALRMBR & ~RTC_ALRMBR_SU) | ((val << 0) & RTC_ALRMBR_SU); }
+static inline uint32_t rtc_alrmbr_get_dt(void) { return (RTC.ALRMBR & RTC_ALRMBR_DT) >> 28; }
+static inline uint32_t rtc_alrmbr_get_du(void) { return (RTC.ALRMBR & RTC_ALRMBR_DU) >> 24; }
+static inline uint32_t rtc_alrmbr_get_ht(void) { return (RTC.ALRMBR & RTC_ALRMBR_HT) >> 20; }
+static inline uint32_t rtc_alrmbr_get_hu(void) { return (RTC.ALRMBR & RTC_ALRMBR_HU) >> 16; }
+static inline uint32_t rtc_alrmbr_get_mnt(void) { return (RTC.ALRMBR & RTC_ALRMBR_MNT) >> 12; }
+static inline uint32_t rtc_alrmbr_get_mnu(void) { return (RTC.ALRMBR & RTC_ALRMBR_MNU) >> 8; }
+static inline uint32_t rtc_alrmbr_get_st(void) { return (RTC.ALRMBR & RTC_ALRMBR_ST) >> 4; }
+static inline uint32_t rtc_alrmbr_get_su(void) { return (RTC.ALRMBR & RTC_ALRMBR_SU) >> 0; }
 
 // RTC->SHIFTR shift control register
 enum {
-	RTC_SHIFTR_ADD1S = 1UL<<31, // Add one second
-	RTC_SHIFTR_SUBFS = ((1UL<<15)-1) << 0, // Subtract a fraction of a second		
+	RTC_SHIFTR_ADD1S = 1UL << 31,				// Add one second
+	RTC_SHIFTR_SUBFS = ((1UL << 15) - 1) << 0,	// Subtract a fraction of a second
 };
-static inline void rtc_shiftr_set_subfs(uint32_t val) { RTC.SHIFTR = (RTC.SHIFTR & ~RTC_SHIFTR_SUBFS) | ((val<<0) & RTC_SHIFTR_SUBFS); }
-static inline uint32_t rtc_shiftr_get_subfs(void) { return (RTC.SHIFTR & RTC_SHIFTR_SUBFS) >> 0 ; }
+static inline void rtc_shiftr_set_subfs(uint32_t val) {
+	RTC.SHIFTR = (RTC.SHIFTR & ~RTC_SHIFTR_SUBFS) | ((val << 0) & RTC_SHIFTR_SUBFS);
+}
+static inline uint32_t rtc_shiftr_get_subfs(void) { return (RTC.SHIFTR & RTC_SHIFTR_SUBFS) >> 0; }
 
 // RTC->TSTR time stamp time register
 enum {
-	RTC_TSTR_PM = 1UL<<22, // AM/PM notation
-	RTC_TSTR_HT = ((1UL<<2)-1) << 20, // Hour tens in BCD format
-	RTC_TSTR_HU = ((1UL<<4)-1) << 16, // Hour units in BCD format
-	RTC_TSTR_MNT = ((1UL<<3)-1) << 12, // Minute tens in BCD format
-	RTC_TSTR_MNU = ((1UL<<4)-1) << 8, // Minute units in BCD format
-	RTC_TSTR_ST = ((1UL<<3)-1) << 4, // Second tens in BCD format
-	RTC_TSTR_SU = ((1UL<<4)-1) << 0, // Second units in BCD format		
+	RTC_TSTR_PM	 = 1UL << 22,				// AM/PM notation
+	RTC_TSTR_HT	 = ((1UL << 2) - 1) << 20,	// Hour tens in BCD format
+	RTC_TSTR_HU	 = ((1UL << 4) - 1) << 16,	// Hour units in BCD format
+	RTC_TSTR_MNT = ((1UL << 3) - 1) << 12,	// Minute tens in BCD format
+	RTC_TSTR_MNU = ((1UL << 4) - 1) << 8,	// Minute units in BCD format
+	RTC_TSTR_ST	 = ((1UL << 3) - 1) << 4,	// Second tens in BCD format
+	RTC_TSTR_SU	 = ((1UL << 4) - 1) << 0,	// Second units in BCD format
 };
-static inline uint32_t rtc_tstr_get_ht(void) { return (RTC.TSTR & RTC_TSTR_HT) >> 20 ; }
-static inline uint32_t rtc_tstr_get_hu(void) { return (RTC.TSTR & RTC_TSTR_HU) >> 16 ; }
-static inline uint32_t rtc_tstr_get_mnt(void) { return (RTC.TSTR & RTC_TSTR_MNT) >> 12 ; }
-static inline uint32_t rtc_tstr_get_mnu(void) { return (RTC.TSTR & RTC_TSTR_MNU) >> 8 ; }
-static inline uint32_t rtc_tstr_get_st(void) { return (RTC.TSTR & RTC_TSTR_ST) >> 4 ; }
-static inline uint32_t rtc_tstr_get_su(void) { return (RTC.TSTR & RTC_TSTR_SU) >> 0 ; }
+static inline uint32_t rtc_tstr_get_ht(void) { return (RTC.TSTR & RTC_TSTR_HT) >> 20; }
+static inline uint32_t rtc_tstr_get_hu(void) { return (RTC.TSTR & RTC_TSTR_HU) >> 16; }
+static inline uint32_t rtc_tstr_get_mnt(void) { return (RTC.TSTR & RTC_TSTR_MNT) >> 12; }
+static inline uint32_t rtc_tstr_get_mnu(void) { return (RTC.TSTR & RTC_TSTR_MNU) >> 8; }
+static inline uint32_t rtc_tstr_get_st(void) { return (RTC.TSTR & RTC_TSTR_ST) >> 4; }
+static inline uint32_t rtc_tstr_get_su(void) { return (RTC.TSTR & RTC_TSTR_SU) >> 0; }
 
 // RTC->TSDR time stamp date register
 enum {
-	RTC_TSDR_WDU = ((1UL<<3)-1) << 13, // Week day units
-	RTC_TSDR_MT = 1UL<<12, // Month tens in BCD format
-	RTC_TSDR_MU = ((1UL<<4)-1) << 8, // Month units in BCD format
-	RTC_TSDR_DT = ((1UL<<2)-1) << 4, // Date tens in BCD format
-	RTC_TSDR_DU = ((1UL<<4)-1) << 0, // Date units in BCD format		
+	RTC_TSDR_WDU = ((1UL << 3) - 1) << 13,	// Week day units
+	RTC_TSDR_MT	 = 1UL << 12,				// Month tens in BCD format
+	RTC_TSDR_MU	 = ((1UL << 4) - 1) << 8,	// Month units in BCD format
+	RTC_TSDR_DT	 = ((1UL << 2) - 1) << 4,	// Date tens in BCD format
+	RTC_TSDR_DU	 = ((1UL << 4) - 1) << 0,	// Date units in BCD format
 };
-static inline uint32_t rtc_tsdr_get_wdu(void) { return (RTC.TSDR & RTC_TSDR_WDU) >> 13 ; }
-static inline uint32_t rtc_tsdr_get_mu(void) { return (RTC.TSDR & RTC_TSDR_MU) >> 8 ; }
-static inline uint32_t rtc_tsdr_get_dt(void) { return (RTC.TSDR & RTC_TSDR_DT) >> 4 ; }
-static inline uint32_t rtc_tsdr_get_du(void) { return (RTC.TSDR & RTC_TSDR_DU) >> 0 ; }
+static inline uint32_t rtc_tsdr_get_wdu(void) { return (RTC.TSDR & RTC_TSDR_WDU) >> 13; }
+static inline uint32_t rtc_tsdr_get_mu(void) { return (RTC.TSDR & RTC_TSDR_MU) >> 8; }
+static inline uint32_t rtc_tsdr_get_dt(void) { return (RTC.TSDR & RTC_TSDR_DT) >> 4; }
+static inline uint32_t rtc_tsdr_get_du(void) { return (RTC.TSDR & RTC_TSDR_DU) >> 0; }
 
 // RTC->CALR calibration register
 enum {
-	RTC_CALR_CALP = 1UL<<15, // Increase frequency of RTC by 488.5 ppm
-	RTC_CALR_CALW8 = 1UL<<14, // Use an 8-second calibration cycle period
-	RTC_CALR_CALW16 = 1UL<<13, // Use a 16-second calibration cycle period
-	RTC_CALR_CALM = ((1UL<<9)-1) << 0, // Calibration minus		
+	RTC_CALR_CALP	= 1UL << 15,			  // Increase frequency of RTC by 488.5 ppm
+	RTC_CALR_CALW8	= 1UL << 14,			  // Use an 8-second calibration cycle period
+	RTC_CALR_CALW16 = 1UL << 13,			  // Use a 16-second calibration cycle period
+	RTC_CALR_CALM	= ((1UL << 9) - 1) << 0,  // Calibration minus
 };
-static inline void rtc_calr_set_calm(uint32_t val) { RTC.CALR = (RTC.CALR & ~RTC_CALR_CALM) | ((val<<0) & RTC_CALR_CALM); }
-static inline uint32_t rtc_calr_get_calm(void) { return (RTC.CALR & RTC_CALR_CALM) >> 0 ; }
+static inline void	   rtc_calr_set_calm(uint32_t val) { RTC.CALR = (RTC.CALR & ~RTC_CALR_CALM) | ((val << 0) & RTC_CALR_CALM); }
+static inline uint32_t rtc_calr_get_calm(void) { return (RTC.CALR & RTC_CALR_CALM) >> 0; }
 
 // RTC->TAMPCR tamper configuration register
 enum {
-	RTC_TAMPCR_TAMP3MF = 1UL<<24, // Tamper 3 mask flag
-	RTC_TAMPCR_TAMP3NOERASE = 1UL<<23, // Tamper 3 no erase
-	RTC_TAMPCR_TAMP3IE = 1UL<<22, // Tamper 3 interrupt enable
-	RTC_TAMPCR_TAMP2MF = 1UL<<21, // Tamper 2 mask flag
-	RTC_TAMPCR_TAMP2NOERASE = 1UL<<20, // Tamper 2 no erase
-	RTC_TAMPCR_TAMP2IE = 1UL<<19, // Tamper 2 interrupt enable
-	RTC_TAMPCR_TAMP1MF = 1UL<<18, // Tamper 1 mask flag
-	RTC_TAMPCR_TAMP1NOERASE = 1UL<<17, // Tamper 1 no erase
-	RTC_TAMPCR_TAMP1IE = 1UL<<16, // Tamper 1 interrupt enable
-	RTC_TAMPCR_TAMPPUDIS = 1UL<<15, // TAMPER pull-up disable
-	RTC_TAMPCR_TAMPPRCH = ((1UL<<2)-1) << 13, // Tamper precharge duration
-	RTC_TAMPCR_TAMPFLT = ((1UL<<2)-1) << 11, // Tamper filter count
-	RTC_TAMPCR_TAMPFREQ = ((1UL<<3)-1) << 8, // Tamper sampling frequency
-	RTC_TAMPCR_TAMPTS = 1UL<<7, // Activate timestamp on tamper detection event
-	RTC_TAMPCR_TAMP3TRG = 1UL<<6, // Active level for tamper 3
-	RTC_TAMPCR_TAMP3E = 1UL<<5, // Tamper 3 detection enable
-	RTC_TAMPCR_TAMP2TRG = 1UL<<4, // Active level for tamper 2
-	RTC_TAMPCR_TAMP2E = 1UL<<3, // Tamper 2 detection enable
-	RTC_TAMPCR_TAMPIE = 1UL<<2, // Tamper interrupt enable
-	RTC_TAMPCR_TAMP1TRG = 1UL<<1, // Active level for tamper 1
-	RTC_TAMPCR_TAMP1E = 1UL<<0, // Tamper 1 detection enable		
+	RTC_TAMPCR_TAMP3MF		= 1UL << 24,			   // Tamper 3 mask flag
+	RTC_TAMPCR_TAMP3NOERASE = 1UL << 23,			   // Tamper 3 no erase
+	RTC_TAMPCR_TAMP3IE		= 1UL << 22,			   // Tamper 3 interrupt enable
+	RTC_TAMPCR_TAMP2MF		= 1UL << 21,			   // Tamper 2 mask flag
+	RTC_TAMPCR_TAMP2NOERASE = 1UL << 20,			   // Tamper 2 no erase
+	RTC_TAMPCR_TAMP2IE		= 1UL << 19,			   // Tamper 2 interrupt enable
+	RTC_TAMPCR_TAMP1MF		= 1UL << 18,			   // Tamper 1 mask flag
+	RTC_TAMPCR_TAMP1NOERASE = 1UL << 17,			   // Tamper 1 no erase
+	RTC_TAMPCR_TAMP1IE		= 1UL << 16,			   // Tamper 1 interrupt enable
+	RTC_TAMPCR_TAMPPUDIS	= 1UL << 15,			   // TAMPER pull-up disable
+	RTC_TAMPCR_TAMPPRCH		= ((1UL << 2) - 1) << 13,  // Tamper precharge duration
+	RTC_TAMPCR_TAMPFLT		= ((1UL << 2) - 1) << 11,  // Tamper filter count
+	RTC_TAMPCR_TAMPFREQ		= ((1UL << 3) - 1) << 8,   // Tamper sampling frequency
+	RTC_TAMPCR_TAMPTS		= 1UL << 7,				   // Activate timestamp on tamper detection event
+	RTC_TAMPCR_TAMP3TRG		= 1UL << 6,				   // Active level for tamper 3
+	RTC_TAMPCR_TAMP3E		= 1UL << 5,				   // Tamper 3 detection enable
+	RTC_TAMPCR_TAMP2TRG		= 1UL << 4,				   // Active level for tamper 2
+	RTC_TAMPCR_TAMP2E		= 1UL << 3,				   // Tamper 2 detection enable
+	RTC_TAMPCR_TAMPIE		= 1UL << 2,				   // Tamper interrupt enable
+	RTC_TAMPCR_TAMP1TRG		= 1UL << 1,				   // Active level for tamper 1
+	RTC_TAMPCR_TAMP1E		= 1UL << 0,				   // Tamper 1 detection enable
 };
-static inline void rtc_tampcr_set_tampprch(uint32_t val) { RTC.TAMPCR = (RTC.TAMPCR & ~RTC_TAMPCR_TAMPPRCH) | ((val<<13) & RTC_TAMPCR_TAMPPRCH); }
-static inline void rtc_tampcr_set_tampflt(uint32_t val) { RTC.TAMPCR = (RTC.TAMPCR & ~RTC_TAMPCR_TAMPFLT) | ((val<<11) & RTC_TAMPCR_TAMPFLT); }
-static inline void rtc_tampcr_set_tampfreq(uint32_t val) { RTC.TAMPCR = (RTC.TAMPCR & ~RTC_TAMPCR_TAMPFREQ) | ((val<<8) & RTC_TAMPCR_TAMPFREQ); }
-static inline uint32_t rtc_tampcr_get_tampprch(void) { return (RTC.TAMPCR & RTC_TAMPCR_TAMPPRCH) >> 13 ; }
-static inline uint32_t rtc_tampcr_get_tampflt(void) { return (RTC.TAMPCR & RTC_TAMPCR_TAMPFLT) >> 11 ; }
-static inline uint32_t rtc_tampcr_get_tampfreq(void) { return (RTC.TAMPCR & RTC_TAMPCR_TAMPFREQ) >> 8 ; }
+static inline void rtc_tampcr_set_tampprch(uint32_t val) {
+	RTC.TAMPCR = (RTC.TAMPCR & ~RTC_TAMPCR_TAMPPRCH) | ((val << 13) & RTC_TAMPCR_TAMPPRCH);
+}
+static inline void rtc_tampcr_set_tampflt(uint32_t val) {
+	RTC.TAMPCR = (RTC.TAMPCR & ~RTC_TAMPCR_TAMPFLT) | ((val << 11) & RTC_TAMPCR_TAMPFLT);
+}
+static inline void rtc_tampcr_set_tampfreq(uint32_t val) {
+	RTC.TAMPCR = (RTC.TAMPCR & ~RTC_TAMPCR_TAMPFREQ) | ((val << 8) & RTC_TAMPCR_TAMPFREQ);
+}
+static inline uint32_t rtc_tampcr_get_tampprch(void) { return (RTC.TAMPCR & RTC_TAMPCR_TAMPPRCH) >> 13; }
+static inline uint32_t rtc_tampcr_get_tampflt(void) { return (RTC.TAMPCR & RTC_TAMPCR_TAMPFLT) >> 11; }
+static inline uint32_t rtc_tampcr_get_tampfreq(void) { return (RTC.TAMPCR & RTC_TAMPCR_TAMPFREQ) >> 8; }
 
 // RTC->ALRMASSR alarm A sub second register
 enum {
-	RTC_ALRMASSR_MASKSS = ((1UL<<4)-1) << 24, // Mask the most-significant bits starting at this bit
-	RTC_ALRMASSR_SS = ((1UL<<15)-1) << 0, // Sub seconds value		
+	RTC_ALRMASSR_MASKSS = ((1UL << 4) - 1) << 24,  // Mask the most-significant bits starting at this bit
+	RTC_ALRMASSR_SS		= ((1UL << 15) - 1) << 0,  // Sub seconds value
 };
-static inline void rtc_alrmassr_set_maskss(uint32_t val) { RTC.ALRMASSR = (RTC.ALRMASSR & ~RTC_ALRMASSR_MASKSS) | ((val<<24) & RTC_ALRMASSR_MASKSS); }
-static inline void rtc_alrmassr_set_ss(uint32_t val) { RTC.ALRMASSR = (RTC.ALRMASSR & ~RTC_ALRMASSR_SS) | ((val<<0) & RTC_ALRMASSR_SS); }
-static inline uint32_t rtc_alrmassr_get_maskss(void) { return (RTC.ALRMASSR & RTC_ALRMASSR_MASKSS) >> 24 ; }
-static inline uint32_t rtc_alrmassr_get_ss(void) { return (RTC.ALRMASSR & RTC_ALRMASSR_SS) >> 0 ; }
+static inline void rtc_alrmassr_set_maskss(uint32_t val) {
+	RTC.ALRMASSR = (RTC.ALRMASSR & ~RTC_ALRMASSR_MASKSS) | ((val << 24) & RTC_ALRMASSR_MASKSS);
+}
+static inline void rtc_alrmassr_set_ss(uint32_t val) {
+	RTC.ALRMASSR = (RTC.ALRMASSR & ~RTC_ALRMASSR_SS) | ((val << 0) & RTC_ALRMASSR_SS);
+}
+static inline uint32_t rtc_alrmassr_get_maskss(void) { return (RTC.ALRMASSR & RTC_ALRMASSR_MASKSS) >> 24; }
+static inline uint32_t rtc_alrmassr_get_ss(void) { return (RTC.ALRMASSR & RTC_ALRMASSR_SS) >> 0; }
 
 // RTC->ALRMBSSR alarm B sub second register
 enum {
-	RTC_ALRMBSSR_MASKSS = ((1UL<<4)-1) << 24, // Mask the most-significant bits starting at this bit
-	RTC_ALRMBSSR_SS = ((1UL<<15)-1) << 0, // Sub seconds value		
+	RTC_ALRMBSSR_MASKSS = ((1UL << 4) - 1) << 24,  // Mask the most-significant bits starting at this bit
+	RTC_ALRMBSSR_SS		= ((1UL << 15) - 1) << 0,  // Sub seconds value
 };
-static inline void rtc_alrmbssr_set_maskss(uint32_t val) { RTC.ALRMBSSR = (RTC.ALRMBSSR & ~RTC_ALRMBSSR_MASKSS) | ((val<<24) & RTC_ALRMBSSR_MASKSS); }
-static inline void rtc_alrmbssr_set_ss(uint32_t val) { RTC.ALRMBSSR = (RTC.ALRMBSSR & ~RTC_ALRMBSSR_SS) | ((val<<0) & RTC_ALRMBSSR_SS); }
-static inline uint32_t rtc_alrmbssr_get_maskss(void) { return (RTC.ALRMBSSR & RTC_ALRMBSSR_MASKSS) >> 24 ; }
-static inline uint32_t rtc_alrmbssr_get_ss(void) { return (RTC.ALRMBSSR & RTC_ALRMBSSR_SS) >> 0 ; }
+static inline void rtc_alrmbssr_set_maskss(uint32_t val) {
+	RTC.ALRMBSSR = (RTC.ALRMBSSR & ~RTC_ALRMBSSR_MASKSS) | ((val << 24) & RTC_ALRMBSSR_MASKSS);
+}
+static inline void rtc_alrmbssr_set_ss(uint32_t val) {
+	RTC.ALRMBSSR = (RTC.ALRMBSSR & ~RTC_ALRMBSSR_SS) | ((val << 0) & RTC_ALRMBSSR_SS);
+}
+static inline uint32_t rtc_alrmbssr_get_maskss(void) { return (RTC.ALRMBSSR & RTC_ALRMBSSR_MASKSS) >> 24; }
+static inline uint32_t rtc_alrmbssr_get_ss(void) { return (RTC.ALRMBSSR & RTC_ALRMBSSR_SS) >> 0; }
 
 // RTC->OR option register
 enum {
-	RTC_OR_RTC_OUT_RMP = 1UL<<1, // RTC_OUT remap
-	RTC_OR_RTC_ALARM_TYPE = 1UL<<0, // RTC_ALARM on PC13 output type		
+	RTC_OR_RTC_OUT_RMP	  = 1UL << 1,  // RTC_OUT remap
+	RTC_OR_RTC_ALARM_TYPE = 1UL << 0,  // RTC_ALARM on PC13 output type
 };
 
 /* System control block
 There is only one peripheral of type SCB. */
 struct SCB_Type {
-	__I uint32_t CPUID; // @0 CPUID base register
-	__IO uint32_t ICSR; // @4 Interrupt control and state register
-	__IO uint32_t VTOR; // @8 Vector table offset register
-	__IO uint32_t AIRCR; // @12 Application interrupt and reset control register
-	__IO uint8_t SCR; // @16 System control register
-	 uint8_t RESERVED0[3]; // @17 
-	__IO uint16_t CCR; // @20 Configuration and control register
-	 uint8_t RESERVED1[2]; // @22 
-	__IO uint32_t SHPR1; // @24 System handler priority registers
-	__IO uint32_t SHPR2; // @28 System handler priority registers
-	__IO uint32_t SHPR3; // @32 System handler priority registers
-	__IO uint32_t SHCSR; // @36 System handler control and state register
-	__IO uint32_t CFSR_UFSR_BFSR_MMFSR; // @40 Configurable fault status register
-	__IO uint32_t HFSR; // @44 Hard fault status register
-	 uint8_t RESERVED2[4]; // @48 
-	__IO uint32_t MMFAR; // @52 Memory management fault address register
-	__IO uint32_t BFAR; // @56 Bus fault address register
-	__IO uint32_t AFSR; // @60 Auxiliary fault status register
+	__I uint32_t  CPUID;				 // @0 CPUID base register
+	__IO uint32_t ICSR;					 // @4 Interrupt control and state register
+	__IO uint32_t VTOR;					 // @8 Vector table offset register
+	__IO uint32_t AIRCR;				 // @12 Application interrupt and reset control register
+	__IO uint8_t  SCR;					 // @16 System control register
+	uint8_t		  RESERVED0[3];			 // @17
+	__IO uint16_t CCR;					 // @20 Configuration and control register
+	uint8_t		  RESERVED1[2];			 // @22
+	__IO uint32_t SHPR1;				 // @24 System handler priority registers
+	__IO uint32_t SHPR2;				 // @28 System handler priority registers
+	__IO uint32_t SHPR3;				 // @32 System handler priority registers
+	__IO uint32_t SHCSR;				 // @36 System handler control and state register
+	__IO uint32_t CFSR_UFSR_BFSR_MMFSR;	 // @40 Configurable fault status register
+	__IO uint32_t HFSR;					 // @44 Hard fault status register
+	uint8_t		  RESERVED2[4];			 // @48
+	__IO uint32_t MMFAR;				 // @52 Memory management fault address register
+	__IO uint32_t BFAR;					 // @56 Bus fault address register
+	__IO uint32_t AFSR;					 // @60 Auxiliary fault status register
 };
-extern struct SCB_Type	SCB;	// @0xE000ED00 
+extern struct SCB_Type SCB;	 // @0xE000ED00
 
 // SCB->CPUID CPUID base register
 enum {
-	SCB_CPUID_IMPLEMENTER = ((1UL<<8)-1) << 24, // Implementer code
-	SCB_CPUID_VARIANT = ((1UL<<4)-1) << 20, // Variant number
-	SCB_CPUID_CONSTANT = ((1UL<<4)-1) << 16, // Reads as 0xF
-	SCB_CPUID_PARTNO = ((1UL<<12)-1) << 4, // Part number of the processor
-	SCB_CPUID_REVISION = ((1UL<<4)-1) << 0, // Revision number		
+	SCB_CPUID_IMPLEMENTER = ((1UL << 8) - 1) << 24,	 // Implementer code
+	SCB_CPUID_VARIANT	  = ((1UL << 4) - 1) << 20,	 // Variant number
+	SCB_CPUID_CONSTANT	  = ((1UL << 4) - 1) << 16,	 // Reads as 0xF
+	SCB_CPUID_PARTNO	  = ((1UL << 12) - 1) << 4,	 // Part number of the processor
+	SCB_CPUID_REVISION	  = ((1UL << 4) - 1) << 0,	 // Revision number
 };
-static inline uint32_t scb_cpuid_get_implementer(void) { return (SCB.CPUID & SCB_CPUID_IMPLEMENTER) >> 24 ; }
-static inline uint32_t scb_cpuid_get_variant(void) { return (SCB.CPUID & SCB_CPUID_VARIANT) >> 20 ; }
-static inline uint32_t scb_cpuid_get_constant(void) { return (SCB.CPUID & SCB_CPUID_CONSTANT) >> 16 ; }
-static inline uint32_t scb_cpuid_get_partno(void) { return (SCB.CPUID & SCB_CPUID_PARTNO) >> 4 ; }
-static inline uint32_t scb_cpuid_get_revision(void) { return (SCB.CPUID & SCB_CPUID_REVISION) >> 0 ; }
+static inline uint32_t scb_cpuid_get_implementer(void) { return (SCB.CPUID & SCB_CPUID_IMPLEMENTER) >> 24; }
+static inline uint32_t scb_cpuid_get_variant(void) { return (SCB.CPUID & SCB_CPUID_VARIANT) >> 20; }
+static inline uint32_t scb_cpuid_get_constant(void) { return (SCB.CPUID & SCB_CPUID_CONSTANT) >> 16; }
+static inline uint32_t scb_cpuid_get_partno(void) { return (SCB.CPUID & SCB_CPUID_PARTNO) >> 4; }
+static inline uint32_t scb_cpuid_get_revision(void) { return (SCB.CPUID & SCB_CPUID_REVISION) >> 0; }
 
 // SCB->ICSR Interrupt control and state register
 enum {
-	SCB_ICSR_NMIPENDSET = 1UL<<31, // NMI set-pending bit.
-	SCB_ICSR_PENDSVSET = 1UL<<28, // PendSV set-pending bit
-	SCB_ICSR_PENDSVCLR = 1UL<<27, // PendSV clear-pending bit
-	SCB_ICSR_PENDSTSET = 1UL<<26, // SysTick exception set-pending bit
-	SCB_ICSR_PENDSTCLR = 1UL<<25, // SysTick exception clear-pending bit
-	SCB_ICSR_ISRPENDING = 1UL<<22, // Interrupt pending flag
-	SCB_ICSR_VECTPENDING = ((1UL<<7)-1) << 12, // Pending vector
-	SCB_ICSR_RETTOBASE = 1UL<<11, // Return to base level
-	SCB_ICSR_VECTACTIVE = ((1UL<<9)-1) << 0, // Active vector		
+	SCB_ICSR_NMIPENDSET	 = 1UL << 31,				// NMI set-pending bit.
+	SCB_ICSR_PENDSVSET	 = 1UL << 28,				// PendSV set-pending bit
+	SCB_ICSR_PENDSVCLR	 = 1UL << 27,				// PendSV clear-pending bit
+	SCB_ICSR_PENDSTSET	 = 1UL << 26,				// SysTick exception set-pending bit
+	SCB_ICSR_PENDSTCLR	 = 1UL << 25,				// SysTick exception clear-pending bit
+	SCB_ICSR_ISRPENDING	 = 1UL << 22,				// Interrupt pending flag
+	SCB_ICSR_VECTPENDING = ((1UL << 7) - 1) << 12,	// Pending vector
+	SCB_ICSR_RETTOBASE	 = 1UL << 11,				// Return to base level
+	SCB_ICSR_VECTACTIVE	 = ((1UL << 9) - 1) << 0,	// Active vector
 };
-static inline void scb_icsr_set_vectpending(uint32_t val) { SCB.ICSR = (SCB.ICSR & ~SCB_ICSR_VECTPENDING) | ((val<<12) & SCB_ICSR_VECTPENDING); }
-static inline void scb_icsr_set_vectactive(uint32_t val) { SCB.ICSR = (SCB.ICSR & ~SCB_ICSR_VECTACTIVE) | ((val<<0) & SCB_ICSR_VECTACTIVE); }
-static inline uint32_t scb_icsr_get_vectpending(void) { return (SCB.ICSR & SCB_ICSR_VECTPENDING) >> 12 ; }
-static inline uint32_t scb_icsr_get_vectactive(void) { return (SCB.ICSR & SCB_ICSR_VECTACTIVE) >> 0 ; }
+static inline void scb_icsr_set_vectpending(uint32_t val) {
+	SCB.ICSR = (SCB.ICSR & ~SCB_ICSR_VECTPENDING) | ((val << 12) & SCB_ICSR_VECTPENDING);
+}
+static inline void scb_icsr_set_vectactive(uint32_t val) {
+	SCB.ICSR = (SCB.ICSR & ~SCB_ICSR_VECTACTIVE) | ((val << 0) & SCB_ICSR_VECTACTIVE);
+}
+static inline uint32_t scb_icsr_get_vectpending(void) { return (SCB.ICSR & SCB_ICSR_VECTPENDING) >> 12; }
+static inline uint32_t scb_icsr_get_vectactive(void) { return (SCB.ICSR & SCB_ICSR_VECTACTIVE) >> 0; }
 
 // SCB->VTOR Vector table offset register
 enum {
-	SCB_VTOR_TBLOFF = ((1UL<<21)-1) << 9, // Vector table base offset field		
+	SCB_VTOR_TBLOFF = ((1UL << 21) - 1) << 9,  // Vector table base offset field
 };
-static inline void scb_vtor_set_tbloff(uint32_t val) { SCB.VTOR = (SCB.VTOR & ~SCB_VTOR_TBLOFF) | ((val<<9) & SCB_VTOR_TBLOFF); }
-static inline uint32_t scb_vtor_get_tbloff(void) { return (SCB.VTOR & SCB_VTOR_TBLOFF) >> 9 ; }
+static inline void scb_vtor_set_tbloff(uint32_t val) { SCB.VTOR = (SCB.VTOR & ~SCB_VTOR_TBLOFF) | ((val << 9) & SCB_VTOR_TBLOFF); }
+static inline uint32_t scb_vtor_get_tbloff(void) { return (SCB.VTOR & SCB_VTOR_TBLOFF) >> 9; }
 
 // SCB->AIRCR Application interrupt and reset control register
 enum {
-	SCB_AIRCR_VECTKEYSTAT = ((1UL<<16)-1) << 16, // Register key
-	SCB_AIRCR_ENDIANESS = 1UL<<15, // ENDIANESS
-	SCB_AIRCR_PRIGROUP = ((1UL<<3)-1) << 8, // PRIGROUP
-	SCB_AIRCR_SYSRESETREQ = 1UL<<2, // SYSRESETREQ
-	SCB_AIRCR_VECTCLRACTIVE = 1UL<<1, // VECTCLRACTIVE
-	SCB_AIRCR_VECTRESET = 1UL<<0, // VECTRESET		
+	SCB_AIRCR_VECTKEYSTAT	= ((1UL << 16) - 1) << 16,	// Register key
+	SCB_AIRCR_ENDIANESS		= 1UL << 15,				// ENDIANESS
+	SCB_AIRCR_PRIGROUP		= ((1UL << 3) - 1) << 8,	// PRIGROUP
+	SCB_AIRCR_SYSRESETREQ	= 1UL << 2,					// SYSRESETREQ
+	SCB_AIRCR_VECTCLRACTIVE = 1UL << 1,					// VECTCLRACTIVE
+	SCB_AIRCR_VECTRESET		= 1UL << 0,					// VECTRESET
 };
-static inline void scb_aircr_set_vectkeystat(uint32_t val) { SCB.AIRCR = (SCB.AIRCR & ~SCB_AIRCR_VECTKEYSTAT) | ((val<<16) & SCB_AIRCR_VECTKEYSTAT); }
-static inline void scb_aircr_set_prigroup(uint32_t val) { SCB.AIRCR = (SCB.AIRCR & ~SCB_AIRCR_PRIGROUP) | ((val<<8) & SCB_AIRCR_PRIGROUP); }
-static inline uint32_t scb_aircr_get_vectkeystat(void) { return (SCB.AIRCR & SCB_AIRCR_VECTKEYSTAT) >> 16 ; }
-static inline uint32_t scb_aircr_get_prigroup(void) { return (SCB.AIRCR & SCB_AIRCR_PRIGROUP) >> 8 ; }
+static inline void scb_aircr_set_vectkeystat(uint32_t val) {
+	SCB.AIRCR = (SCB.AIRCR & ~SCB_AIRCR_VECTKEYSTAT) | ((val << 16) & SCB_AIRCR_VECTKEYSTAT);
+}
+static inline void scb_aircr_set_prigroup(uint32_t val) {
+	SCB.AIRCR = (SCB.AIRCR & ~SCB_AIRCR_PRIGROUP) | ((val << 8) & SCB_AIRCR_PRIGROUP);
+}
+static inline uint32_t scb_aircr_get_vectkeystat(void) { return (SCB.AIRCR & SCB_AIRCR_VECTKEYSTAT) >> 16; }
+static inline uint32_t scb_aircr_get_prigroup(void) { return (SCB.AIRCR & SCB_AIRCR_PRIGROUP) >> 8; }
 
 // SCB->SCR System control register
 enum {
-	SCB_SCR_SEVEONPEND = 1UL<<4, // Send Event on Pending bit
-	SCB_SCR_SLEEPDEEP = 1UL<<2, // SLEEPDEEP
-	SCB_SCR_SLEEPONEXIT = 1UL<<1, // SLEEPONEXIT		
+	SCB_SCR_SEVEONPEND	= 1UL << 4,	 // Send Event on Pending bit
+	SCB_SCR_SLEEPDEEP	= 1UL << 2,	 // SLEEPDEEP
+	SCB_SCR_SLEEPONEXIT = 1UL << 1,	 // SLEEPONEXIT
 };
 
 // SCB->CCR Configuration and control register
 enum {
-	SCB_CCR_STKALIGN = 1UL<<9, // STKALIGN
-	SCB_CCR_BFHFNMIGN = 1UL<<8, // BFHFNMIGN
-	SCB_CCR_DIV_0_TRP = 1UL<<4, // DIV_0_TRP
-	SCB_CCR_UNALIGN__TRP = 1UL<<3, // UNALIGN_ TRP
-	SCB_CCR_USERSETMPEND = 1UL<<1, // USERSETMPEND
-	SCB_CCR_NONBASETHRDENA = 1UL<<0, // Configures how the processor enters Thread mode		
+	SCB_CCR_STKALIGN	   = 1UL << 9,	// STKALIGN
+	SCB_CCR_BFHFNMIGN	   = 1UL << 8,	// BFHFNMIGN
+	SCB_CCR_DIV_0_TRP	   = 1UL << 4,	// DIV_0_TRP
+	SCB_CCR_UNALIGN__TRP   = 1UL << 3,	// UNALIGN_ TRP
+	SCB_CCR_USERSETMPEND   = 1UL << 1,	// USERSETMPEND
+	SCB_CCR_NONBASETHRDENA = 1UL << 0,	// Configures how the processor enters Thread mode
 };
 
 // SCB->SHPR1 System handler priority registers
 enum {
-	SCB_SHPR1_PRI_6 = ((1UL<<8)-1) << 16, // Priority of system handler 6
-	SCB_SHPR1_PRI_5 = ((1UL<<8)-1) << 8, // Priority of system handler 5
-	SCB_SHPR1_PRI_4 = ((1UL<<8)-1) << 0, // Priority of system handler 4		
+	SCB_SHPR1_PRI_6 = ((1UL << 8) - 1) << 16,  // Priority of system handler 6
+	SCB_SHPR1_PRI_5 = ((1UL << 8) - 1) << 8,   // Priority of system handler 5
+	SCB_SHPR1_PRI_4 = ((1UL << 8) - 1) << 0,   // Priority of system handler 4
 };
-static inline void scb_shpr1_set_pri_6(uint32_t val) { SCB.SHPR1 = (SCB.SHPR1 & ~SCB_SHPR1_PRI_6) | ((val<<16) & SCB_SHPR1_PRI_6); }
-static inline void scb_shpr1_set_pri_5(uint32_t val) { SCB.SHPR1 = (SCB.SHPR1 & ~SCB_SHPR1_PRI_5) | ((val<<8) & SCB_SHPR1_PRI_5); }
-static inline void scb_shpr1_set_pri_4(uint32_t val) { SCB.SHPR1 = (SCB.SHPR1 & ~SCB_SHPR1_PRI_4) | ((val<<0) & SCB_SHPR1_PRI_4); }
-static inline uint32_t scb_shpr1_get_pri_6(void) { return (SCB.SHPR1 & SCB_SHPR1_PRI_6) >> 16 ; }
-static inline uint32_t scb_shpr1_get_pri_5(void) { return (SCB.SHPR1 & SCB_SHPR1_PRI_5) >> 8 ; }
-static inline uint32_t scb_shpr1_get_pri_4(void) { return (SCB.SHPR1 & SCB_SHPR1_PRI_4) >> 0 ; }
+static inline void scb_shpr1_set_pri_6(uint32_t val) {
+	SCB.SHPR1 = (SCB.SHPR1 & ~SCB_SHPR1_PRI_6) | ((val << 16) & SCB_SHPR1_PRI_6);
+}
+static inline void scb_shpr1_set_pri_5(uint32_t val) {
+	SCB.SHPR1 = (SCB.SHPR1 & ~SCB_SHPR1_PRI_5) | ((val << 8) & SCB_SHPR1_PRI_5);
+}
+static inline void scb_shpr1_set_pri_4(uint32_t val) {
+	SCB.SHPR1 = (SCB.SHPR1 & ~SCB_SHPR1_PRI_4) | ((val << 0) & SCB_SHPR1_PRI_4);
+}
+static inline uint32_t scb_shpr1_get_pri_6(void) { return (SCB.SHPR1 & SCB_SHPR1_PRI_6) >> 16; }
+static inline uint32_t scb_shpr1_get_pri_5(void) { return (SCB.SHPR1 & SCB_SHPR1_PRI_5) >> 8; }
+static inline uint32_t scb_shpr1_get_pri_4(void) { return (SCB.SHPR1 & SCB_SHPR1_PRI_4) >> 0; }
 
 // SCB->SHPR2 System handler priority registers
 enum {
-	SCB_SHPR2_PRI_11 = ((1UL<<8)-1) << 24, // Priority of system handler 11		
+	SCB_SHPR2_PRI_11 = ((1UL << 8) - 1) << 24,	// Priority of system handler 11
 };
-static inline void scb_shpr2_set_pri_11(uint32_t val) { SCB.SHPR2 = (SCB.SHPR2 & ~SCB_SHPR2_PRI_11) | ((val<<24) & SCB_SHPR2_PRI_11); }
-static inline uint32_t scb_shpr2_get_pri_11(void) { return (SCB.SHPR2 & SCB_SHPR2_PRI_11) >> 24 ; }
+static inline void scb_shpr2_set_pri_11(uint32_t val) {
+	SCB.SHPR2 = (SCB.SHPR2 & ~SCB_SHPR2_PRI_11) | ((val << 24) & SCB_SHPR2_PRI_11);
+}
+static inline uint32_t scb_shpr2_get_pri_11(void) { return (SCB.SHPR2 & SCB_SHPR2_PRI_11) >> 24; }
 
 // SCB->SHPR3 System handler priority registers
 enum {
-	SCB_SHPR3_PRI_15 = ((1UL<<8)-1) << 24, // Priority of system handler 15
-	SCB_SHPR3_PRI_14 = ((1UL<<8)-1) << 16, // Priority of system handler 14		
+	SCB_SHPR3_PRI_15 = ((1UL << 8) - 1) << 24,	// Priority of system handler 15
+	SCB_SHPR3_PRI_14 = ((1UL << 8) - 1) << 16,	// Priority of system handler 14
 };
-static inline void scb_shpr3_set_pri_15(uint32_t val) { SCB.SHPR3 = (SCB.SHPR3 & ~SCB_SHPR3_PRI_15) | ((val<<24) & SCB_SHPR3_PRI_15); }
-static inline void scb_shpr3_set_pri_14(uint32_t val) { SCB.SHPR3 = (SCB.SHPR3 & ~SCB_SHPR3_PRI_14) | ((val<<16) & SCB_SHPR3_PRI_14); }
-static inline uint32_t scb_shpr3_get_pri_15(void) { return (SCB.SHPR3 & SCB_SHPR3_PRI_15) >> 24 ; }
-static inline uint32_t scb_shpr3_get_pri_14(void) { return (SCB.SHPR3 & SCB_SHPR3_PRI_14) >> 16 ; }
+static inline void scb_shpr3_set_pri_15(uint32_t val) {
+	SCB.SHPR3 = (SCB.SHPR3 & ~SCB_SHPR3_PRI_15) | ((val << 24) & SCB_SHPR3_PRI_15);
+}
+static inline void scb_shpr3_set_pri_14(uint32_t val) {
+	SCB.SHPR3 = (SCB.SHPR3 & ~SCB_SHPR3_PRI_14) | ((val << 16) & SCB_SHPR3_PRI_14);
+}
+static inline uint32_t scb_shpr3_get_pri_15(void) { return (SCB.SHPR3 & SCB_SHPR3_PRI_15) >> 24; }
+static inline uint32_t scb_shpr3_get_pri_14(void) { return (SCB.SHPR3 & SCB_SHPR3_PRI_14) >> 16; }
 
 // SCB->SHCSR System handler control and state register
 enum {
-	SCB_SHCSR_USGFAULTENA = 1UL<<18, // Usage fault enable bit
-	SCB_SHCSR_BUSFAULTENA = 1UL<<17, // Bus fault enable bit
-	SCB_SHCSR_MEMFAULTENA = 1UL<<16, // Memory management fault enable bit
-	SCB_SHCSR_SVCALLPENDED = 1UL<<15, // SVC call pending bit
-	SCB_SHCSR_BUSFAULTPENDED = 1UL<<14, // Bus fault exception pending bit
-	SCB_SHCSR_MEMFAULTPENDED = 1UL<<13, // Memory management fault exception pending bit
-	SCB_SHCSR_USGFAULTPENDED = 1UL<<12, // Usage fault exception pending bit
-	SCB_SHCSR_SYSTICKACT = 1UL<<11, // SysTick exception active bit
-	SCB_SHCSR_PENDSVACT = 1UL<<10, // PendSV exception active bit
-	SCB_SHCSR_MONITORACT = 1UL<<8, // Debug monitor active bit
-	SCB_SHCSR_SVCALLACT = 1UL<<7, // SVC call active bit
-	SCB_SHCSR_USGFAULTACT = 1UL<<3, // Usage fault exception active bit
-	SCB_SHCSR_BUSFAULTACT = 1UL<<1, // Bus fault exception active bit
-	SCB_SHCSR_MEMFAULTACT = 1UL<<0, // Memory management fault exception active bit		
+	SCB_SHCSR_USGFAULTENA	 = 1UL << 18,  // Usage fault enable bit
+	SCB_SHCSR_BUSFAULTENA	 = 1UL << 17,  // Bus fault enable bit
+	SCB_SHCSR_MEMFAULTENA	 = 1UL << 16,  // Memory management fault enable bit
+	SCB_SHCSR_SVCALLPENDED	 = 1UL << 15,  // SVC call pending bit
+	SCB_SHCSR_BUSFAULTPENDED = 1UL << 14,  // Bus fault exception pending bit
+	SCB_SHCSR_MEMFAULTPENDED = 1UL << 13,  // Memory management fault exception pending bit
+	SCB_SHCSR_USGFAULTPENDED = 1UL << 12,  // Usage fault exception pending bit
+	SCB_SHCSR_SYSTICKACT	 = 1UL << 11,  // SysTick exception active bit
+	SCB_SHCSR_PENDSVACT		 = 1UL << 10,  // PendSV exception active bit
+	SCB_SHCSR_MONITORACT	 = 1UL << 8,   // Debug monitor active bit
+	SCB_SHCSR_SVCALLACT		 = 1UL << 7,   // SVC call active bit
+	SCB_SHCSR_USGFAULTACT	 = 1UL << 3,   // Usage fault exception active bit
+	SCB_SHCSR_BUSFAULTACT	 = 1UL << 1,   // Bus fault exception active bit
+	SCB_SHCSR_MEMFAULTACT	 = 1UL << 0,   // Memory management fault exception active bit
 };
 
 // SCB->CFSR_UFSR_BFSR_MMFSR Configurable fault status register
 enum {
-	SCB_CFSR_UFSR_BFSR_MMFSR_DIVBYZERO = 1UL<<25, // Divide by zero usage fault
-	SCB_CFSR_UFSR_BFSR_MMFSR_UNALIGNED = 1UL<<24, // Unaligned access usage fault
-	SCB_CFSR_UFSR_BFSR_MMFSR_NOCP = 1UL<<19, // No coprocessor usage fault.
-	SCB_CFSR_UFSR_BFSR_MMFSR_INVPC = 1UL<<18, // Invalid PC load usage fault
-	SCB_CFSR_UFSR_BFSR_MMFSR_INVSTATE = 1UL<<17, // Invalid state usage fault
-	SCB_CFSR_UFSR_BFSR_MMFSR_UNDEFINSTR = 1UL<<16, // Undefined instruction usage fault
-	SCB_CFSR_UFSR_BFSR_MMFSR_BFARVALID = 1UL<<15, // Bus Fault Address Register (BFAR) valid flag
-	SCB_CFSR_UFSR_BFSR_MMFSR_LSPERR = 1UL<<13, // Bus fault on floating-point lazy state preservation
-	SCB_CFSR_UFSR_BFSR_MMFSR_STKERR = 1UL<<12, // Bus fault on stacking for exception entry
-	SCB_CFSR_UFSR_BFSR_MMFSR_UNSTKERR = 1UL<<11, // Bus fault on unstacking for a return from exception
-	SCB_CFSR_UFSR_BFSR_MMFSR_IMPRECISERR = 1UL<<10, // Imprecise data bus error
-	SCB_CFSR_UFSR_BFSR_MMFSR_PRECISERR = 1UL<<9, // Precise data bus error
-	SCB_CFSR_UFSR_BFSR_MMFSR_IBUSERR = 1UL<<8, // Instruction bus error
-	SCB_CFSR_UFSR_BFSR_MMFSR_MMARVALID = 1UL<<7, // Memory Management Fault Address Register (MMAR) valid flag
-	SCB_CFSR_UFSR_BFSR_MMFSR_MLSPERR = 1UL<<5, // MLSPERR
-	SCB_CFSR_UFSR_BFSR_MMFSR_MSTKERR = 1UL<<4, // Memory manager fault on stacking for exception entry.
-	SCB_CFSR_UFSR_BFSR_MMFSR_MUNSTKERR = 1UL<<3, // Memory manager fault on unstacking for a return from exception
-	SCB_CFSR_UFSR_BFSR_MMFSR_IACCVIOL = 1UL<<1, // Instruction access violation flag		
+	SCB_CFSR_UFSR_BFSR_MMFSR_DIVBYZERO	 = 1UL << 25,  // Divide by zero usage fault
+	SCB_CFSR_UFSR_BFSR_MMFSR_UNALIGNED	 = 1UL << 24,  // Unaligned access usage fault
+	SCB_CFSR_UFSR_BFSR_MMFSR_NOCP		 = 1UL << 19,  // No coprocessor usage fault.
+	SCB_CFSR_UFSR_BFSR_MMFSR_INVPC		 = 1UL << 18,  // Invalid PC load usage fault
+	SCB_CFSR_UFSR_BFSR_MMFSR_INVSTATE	 = 1UL << 17,  // Invalid state usage fault
+	SCB_CFSR_UFSR_BFSR_MMFSR_UNDEFINSTR	 = 1UL << 16,  // Undefined instruction usage fault
+	SCB_CFSR_UFSR_BFSR_MMFSR_BFARVALID	 = 1UL << 15,  // Bus Fault Address Register (BFAR) valid flag
+	SCB_CFSR_UFSR_BFSR_MMFSR_LSPERR		 = 1UL << 13,  // Bus fault on floating-point lazy state preservation
+	SCB_CFSR_UFSR_BFSR_MMFSR_STKERR		 = 1UL << 12,  // Bus fault on stacking for exception entry
+	SCB_CFSR_UFSR_BFSR_MMFSR_UNSTKERR	 = 1UL << 11,  // Bus fault on unstacking for a return from exception
+	SCB_CFSR_UFSR_BFSR_MMFSR_IMPRECISERR = 1UL << 10,  // Imprecise data bus error
+	SCB_CFSR_UFSR_BFSR_MMFSR_PRECISERR	 = 1UL << 9,   // Precise data bus error
+	SCB_CFSR_UFSR_BFSR_MMFSR_IBUSERR	 = 1UL << 8,   // Instruction bus error
+	SCB_CFSR_UFSR_BFSR_MMFSR_MMARVALID	 = 1UL << 7,   // Memory Management Fault Address Register (MMAR) valid flag
+	SCB_CFSR_UFSR_BFSR_MMFSR_MLSPERR	 = 1UL << 5,   // MLSPERR
+	SCB_CFSR_UFSR_BFSR_MMFSR_MSTKERR	 = 1UL << 4,   // Memory manager fault on stacking for exception entry.
+	SCB_CFSR_UFSR_BFSR_MMFSR_MUNSTKERR	 = 1UL << 3,   // Memory manager fault on unstacking for a return from exception
+	SCB_CFSR_UFSR_BFSR_MMFSR_IACCVIOL	 = 1UL << 1,   // Instruction access violation flag
 };
 
 // SCB->HFSR Hard fault status register
 enum {
-	SCB_HFSR_DEBUG_VT = 1UL<<31, // Reserved for Debug use
-	SCB_HFSR_FORCED = 1UL<<30, // Forced hard fault
-	SCB_HFSR_VECTTBL = 1UL<<1, // Vector table hard fault		
+	SCB_HFSR_DEBUG_VT = 1UL << 31,	// Reserved for Debug use
+	SCB_HFSR_FORCED	  = 1UL << 30,	// Forced hard fault
+	SCB_HFSR_VECTTBL  = 1UL << 1,	// Vector table hard fault
 };
 
 /* System control block ACTLR
 There is only one peripheral of type SCB_ACTRL. */
 struct SCB_ACTRL_Type {
-	__IO uint16_t ACTRL; // @0 Auxiliary control register
+	__IO uint16_t ACTRL;  // @0 Auxiliary control register
 };
-extern struct SCB_ACTRL_Type	SCB_ACTRL;	// @0xE000E008 
+extern struct SCB_ACTRL_Type SCB_ACTRL;	 // @0xE000E008
 
 // SCB_ACTRL->ACTRL Auxiliary control register
 enum {
-	SCB_ACTRL_ACTRL_DISOOFP = 1UL<<9, // DISOOFP
-	SCB_ACTRL_ACTRL_DISFPCA = 1UL<<8, // DISFPCA
-	SCB_ACTRL_ACTRL_DISFOLD = 1UL<<2, // DISFOLD
-	SCB_ACTRL_ACTRL_DISDEFWBUF = 1UL<<1, // DISDEFWBUF
-	SCB_ACTRL_ACTRL_DISMCYCINT = 1UL<<0, // DISMCYCINT		
+	SCB_ACTRL_ACTRL_DISOOFP	   = 1UL << 9,	// DISOOFP
+	SCB_ACTRL_ACTRL_DISFPCA	   = 1UL << 8,	// DISFPCA
+	SCB_ACTRL_ACTRL_DISFOLD	   = 1UL << 2,	// DISFOLD
+	SCB_ACTRL_ACTRL_DISDEFWBUF = 1UL << 1,	// DISDEFWBUF
+	SCB_ACTRL_ACTRL_DISMCYCINT = 1UL << 0,	// DISMCYCINT
 };
 
 /* Serial peripheral interface/Inter-IC sound */
 struct SPI_Type {
-	__IO uint16_t CR1; // @0 control register 1
-	 uint8_t RESERVED0[2]; // @2 
-	__IO uint16_t CR2; // @4 control register 2
-	 uint8_t RESERVED1[2]; // @6 
-	__IO uint16_t SR; // @8 status register
-	 uint8_t RESERVED2[2]; // @10 
-	__IO uint16_t DR; // @12 data register
-	 uint8_t RESERVED3[2]; // @14 
-	__IO uint16_t CRCPR; // @16 CRC polynomial register
-	 uint8_t RESERVED4[2]; // @18 
-	__I uint16_t RXCRCR; // @20 RX CRC register
-	 uint8_t RESERVED5[2]; // @22 
-	__I uint16_t TXCRCR; // @24 TX CRC register
+	__IO uint16_t CR1;			 // @0 control register 1
+	uint8_t		  RESERVED0[2];	 // @2
+	__IO uint16_t CR2;			 // @4 control register 2
+	uint8_t		  RESERVED1[2];	 // @6
+	__IO uint16_t SR;			 // @8 status register
+	uint8_t		  RESERVED2[2];	 // @10
+	__IO uint16_t DR;			 // @12 data register
+	uint8_t		  RESERVED3[2];	 // @14
+	__IO uint16_t CRCPR;		 // @16 CRC polynomial register
+	uint8_t		  RESERVED4[2];	 // @18
+	__I uint16_t  RXCRCR;		 // @20 RX CRC register
+	uint8_t		  RESERVED5[2];	 // @22
+	__I uint16_t  TXCRCR;		 // @24 TX CRC register
 };
-extern struct SPI_Type	SPI1;	// @0x40013000 
-extern struct SPI_Type 	SPI2;	// @0x40003800
-extern struct SPI_Type 	SPI3;	// @0x40003C00
+extern struct SPI_Type SPI1;  // @0x40013000
+extern struct SPI_Type SPI2;  // @0x40003800
+extern struct SPI_Type SPI3;  // @0x40003C00
 
 // SPI->CR1 control register 1
 enum {
-	SPI_CR1_BIDIMODE = 1UL<<15, // Bidirectional data mode enable
-	SPI_CR1_BIDIOE = 1UL<<14, // Output enable in bidirectional mode
-	SPI_CR1_CRCEN = 1UL<<13, // Hardware CRC calculation enable
-	SPI_CR1_CRCNEXT = 1UL<<12, // CRC transfer next
-	SPI_CR1_DFF = 1UL<<11, // Data frame format
-	SPI_CR1_RXONLY = 1UL<<10, // Receive only
-	SPI_CR1_SSM = 1UL<<9, // Software slave management
-	SPI_CR1_SSI = 1UL<<8, // Internal slave select
-	SPI_CR1_LSBFIRST = 1UL<<7, // Frame format
-	SPI_CR1_SPE = 1UL<<6, // SPI enable
-	SPI_CR1_BR = ((1UL<<3)-1) << 3, // Baud rate control
-	SPI_CR1_MSTR = 1UL<<2, // Master selection
-	SPI_CR1_CPOL = 1UL<<1, // Clock polarity
-	SPI_CR1_CPHA = 1UL<<0, // Clock phase		
+	SPI_CR1_BIDIMODE = 1UL << 15,			   // Bidirectional data mode enable
+	SPI_CR1_BIDIOE	 = 1UL << 14,			   // Output enable in bidirectional mode
+	SPI_CR1_CRCEN	 = 1UL << 13,			   // Hardware CRC calculation enable
+	SPI_CR1_CRCNEXT	 = 1UL << 12,			   // CRC transfer next
+	SPI_CR1_DFF		 = 1UL << 11,			   // Data frame format
+	SPI_CR1_RXONLY	 = 1UL << 10,			   // Receive only
+	SPI_CR1_SSM		 = 1UL << 9,			   // Software slave management
+	SPI_CR1_SSI		 = 1UL << 8,			   // Internal slave select
+	SPI_CR1_LSBFIRST = 1UL << 7,			   // Frame format
+	SPI_CR1_SPE		 = 1UL << 6,			   // SPI enable
+	SPI_CR1_BR		 = ((1UL << 3) - 1) << 3,  // Baud rate control
+	SPI_CR1_MSTR	 = 1UL << 2,			   // Master selection
+	SPI_CR1_CPOL	 = 1UL << 1,			   // Clock polarity
+	SPI_CR1_CPHA	 = 1UL << 0,			   // Clock phase
 };
-static inline void spi_cr1_set_br(struct SPI_Type* p, uint32_t val) { p->CR1 = (p->CR1 & ~SPI_CR1_BR) | ((val<<3) & SPI_CR1_BR); }
-static inline uint32_t spi_cr1_get_br(struct SPI_Type* p) { return (p->CR1 & SPI_CR1_BR) >> 3 ; }
+static inline void spi_cr1_set_br(struct SPI_Type *p, uint32_t val) { p->CR1 = (p->CR1 & ~SPI_CR1_BR) | ((val << 3) & SPI_CR1_BR); }
+static inline uint32_t spi_cr1_get_br(struct SPI_Type *p) { return (p->CR1 & SPI_CR1_BR) >> 3; }
 
 // SPI->CR2 control register 2
 enum {
-	SPI_CR2_LDMA_TX = 1UL<<14, // Last DMA transfer for transmission
-	SPI_CR2_LDMA_RX = 1UL<<13, // Last DMA transfer for reception
-	SPI_CR2_FRXTH = 1UL<<12, // FIFO reception threshold
-	SPI_CR2_DS = ((1UL<<4)-1) << 8, // Data size
-	SPI_CR2_TXEIE = 1UL<<7, // Tx buffer empty interrupt enable
-	SPI_CR2_RXNEIE = 1UL<<6, // RX buffer not empty interrupt enable
-	SPI_CR2_ERRIE = 1UL<<5, // Error interrupt enable
-	SPI_CR2_FRF = 1UL<<4, // Frame format
-	SPI_CR2_NSSP = 1UL<<3, // NSS pulse management
-	SPI_CR2_SSOE = 1UL<<2, // SS output enable
-	SPI_CR2_TXDMAEN = 1UL<<1, // Tx buffer DMA enable
-	SPI_CR2_RXDMAEN = 1UL<<0, // Rx buffer DMA enable		
+	SPI_CR2_LDMA_TX = 1UL << 14,			  // Last DMA transfer for transmission
+	SPI_CR2_LDMA_RX = 1UL << 13,			  // Last DMA transfer for reception
+	SPI_CR2_FRXTH	= 1UL << 12,			  // FIFO reception threshold
+	SPI_CR2_DS		= ((1UL << 4) - 1) << 8,  // Data size
+	SPI_CR2_TXEIE	= 1UL << 7,				  // Tx buffer empty interrupt enable
+	SPI_CR2_RXNEIE	= 1UL << 6,				  // RX buffer not empty interrupt enable
+	SPI_CR2_ERRIE	= 1UL << 5,				  // Error interrupt enable
+	SPI_CR2_FRF		= 1UL << 4,				  // Frame format
+	SPI_CR2_NSSP	= 1UL << 3,				  // NSS pulse management
+	SPI_CR2_SSOE	= 1UL << 2,				  // SS output enable
+	SPI_CR2_TXDMAEN = 1UL << 1,				  // Tx buffer DMA enable
+	SPI_CR2_RXDMAEN = 1UL << 0,				  // Rx buffer DMA enable
 };
-static inline void spi_cr2_set_ds(struct SPI_Type* p, uint32_t val) { p->CR2 = (p->CR2 & ~SPI_CR2_DS) | ((val<<8) & SPI_CR2_DS); }
-static inline uint32_t spi_cr2_get_ds(struct SPI_Type* p) { return (p->CR2 & SPI_CR2_DS) >> 8 ; }
+static inline void spi_cr2_set_ds(struct SPI_Type *p, uint32_t val) { p->CR2 = (p->CR2 & ~SPI_CR2_DS) | ((val << 8) & SPI_CR2_DS); }
+static inline uint32_t spi_cr2_get_ds(struct SPI_Type *p) { return (p->CR2 & SPI_CR2_DS) >> 8; }
 
 // SPI->SR status register
 enum {
-	SPI_SR_FTLVL = ((1UL<<2)-1) << 11, // FIFO transmission level
-	SPI_SR_FRLVL = ((1UL<<2)-1) << 9, // FIFO reception level
-	SPI_SR_TIFRFE = 1UL<<8, // TI frame format error
-	SPI_SR_BSY = 1UL<<7, // Busy flag
-	SPI_SR_OVR = 1UL<<6, // Overrun flag
-	SPI_SR_MODF = 1UL<<5, // Mode fault
-	SPI_SR_CRCERR = 1UL<<4, // CRC error flag
-	SPI_SR_TXE = 1UL<<1, // Transmit buffer empty
-	SPI_SR_RXNE = 1UL<<0, // Receive buffer not empty		
+	SPI_SR_FTLVL  = ((1UL << 2) - 1) << 11,	 // FIFO transmission level
+	SPI_SR_FRLVL  = ((1UL << 2) - 1) << 9,	 // FIFO reception level
+	SPI_SR_TIFRFE = 1UL << 8,				 // TI frame format error
+	SPI_SR_BSY	  = 1UL << 7,				 // Busy flag
+	SPI_SR_OVR	  = 1UL << 6,				 // Overrun flag
+	SPI_SR_MODF	  = 1UL << 5,				 // Mode fault
+	SPI_SR_CRCERR = 1UL << 4,				 // CRC error flag
+	SPI_SR_TXE	  = 1UL << 1,				 // Transmit buffer empty
+	SPI_SR_RXNE	  = 1UL << 0,				 // Receive buffer not empty
 };
-static inline void spi_sr_set_ftlvl(struct SPI_Type* p, uint32_t val) { p->SR = (p->SR & ~SPI_SR_FTLVL) | ((val<<11) & SPI_SR_FTLVL); }
-static inline void spi_sr_set_frlvl(struct SPI_Type* p, uint32_t val) { p->SR = (p->SR & ~SPI_SR_FRLVL) | ((val<<9) & SPI_SR_FRLVL); }
-static inline uint32_t spi_sr_get_ftlvl(struct SPI_Type* p) { return (p->SR & SPI_SR_FTLVL) >> 11 ; }
-static inline uint32_t spi_sr_get_frlvl(struct SPI_Type* p) { return (p->SR & SPI_SR_FRLVL) >> 9 ; }
-
-
+static inline void spi_sr_set_ftlvl(struct SPI_Type *p, uint32_t val) {
+	p->SR = (p->SR & ~SPI_SR_FTLVL) | ((val << 11) & SPI_SR_FTLVL);
+}
+static inline void spi_sr_set_frlvl(struct SPI_Type *p, uint32_t val) {
+	p->SR = (p->SR & ~SPI_SR_FRLVL) | ((val << 9) & SPI_SR_FRLVL);
+}
+static inline uint32_t spi_sr_get_ftlvl(struct SPI_Type *p) { return (p->SR & SPI_SR_FTLVL) >> 11; }
+static inline uint32_t spi_sr_get_frlvl(struct SPI_Type *p) { return (p->SR & SPI_SR_FRLVL) >> 9; }
 
 /* SysTick timer
 There is only one peripheral of type STK. */
 struct STK_Type {
-	__IO uint32_t CTRL; // @0 SysTick control and status register
-	__IO uint32_t LOAD; // @4 SysTick reload value register
-	__IO uint32_t VAL; // @8 SysTick current value register
-	__IO uint32_t CALIB; // @12 SysTick calibration value register
+	__IO uint32_t CTRL;	  // @0 SysTick control and status register
+	__IO uint32_t LOAD;	  // @4 SysTick reload value register
+	__IO uint32_t VAL;	  // @8 SysTick current value register
+	__IO uint32_t CALIB;  // @12 SysTick calibration value register
 };
-extern struct STK_Type	STK;	// @0xE000E010 
+extern struct STK_Type STK;	 // @0xE000E010
 
 // STK->CTRL SysTick control and status register
 enum {
-	STK_CTRL_COUNTFLAG = 1UL<<16, // COUNTFLAG
-	STK_CTRL_CLKSOURCE = 1UL<<2, // Clock source selection
-	STK_CTRL_TICKINT = 1UL<<1, // SysTick exception request enable
-	STK_CTRL_ENABLE = 1UL<<0, // Counter enable		
+	STK_CTRL_COUNTFLAG = 1UL << 16,	 // COUNTFLAG
+	STK_CTRL_CLKSOURCE = 1UL << 2,	 // Clock source selection
+	STK_CTRL_TICKINT   = 1UL << 1,	 // SysTick exception request enable
+	STK_CTRL_ENABLE	   = 1UL << 0,	 // Counter enable
 };
 
 // STK->LOAD SysTick reload value register
 enum {
-	STK_LOAD_RELOAD = ((1UL<<24)-1) << 0, // RELOAD value		
+	STK_LOAD_RELOAD = ((1UL << 24) - 1) << 0,  // RELOAD value
 };
-static inline void stk_load_set_reload(uint32_t val) { STK.LOAD = (STK.LOAD & ~STK_LOAD_RELOAD) | ((val<<0) & STK_LOAD_RELOAD); }
-static inline uint32_t stk_load_get_reload(void) { return (STK.LOAD & STK_LOAD_RELOAD) >> 0 ; }
+static inline void stk_load_set_reload(uint32_t val) { STK.LOAD = (STK.LOAD & ~STK_LOAD_RELOAD) | ((val << 0) & STK_LOAD_RELOAD); }
+static inline uint32_t stk_load_get_reload(void) { return (STK.LOAD & STK_LOAD_RELOAD) >> 0; }
 
 // STK->VAL SysTick current value register
 enum {
-	STK_VAL_CURRENT = ((1UL<<24)-1) << 0, // Current counter value		
+	STK_VAL_CURRENT = ((1UL << 24) - 1) << 0,  // Current counter value
 };
-static inline void stk_val_set_current(uint32_t val) { STK.VAL = (STK.VAL & ~STK_VAL_CURRENT) | ((val<<0) & STK_VAL_CURRENT); }
-static inline uint32_t stk_val_get_current(void) { return (STK.VAL & STK_VAL_CURRENT) >> 0 ; }
+static inline void stk_val_set_current(uint32_t val) { STK.VAL = (STK.VAL & ~STK_VAL_CURRENT) | ((val << 0) & STK_VAL_CURRENT); }
+static inline uint32_t stk_val_get_current(void) { return (STK.VAL & STK_VAL_CURRENT) >> 0; }
 
 // STK->CALIB SysTick calibration value register
 enum {
-	STK_CALIB_NOREF = 1UL<<31, // NOREF flag. Reads as zero
-	STK_CALIB_SKEW = 1UL<<30, // SKEW flag: Indicates whether the TENMS value is exact
-	STK_CALIB_TENMS = ((1UL<<24)-1) << 0, // Calibration value		
+	STK_CALIB_NOREF = 1UL << 31,			   // NOREF flag. Reads as zero
+	STK_CALIB_SKEW	= 1UL << 30,			   // SKEW flag: Indicates whether the TENMS value is exact
+	STK_CALIB_TENMS = ((1UL << 24) - 1) << 0,  // Calibration value
 };
-static inline void stk_calib_set_tenms(uint32_t val) { STK.CALIB = (STK.CALIB & ~STK_CALIB_TENMS) | ((val<<0) & STK_CALIB_TENMS); }
-static inline uint32_t stk_calib_get_tenms(void) { return (STK.CALIB & STK_CALIB_TENMS) >> 0 ; }
+static inline void stk_calib_set_tenms(uint32_t val) {
+	STK.CALIB = (STK.CALIB & ~STK_CALIB_TENMS) | ((val << 0) & STK_CALIB_TENMS);
+}
+static inline uint32_t stk_calib_get_tenms(void) { return (STK.CALIB & STK_CALIB_TENMS) >> 0; }
 
 /* System configuration controller
 There is only one peripheral of type SYSCFG. */
 struct SYSCFG_Type {
-	__IO uint16_t MEMRMP; // @0 memory remap register
-	 uint8_t RESERVED0[2]; // @2 
-	__IO uint32_t CFGR1; // @4 configuration register 1
-	__IO uint16_t EXTICR1; // @8 external interrupt configuration register 1
-	 uint8_t RESERVED1[2]; // @10 
-	__IO uint16_t EXTICR2; // @12 external interrupt configuration register 2
-	 uint8_t RESERVED2[2]; // @14 
-	__IO uint16_t EXTICR3; // @16 external interrupt configuration register 3
-	 uint8_t RESERVED3[2]; // @18 
-	__IO uint16_t EXTICR4; // @20 external interrupt configuration register 4
-	 uint8_t RESERVED4[2]; // @22 
-	__IO uint8_t SCSR; // @24 SCSR
-	 uint8_t RESERVED5[3]; // @25 
-	__IO uint16_t CFGR2; // @28 CFGR2
-	 uint8_t RESERVED6[2]; // @30 
-	__O uint32_t SWPR; // @32 SWPR
-	__O uint8_t SKR; // @36 SKR
+	__IO uint16_t MEMRMP;		 // @0 memory remap register
+	uint8_t		  RESERVED0[2];	 // @2
+	__IO uint32_t CFGR1;		 // @4 configuration register 1
+	__IO uint16_t EXTICR1;		 // @8 external interrupt configuration register 1
+	uint8_t		  RESERVED1[2];	 // @10
+	__IO uint16_t EXTICR2;		 // @12 external interrupt configuration register 2
+	uint8_t		  RESERVED2[2];	 // @14
+	__IO uint16_t EXTICR3;		 // @16 external interrupt configuration register 3
+	uint8_t		  RESERVED3[2];	 // @18
+	__IO uint16_t EXTICR4;		 // @20 external interrupt configuration register 4
+	uint8_t		  RESERVED4[2];	 // @22
+	__IO uint8_t  SCSR;			 // @24 SCSR
+	uint8_t		  RESERVED5[3];	 // @25
+	__IO uint16_t CFGR2;		 // @28 CFGR2
+	uint8_t		  RESERVED6[2];	 // @30
+	__O uint32_t  SWPR;			 // @32 SWPR
+	__O uint8_t	  SKR;			 // @36 SKR
 };
-extern struct SYSCFG_Type	SYSCFG;	// @0x40010000 
+extern struct SYSCFG_Type SYSCFG;  // @0x40010000
 
 // SYSCFG->MEMRMP memory remap register
 enum {
-	SYSCFG_MEMRMP_FB_MODE = 1UL<<8, // Flash Bank mode selection
-	SYSCFG_MEMRMP_QFS = 1UL<<3, // QUADSPI memory mapping swap
-	SYSCFG_MEMRMP_MEM_MODE = ((1UL<<3)-1) << 0, // Memory mapping selection		
+	SYSCFG_MEMRMP_FB_MODE  = 1UL << 8,				 // Flash Bank mode selection
+	SYSCFG_MEMRMP_QFS	   = 1UL << 3,				 // QUADSPI memory mapping swap
+	SYSCFG_MEMRMP_MEM_MODE = ((1UL << 3) - 1) << 0,	 // Memory mapping selection
 };
-static inline void syscfg_memrmp_set_mem_mode(uint32_t val) { SYSCFG.MEMRMP = (SYSCFG.MEMRMP & ~SYSCFG_MEMRMP_MEM_MODE) | ((val<<0) & SYSCFG_MEMRMP_MEM_MODE); }
-static inline uint32_t syscfg_memrmp_get_mem_mode(void) { return (SYSCFG.MEMRMP & SYSCFG_MEMRMP_MEM_MODE) >> 0 ; }
+static inline void syscfg_memrmp_set_mem_mode(uint32_t val) {
+	SYSCFG.MEMRMP = (SYSCFG.MEMRMP & ~SYSCFG_MEMRMP_MEM_MODE) | ((val << 0) & SYSCFG_MEMRMP_MEM_MODE);
+}
+static inline uint32_t syscfg_memrmp_get_mem_mode(void) { return (SYSCFG.MEMRMP & SYSCFG_MEMRMP_MEM_MODE) >> 0; }
 
 // SYSCFG->CFGR1 configuration register 1
 enum {
-	SYSCFG_CFGR1_FPU_IE = ((1UL<<6)-1) << 26, // Floating Point Unit interrupts enable bits
-	SYSCFG_CFGR1_I2C3_FMP = 1UL<<22, // I2C3 Fast-mode Plus driving capability activation
-	SYSCFG_CFGR1_I2C2_FMP = 1UL<<21, // I2C2 Fast-mode Plus driving capability activation
-	SYSCFG_CFGR1_I2C1_FMP = 1UL<<20, // I2C1 Fast-mode Plus driving capability activation
-	SYSCFG_CFGR1_I2C_PB9_FMP = 1UL<<19, // Fast-mode Plus (Fm+) driving capability activation on PB9
-	SYSCFG_CFGR1_I2C_PB8_FMP = 1UL<<18, // Fast-mode Plus (Fm+) driving capability activation on PB8
-	SYSCFG_CFGR1_I2C_PB7_FMP = 1UL<<17, // Fast-mode Plus (Fm+) driving capability activation on PB7
-	SYSCFG_CFGR1_I2C_PB6_FMP = 1UL<<16, // Fast-mode Plus (Fm+) driving capability activation on PB6
-	SYSCFG_CFGR1_BOOSTEN = 1UL<<8, // I/O analog switch voltage booster enable
-	SYSCFG_CFGR1_FWDIS = 1UL<<0, // Firewall disable		
+	SYSCFG_CFGR1_FPU_IE		 = ((1UL << 6) - 1) << 26,	// Floating Point Unit interrupts enable bits
+	SYSCFG_CFGR1_I2C3_FMP	 = 1UL << 22,				// I2C3 Fast-mode Plus driving capability activation
+	SYSCFG_CFGR1_I2C2_FMP	 = 1UL << 21,				// I2C2 Fast-mode Plus driving capability activation
+	SYSCFG_CFGR1_I2C1_FMP	 = 1UL << 20,				// I2C1 Fast-mode Plus driving capability activation
+	SYSCFG_CFGR1_I2C_PB9_FMP = 1UL << 19,				// Fast-mode Plus (Fm+) driving capability activation on PB9
+	SYSCFG_CFGR1_I2C_PB8_FMP = 1UL << 18,				// Fast-mode Plus (Fm+) driving capability activation on PB8
+	SYSCFG_CFGR1_I2C_PB7_FMP = 1UL << 17,				// Fast-mode Plus (Fm+) driving capability activation on PB7
+	SYSCFG_CFGR1_I2C_PB6_FMP = 1UL << 16,				// Fast-mode Plus (Fm+) driving capability activation on PB6
+	SYSCFG_CFGR1_BOOSTEN	 = 1UL << 8,				// I/O analog switch voltage booster enable
+	SYSCFG_CFGR1_FWDIS		 = 1UL << 0,				// Firewall disable
 };
-static inline void syscfg_cfgr1_set_fpu_ie(uint32_t val) { SYSCFG.CFGR1 = (SYSCFG.CFGR1 & ~SYSCFG_CFGR1_FPU_IE) | ((val<<26) & SYSCFG_CFGR1_FPU_IE); }
-static inline uint32_t syscfg_cfgr1_get_fpu_ie(void) { return (SYSCFG.CFGR1 & SYSCFG_CFGR1_FPU_IE) >> 26 ; }
+static inline void syscfg_cfgr1_set_fpu_ie(uint32_t val) {
+	SYSCFG.CFGR1 = (SYSCFG.CFGR1 & ~SYSCFG_CFGR1_FPU_IE) | ((val << 26) & SYSCFG_CFGR1_FPU_IE);
+}
+static inline uint32_t syscfg_cfgr1_get_fpu_ie(void) { return (SYSCFG.CFGR1 & SYSCFG_CFGR1_FPU_IE) >> 26; }
 
 // SYSCFG->EXTICR1 external interrupt configuration register 1
 enum {
-	SYSCFG_EXTICR1_EXTI3 = ((1UL<<3)-1) << 12, // EXTI 3 configuration bits
-	SYSCFG_EXTICR1_EXTI2 = ((1UL<<3)-1) << 8, // EXTI 2 configuration bits
-	SYSCFG_EXTICR1_EXTI1 = ((1UL<<3)-1) << 4, // EXTI 1 configuration bits
-	SYSCFG_EXTICR1_EXTI0 = ((1UL<<3)-1) << 0, // EXTI 0 configuration bits		
+	SYSCFG_EXTICR1_EXTI3 = ((1UL << 3) - 1) << 12,	// EXTI 3 configuration bits
+	SYSCFG_EXTICR1_EXTI2 = ((1UL << 3) - 1) << 8,	// EXTI 2 configuration bits
+	SYSCFG_EXTICR1_EXTI1 = ((1UL << 3) - 1) << 4,	// EXTI 1 configuration bits
+	SYSCFG_EXTICR1_EXTI0 = ((1UL << 3) - 1) << 0,	// EXTI 0 configuration bits
 };
-static inline void syscfg_exticr1_set_exti3(uint32_t val) { SYSCFG.EXTICR1 = (SYSCFG.EXTICR1 & ~SYSCFG_EXTICR1_EXTI3) | ((val<<12) & SYSCFG_EXTICR1_EXTI3); }
-static inline void syscfg_exticr1_set_exti2(uint32_t val) { SYSCFG.EXTICR1 = (SYSCFG.EXTICR1 & ~SYSCFG_EXTICR1_EXTI2) | ((val<<8) & SYSCFG_EXTICR1_EXTI2); }
-static inline void syscfg_exticr1_set_exti1(uint32_t val) { SYSCFG.EXTICR1 = (SYSCFG.EXTICR1 & ~SYSCFG_EXTICR1_EXTI1) | ((val<<4) & SYSCFG_EXTICR1_EXTI1); }
-static inline void syscfg_exticr1_set_exti0(uint32_t val) { SYSCFG.EXTICR1 = (SYSCFG.EXTICR1 & ~SYSCFG_EXTICR1_EXTI0) | ((val<<0) & SYSCFG_EXTICR1_EXTI0); }
-static inline uint32_t syscfg_exticr1_get_exti3(void) { return (SYSCFG.EXTICR1 & SYSCFG_EXTICR1_EXTI3) >> 12 ; }
-static inline uint32_t syscfg_exticr1_get_exti2(void) { return (SYSCFG.EXTICR1 & SYSCFG_EXTICR1_EXTI2) >> 8 ; }
-static inline uint32_t syscfg_exticr1_get_exti1(void) { return (SYSCFG.EXTICR1 & SYSCFG_EXTICR1_EXTI1) >> 4 ; }
-static inline uint32_t syscfg_exticr1_get_exti0(void) { return (SYSCFG.EXTICR1 & SYSCFG_EXTICR1_EXTI0) >> 0 ; }
+static inline void syscfg_exticr1_set_exti3(uint32_t val) {
+	SYSCFG.EXTICR1 = (SYSCFG.EXTICR1 & ~SYSCFG_EXTICR1_EXTI3) | ((val << 12) & SYSCFG_EXTICR1_EXTI3);
+}
+static inline void syscfg_exticr1_set_exti2(uint32_t val) {
+	SYSCFG.EXTICR1 = (SYSCFG.EXTICR1 & ~SYSCFG_EXTICR1_EXTI2) | ((val << 8) & SYSCFG_EXTICR1_EXTI2);
+}
+static inline void syscfg_exticr1_set_exti1(uint32_t val) {
+	SYSCFG.EXTICR1 = (SYSCFG.EXTICR1 & ~SYSCFG_EXTICR1_EXTI1) | ((val << 4) & SYSCFG_EXTICR1_EXTI1);
+}
+static inline void syscfg_exticr1_set_exti0(uint32_t val) {
+	SYSCFG.EXTICR1 = (SYSCFG.EXTICR1 & ~SYSCFG_EXTICR1_EXTI0) | ((val << 0) & SYSCFG_EXTICR1_EXTI0);
+}
+static inline uint32_t syscfg_exticr1_get_exti3(void) { return (SYSCFG.EXTICR1 & SYSCFG_EXTICR1_EXTI3) >> 12; }
+static inline uint32_t syscfg_exticr1_get_exti2(void) { return (SYSCFG.EXTICR1 & SYSCFG_EXTICR1_EXTI2) >> 8; }
+static inline uint32_t syscfg_exticr1_get_exti1(void) { return (SYSCFG.EXTICR1 & SYSCFG_EXTICR1_EXTI1) >> 4; }
+static inline uint32_t syscfg_exticr1_get_exti0(void) { return (SYSCFG.EXTICR1 & SYSCFG_EXTICR1_EXTI0) >> 0; }
 
 // SYSCFG->EXTICR2 external interrupt configuration register 2
 enum {
-	SYSCFG_EXTICR2_EXTI7 = ((1UL<<3)-1) << 12, // EXTI 7 configuration bits
-	SYSCFG_EXTICR2_EXTI6 = ((1UL<<3)-1) << 8, // EXTI 6 configuration bits
-	SYSCFG_EXTICR2_EXTI5 = ((1UL<<3)-1) << 4, // EXTI 5 configuration bits
-	SYSCFG_EXTICR2_EXTI4 = ((1UL<<3)-1) << 0, // EXTI 4 configuration bits		
+	SYSCFG_EXTICR2_EXTI7 = ((1UL << 3) - 1) << 12,	// EXTI 7 configuration bits
+	SYSCFG_EXTICR2_EXTI6 = ((1UL << 3) - 1) << 8,	// EXTI 6 configuration bits
+	SYSCFG_EXTICR2_EXTI5 = ((1UL << 3) - 1) << 4,	// EXTI 5 configuration bits
+	SYSCFG_EXTICR2_EXTI4 = ((1UL << 3) - 1) << 0,	// EXTI 4 configuration bits
 };
-static inline void syscfg_exticr2_set_exti7(uint32_t val) { SYSCFG.EXTICR2 = (SYSCFG.EXTICR2 & ~SYSCFG_EXTICR2_EXTI7) | ((val<<12) & SYSCFG_EXTICR2_EXTI7); }
-static inline void syscfg_exticr2_set_exti6(uint32_t val) { SYSCFG.EXTICR2 = (SYSCFG.EXTICR2 & ~SYSCFG_EXTICR2_EXTI6) | ((val<<8) & SYSCFG_EXTICR2_EXTI6); }
-static inline void syscfg_exticr2_set_exti5(uint32_t val) { SYSCFG.EXTICR2 = (SYSCFG.EXTICR2 & ~SYSCFG_EXTICR2_EXTI5) | ((val<<4) & SYSCFG_EXTICR2_EXTI5); }
-static inline void syscfg_exticr2_set_exti4(uint32_t val) { SYSCFG.EXTICR2 = (SYSCFG.EXTICR2 & ~SYSCFG_EXTICR2_EXTI4) | ((val<<0) & SYSCFG_EXTICR2_EXTI4); }
-static inline uint32_t syscfg_exticr2_get_exti7(void) { return (SYSCFG.EXTICR2 & SYSCFG_EXTICR2_EXTI7) >> 12 ; }
-static inline uint32_t syscfg_exticr2_get_exti6(void) { return (SYSCFG.EXTICR2 & SYSCFG_EXTICR2_EXTI6) >> 8 ; }
-static inline uint32_t syscfg_exticr2_get_exti5(void) { return (SYSCFG.EXTICR2 & SYSCFG_EXTICR2_EXTI5) >> 4 ; }
-static inline uint32_t syscfg_exticr2_get_exti4(void) { return (SYSCFG.EXTICR2 & SYSCFG_EXTICR2_EXTI4) >> 0 ; }
+static inline void syscfg_exticr2_set_exti7(uint32_t val) {
+	SYSCFG.EXTICR2 = (SYSCFG.EXTICR2 & ~SYSCFG_EXTICR2_EXTI7) | ((val << 12) & SYSCFG_EXTICR2_EXTI7);
+}
+static inline void syscfg_exticr2_set_exti6(uint32_t val) {
+	SYSCFG.EXTICR2 = (SYSCFG.EXTICR2 & ~SYSCFG_EXTICR2_EXTI6) | ((val << 8) & SYSCFG_EXTICR2_EXTI6);
+}
+static inline void syscfg_exticr2_set_exti5(uint32_t val) {
+	SYSCFG.EXTICR2 = (SYSCFG.EXTICR2 & ~SYSCFG_EXTICR2_EXTI5) | ((val << 4) & SYSCFG_EXTICR2_EXTI5);
+}
+static inline void syscfg_exticr2_set_exti4(uint32_t val) {
+	SYSCFG.EXTICR2 = (SYSCFG.EXTICR2 & ~SYSCFG_EXTICR2_EXTI4) | ((val << 0) & SYSCFG_EXTICR2_EXTI4);
+}
+static inline uint32_t syscfg_exticr2_get_exti7(void) { return (SYSCFG.EXTICR2 & SYSCFG_EXTICR2_EXTI7) >> 12; }
+static inline uint32_t syscfg_exticr2_get_exti6(void) { return (SYSCFG.EXTICR2 & SYSCFG_EXTICR2_EXTI6) >> 8; }
+static inline uint32_t syscfg_exticr2_get_exti5(void) { return (SYSCFG.EXTICR2 & SYSCFG_EXTICR2_EXTI5) >> 4; }
+static inline uint32_t syscfg_exticr2_get_exti4(void) { return (SYSCFG.EXTICR2 & SYSCFG_EXTICR2_EXTI4) >> 0; }
 
 // SYSCFG->EXTICR3 external interrupt configuration register 3
 enum {
-	SYSCFG_EXTICR3_EXTI11 = ((1UL<<3)-1) << 12, // EXTI 11 configuration bits
-	SYSCFG_EXTICR3_EXTI10 = ((1UL<<3)-1) << 8, // EXTI 10 configuration bits
-	SYSCFG_EXTICR3_EXTI9 = ((1UL<<3)-1) << 4, // EXTI 9 configuration bits
-	SYSCFG_EXTICR3_EXTI8 = ((1UL<<3)-1) << 0, // EXTI 8 configuration bits		
+	SYSCFG_EXTICR3_EXTI11 = ((1UL << 3) - 1) << 12,	 // EXTI 11 configuration bits
+	SYSCFG_EXTICR3_EXTI10 = ((1UL << 3) - 1) << 8,	 // EXTI 10 configuration bits
+	SYSCFG_EXTICR3_EXTI9  = ((1UL << 3) - 1) << 4,	 // EXTI 9 configuration bits
+	SYSCFG_EXTICR3_EXTI8  = ((1UL << 3) - 1) << 0,	 // EXTI 8 configuration bits
 };
-static inline void syscfg_exticr3_set_exti11(uint32_t val) { SYSCFG.EXTICR3 = (SYSCFG.EXTICR3 & ~SYSCFG_EXTICR3_EXTI11) | ((val<<12) & SYSCFG_EXTICR3_EXTI11); }
-static inline void syscfg_exticr3_set_exti10(uint32_t val) { SYSCFG.EXTICR3 = (SYSCFG.EXTICR3 & ~SYSCFG_EXTICR3_EXTI10) | ((val<<8) & SYSCFG_EXTICR3_EXTI10); }
-static inline void syscfg_exticr3_set_exti9(uint32_t val) { SYSCFG.EXTICR3 = (SYSCFG.EXTICR3 & ~SYSCFG_EXTICR3_EXTI9) | ((val<<4) & SYSCFG_EXTICR3_EXTI9); }
-static inline void syscfg_exticr3_set_exti8(uint32_t val) { SYSCFG.EXTICR3 = (SYSCFG.EXTICR3 & ~SYSCFG_EXTICR3_EXTI8) | ((val<<0) & SYSCFG_EXTICR3_EXTI8); }
-static inline uint32_t syscfg_exticr3_get_exti11(void) { return (SYSCFG.EXTICR3 & SYSCFG_EXTICR3_EXTI11) >> 12 ; }
-static inline uint32_t syscfg_exticr3_get_exti10(void) { return (SYSCFG.EXTICR3 & SYSCFG_EXTICR3_EXTI10) >> 8 ; }
-static inline uint32_t syscfg_exticr3_get_exti9(void) { return (SYSCFG.EXTICR3 & SYSCFG_EXTICR3_EXTI9) >> 4 ; }
-static inline uint32_t syscfg_exticr3_get_exti8(void) { return (SYSCFG.EXTICR3 & SYSCFG_EXTICR3_EXTI8) >> 0 ; }
+static inline void syscfg_exticr3_set_exti11(uint32_t val) {
+	SYSCFG.EXTICR3 = (SYSCFG.EXTICR3 & ~SYSCFG_EXTICR3_EXTI11) | ((val << 12) & SYSCFG_EXTICR3_EXTI11);
+}
+static inline void syscfg_exticr3_set_exti10(uint32_t val) {
+	SYSCFG.EXTICR3 = (SYSCFG.EXTICR3 & ~SYSCFG_EXTICR3_EXTI10) | ((val << 8) & SYSCFG_EXTICR3_EXTI10);
+}
+static inline void syscfg_exticr3_set_exti9(uint32_t val) {
+	SYSCFG.EXTICR3 = (SYSCFG.EXTICR3 & ~SYSCFG_EXTICR3_EXTI9) | ((val << 4) & SYSCFG_EXTICR3_EXTI9);
+}
+static inline void syscfg_exticr3_set_exti8(uint32_t val) {
+	SYSCFG.EXTICR3 = (SYSCFG.EXTICR3 & ~SYSCFG_EXTICR3_EXTI8) | ((val << 0) & SYSCFG_EXTICR3_EXTI8);
+}
+static inline uint32_t syscfg_exticr3_get_exti11(void) { return (SYSCFG.EXTICR3 & SYSCFG_EXTICR3_EXTI11) >> 12; }
+static inline uint32_t syscfg_exticr3_get_exti10(void) { return (SYSCFG.EXTICR3 & SYSCFG_EXTICR3_EXTI10) >> 8; }
+static inline uint32_t syscfg_exticr3_get_exti9(void) { return (SYSCFG.EXTICR3 & SYSCFG_EXTICR3_EXTI9) >> 4; }
+static inline uint32_t syscfg_exticr3_get_exti8(void) { return (SYSCFG.EXTICR3 & SYSCFG_EXTICR3_EXTI8) >> 0; }
 
 // SYSCFG->EXTICR4 external interrupt configuration register 4
 enum {
-	SYSCFG_EXTICR4_EXTI15 = ((1UL<<3)-1) << 12, // EXTI15 configuration bits
-	SYSCFG_EXTICR4_EXTI14 = ((1UL<<3)-1) << 8, // EXTI14 configuration bits
-	SYSCFG_EXTICR4_EXTI13 = ((1UL<<3)-1) << 4, // EXTI13 configuration bits
-	SYSCFG_EXTICR4_EXTI12 = ((1UL<<3)-1) << 0, // EXTI12 configuration bits		
+	SYSCFG_EXTICR4_EXTI15 = ((1UL << 3) - 1) << 12,	 // EXTI15 configuration bits
+	SYSCFG_EXTICR4_EXTI14 = ((1UL << 3) - 1) << 8,	 // EXTI14 configuration bits
+	SYSCFG_EXTICR4_EXTI13 = ((1UL << 3) - 1) << 4,	 // EXTI13 configuration bits
+	SYSCFG_EXTICR4_EXTI12 = ((1UL << 3) - 1) << 0,	 // EXTI12 configuration bits
 };
-static inline void syscfg_exticr4_set_exti15(uint32_t val) { SYSCFG.EXTICR4 = (SYSCFG.EXTICR4 & ~SYSCFG_EXTICR4_EXTI15) | ((val<<12) & SYSCFG_EXTICR4_EXTI15); }
-static inline void syscfg_exticr4_set_exti14(uint32_t val) { SYSCFG.EXTICR4 = (SYSCFG.EXTICR4 & ~SYSCFG_EXTICR4_EXTI14) | ((val<<8) & SYSCFG_EXTICR4_EXTI14); }
-static inline void syscfg_exticr4_set_exti13(uint32_t val) { SYSCFG.EXTICR4 = (SYSCFG.EXTICR4 & ~SYSCFG_EXTICR4_EXTI13) | ((val<<4) & SYSCFG_EXTICR4_EXTI13); }
-static inline void syscfg_exticr4_set_exti12(uint32_t val) { SYSCFG.EXTICR4 = (SYSCFG.EXTICR4 & ~SYSCFG_EXTICR4_EXTI12) | ((val<<0) & SYSCFG_EXTICR4_EXTI12); }
-static inline uint32_t syscfg_exticr4_get_exti15(void) { return (SYSCFG.EXTICR4 & SYSCFG_EXTICR4_EXTI15) >> 12 ; }
-static inline uint32_t syscfg_exticr4_get_exti14(void) { return (SYSCFG.EXTICR4 & SYSCFG_EXTICR4_EXTI14) >> 8 ; }
-static inline uint32_t syscfg_exticr4_get_exti13(void) { return (SYSCFG.EXTICR4 & SYSCFG_EXTICR4_EXTI13) >> 4 ; }
-static inline uint32_t syscfg_exticr4_get_exti12(void) { return (SYSCFG.EXTICR4 & SYSCFG_EXTICR4_EXTI12) >> 0 ; }
+static inline void syscfg_exticr4_set_exti15(uint32_t val) {
+	SYSCFG.EXTICR4 = (SYSCFG.EXTICR4 & ~SYSCFG_EXTICR4_EXTI15) | ((val << 12) & SYSCFG_EXTICR4_EXTI15);
+}
+static inline void syscfg_exticr4_set_exti14(uint32_t val) {
+	SYSCFG.EXTICR4 = (SYSCFG.EXTICR4 & ~SYSCFG_EXTICR4_EXTI14) | ((val << 8) & SYSCFG_EXTICR4_EXTI14);
+}
+static inline void syscfg_exticr4_set_exti13(uint32_t val) {
+	SYSCFG.EXTICR4 = (SYSCFG.EXTICR4 & ~SYSCFG_EXTICR4_EXTI13) | ((val << 4) & SYSCFG_EXTICR4_EXTI13);
+}
+static inline void syscfg_exticr4_set_exti12(uint32_t val) {
+	SYSCFG.EXTICR4 = (SYSCFG.EXTICR4 & ~SYSCFG_EXTICR4_EXTI12) | ((val << 0) & SYSCFG_EXTICR4_EXTI12);
+}
+static inline uint32_t syscfg_exticr4_get_exti15(void) { return (SYSCFG.EXTICR4 & SYSCFG_EXTICR4_EXTI15) >> 12; }
+static inline uint32_t syscfg_exticr4_get_exti14(void) { return (SYSCFG.EXTICR4 & SYSCFG_EXTICR4_EXTI14) >> 8; }
+static inline uint32_t syscfg_exticr4_get_exti13(void) { return (SYSCFG.EXTICR4 & SYSCFG_EXTICR4_EXTI13) >> 4; }
+static inline uint32_t syscfg_exticr4_get_exti12(void) { return (SYSCFG.EXTICR4 & SYSCFG_EXTICR4_EXTI12) >> 0; }
 
 // SYSCFG->SCSR SCSR
 enum {
-	SYSCFG_SCSR_SRAM2BSY = 1UL<<1, // SRAM2 busy by erase operation
-	SYSCFG_SCSR_SRAM2ER = 1UL<<0, // SRAM2 Erase		
+	SYSCFG_SCSR_SRAM2BSY = 1UL << 1,  // SRAM2 busy by erase operation
+	SYSCFG_SCSR_SRAM2ER	 = 1UL << 0,  // SRAM2 Erase
 };
 
 // SYSCFG->CFGR2 CFGR2
 enum {
-	SYSCFG_CFGR2_SPF = 1UL<<8, // SRAM2 parity error flag
-	SYSCFG_CFGR2_ECCL = 1UL<<3, // ECC Lock
-	SYSCFG_CFGR2_PVDL = 1UL<<2, // PVD lock enable bit
-	SYSCFG_CFGR2_SPL = 1UL<<1, // SRAM2 parity lock bit
-	SYSCFG_CFGR2_CLL = 1UL<<0, // OCKUP (Hardfault) output enable bit		
+	SYSCFG_CFGR2_SPF  = 1UL << 8,  // SRAM2 parity error flag
+	SYSCFG_CFGR2_ECCL = 1UL << 3,  // ECC Lock
+	SYSCFG_CFGR2_PVDL = 1UL << 2,  // PVD lock enable bit
+	SYSCFG_CFGR2_SPL  = 1UL << 1,  // SRAM2 parity lock bit
+	SYSCFG_CFGR2_CLL  = 1UL << 0,  // OCKUP (Hardfault) output enable bit
 };
 
 /* Advanced-timers
 There is only one peripheral of type TIM1. */
 struct TIM1_Type {
-	__IO uint16_t CR1; // @0 control register 1
-	 uint8_t RESERVED0[2]; // @2 
-	__IO uint16_t CR2; // @4 control register 2
-	 uint8_t RESERVED1[2]; // @6 
-	__IO uint16_t SMCR; // @8 slave mode control register
-	 uint8_t RESERVED2[2]; // @10 
-	__IO uint16_t DIER; // @12 DMA/Interrupt enable register
-	 uint8_t RESERVED3[2]; // @14 
-	__IO uint16_t SR; // @16 status register
-	 uint8_t RESERVED4[2]; // @18 
-	__O uint8_t EGR; // @20 event generation register
-	 uint8_t RESERVED5[3]; // @21 
-	union {  // @24
-		__IO uint16_t CCMR1_Output; // capture/compare mode register 1 (output mode)
-		__IO uint16_t CCMR1_Input; // capture/compare mode register 1 (input mode)
+	__IO uint16_t CR1;				 // @0 control register 1
+	uint8_t		  RESERVED0[2];		 // @2
+	__IO uint16_t CR2;				 // @4 control register 2
+	uint8_t		  RESERVED1[2];		 // @6
+	__IO uint16_t SMCR;				 // @8 slave mode control register
+	uint8_t		  RESERVED2[2];		 // @10
+	__IO uint16_t DIER;				 // @12 DMA/Interrupt enable register
+	uint8_t		  RESERVED3[2];		 // @14
+	__IO uint16_t SR;				 // @16 status register
+	uint8_t		  RESERVED4[2];		 // @18
+	__O uint8_t	  EGR;				 // @20 event generation register
+	uint8_t		  RESERVED5[3];		 // @21
+	union {							 // @24
+		__IO uint16_t CCMR1_Output;	 // capture/compare mode register 1 (output mode)
+		__IO uint16_t CCMR1_Input;	 // capture/compare mode register 1 (input mode)
 	};
-	 uint8_t RESERVED6[2]; // @26 
-	union {  // @28
-		__IO uint16_t CCMR2_Output; // capture/compare mode register 2 (output mode)
-		__IO uint16_t CCMR2_Input; // capture/compare mode register 2 (input mode)
+	uint8_t RESERVED6[2];			 // @26
+	union {							 // @28
+		__IO uint16_t CCMR2_Output;	 // capture/compare mode register 2 (output mode)
+		__IO uint16_t CCMR2_Input;	 // capture/compare mode register 2 (input mode)
 	};
-	 uint8_t RESERVED7[2]; // @30 
-	__IO uint16_t CCER; // @32 capture/compare enable register
-	 uint8_t RESERVED8[2]; // @34 
-	__IO uint16_t CNT; // @36 counter
-	 uint8_t RESERVED9[2]; // @38 
-	__IO uint16_t PSC; // @40 prescaler
-	 uint8_t RESERVED10[2]; // @42 
-	__IO uint16_t ARR; // @44 auto-reload register
-	 uint8_t RESERVED11[2]; // @46 
-	__IO uint8_t RCR; // @48 repetition counter register
-	 uint8_t RESERVED12[3]; // @49 
-	__IO uint16_t CCR1; // @52 capture/compare register 1
-	 uint8_t RESERVED13[2]; // @54 
-	__IO uint16_t CCR2; // @56 capture/compare register 2
-	 uint8_t RESERVED14[2]; // @58 
-	__IO uint16_t CCR3; // @60 capture/compare register 3
-	 uint8_t RESERVED15[2]; // @62 
-	__IO uint16_t CCR4; // @64 capture/compare register 4
-	 uint8_t RESERVED16[2]; // @66 
-	__IO uint16_t BDTR; // @68 break and dead-time register
-	 uint8_t RESERVED17[2]; // @70 
-	__IO uint16_t DCR; // @72 DMA control register
-	 uint8_t RESERVED18[2]; // @74 
-	__IO uint16_t DMAR; // @76 DMA address for full transfer
-	 uint8_t RESERVED19[2]; // @78 
-	__IO uint8_t OR1; // @80 DMA address for full transfer
-	 uint8_t RESERVED20[3]; // @81 
-	__IO uint32_t CCMR3_Output; // @84 capture/compare mode register 2 (output mode)
-	__IO uint32_t CCR5; // @88 capture/compare register 4
-	__IO uint16_t CCR6; // @92 capture/compare register 4
-	 uint8_t RESERVED21[2]; // @94 
-	__IO uint32_t OR2; // @96 DMA address for full transfer
-	__IO uint16_t OR3; // @100 DMA address for full transfer
+	uint8_t		  RESERVED7[2];	  // @30
+	__IO uint16_t CCER;			  // @32 capture/compare enable register
+	uint8_t		  RESERVED8[2];	  // @34
+	__IO uint16_t CNT;			  // @36 counter
+	uint8_t		  RESERVED9[2];	  // @38
+	__IO uint16_t PSC;			  // @40 prescaler
+	uint8_t		  RESERVED10[2];  // @42
+	__IO uint16_t ARR;			  // @44 auto-reload register
+	uint8_t		  RESERVED11[2];  // @46
+	__IO uint8_t  RCR;			  // @48 repetition counter register
+	uint8_t		  RESERVED12[3];  // @49
+	__IO uint16_t CCR1;			  // @52 capture/compare register 1
+	uint8_t		  RESERVED13[2];  // @54
+	__IO uint16_t CCR2;			  // @56 capture/compare register 2
+	uint8_t		  RESERVED14[2];  // @58
+	__IO uint16_t CCR3;			  // @60 capture/compare register 3
+	uint8_t		  RESERVED15[2];  // @62
+	__IO uint16_t CCR4;			  // @64 capture/compare register 4
+	uint8_t		  RESERVED16[2];  // @66
+	__IO uint16_t BDTR;			  // @68 break and dead-time register
+	uint8_t		  RESERVED17[2];  // @70
+	__IO uint16_t DCR;			  // @72 DMA control register
+	uint8_t		  RESERVED18[2];  // @74
+	__IO uint16_t DMAR;			  // @76 DMA address for full transfer
+	uint8_t		  RESERVED19[2];  // @78
+	__IO uint8_t  OR1;			  // @80 DMA address for full transfer
+	uint8_t		  RESERVED20[3];  // @81
+	__IO uint32_t CCMR3_Output;	  // @84 capture/compare mode register 2 (output mode)
+	__IO uint32_t CCR5;			  // @88 capture/compare register 4
+	__IO uint16_t CCR6;			  // @92 capture/compare register 4
+	uint8_t		  RESERVED21[2];  // @94
+	__IO uint32_t OR2;			  // @96 DMA address for full transfer
+	__IO uint16_t OR3;			  // @100 DMA address for full transfer
 };
-extern struct TIM1_Type	TIM1;	// @0x40012C00 Also: TIM6_Type
+extern struct TIM1_Type TIM1;  // @0x40012C00 Also: TIM6_Type
 
 // TIM1->CR1 control register 1
 enum {
-	TIM1_CR1_CKD = ((1UL<<2)-1) << 8, // Clock division
-	TIM1_CR1_ARPE = 1UL<<7, // Auto-reload preload enable
-	TIM1_CR1_CMS = ((1UL<<2)-1) << 5, // Center-aligned mode selection
-	TIM1_CR1_DIR = 1UL<<4, // Direction
-	TIM1_CR1_OPM = 1UL<<3, // One-pulse mode
-	TIM1_CR1_URS = 1UL<<2, // Update request source
-	TIM1_CR1_UDIS = 1UL<<1, // Update disable
-	TIM1_CR1_CEN = 1UL<<0, // Counter enable		
+	TIM1_CR1_CKD  = ((1UL << 2) - 1) << 8,	// Clock division
+	TIM1_CR1_ARPE = 1UL << 7,				// Auto-reload preload enable
+	TIM1_CR1_CMS  = ((1UL << 2) - 1) << 5,	// Center-aligned mode selection
+	TIM1_CR1_DIR  = 1UL << 4,				// Direction
+	TIM1_CR1_OPM  = 1UL << 3,				// One-pulse mode
+	TIM1_CR1_URS  = 1UL << 2,				// Update request source
+	TIM1_CR1_UDIS = 1UL << 1,				// Update disable
+	TIM1_CR1_CEN  = 1UL << 0,				// Counter enable
 };
-static inline void tim1_cr1_set_ckd(uint32_t val) { TIM1.CR1 = (TIM1.CR1 & ~TIM1_CR1_CKD) | ((val<<8) & TIM1_CR1_CKD); }
-static inline void tim1_cr1_set_cms(uint32_t val) { TIM1.CR1 = (TIM1.CR1 & ~TIM1_CR1_CMS) | ((val<<5) & TIM1_CR1_CMS); }
-static inline uint32_t tim1_cr1_get_ckd(void) { return (TIM1.CR1 & TIM1_CR1_CKD) >> 8 ; }
-static inline uint32_t tim1_cr1_get_cms(void) { return (TIM1.CR1 & TIM1_CR1_CMS) >> 5 ; }
+static inline void	   tim1_cr1_set_ckd(uint32_t val) { TIM1.CR1 = (TIM1.CR1 & ~TIM1_CR1_CKD) | ((val << 8) & TIM1_CR1_CKD); }
+static inline void	   tim1_cr1_set_cms(uint32_t val) { TIM1.CR1 = (TIM1.CR1 & ~TIM1_CR1_CMS) | ((val << 5) & TIM1_CR1_CMS); }
+static inline uint32_t tim1_cr1_get_ckd(void) { return (TIM1.CR1 & TIM1_CR1_CKD) >> 8; }
+static inline uint32_t tim1_cr1_get_cms(void) { return (TIM1.CR1 & TIM1_CR1_CMS) >> 5; }
 
 // TIM1->CR2 control register 2
 enum {
-	TIM1_CR2_OIS4 = 1UL<<14, // Output Idle state 4
-	TIM1_CR2_OIS3N = 1UL<<13, // Output Idle state 3
-	TIM1_CR2_OIS3 = 1UL<<12, // Output Idle state 3
-	TIM1_CR2_OIS2N = 1UL<<11, // Output Idle state 2
-	TIM1_CR2_OIS2 = 1UL<<10, // Output Idle state 2
-	TIM1_CR2_OIS1N = 1UL<<9, // Output Idle state 1
-	TIM1_CR2_OIS1 = 1UL<<8, // Output Idle state 1
-	TIM1_CR2_TI1S = 1UL<<7, // TI1 selection
-	TIM1_CR2_MMS = ((1UL<<3)-1) << 4, // Master mode selection
-	TIM1_CR2_CCDS = 1UL<<3, // Capture/compare DMA selection
-	TIM1_CR2_CCUS = 1UL<<2, // Capture/compare control update selection
-	TIM1_CR2_CCPC = 1UL<<0, // Capture/compare preloaded control		
+	TIM1_CR2_OIS4  = 1UL << 14,				 // Output Idle state 4
+	TIM1_CR2_OIS3N = 1UL << 13,				 // Output Idle state 3
+	TIM1_CR2_OIS3  = 1UL << 12,				 // Output Idle state 3
+	TIM1_CR2_OIS2N = 1UL << 11,				 // Output Idle state 2
+	TIM1_CR2_OIS2  = 1UL << 10,				 // Output Idle state 2
+	TIM1_CR2_OIS1N = 1UL << 9,				 // Output Idle state 1
+	TIM1_CR2_OIS1  = 1UL << 8,				 // Output Idle state 1
+	TIM1_CR2_TI1S  = 1UL << 7,				 // TI1 selection
+	TIM1_CR2_MMS   = ((1UL << 3) - 1) << 4,	 // Master mode selection
+	TIM1_CR2_CCDS  = 1UL << 3,				 // Capture/compare DMA selection
+	TIM1_CR2_CCUS  = 1UL << 2,				 // Capture/compare control update selection
+	TIM1_CR2_CCPC  = 1UL << 0,				 // Capture/compare preloaded control
 };
-static inline void tim1_cr2_set_mms(uint32_t val) { TIM1.CR2 = (TIM1.CR2 & ~TIM1_CR2_MMS) | ((val<<4) & TIM1_CR2_MMS); }
-static inline uint32_t tim1_cr2_get_mms(void) { return (TIM1.CR2 & TIM1_CR2_MMS) >> 4 ; }
+static inline void	   tim1_cr2_set_mms(uint32_t val) { TIM1.CR2 = (TIM1.CR2 & ~TIM1_CR2_MMS) | ((val << 4) & TIM1_CR2_MMS); }
+static inline uint32_t tim1_cr2_get_mms(void) { return (TIM1.CR2 & TIM1_CR2_MMS) >> 4; }
 
 // TIM1->SMCR slave mode control register
 enum {
-	TIM1_SMCR_ETP = 1UL<<15, // External trigger polarity
-	TIM1_SMCR_ECE = 1UL<<14, // External clock enable
-	TIM1_SMCR_ETPS = ((1UL<<2)-1) << 12, // External trigger prescaler
-	TIM1_SMCR_ETF = ((1UL<<4)-1) << 8, // External trigger filter
-	TIM1_SMCR_MSM = 1UL<<7, // Master/Slave mode
-	TIM1_SMCR_TS = ((1UL<<3)-1) << 4, // Trigger selection
-	TIM1_SMCR_SMS = ((1UL<<3)-1) << 0, // Slave mode selection		
+	TIM1_SMCR_ETP  = 1UL << 15,				  // External trigger polarity
+	TIM1_SMCR_ECE  = 1UL << 14,				  // External clock enable
+	TIM1_SMCR_ETPS = ((1UL << 2) - 1) << 12,  // External trigger prescaler
+	TIM1_SMCR_ETF  = ((1UL << 4) - 1) << 8,	  // External trigger filter
+	TIM1_SMCR_MSM  = 1UL << 7,				  // Master/Slave mode
+	TIM1_SMCR_TS   = ((1UL << 3) - 1) << 4,	  // Trigger selection
+	TIM1_SMCR_SMS  = ((1UL << 3) - 1) << 0,	  // Slave mode selection
 };
-static inline void tim1_smcr_set_etps(uint32_t val) { TIM1.SMCR = (TIM1.SMCR & ~TIM1_SMCR_ETPS) | ((val<<12) & TIM1_SMCR_ETPS); }
-static inline void tim1_smcr_set_etf(uint32_t val) { TIM1.SMCR = (TIM1.SMCR & ~TIM1_SMCR_ETF) | ((val<<8) & TIM1_SMCR_ETF); }
-static inline void tim1_smcr_set_ts(uint32_t val) { TIM1.SMCR = (TIM1.SMCR & ~TIM1_SMCR_TS) | ((val<<4) & TIM1_SMCR_TS); }
-static inline void tim1_smcr_set_sms(uint32_t val) { TIM1.SMCR = (TIM1.SMCR & ~TIM1_SMCR_SMS) | ((val<<0) & TIM1_SMCR_SMS); }
-static inline uint32_t tim1_smcr_get_etps(void) { return (TIM1.SMCR & TIM1_SMCR_ETPS) >> 12 ; }
-static inline uint32_t tim1_smcr_get_etf(void) { return (TIM1.SMCR & TIM1_SMCR_ETF) >> 8 ; }
-static inline uint32_t tim1_smcr_get_ts(void) { return (TIM1.SMCR & TIM1_SMCR_TS) >> 4 ; }
-static inline uint32_t tim1_smcr_get_sms(void) { return (TIM1.SMCR & TIM1_SMCR_SMS) >> 0 ; }
+static inline void tim1_smcr_set_etps(uint32_t val) { TIM1.SMCR = (TIM1.SMCR & ~TIM1_SMCR_ETPS) | ((val << 12) & TIM1_SMCR_ETPS); }
+static inline void tim1_smcr_set_etf(uint32_t val) { TIM1.SMCR = (TIM1.SMCR & ~TIM1_SMCR_ETF) | ((val << 8) & TIM1_SMCR_ETF); }
+static inline void tim1_smcr_set_ts(uint32_t val) { TIM1.SMCR = (TIM1.SMCR & ~TIM1_SMCR_TS) | ((val << 4) & TIM1_SMCR_TS); }
+static inline void tim1_smcr_set_sms(uint32_t val) { TIM1.SMCR = (TIM1.SMCR & ~TIM1_SMCR_SMS) | ((val << 0) & TIM1_SMCR_SMS); }
+static inline uint32_t tim1_smcr_get_etps(void) { return (TIM1.SMCR & TIM1_SMCR_ETPS) >> 12; }
+static inline uint32_t tim1_smcr_get_etf(void) { return (TIM1.SMCR & TIM1_SMCR_ETF) >> 8; }
+static inline uint32_t tim1_smcr_get_ts(void) { return (TIM1.SMCR & TIM1_SMCR_TS) >> 4; }
+static inline uint32_t tim1_smcr_get_sms(void) { return (TIM1.SMCR & TIM1_SMCR_SMS) >> 0; }
 
 // TIM1->DIER DMA/Interrupt enable register
 enum {
-	TIM1_DIER_TDE = 1UL<<14, // Trigger DMA request enable
-	TIM1_DIER_COMDE = 1UL<<13, // COM DMA request enable
-	TIM1_DIER_CC4DE = 1UL<<12, // Capture/Compare 4 DMA request enable
-	TIM1_DIER_CC3DE = 1UL<<11, // Capture/Compare 3 DMA request enable
-	TIM1_DIER_CC2DE = 1UL<<10, // Capture/Compare 2 DMA request enable
-	TIM1_DIER_CC1DE = 1UL<<9, // Capture/Compare 1 DMA request enable
-	TIM1_DIER_UDE = 1UL<<8, // Update DMA request enable
-	TIM1_DIER_BIE = 1UL<<7, // Break interrupt enable
-	TIM1_DIER_TIE = 1UL<<6, // Trigger interrupt enable
-	TIM1_DIER_COMIE = 1UL<<5, // COM interrupt enable
-	TIM1_DIER_CC4IE = 1UL<<4, // Capture/Compare 4 interrupt enable
-	TIM1_DIER_CC3IE = 1UL<<3, // Capture/Compare 3 interrupt enable
-	TIM1_DIER_CC2IE = 1UL<<2, // Capture/Compare 2 interrupt enable
-	TIM1_DIER_CC1IE = 1UL<<1, // Capture/Compare 1 interrupt enable
-	TIM1_DIER_UIE = 1UL<<0, // Update interrupt enable		
+	TIM1_DIER_TDE	= 1UL << 14,  // Trigger DMA request enable
+	TIM1_DIER_COMDE = 1UL << 13,  // COM DMA request enable
+	TIM1_DIER_CC4DE = 1UL << 12,  // Capture/Compare 4 DMA request enable
+	TIM1_DIER_CC3DE = 1UL << 11,  // Capture/Compare 3 DMA request enable
+	TIM1_DIER_CC2DE = 1UL << 10,  // Capture/Compare 2 DMA request enable
+	TIM1_DIER_CC1DE = 1UL << 9,	  // Capture/Compare 1 DMA request enable
+	TIM1_DIER_UDE	= 1UL << 8,	  // Update DMA request enable
+	TIM1_DIER_BIE	= 1UL << 7,	  // Break interrupt enable
+	TIM1_DIER_TIE	= 1UL << 6,	  // Trigger interrupt enable
+	TIM1_DIER_COMIE = 1UL << 5,	  // COM interrupt enable
+	TIM1_DIER_CC4IE = 1UL << 4,	  // Capture/Compare 4 interrupt enable
+	TIM1_DIER_CC3IE = 1UL << 3,	  // Capture/Compare 3 interrupt enable
+	TIM1_DIER_CC2IE = 1UL << 2,	  // Capture/Compare 2 interrupt enable
+	TIM1_DIER_CC1IE = 1UL << 1,	  // Capture/Compare 1 interrupt enable
+	TIM1_DIER_UIE	= 1UL << 0,	  // Update interrupt enable
 };
 
 // TIM1->SR status register
 enum {
-	TIM1_SR_CC4OF = 1UL<<12, // Capture/Compare 4 overcapture flag
-	TIM1_SR_CC3OF = 1UL<<11, // Capture/Compare 3 overcapture flag
-	TIM1_SR_CC2OF = 1UL<<10, // Capture/compare 2 overcapture flag
-	TIM1_SR_CC1OF = 1UL<<9, // Capture/Compare 1 overcapture flag
-	TIM1_SR_BIF = 1UL<<7, // Break interrupt flag
-	TIM1_SR_TIF = 1UL<<6, // Trigger interrupt flag
-	TIM1_SR_COMIF = 1UL<<5, // COM interrupt flag
-	TIM1_SR_CC4IF = 1UL<<4, // Capture/Compare 4 interrupt flag
-	TIM1_SR_CC3IF = 1UL<<3, // Capture/Compare 3 interrupt flag
-	TIM1_SR_CC2IF = 1UL<<2, // Capture/Compare 2 interrupt flag
-	TIM1_SR_CC1IF = 1UL<<1, // Capture/compare 1 interrupt flag
-	TIM1_SR_UIF = 1UL<<0, // Update interrupt flag		
+	TIM1_SR_CC4OF = 1UL << 12,	// Capture/Compare 4 overcapture flag
+	TIM1_SR_CC3OF = 1UL << 11,	// Capture/Compare 3 overcapture flag
+	TIM1_SR_CC2OF = 1UL << 10,	// Capture/compare 2 overcapture flag
+	TIM1_SR_CC1OF = 1UL << 9,	// Capture/Compare 1 overcapture flag
+	TIM1_SR_BIF	  = 1UL << 7,	// Break interrupt flag
+	TIM1_SR_TIF	  = 1UL << 6,	// Trigger interrupt flag
+	TIM1_SR_COMIF = 1UL << 5,	// COM interrupt flag
+	TIM1_SR_CC4IF = 1UL << 4,	// Capture/Compare 4 interrupt flag
+	TIM1_SR_CC3IF = 1UL << 3,	// Capture/Compare 3 interrupt flag
+	TIM1_SR_CC2IF = 1UL << 2,	// Capture/Compare 2 interrupt flag
+	TIM1_SR_CC1IF = 1UL << 1,	// Capture/compare 1 interrupt flag
+	TIM1_SR_UIF	  = 1UL << 0,	// Update interrupt flag
 };
 
 // TIM1->EGR event generation register
 enum {
-	TIM1_EGR_BG = 1UL<<7, // Break generation
-	TIM1_EGR_TG = 1UL<<6, // Trigger generation
-	TIM1_EGR_COMG = 1UL<<5, // Capture/Compare control update generation
-	TIM1_EGR_CC4G = 1UL<<4, // Capture/compare 4 generation
-	TIM1_EGR_CC3G = 1UL<<3, // Capture/compare 3 generation
-	TIM1_EGR_CC2G = 1UL<<2, // Capture/compare 2 generation
-	TIM1_EGR_CC1G = 1UL<<1, // Capture/compare 1 generation
-	TIM1_EGR_UG = 1UL<<0, // Update generation		
+	TIM1_EGR_BG	  = 1UL << 7,  // Break generation
+	TIM1_EGR_TG	  = 1UL << 6,  // Trigger generation
+	TIM1_EGR_COMG = 1UL << 5,  // Capture/Compare control update generation
+	TIM1_EGR_CC4G = 1UL << 4,  // Capture/compare 4 generation
+	TIM1_EGR_CC3G = 1UL << 3,  // Capture/compare 3 generation
+	TIM1_EGR_CC2G = 1UL << 2,  // Capture/compare 2 generation
+	TIM1_EGR_CC1G = 1UL << 1,  // Capture/compare 1 generation
+	TIM1_EGR_UG	  = 1UL << 0,  // Update generation
 };
 
 // TIM1->CCMR1_Output capture/compare mode register 1 (output mode)
 enum {
-	TIM1_CCMR1_OUTPUT_OC2CE = 1UL<<15, // Output Compare 2 clear enable
-	TIM1_CCMR1_OUTPUT_OC2M = ((1UL<<3)-1) << 12, // Output Compare 2 mode
-	TIM1_CCMR1_OUTPUT_OC2PE = 1UL<<11, // Output Compare 2 preload enable
-	TIM1_CCMR1_OUTPUT_OC2FE = 1UL<<10, // Output Compare 2 fast enable
-	TIM1_CCMR1_OUTPUT_CC2S = ((1UL<<2)-1) << 8, // Capture/Compare 2 selection
-	TIM1_CCMR1_OUTPUT_OC1CE = 1UL<<7, // Output Compare 1 clear enable
-	TIM1_CCMR1_OUTPUT_OC1M = ((1UL<<3)-1) << 4, // Output Compare 1 mode
-	TIM1_CCMR1_OUTPUT_OC1PE = 1UL<<3, // Output Compare 1 preload enable
-	TIM1_CCMR1_OUTPUT_OC1FE = 1UL<<2, // Output Compare 1 fast enable
-	TIM1_CCMR1_OUTPUT_CC1S = ((1UL<<2)-1) << 0, // Capture/Compare 1 selection		
+	TIM1_CCMR1_OUTPUT_OC2CE = 1UL << 15,			   // Output Compare 2 clear enable
+	TIM1_CCMR1_OUTPUT_OC2M	= ((1UL << 3) - 1) << 12,  // Output Compare 2 mode
+	TIM1_CCMR1_OUTPUT_OC2PE = 1UL << 11,			   // Output Compare 2 preload enable
+	TIM1_CCMR1_OUTPUT_OC2FE = 1UL << 10,			   // Output Compare 2 fast enable
+	TIM1_CCMR1_OUTPUT_CC2S	= ((1UL << 2) - 1) << 8,   // Capture/Compare 2 selection
+	TIM1_CCMR1_OUTPUT_OC1CE = 1UL << 7,				   // Output Compare 1 clear enable
+	TIM1_CCMR1_OUTPUT_OC1M	= ((1UL << 3) - 1) << 4,   // Output Compare 1 mode
+	TIM1_CCMR1_OUTPUT_OC1PE = 1UL << 3,				   // Output Compare 1 preload enable
+	TIM1_CCMR1_OUTPUT_OC1FE = 1UL << 2,				   // Output Compare 1 fast enable
+	TIM1_CCMR1_OUTPUT_CC1S	= ((1UL << 2) - 1) << 0,   // Capture/Compare 1 selection
 };
-static inline void tim1_ccmr1_output_set_oc2m(uint32_t val) { TIM1.CCMR1_Output = (TIM1.CCMR1_Output & ~TIM1_CCMR1_OUTPUT_OC2M) | ((val<<12) & TIM1_CCMR1_OUTPUT_OC2M); }
-static inline void tim1_ccmr1_output_set_cc2s(uint32_t val) { TIM1.CCMR1_Output = (TIM1.CCMR1_Output & ~TIM1_CCMR1_OUTPUT_CC2S) | ((val<<8) & TIM1_CCMR1_OUTPUT_CC2S); }
-static inline void tim1_ccmr1_output_set_oc1m(uint32_t val) { TIM1.CCMR1_Output = (TIM1.CCMR1_Output & ~TIM1_CCMR1_OUTPUT_OC1M) | ((val<<4) & TIM1_CCMR1_OUTPUT_OC1M); }
-static inline void tim1_ccmr1_output_set_cc1s(uint32_t val) { TIM1.CCMR1_Output = (TIM1.CCMR1_Output & ~TIM1_CCMR1_OUTPUT_CC1S) | ((val<<0) & TIM1_CCMR1_OUTPUT_CC1S); }
-static inline uint32_t tim1_ccmr1_output_get_oc2m(void) { return (TIM1.CCMR1_Output & TIM1_CCMR1_OUTPUT_OC2M) >> 12 ; }
-static inline uint32_t tim1_ccmr1_output_get_cc2s(void) { return (TIM1.CCMR1_Output & TIM1_CCMR1_OUTPUT_CC2S) >> 8 ; }
-static inline uint32_t tim1_ccmr1_output_get_oc1m(void) { return (TIM1.CCMR1_Output & TIM1_CCMR1_OUTPUT_OC1M) >> 4 ; }
-static inline uint32_t tim1_ccmr1_output_get_cc1s(void) { return (TIM1.CCMR1_Output & TIM1_CCMR1_OUTPUT_CC1S) >> 0 ; }
+static inline void tim1_ccmr1_output_set_oc2m(uint32_t val) {
+	TIM1.CCMR1_Output = (TIM1.CCMR1_Output & ~TIM1_CCMR1_OUTPUT_OC2M) | ((val << 12) & TIM1_CCMR1_OUTPUT_OC2M);
+}
+static inline void tim1_ccmr1_output_set_cc2s(uint32_t val) {
+	TIM1.CCMR1_Output = (TIM1.CCMR1_Output & ~TIM1_CCMR1_OUTPUT_CC2S) | ((val << 8) & TIM1_CCMR1_OUTPUT_CC2S);
+}
+static inline void tim1_ccmr1_output_set_oc1m(uint32_t val) {
+	TIM1.CCMR1_Output = (TIM1.CCMR1_Output & ~TIM1_CCMR1_OUTPUT_OC1M) | ((val << 4) & TIM1_CCMR1_OUTPUT_OC1M);
+}
+static inline void tim1_ccmr1_output_set_cc1s(uint32_t val) {
+	TIM1.CCMR1_Output = (TIM1.CCMR1_Output & ~TIM1_CCMR1_OUTPUT_CC1S) | ((val << 0) & TIM1_CCMR1_OUTPUT_CC1S);
+}
+static inline uint32_t tim1_ccmr1_output_get_oc2m(void) { return (TIM1.CCMR1_Output & TIM1_CCMR1_OUTPUT_OC2M) >> 12; }
+static inline uint32_t tim1_ccmr1_output_get_cc2s(void) { return (TIM1.CCMR1_Output & TIM1_CCMR1_OUTPUT_CC2S) >> 8; }
+static inline uint32_t tim1_ccmr1_output_get_oc1m(void) { return (TIM1.CCMR1_Output & TIM1_CCMR1_OUTPUT_OC1M) >> 4; }
+static inline uint32_t tim1_ccmr1_output_get_cc1s(void) { return (TIM1.CCMR1_Output & TIM1_CCMR1_OUTPUT_CC1S) >> 0; }
 
 // TIM1->CCMR2_Output capture/compare mode register 2 (output mode)
 enum {
-	TIM1_CCMR2_OUTPUT_OC4CE = 1UL<<15, // Output compare 4 clear enable
-	TIM1_CCMR2_OUTPUT_OC4M = ((1UL<<3)-1) << 12, // Output compare 4 mode
-	TIM1_CCMR2_OUTPUT_OC4PE = 1UL<<11, // Output compare 4 preload enable
-	TIM1_CCMR2_OUTPUT_OC4FE = 1UL<<10, // Output compare 4 fast enable
-	TIM1_CCMR2_OUTPUT_CC4S = ((1UL<<2)-1) << 8, // Capture/Compare 4 selection
-	TIM1_CCMR2_OUTPUT_OC3CE = 1UL<<7, // Output compare 3 clear enable
-	TIM1_CCMR2_OUTPUT_OC3M = ((1UL<<3)-1) << 4, // Output compare 3 mode
-	TIM1_CCMR2_OUTPUT_OC3PE = 1UL<<3, // Output compare 3 preload enable
-	TIM1_CCMR2_OUTPUT_OC3FE = 1UL<<2, // Output compare 3 fast enable
-	TIM1_CCMR2_OUTPUT_CC3S = ((1UL<<2)-1) << 0, // Capture/Compare 3 selection		
+	TIM1_CCMR2_OUTPUT_OC4CE = 1UL << 15,			   // Output compare 4 clear enable
+	TIM1_CCMR2_OUTPUT_OC4M	= ((1UL << 3) - 1) << 12,  // Output compare 4 mode
+	TIM1_CCMR2_OUTPUT_OC4PE = 1UL << 11,			   // Output compare 4 preload enable
+	TIM1_CCMR2_OUTPUT_OC4FE = 1UL << 10,			   // Output compare 4 fast enable
+	TIM1_CCMR2_OUTPUT_CC4S	= ((1UL << 2) - 1) << 8,   // Capture/Compare 4 selection
+	TIM1_CCMR2_OUTPUT_OC3CE = 1UL << 7,				   // Output compare 3 clear enable
+	TIM1_CCMR2_OUTPUT_OC3M	= ((1UL << 3) - 1) << 4,   // Output compare 3 mode
+	TIM1_CCMR2_OUTPUT_OC3PE = 1UL << 3,				   // Output compare 3 preload enable
+	TIM1_CCMR2_OUTPUT_OC3FE = 1UL << 2,				   // Output compare 3 fast enable
+	TIM1_CCMR2_OUTPUT_CC3S	= ((1UL << 2) - 1) << 0,   // Capture/Compare 3 selection
 };
-static inline void tim1_ccmr2_output_set_oc4m(uint32_t val) { TIM1.CCMR2_Output = (TIM1.CCMR2_Output & ~TIM1_CCMR2_OUTPUT_OC4M) | ((val<<12) & TIM1_CCMR2_OUTPUT_OC4M); }
-static inline void tim1_ccmr2_output_set_cc4s(uint32_t val) { TIM1.CCMR2_Output = (TIM1.CCMR2_Output & ~TIM1_CCMR2_OUTPUT_CC4S) | ((val<<8) & TIM1_CCMR2_OUTPUT_CC4S); }
-static inline void tim1_ccmr2_output_set_oc3m(uint32_t val) { TIM1.CCMR2_Output = (TIM1.CCMR2_Output & ~TIM1_CCMR2_OUTPUT_OC3M) | ((val<<4) & TIM1_CCMR2_OUTPUT_OC3M); }
-static inline void tim1_ccmr2_output_set_cc3s(uint32_t val) { TIM1.CCMR2_Output = (TIM1.CCMR2_Output & ~TIM1_CCMR2_OUTPUT_CC3S) | ((val<<0) & TIM1_CCMR2_OUTPUT_CC3S); }
-static inline uint32_t tim1_ccmr2_output_get_oc4m(void) { return (TIM1.CCMR2_Output & TIM1_CCMR2_OUTPUT_OC4M) >> 12 ; }
-static inline uint32_t tim1_ccmr2_output_get_cc4s(void) { return (TIM1.CCMR2_Output & TIM1_CCMR2_OUTPUT_CC4S) >> 8 ; }
-static inline uint32_t tim1_ccmr2_output_get_oc3m(void) { return (TIM1.CCMR2_Output & TIM1_CCMR2_OUTPUT_OC3M) >> 4 ; }
-static inline uint32_t tim1_ccmr2_output_get_cc3s(void) { return (TIM1.CCMR2_Output & TIM1_CCMR2_OUTPUT_CC3S) >> 0 ; }
+static inline void tim1_ccmr2_output_set_oc4m(uint32_t val) {
+	TIM1.CCMR2_Output = (TIM1.CCMR2_Output & ~TIM1_CCMR2_OUTPUT_OC4M) | ((val << 12) & TIM1_CCMR2_OUTPUT_OC4M);
+}
+static inline void tim1_ccmr2_output_set_cc4s(uint32_t val) {
+	TIM1.CCMR2_Output = (TIM1.CCMR2_Output & ~TIM1_CCMR2_OUTPUT_CC4S) | ((val << 8) & TIM1_CCMR2_OUTPUT_CC4S);
+}
+static inline void tim1_ccmr2_output_set_oc3m(uint32_t val) {
+	TIM1.CCMR2_Output = (TIM1.CCMR2_Output & ~TIM1_CCMR2_OUTPUT_OC3M) | ((val << 4) & TIM1_CCMR2_OUTPUT_OC3M);
+}
+static inline void tim1_ccmr2_output_set_cc3s(uint32_t val) {
+	TIM1.CCMR2_Output = (TIM1.CCMR2_Output & ~TIM1_CCMR2_OUTPUT_CC3S) | ((val << 0) & TIM1_CCMR2_OUTPUT_CC3S);
+}
+static inline uint32_t tim1_ccmr2_output_get_oc4m(void) { return (TIM1.CCMR2_Output & TIM1_CCMR2_OUTPUT_OC4M) >> 12; }
+static inline uint32_t tim1_ccmr2_output_get_cc4s(void) { return (TIM1.CCMR2_Output & TIM1_CCMR2_OUTPUT_CC4S) >> 8; }
+static inline uint32_t tim1_ccmr2_output_get_oc3m(void) { return (TIM1.CCMR2_Output & TIM1_CCMR2_OUTPUT_OC3M) >> 4; }
+static inline uint32_t tim1_ccmr2_output_get_cc3s(void) { return (TIM1.CCMR2_Output & TIM1_CCMR2_OUTPUT_CC3S) >> 0; }
 
 // TIM1->CCER capture/compare enable register
 enum {
-	TIM1_CCER_CC4P = 1UL<<13, // Capture/Compare 3 output Polarity
-	TIM1_CCER_CC4E = 1UL<<12, // Capture/Compare 4 output enable
-	TIM1_CCER_CC3NP = 1UL<<11, // Capture/Compare 3 output Polarity
-	TIM1_CCER_CC3NE = 1UL<<10, // Capture/Compare 3 complementary output enable
-	TIM1_CCER_CC3P = 1UL<<9, // Capture/Compare 3 output Polarity
-	TIM1_CCER_CC3E = 1UL<<8, // Capture/Compare 3 output enable
-	TIM1_CCER_CC2NP = 1UL<<7, // Capture/Compare 2 output Polarity
-	TIM1_CCER_CC2NE = 1UL<<6, // Capture/Compare 2 complementary output enable
-	TIM1_CCER_CC2P = 1UL<<5, // Capture/Compare 2 output Polarity
-	TIM1_CCER_CC2E = 1UL<<4, // Capture/Compare 2 output enable
-	TIM1_CCER_CC1NP = 1UL<<3, // Capture/Compare 1 output Polarity
-	TIM1_CCER_CC1NE = 1UL<<2, // Capture/Compare 1 complementary output enable
-	TIM1_CCER_CC1P = 1UL<<1, // Capture/Compare 1 output Polarity
-	TIM1_CCER_CC1E = 1UL<<0, // Capture/Compare 1 output enable		
+	TIM1_CCER_CC4P	= 1UL << 13,  // Capture/Compare 3 output Polarity
+	TIM1_CCER_CC4E	= 1UL << 12,  // Capture/Compare 4 output enable
+	TIM1_CCER_CC3NP = 1UL << 11,  // Capture/Compare 3 output Polarity
+	TIM1_CCER_CC3NE = 1UL << 10,  // Capture/Compare 3 complementary output enable
+	TIM1_CCER_CC3P	= 1UL << 9,	  // Capture/Compare 3 output Polarity
+	TIM1_CCER_CC3E	= 1UL << 8,	  // Capture/Compare 3 output enable
+	TIM1_CCER_CC2NP = 1UL << 7,	  // Capture/Compare 2 output Polarity
+	TIM1_CCER_CC2NE = 1UL << 6,	  // Capture/Compare 2 complementary output enable
+	TIM1_CCER_CC2P	= 1UL << 5,	  // Capture/Compare 2 output Polarity
+	TIM1_CCER_CC2E	= 1UL << 4,	  // Capture/Compare 2 output enable
+	TIM1_CCER_CC1NP = 1UL << 3,	  // Capture/Compare 1 output Polarity
+	TIM1_CCER_CC1NE = 1UL << 2,	  // Capture/Compare 1 complementary output enable
+	TIM1_CCER_CC1P	= 1UL << 1,	  // Capture/Compare 1 output Polarity
+	TIM1_CCER_CC1E	= 1UL << 0,	  // Capture/Compare 1 output enable
 };
 
 // TIM1->BDTR break and dead-time register
 enum {
-	TIM1_BDTR_MOE = 1UL<<15, // Main output enable
-	TIM1_BDTR_AOE = 1UL<<14, // Automatic output enable
-	TIM1_BDTR_BKP = 1UL<<13, // Break polarity
-	TIM1_BDTR_BKE = 1UL<<12, // Break enable
-	TIM1_BDTR_OSSR = 1UL<<11, // Off-state selection for Run mode
-	TIM1_BDTR_OSSI = 1UL<<10, // Off-state selection for Idle mode
-	TIM1_BDTR_LOCK = ((1UL<<2)-1) << 8, // Lock configuration
-	TIM1_BDTR_DTG = ((1UL<<8)-1) << 0, // Dead-time generator setup		
+	TIM1_BDTR_MOE  = 1UL << 15,				 // Main output enable
+	TIM1_BDTR_AOE  = 1UL << 14,				 // Automatic output enable
+	TIM1_BDTR_BKP  = 1UL << 13,				 // Break polarity
+	TIM1_BDTR_BKE  = 1UL << 12,				 // Break enable
+	TIM1_BDTR_OSSR = 1UL << 11,				 // Off-state selection for Run mode
+	TIM1_BDTR_OSSI = 1UL << 10,				 // Off-state selection for Idle mode
+	TIM1_BDTR_LOCK = ((1UL << 2) - 1) << 8,	 // Lock configuration
+	TIM1_BDTR_DTG  = ((1UL << 8) - 1) << 0,	 // Dead-time generator setup
 };
-static inline void tim1_bdtr_set_lock(uint32_t val) { TIM1.BDTR = (TIM1.BDTR & ~TIM1_BDTR_LOCK) | ((val<<8) & TIM1_BDTR_LOCK); }
-static inline void tim1_bdtr_set_dtg(uint32_t val) { TIM1.BDTR = (TIM1.BDTR & ~TIM1_BDTR_DTG) | ((val<<0) & TIM1_BDTR_DTG); }
-static inline uint32_t tim1_bdtr_get_lock(void) { return (TIM1.BDTR & TIM1_BDTR_LOCK) >> 8 ; }
-static inline uint32_t tim1_bdtr_get_dtg(void) { return (TIM1.BDTR & TIM1_BDTR_DTG) >> 0 ; }
+static inline void tim1_bdtr_set_lock(uint32_t val) { TIM1.BDTR = (TIM1.BDTR & ~TIM1_BDTR_LOCK) | ((val << 8) & TIM1_BDTR_LOCK); }
+static inline void tim1_bdtr_set_dtg(uint32_t val) { TIM1.BDTR = (TIM1.BDTR & ~TIM1_BDTR_DTG) | ((val << 0) & TIM1_BDTR_DTG); }
+static inline uint32_t tim1_bdtr_get_lock(void) { return (TIM1.BDTR & TIM1_BDTR_LOCK) >> 8; }
+static inline uint32_t tim1_bdtr_get_dtg(void) { return (TIM1.BDTR & TIM1_BDTR_DTG) >> 0; }
 
 // TIM1->DCR DMA control register
 enum {
-	TIM1_DCR_DBL = ((1UL<<5)-1) << 8, // DMA burst length
-	TIM1_DCR_DBA = ((1UL<<5)-1) << 0, // DMA base address		
+	TIM1_DCR_DBL = ((1UL << 5) - 1) << 8,  // DMA burst length
+	TIM1_DCR_DBA = ((1UL << 5) - 1) << 0,  // DMA base address
 };
-static inline void tim1_dcr_set_dbl(uint32_t val) { TIM1.DCR = (TIM1.DCR & ~TIM1_DCR_DBL) | ((val<<8) & TIM1_DCR_DBL); }
-static inline void tim1_dcr_set_dba(uint32_t val) { TIM1.DCR = (TIM1.DCR & ~TIM1_DCR_DBA) | ((val<<0) & TIM1_DCR_DBA); }
-static inline uint32_t tim1_dcr_get_dbl(void) { return (TIM1.DCR & TIM1_DCR_DBL) >> 8 ; }
-static inline uint32_t tim1_dcr_get_dba(void) { return (TIM1.DCR & TIM1_DCR_DBA) >> 0 ; }
+static inline void	   tim1_dcr_set_dbl(uint32_t val) { TIM1.DCR = (TIM1.DCR & ~TIM1_DCR_DBL) | ((val << 8) & TIM1_DCR_DBL); }
+static inline void	   tim1_dcr_set_dba(uint32_t val) { TIM1.DCR = (TIM1.DCR & ~TIM1_DCR_DBA) | ((val << 0) & TIM1_DCR_DBA); }
+static inline uint32_t tim1_dcr_get_dbl(void) { return (TIM1.DCR & TIM1_DCR_DBL) >> 8; }
+static inline uint32_t tim1_dcr_get_dba(void) { return (TIM1.DCR & TIM1_DCR_DBA) >> 0; }
 
 // TIM1->OR1 DMA address for full transfer
 enum {
-	TIM1_OR1_TI1_RMP = 1UL<<4, // Input Capture 1 remap
-	TIM1_OR1_ETR_ADC3_RMP = ((1UL<<2)-1) << 2, // External trigger remap on ADC3 analog watchdog
-	TIM1_OR1_ETR_ADC1_RMP = ((1UL<<2)-1) << 0, // External trigger remap on ADC1 analog watchdog		
+	TIM1_OR1_TI1_RMP	  = 1UL << 4,				// Input Capture 1 remap
+	TIM1_OR1_ETR_ADC3_RMP = ((1UL << 2) - 1) << 2,	// External trigger remap on ADC3 analog watchdog
+	TIM1_OR1_ETR_ADC1_RMP = ((1UL << 2) - 1) << 0,	// External trigger remap on ADC1 analog watchdog
 };
-static inline void tim1_or1_set_etr_adc3_rmp(uint32_t val) { TIM1.OR1 = (TIM1.OR1 & ~TIM1_OR1_ETR_ADC3_RMP) | ((val<<2) & TIM1_OR1_ETR_ADC3_RMP); }
-static inline void tim1_or1_set_etr_adc1_rmp(uint32_t val) { TIM1.OR1 = (TIM1.OR1 & ~TIM1_OR1_ETR_ADC1_RMP) | ((val<<0) & TIM1_OR1_ETR_ADC1_RMP); }
-static inline uint32_t tim1_or1_get_etr_adc3_rmp(void) { return (TIM1.OR1 & TIM1_OR1_ETR_ADC3_RMP) >> 2 ; }
-static inline uint32_t tim1_or1_get_etr_adc1_rmp(void) { return (TIM1.OR1 & TIM1_OR1_ETR_ADC1_RMP) >> 0 ; }
+static inline void tim1_or1_set_etr_adc3_rmp(uint32_t val) {
+	TIM1.OR1 = (TIM1.OR1 & ~TIM1_OR1_ETR_ADC3_RMP) | ((val << 2) & TIM1_OR1_ETR_ADC3_RMP);
+}
+static inline void tim1_or1_set_etr_adc1_rmp(uint32_t val) {
+	TIM1.OR1 = (TIM1.OR1 & ~TIM1_OR1_ETR_ADC1_RMP) | ((val << 0) & TIM1_OR1_ETR_ADC1_RMP);
+}
+static inline uint32_t tim1_or1_get_etr_adc3_rmp(void) { return (TIM1.OR1 & TIM1_OR1_ETR_ADC3_RMP) >> 2; }
+static inline uint32_t tim1_or1_get_etr_adc1_rmp(void) { return (TIM1.OR1 & TIM1_OR1_ETR_ADC1_RMP) >> 0; }
 
 // TIM1->CCMR3_Output capture/compare mode register 2 (output mode)
 enum {
-	TIM1_CCMR3_OUTPUT_OC6M_BIT3 = 1UL<<24, // Output Compare 6 mode bit 3
-	TIM1_CCMR3_OUTPUT_OC5M_BIT3 = ((1UL<<3)-1) << 16, // Output Compare 5 mode bit 3
-	TIM1_CCMR3_OUTPUT_OC6CE = 1UL<<15, // Output compare 6 clear enable
-	TIM1_CCMR3_OUTPUT_OC6M = ((1UL<<3)-1) << 12, // Output compare 6 mode
-	TIM1_CCMR3_OUTPUT_OC6PE = 1UL<<11, // Output compare 6 preload enable
-	TIM1_CCMR3_OUTPUT_OC6FE = 1UL<<10, // Output compare 6 fast enable
-	TIM1_CCMR3_OUTPUT_OC5CE = 1UL<<7, // Output compare 5 clear enable
-	TIM1_CCMR3_OUTPUT_OC5M = ((1UL<<3)-1) << 4, // Output compare 5 mode
-	TIM1_CCMR3_OUTPUT_OC5PE = 1UL<<3, // Output compare 5 preload enable
-	TIM1_CCMR3_OUTPUT_OC5FE = 1UL<<2, // Output compare 5 fast enable		
+	TIM1_CCMR3_OUTPUT_OC6M_BIT3 = 1UL << 24,			   // Output Compare 6 mode bit 3
+	TIM1_CCMR3_OUTPUT_OC5M_BIT3 = ((1UL << 3) - 1) << 16,  // Output Compare 5 mode bit 3
+	TIM1_CCMR3_OUTPUT_OC6CE		= 1UL << 15,			   // Output compare 6 clear enable
+	TIM1_CCMR3_OUTPUT_OC6M		= ((1UL << 3) - 1) << 12,  // Output compare 6 mode
+	TIM1_CCMR3_OUTPUT_OC6PE		= 1UL << 11,			   // Output compare 6 preload enable
+	TIM1_CCMR3_OUTPUT_OC6FE		= 1UL << 10,			   // Output compare 6 fast enable
+	TIM1_CCMR3_OUTPUT_OC5CE		= 1UL << 7,				   // Output compare 5 clear enable
+	TIM1_CCMR3_OUTPUT_OC5M		= ((1UL << 3) - 1) << 4,   // Output compare 5 mode
+	TIM1_CCMR3_OUTPUT_OC5PE		= 1UL << 3,				   // Output compare 5 preload enable
+	TIM1_CCMR3_OUTPUT_OC5FE		= 1UL << 2,				   // Output compare 5 fast enable
 };
-static inline void tim1_ccmr3_output_set_oc5m_bit3(uint32_t val) { TIM1.CCMR3_Output = (TIM1.CCMR3_Output & ~TIM1_CCMR3_OUTPUT_OC5M_BIT3) | ((val<<16) & TIM1_CCMR3_OUTPUT_OC5M_BIT3); }
-static inline void tim1_ccmr3_output_set_oc6m(uint32_t val) { TIM1.CCMR3_Output = (TIM1.CCMR3_Output & ~TIM1_CCMR3_OUTPUT_OC6M) | ((val<<12) & TIM1_CCMR3_OUTPUT_OC6M); }
-static inline void tim1_ccmr3_output_set_oc5m(uint32_t val) { TIM1.CCMR3_Output = (TIM1.CCMR3_Output & ~TIM1_CCMR3_OUTPUT_OC5M) | ((val<<4) & TIM1_CCMR3_OUTPUT_OC5M); }
-static inline uint32_t tim1_ccmr3_output_get_oc5m_bit3(void) { return (TIM1.CCMR3_Output & TIM1_CCMR3_OUTPUT_OC5M_BIT3) >> 16 ; }
-static inline uint32_t tim1_ccmr3_output_get_oc6m(void) { return (TIM1.CCMR3_Output & TIM1_CCMR3_OUTPUT_OC6M) >> 12 ; }
-static inline uint32_t tim1_ccmr3_output_get_oc5m(void) { return (TIM1.CCMR3_Output & TIM1_CCMR3_OUTPUT_OC5M) >> 4 ; }
+static inline void tim1_ccmr3_output_set_oc5m_bit3(uint32_t val) {
+	TIM1.CCMR3_Output = (TIM1.CCMR3_Output & ~TIM1_CCMR3_OUTPUT_OC5M_BIT3) | ((val << 16) & TIM1_CCMR3_OUTPUT_OC5M_BIT3);
+}
+static inline void tim1_ccmr3_output_set_oc6m(uint32_t val) {
+	TIM1.CCMR3_Output = (TIM1.CCMR3_Output & ~TIM1_CCMR3_OUTPUT_OC6M) | ((val << 12) & TIM1_CCMR3_OUTPUT_OC6M);
+}
+static inline void tim1_ccmr3_output_set_oc5m(uint32_t val) {
+	TIM1.CCMR3_Output = (TIM1.CCMR3_Output & ~TIM1_CCMR3_OUTPUT_OC5M) | ((val << 4) & TIM1_CCMR3_OUTPUT_OC5M);
+}
+static inline uint32_t tim1_ccmr3_output_get_oc5m_bit3(void) { return (TIM1.CCMR3_Output & TIM1_CCMR3_OUTPUT_OC5M_BIT3) >> 16; }
+static inline uint32_t tim1_ccmr3_output_get_oc6m(void) { return (TIM1.CCMR3_Output & TIM1_CCMR3_OUTPUT_OC6M) >> 12; }
+static inline uint32_t tim1_ccmr3_output_get_oc5m(void) { return (TIM1.CCMR3_Output & TIM1_CCMR3_OUTPUT_OC5M) >> 4; }
 
 // TIM1->CCR5 capture/compare register 4
 enum {
-	TIM1_CCR5_GC5C3 = 1UL<<31, // Group Channel 5 and Channel 3
-	TIM1_CCR5_GC5C2 = 1UL<<30, // Group Channel 5 and Channel 2
-	TIM1_CCR5_GC5C1 = 1UL<<29, // Group Channel 5 and Channel 1
-	TIM1_CCR5_CCR5 = ((1UL<<16)-1) << 0, // Capture/Compare value		
+	TIM1_CCR5_GC5C3 = 1UL << 31,			   // Group Channel 5 and Channel 3
+	TIM1_CCR5_GC5C2 = 1UL << 30,			   // Group Channel 5 and Channel 2
+	TIM1_CCR5_GC5C1 = 1UL << 29,			   // Group Channel 5 and Channel 1
+	TIM1_CCR5_CCR5	= ((1UL << 16) - 1) << 0,  // Capture/Compare value
 };
-static inline void tim1_ccr5_set_ccr5(uint32_t val) { TIM1.CCR5 = (TIM1.CCR5 & ~TIM1_CCR5_CCR5) | ((val<<0) & TIM1_CCR5_CCR5); }
-static inline uint32_t tim1_ccr5_get_ccr5(void) { return (TIM1.CCR5 & TIM1_CCR5_CCR5) >> 0 ; }
+static inline void tim1_ccr5_set_ccr5(uint32_t val) { TIM1.CCR5 = (TIM1.CCR5 & ~TIM1_CCR5_CCR5) | ((val << 0) & TIM1_CCR5_CCR5); }
+static inline uint32_t tim1_ccr5_get_ccr5(void) { return (TIM1.CCR5 & TIM1_CCR5_CCR5) >> 0; }
 
 // TIM1->OR2 DMA address for full transfer
 enum {
-	TIM1_OR2_ETRSEL = ((1UL<<3)-1) << 14, // ETR source selection
-	TIM1_OR2_BKCMP2P = 1UL<<11, // BRK COMP2 input polarity
-	TIM1_OR2_BKCMP1P = 1UL<<10, // BRK COMP1 input polarity
-	TIM1_OR2_BKINP = 1UL<<9, // BRK BKIN input polarity
-	TIM1_OR2_BKDFBK0E = 1UL<<8, // BRK DFSDM_BREAK0 enable
-	TIM1_OR2_BKCMP2E = 1UL<<2, // BRK COMP2 enable
-	TIM1_OR2_BKCMP1E = 1UL<<1, // BRK COMP1 enable
-	TIM1_OR2_BKINE = 1UL<<0, // BRK BKIN input enable		
+	TIM1_OR2_ETRSEL	  = ((1UL << 3) - 1) << 14,	 // ETR source selection
+	TIM1_OR2_BKCMP2P  = 1UL << 11,				 // BRK COMP2 input polarity
+	TIM1_OR2_BKCMP1P  = 1UL << 10,				 // BRK COMP1 input polarity
+	TIM1_OR2_BKINP	  = 1UL << 9,				 // BRK BKIN input polarity
+	TIM1_OR2_BKDFBK0E = 1UL << 8,				 // BRK DFSDM_BREAK0 enable
+	TIM1_OR2_BKCMP2E  = 1UL << 2,				 // BRK COMP2 enable
+	TIM1_OR2_BKCMP1E  = 1UL << 1,				 // BRK COMP1 enable
+	TIM1_OR2_BKINE	  = 1UL << 0,				 // BRK BKIN input enable
 };
-static inline void tim1_or2_set_etrsel(uint32_t val) { TIM1.OR2 = (TIM1.OR2 & ~TIM1_OR2_ETRSEL) | ((val<<14) & TIM1_OR2_ETRSEL); }
-static inline uint32_t tim1_or2_get_etrsel(void) { return (TIM1.OR2 & TIM1_OR2_ETRSEL) >> 14 ; }
+static inline void tim1_or2_set_etrsel(uint32_t val) { TIM1.OR2 = (TIM1.OR2 & ~TIM1_OR2_ETRSEL) | ((val << 14) & TIM1_OR2_ETRSEL); }
+static inline uint32_t tim1_or2_get_etrsel(void) { return (TIM1.OR2 & TIM1_OR2_ETRSEL) >> 14; }
 
 // TIM1->OR3 DMA address for full transfer
 enum {
-	TIM1_OR3_BK2CMP2P = 1UL<<11, // BRK2 COMP2 input polarity
-	TIM1_OR3_BK2CMP1P = 1UL<<10, // BRK2 COMP1 input polarity
-	TIM1_OR3_BK2INP = 1UL<<9, // BRK2 BKIN input polarity
-	TIM1_OR3_BK2DFBK0E = 1UL<<8, // BRK2 DFSDM_BREAK0 enable
-	TIM1_OR3_BK2CMP2E = 1UL<<2, // BRK2 COMP2 enable
-	TIM1_OR3_BK2CMP1E = 1UL<<1, // BRK2 COMP1 enable
-	TIM1_OR3_BK2INE = 1UL<<0, // BRK2 BKIN input enable		
+	TIM1_OR3_BK2CMP2P  = 1UL << 11,	 // BRK2 COMP2 input polarity
+	TIM1_OR3_BK2CMP1P  = 1UL << 10,	 // BRK2 COMP1 input polarity
+	TIM1_OR3_BK2INP	   = 1UL << 9,	 // BRK2 BKIN input polarity
+	TIM1_OR3_BK2DFBK0E = 1UL << 8,	 // BRK2 DFSDM_BREAK0 enable
+	TIM1_OR3_BK2CMP2E  = 1UL << 2,	 // BRK2 COMP2 enable
+	TIM1_OR3_BK2CMP1E  = 1UL << 1,	 // BRK2 COMP1 enable
+	TIM1_OR3_BK2INE	   = 1UL << 0,	 // BRK2 BKIN input enable
 };
 
 // Valid Casts:
- 
-static inline struct TIM6_Type* TIM1_as_TIM6_Type(struct TIM1_Type* p) { return (struct TIM6_Type*)p; }
 
+static inline struct TIM6_Type *TIM1_as_TIM6_Type(struct TIM1_Type *p) { return (struct TIM6_Type *)p; }
 
 /* General purpose timers
 There is only one peripheral of type TIM15. */
 struct TIM15_Type {
-	__IO uint16_t CR1; // @0 control register 1
-	 uint8_t RESERVED0[2]; // @2 
-	__IO uint16_t CR2; // @4 control register 2
-	 uint8_t RESERVED1[6]; // @6 
-	__IO uint16_t DIER; // @12 DMA/Interrupt enable register
-	 uint8_t RESERVED2[2]; // @14 
-	__IO uint16_t SR; // @16 status register
-	 uint8_t RESERVED3[2]; // @18 
-	__O uint8_t EGR; // @20 event generation register
-	 uint8_t RESERVED4[3]; // @21 
-	union {  // @24
-		__IO uint32_t CCMR1_Output; // capture/compare mode register (output mode)
-		__IO uint8_t CCMR1_Input; // capture/compare mode register 1 (input mode)
+	__IO uint16_t CR1;				 // @0 control register 1
+	uint8_t		  RESERVED0[2];		 // @2
+	__IO uint16_t CR2;				 // @4 control register 2
+	uint8_t		  RESERVED1[6];		 // @6
+	__IO uint16_t DIER;				 // @12 DMA/Interrupt enable register
+	uint8_t		  RESERVED2[2];		 // @14
+	__IO uint16_t SR;				 // @16 status register
+	uint8_t		  RESERVED3[2];		 // @18
+	__O uint8_t	  EGR;				 // @20 event generation register
+	uint8_t		  RESERVED4[3];		 // @21
+	union {							 // @24
+		__IO uint32_t CCMR1_Output;	 // capture/compare mode register (output mode)
+		__IO uint8_t  CCMR1_Input;	 // capture/compare mode register 1 (input mode)
 	};
-	 uint8_t RESERVED5[4]; // @28 
-	__IO uint8_t CCER; // @32 capture/compare enable register
-	 uint8_t RESERVED6[3]; // @33 
-	__IO uint32_t CNT; // @36 counter
-	__IO uint16_t PSC; // @40 prescaler
-	 uint8_t RESERVED7[2]; // @42 
-	__IO uint16_t ARR; // @44 auto-reload register
-	 uint8_t RESERVED8[2]; // @46 
-	__IO uint8_t RCR; // @48 repetition counter register
-	 uint8_t RESERVED9[3]; // @49 
-	__IO uint16_t CCR1; // @52 capture/compare register 1
-	 uint8_t RESERVED10[14]; // @54 
-	__IO uint32_t BDTR; // @68 break and dead-time register
-	__IO uint16_t DCR; // @72 DMA control register
-	 uint8_t RESERVED11[2]; // @74 
-	__IO uint16_t DMAR; // @76 DMA address for full transfer
+	uint8_t		  RESERVED5[4];	   // @28
+	__IO uint8_t  CCER;			   // @32 capture/compare enable register
+	uint8_t		  RESERVED6[3];	   // @33
+	__IO uint32_t CNT;			   // @36 counter
+	__IO uint16_t PSC;			   // @40 prescaler
+	uint8_t		  RESERVED7[2];	   // @42
+	__IO uint16_t ARR;			   // @44 auto-reload register
+	uint8_t		  RESERVED8[2];	   // @46
+	__IO uint8_t  RCR;			   // @48 repetition counter register
+	uint8_t		  RESERVED9[3];	   // @49
+	__IO uint16_t CCR1;			   // @52 capture/compare register 1
+	uint8_t		  RESERVED10[14];  // @54
+	__IO uint32_t BDTR;			   // @68 break and dead-time register
+	__IO uint16_t DCR;			   // @72 DMA control register
+	uint8_t		  RESERVED11[2];   // @74
+	__IO uint16_t DMAR;			   // @76 DMA address for full transfer
 };
-extern struct TIM15_Type	TIM15;	// @0x40014000 
+extern struct TIM15_Type TIM15;	 // @0x40014000
 
 // TIM15->CR1 control register 1
 enum {
-	TIM15_CR1_UIFREMAP = 1UL<<11, // UIF status bit remapping
-	TIM15_CR1_CKD = ((1UL<<2)-1) << 8, // Clock division
-	TIM15_CR1_ARPE = 1UL<<7, // Auto-reload preload enable
-	TIM15_CR1_OPM = 1UL<<3, // One-pulse mode
-	TIM15_CR1_URS = 1UL<<2, // Update request source
-	TIM15_CR1_UDIS = 1UL<<1, // Update disable
-	TIM15_CR1_CEN = 1UL<<0, // Counter enable		
+	TIM15_CR1_UIFREMAP = 1UL << 11,				 // UIF status bit remapping
+	TIM15_CR1_CKD	   = ((1UL << 2) - 1) << 8,	 // Clock division
+	TIM15_CR1_ARPE	   = 1UL << 7,				 // Auto-reload preload enable
+	TIM15_CR1_OPM	   = 1UL << 3,				 // One-pulse mode
+	TIM15_CR1_URS	   = 1UL << 2,				 // Update request source
+	TIM15_CR1_UDIS	   = 1UL << 1,				 // Update disable
+	TIM15_CR1_CEN	   = 1UL << 0,				 // Counter enable
 };
-static inline void tim15_cr1_set_ckd(uint32_t val) { TIM15.CR1 = (TIM15.CR1 & ~TIM15_CR1_CKD) | ((val<<8) & TIM15_CR1_CKD); }
-static inline uint32_t tim15_cr1_get_ckd(void) { return (TIM15.CR1 & TIM15_CR1_CKD) >> 8 ; }
+static inline void	   tim15_cr1_set_ckd(uint32_t val) { TIM15.CR1 = (TIM15.CR1 & ~TIM15_CR1_CKD) | ((val << 8) & TIM15_CR1_CKD); }
+static inline uint32_t tim15_cr1_get_ckd(void) { return (TIM15.CR1 & TIM15_CR1_CKD) >> 8; }
 
 // TIM15->CR2 control register 2
 enum {
-	TIM15_CR2_OIS1N = 1UL<<9, // Output Idle state 1
-	TIM15_CR2_OIS1 = 1UL<<8, // Output Idle state 1
-	TIM15_CR2_CCDS = 1UL<<3, // Capture/compare DMA selection
-	TIM15_CR2_CCUS = 1UL<<2, // Capture/compare control update selection
-	TIM15_CR2_CCPC = 1UL<<0, // Capture/compare preloaded control		
+	TIM15_CR2_OIS1N = 1UL << 9,	 // Output Idle state 1
+	TIM15_CR2_OIS1	= 1UL << 8,	 // Output Idle state 1
+	TIM15_CR2_CCDS	= 1UL << 3,	 // Capture/compare DMA selection
+	TIM15_CR2_CCUS	= 1UL << 2,	 // Capture/compare control update selection
+	TIM15_CR2_CCPC	= 1UL << 0,	 // Capture/compare preloaded control
 };
 
 // TIM15->DIER DMA/Interrupt enable register
 enum {
-	TIM15_DIER_TDE = 1UL<<14, // Trigger DMA request enable
-	TIM15_DIER_COMDE = 1UL<<13, // COM DMA request enable
-	TIM15_DIER_CC1DE = 1UL<<9, // Capture/Compare 1 DMA request enable
-	TIM15_DIER_UDE = 1UL<<8, // Update DMA request enable
-	TIM15_DIER_BIE = 1UL<<7, // Break interrupt enable
-	TIM15_DIER_TIE = 1UL<<6, // Trigger interrupt enable
-	TIM15_DIER_COMIE = 1UL<<5, // COM interrupt enable
-	TIM15_DIER_CC1IE = 1UL<<1, // Capture/Compare 1 interrupt enable
-	TIM15_DIER_UIE = 1UL<<0, // Update interrupt enable		
+	TIM15_DIER_TDE	 = 1UL << 14,  // Trigger DMA request enable
+	TIM15_DIER_COMDE = 1UL << 13,  // COM DMA request enable
+	TIM15_DIER_CC1DE = 1UL << 9,   // Capture/Compare 1 DMA request enable
+	TIM15_DIER_UDE	 = 1UL << 8,   // Update DMA request enable
+	TIM15_DIER_BIE	 = 1UL << 7,   // Break interrupt enable
+	TIM15_DIER_TIE	 = 1UL << 6,   // Trigger interrupt enable
+	TIM15_DIER_COMIE = 1UL << 5,   // COM interrupt enable
+	TIM15_DIER_CC1IE = 1UL << 1,   // Capture/Compare 1 interrupt enable
+	TIM15_DIER_UIE	 = 1UL << 0,   // Update interrupt enable
 };
 
 // TIM15->SR status register
 enum {
-	TIM15_SR_CC1OF = 1UL<<9, // Capture/Compare 1 overcapture flag
-	TIM15_SR_BIF = 1UL<<7, // Break interrupt flag
-	TIM15_SR_TIF = 1UL<<6, // Trigger interrupt flag
-	TIM15_SR_COMIF = 1UL<<5, // COM interrupt flag
-	TIM15_SR_CC1IF = 1UL<<1, // Capture/compare 1 interrupt flag
-	TIM15_SR_UIF = 1UL<<0, // Update interrupt flag		
+	TIM15_SR_CC1OF = 1UL << 9,	// Capture/Compare 1 overcapture flag
+	TIM15_SR_BIF   = 1UL << 7,	// Break interrupt flag
+	TIM15_SR_TIF   = 1UL << 6,	// Trigger interrupt flag
+	TIM15_SR_COMIF = 1UL << 5,	// COM interrupt flag
+	TIM15_SR_CC1IF = 1UL << 1,	// Capture/compare 1 interrupt flag
+	TIM15_SR_UIF   = 1UL << 0,	// Update interrupt flag
 };
 
 // TIM15->EGR event generation register
 enum {
-	TIM15_EGR_BG = 1UL<<7, // Break generation
-	TIM15_EGR_TG = 1UL<<6, // Trigger generation
-	TIM15_EGR_COMG = 1UL<<5, // Capture/Compare control update generation
-	TIM15_EGR_CC1G = 1UL<<1, // Capture/compare 1 generation
-	TIM15_EGR_UG = 1UL<<0, // Update generation		
+	TIM15_EGR_BG   = 1UL << 7,	// Break generation
+	TIM15_EGR_TG   = 1UL << 6,	// Trigger generation
+	TIM15_EGR_COMG = 1UL << 5,	// Capture/Compare control update generation
+	TIM15_EGR_CC1G = 1UL << 1,	// Capture/compare 1 generation
+	TIM15_EGR_UG   = 1UL << 0,	// Update generation
 };
 
 // TIM15->CCMR1_Output capture/compare mode register (output mode)
 enum {
-	TIM15_CCMR1_OUTPUT_OC1M_2 = 1UL<<16, // Output Compare 1 mode
-	TIM15_CCMR1_OUTPUT_OC1M = ((1UL<<3)-1) << 4, // Output Compare 1 mode
-	TIM15_CCMR1_OUTPUT_OC1PE = 1UL<<3, // Output Compare 1 preload enable
-	TIM15_CCMR1_OUTPUT_OC1FE = 1UL<<2, // Output Compare 1 fast enable
-	TIM15_CCMR1_OUTPUT_CC1S = ((1UL<<2)-1) << 0, // Capture/Compare 1 selection		
+	TIM15_CCMR1_OUTPUT_OC1M_2 = 1UL << 16,				// Output Compare 1 mode
+	TIM15_CCMR1_OUTPUT_OC1M	  = ((1UL << 3) - 1) << 4,	// Output Compare 1 mode
+	TIM15_CCMR1_OUTPUT_OC1PE  = 1UL << 3,				// Output Compare 1 preload enable
+	TIM15_CCMR1_OUTPUT_OC1FE  = 1UL << 2,				// Output Compare 1 fast enable
+	TIM15_CCMR1_OUTPUT_CC1S	  = ((1UL << 2) - 1) << 0,	// Capture/Compare 1 selection
 };
-static inline void tim15_ccmr1_output_set_oc1m(uint32_t val) { TIM15.CCMR1_Output = (TIM15.CCMR1_Output & ~TIM15_CCMR1_OUTPUT_OC1M) | ((val<<4) & TIM15_CCMR1_OUTPUT_OC1M); }
-static inline void tim15_ccmr1_output_set_cc1s(uint32_t val) { TIM15.CCMR1_Output = (TIM15.CCMR1_Output & ~TIM15_CCMR1_OUTPUT_CC1S) | ((val<<0) & TIM15_CCMR1_OUTPUT_CC1S); }
-static inline uint32_t tim15_ccmr1_output_get_oc1m(void) { return (TIM15.CCMR1_Output & TIM15_CCMR1_OUTPUT_OC1M) >> 4 ; }
-static inline uint32_t tim15_ccmr1_output_get_cc1s(void) { return (TIM15.CCMR1_Output & TIM15_CCMR1_OUTPUT_CC1S) >> 0 ; }
+static inline void tim15_ccmr1_output_set_oc1m(uint32_t val) {
+	TIM15.CCMR1_Output = (TIM15.CCMR1_Output & ~TIM15_CCMR1_OUTPUT_OC1M) | ((val << 4) & TIM15_CCMR1_OUTPUT_OC1M);
+}
+static inline void tim15_ccmr1_output_set_cc1s(uint32_t val) {
+	TIM15.CCMR1_Output = (TIM15.CCMR1_Output & ~TIM15_CCMR1_OUTPUT_CC1S) | ((val << 0) & TIM15_CCMR1_OUTPUT_CC1S);
+}
+static inline uint32_t tim15_ccmr1_output_get_oc1m(void) { return (TIM15.CCMR1_Output & TIM15_CCMR1_OUTPUT_OC1M) >> 4; }
+static inline uint32_t tim15_ccmr1_output_get_cc1s(void) { return (TIM15.CCMR1_Output & TIM15_CCMR1_OUTPUT_CC1S) >> 0; }
 
 // TIM15->CCER capture/compare enable register
 enum {
-	TIM15_CCER_CC1NP = 1UL<<3, // Capture/Compare 1 output Polarity
-	TIM15_CCER_CC1NE = 1UL<<2, // Capture/Compare 1 complementary output enable
-	TIM15_CCER_CC1P = 1UL<<1, // Capture/Compare 1 output Polarity
-	TIM15_CCER_CC1E = 1UL<<0, // Capture/Compare 1 output enable		
+	TIM15_CCER_CC1NP = 1UL << 3,  // Capture/Compare 1 output Polarity
+	TIM15_CCER_CC1NE = 1UL << 2,  // Capture/Compare 1 complementary output enable
+	TIM15_CCER_CC1P	 = 1UL << 1,  // Capture/Compare 1 output Polarity
+	TIM15_CCER_CC1E	 = 1UL << 0,  // Capture/Compare 1 output enable
 };
 
 // TIM15->CNT counter
 enum {
-	TIM15_CNT_UIFCPY = 1UL<<31, // UIF Copy
-	TIM15_CNT_CNT = ((1UL<<16)-1) << 0, // counter value		
+	TIM15_CNT_UIFCPY = 1UL << 31,				// UIF Copy
+	TIM15_CNT_CNT	 = ((1UL << 16) - 1) << 0,	// counter value
 };
-static inline void tim15_cnt_set_cnt(uint32_t val) { TIM15.CNT = (TIM15.CNT & ~TIM15_CNT_CNT) | ((val<<0) & TIM15_CNT_CNT); }
-static inline uint32_t tim15_cnt_get_cnt(void) { return (TIM15.CNT & TIM15_CNT_CNT) >> 0 ; }
+static inline void	   tim15_cnt_set_cnt(uint32_t val) { TIM15.CNT = (TIM15.CNT & ~TIM15_CNT_CNT) | ((val << 0) & TIM15_CNT_CNT); }
+static inline uint32_t tim15_cnt_get_cnt(void) { return (TIM15.CNT & TIM15_CNT_CNT) >> 0; }
 
 // TIM15->BDTR break and dead-time register
 enum {
-	TIM15_BDTR_BKF = ((1UL<<4)-1) << 16, // Break filter
-	TIM15_BDTR_MOE = 1UL<<15, // Main output enable
-	TIM15_BDTR_AOE = 1UL<<14, // Automatic output enable
-	TIM15_BDTR_BKP = 1UL<<13, // Break polarity
-	TIM15_BDTR_BKE = 1UL<<12, // Break enable
-	TIM15_BDTR_OSSR = 1UL<<11, // Off-state selection for Run mode
-	TIM15_BDTR_OSSI = 1UL<<10, // Off-state selection for Idle mode
-	TIM15_BDTR_LOCK = ((1UL<<2)-1) << 8, // Lock configuration
-	TIM15_BDTR_DTG = ((1UL<<8)-1) << 0, // Dead-time generator setup		
+	TIM15_BDTR_BKF	= ((1UL << 4) - 1) << 16,  // Break filter
+	TIM15_BDTR_MOE	= 1UL << 15,			   // Main output enable
+	TIM15_BDTR_AOE	= 1UL << 14,			   // Automatic output enable
+	TIM15_BDTR_BKP	= 1UL << 13,			   // Break polarity
+	TIM15_BDTR_BKE	= 1UL << 12,			   // Break enable
+	TIM15_BDTR_OSSR = 1UL << 11,			   // Off-state selection for Run mode
+	TIM15_BDTR_OSSI = 1UL << 10,			   // Off-state selection for Idle mode
+	TIM15_BDTR_LOCK = ((1UL << 2) - 1) << 8,   // Lock configuration
+	TIM15_BDTR_DTG	= ((1UL << 8) - 1) << 0,   // Dead-time generator setup
 };
-static inline void tim15_bdtr_set_bkf(uint32_t val) { TIM15.BDTR = (TIM15.BDTR & ~TIM15_BDTR_BKF) | ((val<<16) & TIM15_BDTR_BKF); }
-static inline void tim15_bdtr_set_lock(uint32_t val) { TIM15.BDTR = (TIM15.BDTR & ~TIM15_BDTR_LOCK) | ((val<<8) & TIM15_BDTR_LOCK); }
-static inline void tim15_bdtr_set_dtg(uint32_t val) { TIM15.BDTR = (TIM15.BDTR & ~TIM15_BDTR_DTG) | ((val<<0) & TIM15_BDTR_DTG); }
-static inline uint32_t tim15_bdtr_get_bkf(void) { return (TIM15.BDTR & TIM15_BDTR_BKF) >> 16 ; }
-static inline uint32_t tim15_bdtr_get_lock(void) { return (TIM15.BDTR & TIM15_BDTR_LOCK) >> 8 ; }
-static inline uint32_t tim15_bdtr_get_dtg(void) { return (TIM15.BDTR & TIM15_BDTR_DTG) >> 0 ; }
+static inline void tim15_bdtr_set_bkf(uint32_t val) {
+	TIM15.BDTR = (TIM15.BDTR & ~TIM15_BDTR_BKF) | ((val << 16) & TIM15_BDTR_BKF);
+}
+static inline void tim15_bdtr_set_lock(uint32_t val) {
+	TIM15.BDTR = (TIM15.BDTR & ~TIM15_BDTR_LOCK) | ((val << 8) & TIM15_BDTR_LOCK);
+}
+static inline void tim15_bdtr_set_dtg(uint32_t val) { TIM15.BDTR = (TIM15.BDTR & ~TIM15_BDTR_DTG) | ((val << 0) & TIM15_BDTR_DTG); }
+static inline uint32_t tim15_bdtr_get_bkf(void) { return (TIM15.BDTR & TIM15_BDTR_BKF) >> 16; }
+static inline uint32_t tim15_bdtr_get_lock(void) { return (TIM15.BDTR & TIM15_BDTR_LOCK) >> 8; }
+static inline uint32_t tim15_bdtr_get_dtg(void) { return (TIM15.BDTR & TIM15_BDTR_DTG) >> 0; }
 
 // TIM15->DCR DMA control register
 enum {
-	TIM15_DCR_DBL = ((1UL<<5)-1) << 8, // DMA burst length
-	TIM15_DCR_DBA = ((1UL<<5)-1) << 0, // DMA base address		
+	TIM15_DCR_DBL = ((1UL << 5) - 1) << 8,	// DMA burst length
+	TIM15_DCR_DBA = ((1UL << 5) - 1) << 0,	// DMA base address
 };
-static inline void tim15_dcr_set_dbl(uint32_t val) { TIM15.DCR = (TIM15.DCR & ~TIM15_DCR_DBL) | ((val<<8) & TIM15_DCR_DBL); }
-static inline void tim15_dcr_set_dba(uint32_t val) { TIM15.DCR = (TIM15.DCR & ~TIM15_DCR_DBA) | ((val<<0) & TIM15_DCR_DBA); }
-static inline uint32_t tim15_dcr_get_dbl(void) { return (TIM15.DCR & TIM15_DCR_DBL) >> 8 ; }
-static inline uint32_t tim15_dcr_get_dba(void) { return (TIM15.DCR & TIM15_DCR_DBA) >> 0 ; }
+static inline void	   tim15_dcr_set_dbl(uint32_t val) { TIM15.DCR = (TIM15.DCR & ~TIM15_DCR_DBL) | ((val << 8) & TIM15_DCR_DBL); }
+static inline void	   tim15_dcr_set_dba(uint32_t val) { TIM15.DCR = (TIM15.DCR & ~TIM15_DCR_DBA) | ((val << 0) & TIM15_DCR_DBA); }
+static inline uint32_t tim15_dcr_get_dbl(void) { return (TIM15.DCR & TIM15_DCR_DBL) >> 8; }
+static inline uint32_t tim15_dcr_get_dba(void) { return (TIM15.DCR & TIM15_DCR_DBA) >> 0; }
 
 /* General purpose timers
 There is only one peripheral of type TIM16. */
 struct TIM16_Type {
-	__IO uint16_t CR1; // @0 control register 1
-	 uint8_t RESERVED0[2]; // @2 
-	__IO uint16_t CR2; // @4 control register 2
-	 uint8_t RESERVED1[6]; // @6 
-	__IO uint16_t DIER; // @12 DMA/Interrupt enable register
-	 uint8_t RESERVED2[2]; // @14 
-	__IO uint16_t SR; // @16 status register
-	 uint8_t RESERVED3[2]; // @18 
-	__O uint8_t EGR; // @20 event generation register
-	 uint8_t RESERVED4[3]; // @21 
-	union {  // @24
-		__IO uint32_t CCMR1_Output; // capture/compare mode register (output mode)
-		__IO uint8_t CCMR1_Input; // capture/compare mode register 1 (input mode)
+	__IO uint16_t CR1;				 // @0 control register 1
+	uint8_t		  RESERVED0[2];		 // @2
+	__IO uint16_t CR2;				 // @4 control register 2
+	uint8_t		  RESERVED1[6];		 // @6
+	__IO uint16_t DIER;				 // @12 DMA/Interrupt enable register
+	uint8_t		  RESERVED2[2];		 // @14
+	__IO uint16_t SR;				 // @16 status register
+	uint8_t		  RESERVED3[2];		 // @18
+	__O uint8_t	  EGR;				 // @20 event generation register
+	uint8_t		  RESERVED4[3];		 // @21
+	union {							 // @24
+		__IO uint32_t CCMR1_Output;	 // capture/compare mode register (output mode)
+		__IO uint8_t  CCMR1_Input;	 // capture/compare mode register 1 (input mode)
 	};
-	 uint8_t RESERVED5[4]; // @28 
-	__IO uint8_t CCER; // @32 capture/compare enable register
-	 uint8_t RESERVED6[3]; // @33 
-	__IO uint32_t CNT; // @36 counter
-	__IO uint16_t PSC; // @40 prescaler
-	 uint8_t RESERVED7[2]; // @42 
-	__IO uint16_t ARR; // @44 auto-reload register
-	 uint8_t RESERVED8[2]; // @46 
-	__IO uint8_t RCR; // @48 repetition counter register
-	 uint8_t RESERVED9[3]; // @49 
-	__IO uint16_t CCR1; // @52 capture/compare register 1
-	 uint8_t RESERVED10[14]; // @54 
-	__IO uint32_t BDTR; // @68 break and dead-time register
-	__IO uint16_t DCR; // @72 DMA control register
-	 uint8_t RESERVED11[2]; // @74 
-	__IO uint16_t DMAR; // @76 DMA address for full transfer
-	 uint8_t RESERVED12[2]; // @78 
-	__IO uint8_t OR1; // @80 TIM16 option register 1
-	 uint8_t RESERVED13[15]; // @81 
-	__IO uint16_t OR2; // @96 TIM17 option register 1
+	uint8_t		  RESERVED5[4];	   // @28
+	__IO uint8_t  CCER;			   // @32 capture/compare enable register
+	uint8_t		  RESERVED6[3];	   // @33
+	__IO uint32_t CNT;			   // @36 counter
+	__IO uint16_t PSC;			   // @40 prescaler
+	uint8_t		  RESERVED7[2];	   // @42
+	__IO uint16_t ARR;			   // @44 auto-reload register
+	uint8_t		  RESERVED8[2];	   // @46
+	__IO uint8_t  RCR;			   // @48 repetition counter register
+	uint8_t		  RESERVED9[3];	   // @49
+	__IO uint16_t CCR1;			   // @52 capture/compare register 1
+	uint8_t		  RESERVED10[14];  // @54
+	__IO uint32_t BDTR;			   // @68 break and dead-time register
+	__IO uint16_t DCR;			   // @72 DMA control register
+	uint8_t		  RESERVED11[2];   // @74
+	__IO uint16_t DMAR;			   // @76 DMA address for full transfer
+	uint8_t		  RESERVED12[2];   // @78
+	__IO uint8_t  OR1;			   // @80 TIM16 option register 1
+	uint8_t		  RESERVED13[15];  // @81
+	__IO uint16_t OR2;			   // @96 TIM17 option register 1
 };
-extern struct TIM16_Type	TIM16;	// @0x40014400 Also: TIM15_Type
+extern struct TIM16_Type TIM16;	 // @0x40014400 Also: TIM15_Type
 
 // TIM16->CR1 control register 1
 enum {
-	TIM16_CR1_UIFREMAP = 1UL<<11, // UIF status bit remapping
-	TIM16_CR1_CKD = ((1UL<<2)-1) << 8, // Clock division
-	TIM16_CR1_ARPE = 1UL<<7, // Auto-reload preload enable
-	TIM16_CR1_OPM = 1UL<<3, // One-pulse mode
-	TIM16_CR1_URS = 1UL<<2, // Update request source
-	TIM16_CR1_UDIS = 1UL<<1, // Update disable
-	TIM16_CR1_CEN = 1UL<<0, // Counter enable		
+	TIM16_CR1_UIFREMAP = 1UL << 11,				 // UIF status bit remapping
+	TIM16_CR1_CKD	   = ((1UL << 2) - 1) << 8,	 // Clock division
+	TIM16_CR1_ARPE	   = 1UL << 7,				 // Auto-reload preload enable
+	TIM16_CR1_OPM	   = 1UL << 3,				 // One-pulse mode
+	TIM16_CR1_URS	   = 1UL << 2,				 // Update request source
+	TIM16_CR1_UDIS	   = 1UL << 1,				 // Update disable
+	TIM16_CR1_CEN	   = 1UL << 0,				 // Counter enable
 };
-static inline void tim16_cr1_set_ckd(uint32_t val) { TIM16.CR1 = (TIM16.CR1 & ~TIM16_CR1_CKD) | ((val<<8) & TIM16_CR1_CKD); }
-static inline uint32_t tim16_cr1_get_ckd(void) { return (TIM16.CR1 & TIM16_CR1_CKD) >> 8 ; }
+static inline void	   tim16_cr1_set_ckd(uint32_t val) { TIM16.CR1 = (TIM16.CR1 & ~TIM16_CR1_CKD) | ((val << 8) & TIM16_CR1_CKD); }
+static inline uint32_t tim16_cr1_get_ckd(void) { return (TIM16.CR1 & TIM16_CR1_CKD) >> 8; }
 
 // TIM16->CR2 control register 2
 enum {
-	TIM16_CR2_OIS1N = 1UL<<9, // Output Idle state 1
-	TIM16_CR2_OIS1 = 1UL<<8, // Output Idle state 1
-	TIM16_CR2_CCDS = 1UL<<3, // Capture/compare DMA selection
-	TIM16_CR2_CCUS = 1UL<<2, // Capture/compare control update selection
-	TIM16_CR2_CCPC = 1UL<<0, // Capture/compare preloaded control		
+	TIM16_CR2_OIS1N = 1UL << 9,	 // Output Idle state 1
+	TIM16_CR2_OIS1	= 1UL << 8,	 // Output Idle state 1
+	TIM16_CR2_CCDS	= 1UL << 3,	 // Capture/compare DMA selection
+	TIM16_CR2_CCUS	= 1UL << 2,	 // Capture/compare control update selection
+	TIM16_CR2_CCPC	= 1UL << 0,	 // Capture/compare preloaded control
 };
 
 // TIM16->DIER DMA/Interrupt enable register
 enum {
-	TIM16_DIER_TDE = 1UL<<14, // Trigger DMA request enable
-	TIM16_DIER_COMDE = 1UL<<13, // COM DMA request enable
-	TIM16_DIER_CC1DE = 1UL<<9, // Capture/Compare 1 DMA request enable
-	TIM16_DIER_UDE = 1UL<<8, // Update DMA request enable
-	TIM16_DIER_BIE = 1UL<<7, // Break interrupt enable
-	TIM16_DIER_TIE = 1UL<<6, // Trigger interrupt enable
-	TIM16_DIER_COMIE = 1UL<<5, // COM interrupt enable
-	TIM16_DIER_CC1IE = 1UL<<1, // Capture/Compare 1 interrupt enable
-	TIM16_DIER_UIE = 1UL<<0, // Update interrupt enable		
+	TIM16_DIER_TDE	 = 1UL << 14,  // Trigger DMA request enable
+	TIM16_DIER_COMDE = 1UL << 13,  // COM DMA request enable
+	TIM16_DIER_CC1DE = 1UL << 9,   // Capture/Compare 1 DMA request enable
+	TIM16_DIER_UDE	 = 1UL << 8,   // Update DMA request enable
+	TIM16_DIER_BIE	 = 1UL << 7,   // Break interrupt enable
+	TIM16_DIER_TIE	 = 1UL << 6,   // Trigger interrupt enable
+	TIM16_DIER_COMIE = 1UL << 5,   // COM interrupt enable
+	TIM16_DIER_CC1IE = 1UL << 1,   // Capture/Compare 1 interrupt enable
+	TIM16_DIER_UIE	 = 1UL << 0,   // Update interrupt enable
 };
 
 // TIM16->SR status register
 enum {
-	TIM16_SR_CC1OF = 1UL<<9, // Capture/Compare 1 overcapture flag
-	TIM16_SR_BIF = 1UL<<7, // Break interrupt flag
-	TIM16_SR_TIF = 1UL<<6, // Trigger interrupt flag
-	TIM16_SR_COMIF = 1UL<<5, // COM interrupt flag
-	TIM16_SR_CC1IF = 1UL<<1, // Capture/compare 1 interrupt flag
-	TIM16_SR_UIF = 1UL<<0, // Update interrupt flag		
+	TIM16_SR_CC1OF = 1UL << 9,	// Capture/Compare 1 overcapture flag
+	TIM16_SR_BIF   = 1UL << 7,	// Break interrupt flag
+	TIM16_SR_TIF   = 1UL << 6,	// Trigger interrupt flag
+	TIM16_SR_COMIF = 1UL << 5,	// COM interrupt flag
+	TIM16_SR_CC1IF = 1UL << 1,	// Capture/compare 1 interrupt flag
+	TIM16_SR_UIF   = 1UL << 0,	// Update interrupt flag
 };
 
 // TIM16->EGR event generation register
 enum {
-	TIM16_EGR_BG = 1UL<<7, // Break generation
-	TIM16_EGR_TG = 1UL<<6, // Trigger generation
-	TIM16_EGR_COMG = 1UL<<5, // Capture/Compare control update generation
-	TIM16_EGR_CC1G = 1UL<<1, // Capture/compare 1 generation
-	TIM16_EGR_UG = 1UL<<0, // Update generation		
+	TIM16_EGR_BG   = 1UL << 7,	// Break generation
+	TIM16_EGR_TG   = 1UL << 6,	// Trigger generation
+	TIM16_EGR_COMG = 1UL << 5,	// Capture/Compare control update generation
+	TIM16_EGR_CC1G = 1UL << 1,	// Capture/compare 1 generation
+	TIM16_EGR_UG   = 1UL << 0,	// Update generation
 };
 
 // TIM16->CCMR1_Output capture/compare mode register (output mode)
 enum {
-	TIM16_CCMR1_OUTPUT_OC1M_2 = 1UL<<16, // Output Compare 1 mode
-	TIM16_CCMR1_OUTPUT_OC1M = ((1UL<<3)-1) << 4, // Output Compare 1 mode
-	TIM16_CCMR1_OUTPUT_OC1PE = 1UL<<3, // Output Compare 1 preload enable
-	TIM16_CCMR1_OUTPUT_OC1FE = 1UL<<2, // Output Compare 1 fast enable
-	TIM16_CCMR1_OUTPUT_CC1S = ((1UL<<2)-1) << 0, // Capture/Compare 1 selection		
+	TIM16_CCMR1_OUTPUT_OC1M_2 = 1UL << 16,				// Output Compare 1 mode
+	TIM16_CCMR1_OUTPUT_OC1M	  = ((1UL << 3) - 1) << 4,	// Output Compare 1 mode
+	TIM16_CCMR1_OUTPUT_OC1PE  = 1UL << 3,				// Output Compare 1 preload enable
+	TIM16_CCMR1_OUTPUT_OC1FE  = 1UL << 2,				// Output Compare 1 fast enable
+	TIM16_CCMR1_OUTPUT_CC1S	  = ((1UL << 2) - 1) << 0,	// Capture/Compare 1 selection
 };
-static inline void tim16_ccmr1_output_set_oc1m(uint32_t val) { TIM16.CCMR1_Output = (TIM16.CCMR1_Output & ~TIM16_CCMR1_OUTPUT_OC1M) | ((val<<4) & TIM16_CCMR1_OUTPUT_OC1M); }
-static inline void tim16_ccmr1_output_set_cc1s(uint32_t val) { TIM16.CCMR1_Output = (TIM16.CCMR1_Output & ~TIM16_CCMR1_OUTPUT_CC1S) | ((val<<0) & TIM16_CCMR1_OUTPUT_CC1S); }
-static inline uint32_t tim16_ccmr1_output_get_oc1m(void) { return (TIM16.CCMR1_Output & TIM16_CCMR1_OUTPUT_OC1M) >> 4 ; }
-static inline uint32_t tim16_ccmr1_output_get_cc1s(void) { return (TIM16.CCMR1_Output & TIM16_CCMR1_OUTPUT_CC1S) >> 0 ; }
+static inline void tim16_ccmr1_output_set_oc1m(uint32_t val) {
+	TIM16.CCMR1_Output = (TIM16.CCMR1_Output & ~TIM16_CCMR1_OUTPUT_OC1M) | ((val << 4) & TIM16_CCMR1_OUTPUT_OC1M);
+}
+static inline void tim16_ccmr1_output_set_cc1s(uint32_t val) {
+	TIM16.CCMR1_Output = (TIM16.CCMR1_Output & ~TIM16_CCMR1_OUTPUT_CC1S) | ((val << 0) & TIM16_CCMR1_OUTPUT_CC1S);
+}
+static inline uint32_t tim16_ccmr1_output_get_oc1m(void) { return (TIM16.CCMR1_Output & TIM16_CCMR1_OUTPUT_OC1M) >> 4; }
+static inline uint32_t tim16_ccmr1_output_get_cc1s(void) { return (TIM16.CCMR1_Output & TIM16_CCMR1_OUTPUT_CC1S) >> 0; }
 
 // TIM16->CCER capture/compare enable register
 enum {
-	TIM16_CCER_CC1NP = 1UL<<3, // Capture/Compare 1 output Polarity
-	TIM16_CCER_CC1NE = 1UL<<2, // Capture/Compare 1 complementary output enable
-	TIM16_CCER_CC1P = 1UL<<1, // Capture/Compare 1 output Polarity
-	TIM16_CCER_CC1E = 1UL<<0, // Capture/Compare 1 output enable		
+	TIM16_CCER_CC1NP = 1UL << 3,  // Capture/Compare 1 output Polarity
+	TIM16_CCER_CC1NE = 1UL << 2,  // Capture/Compare 1 complementary output enable
+	TIM16_CCER_CC1P	 = 1UL << 1,  // Capture/Compare 1 output Polarity
+	TIM16_CCER_CC1E	 = 1UL << 0,  // Capture/Compare 1 output enable
 };
 
 // TIM16->CNT counter
 enum {
-	TIM16_CNT_UIFCPY = 1UL<<31, // UIF Copy
-	TIM16_CNT_CNT = ((1UL<<16)-1) << 0, // counter value		
+	TIM16_CNT_UIFCPY = 1UL << 31,				// UIF Copy
+	TIM16_CNT_CNT	 = ((1UL << 16) - 1) << 0,	// counter value
 };
-static inline void tim16_cnt_set_cnt(uint32_t val) { TIM16.CNT = (TIM16.CNT & ~TIM16_CNT_CNT) | ((val<<0) & TIM16_CNT_CNT); }
-static inline uint32_t tim16_cnt_get_cnt(void) { return (TIM16.CNT & TIM16_CNT_CNT) >> 0 ; }
+static inline void	   tim16_cnt_set_cnt(uint32_t val) { TIM16.CNT = (TIM16.CNT & ~TIM16_CNT_CNT) | ((val << 0) & TIM16_CNT_CNT); }
+static inline uint32_t tim16_cnt_get_cnt(void) { return (TIM16.CNT & TIM16_CNT_CNT) >> 0; }
 
 // TIM16->BDTR break and dead-time register
 enum {
-	TIM16_BDTR_BKF = ((1UL<<4)-1) << 16, // Break filter
-	TIM16_BDTR_MOE = 1UL<<15, // Main output enable
-	TIM16_BDTR_AOE = 1UL<<14, // Automatic output enable
-	TIM16_BDTR_BKP = 1UL<<13, // Break polarity
-	TIM16_BDTR_BKE = 1UL<<12, // Break enable
-	TIM16_BDTR_OSSR = 1UL<<11, // Off-state selection for Run mode
-	TIM16_BDTR_OSSI = 1UL<<10, // Off-state selection for Idle mode
-	TIM16_BDTR_LOCK = ((1UL<<2)-1) << 8, // Lock configuration
-	TIM16_BDTR_DTG = ((1UL<<8)-1) << 0, // Dead-time generator setup		
+	TIM16_BDTR_BKF	= ((1UL << 4) - 1) << 16,  // Break filter
+	TIM16_BDTR_MOE	= 1UL << 15,			   // Main output enable
+	TIM16_BDTR_AOE	= 1UL << 14,			   // Automatic output enable
+	TIM16_BDTR_BKP	= 1UL << 13,			   // Break polarity
+	TIM16_BDTR_BKE	= 1UL << 12,			   // Break enable
+	TIM16_BDTR_OSSR = 1UL << 11,			   // Off-state selection for Run mode
+	TIM16_BDTR_OSSI = 1UL << 10,			   // Off-state selection for Idle mode
+	TIM16_BDTR_LOCK = ((1UL << 2) - 1) << 8,   // Lock configuration
+	TIM16_BDTR_DTG	= ((1UL << 8) - 1) << 0,   // Dead-time generator setup
 };
-static inline void tim16_bdtr_set_bkf(uint32_t val) { TIM16.BDTR = (TIM16.BDTR & ~TIM16_BDTR_BKF) | ((val<<16) & TIM16_BDTR_BKF); }
-static inline void tim16_bdtr_set_lock(uint32_t val) { TIM16.BDTR = (TIM16.BDTR & ~TIM16_BDTR_LOCK) | ((val<<8) & TIM16_BDTR_LOCK); }
-static inline void tim16_bdtr_set_dtg(uint32_t val) { TIM16.BDTR = (TIM16.BDTR & ~TIM16_BDTR_DTG) | ((val<<0) & TIM16_BDTR_DTG); }
-static inline uint32_t tim16_bdtr_get_bkf(void) { return (TIM16.BDTR & TIM16_BDTR_BKF) >> 16 ; }
-static inline uint32_t tim16_bdtr_get_lock(void) { return (TIM16.BDTR & TIM16_BDTR_LOCK) >> 8 ; }
-static inline uint32_t tim16_bdtr_get_dtg(void) { return (TIM16.BDTR & TIM16_BDTR_DTG) >> 0 ; }
+static inline void tim16_bdtr_set_bkf(uint32_t val) {
+	TIM16.BDTR = (TIM16.BDTR & ~TIM16_BDTR_BKF) | ((val << 16) & TIM16_BDTR_BKF);
+}
+static inline void tim16_bdtr_set_lock(uint32_t val) {
+	TIM16.BDTR = (TIM16.BDTR & ~TIM16_BDTR_LOCK) | ((val << 8) & TIM16_BDTR_LOCK);
+}
+static inline void tim16_bdtr_set_dtg(uint32_t val) { TIM16.BDTR = (TIM16.BDTR & ~TIM16_BDTR_DTG) | ((val << 0) & TIM16_BDTR_DTG); }
+static inline uint32_t tim16_bdtr_get_bkf(void) { return (TIM16.BDTR & TIM16_BDTR_BKF) >> 16; }
+static inline uint32_t tim16_bdtr_get_lock(void) { return (TIM16.BDTR & TIM16_BDTR_LOCK) >> 8; }
+static inline uint32_t tim16_bdtr_get_dtg(void) { return (TIM16.BDTR & TIM16_BDTR_DTG) >> 0; }
 
 // TIM16->DCR DMA control register
 enum {
-	TIM16_DCR_DBL = ((1UL<<5)-1) << 8, // DMA burst length
-	TIM16_DCR_DBA = ((1UL<<5)-1) << 0, // DMA base address		
+	TIM16_DCR_DBL = ((1UL << 5) - 1) << 8,	// DMA burst length
+	TIM16_DCR_DBA = ((1UL << 5) - 1) << 0,	// DMA base address
 };
-static inline void tim16_dcr_set_dbl(uint32_t val) { TIM16.DCR = (TIM16.DCR & ~TIM16_DCR_DBL) | ((val<<8) & TIM16_DCR_DBL); }
-static inline void tim16_dcr_set_dba(uint32_t val) { TIM16.DCR = (TIM16.DCR & ~TIM16_DCR_DBA) | ((val<<0) & TIM16_DCR_DBA); }
-static inline uint32_t tim16_dcr_get_dbl(void) { return (TIM16.DCR & TIM16_DCR_DBL) >> 8 ; }
-static inline uint32_t tim16_dcr_get_dba(void) { return (TIM16.DCR & TIM16_DCR_DBA) >> 0 ; }
+static inline void	   tim16_dcr_set_dbl(uint32_t val) { TIM16.DCR = (TIM16.DCR & ~TIM16_DCR_DBL) | ((val << 8) & TIM16_DCR_DBL); }
+static inline void	   tim16_dcr_set_dba(uint32_t val) { TIM16.DCR = (TIM16.DCR & ~TIM16_DCR_DBA) | ((val << 0) & TIM16_DCR_DBA); }
+static inline uint32_t tim16_dcr_get_dbl(void) { return (TIM16.DCR & TIM16_DCR_DBL) >> 8; }
+static inline uint32_t tim16_dcr_get_dba(void) { return (TIM16.DCR & TIM16_DCR_DBA) >> 0; }
 
 // TIM16->OR1 TIM16 option register 1
 enum {
-	TIM16_OR1_TI1_RMP = ((1UL<<2)-1) << 0, // Input capture 1 remap		
+	TIM16_OR1_TI1_RMP = ((1UL << 2) - 1) << 0,	// Input capture 1 remap
 };
-static inline void tim16_or1_set_ti1_rmp(uint32_t val) { TIM16.OR1 = (TIM16.OR1 & ~TIM16_OR1_TI1_RMP) | ((val<<0) & TIM16_OR1_TI1_RMP); }
-static inline uint32_t tim16_or1_get_ti1_rmp(void) { return (TIM16.OR1 & TIM16_OR1_TI1_RMP) >> 0 ; }
+static inline void tim16_or1_set_ti1_rmp(uint32_t val) {
+	TIM16.OR1 = (TIM16.OR1 & ~TIM16_OR1_TI1_RMP) | ((val << 0) & TIM16_OR1_TI1_RMP);
+}
+static inline uint32_t tim16_or1_get_ti1_rmp(void) { return (TIM16.OR1 & TIM16_OR1_TI1_RMP) >> 0; }
 
 // TIM16->OR2 TIM17 option register 1
 enum {
-	TIM16_OR2_BKCMP2P = 1UL<<11, // BRK COMP2 input polarit
-	TIM16_OR2_BKCMP1P = 1UL<<10, // BRK COMP1 input polarity
-	TIM16_OR2_BKINP = 1UL<<9, // BRK BKIN input polarity
-	TIM16_OR2_BKDFBK1E = 1UL<<8, // BRK DFSDM_BREAK1 enable
-	TIM16_OR2_BKCMP2E = 1UL<<2, // BRK COMP2 enable
-	TIM16_OR2_BKCMP1E = 1UL<<1, // BRK COMP1 enable
-	TIM16_OR2_BKINE = 1UL<<0, // BRK BKIN input enable		
+	TIM16_OR2_BKCMP2P  = 1UL << 11,	 // BRK COMP2 input polarit
+	TIM16_OR2_BKCMP1P  = 1UL << 10,	 // BRK COMP1 input polarity
+	TIM16_OR2_BKINP	   = 1UL << 9,	 // BRK BKIN input polarity
+	TIM16_OR2_BKDFBK1E = 1UL << 8,	 // BRK DFSDM_BREAK1 enable
+	TIM16_OR2_BKCMP2E  = 1UL << 2,	 // BRK COMP2 enable
+	TIM16_OR2_BKCMP1E  = 1UL << 1,	 // BRK COMP1 enable
+	TIM16_OR2_BKINE	   = 1UL << 0,	 // BRK BKIN input enable
 };
 
 // Valid Casts:
- 
-static inline struct TIM15_Type* TIM16_as_TIM15_Type(struct TIM16_Type* p) { return (struct TIM15_Type*)p; }
 
+static inline struct TIM15_Type *TIM16_as_TIM15_Type(struct TIM16_Type *p) { return (struct TIM15_Type *)p; }
 
 /* General-purpose-timers */
 struct TIM2_Type {
-	__IO uint16_t CR1; // @0 control register 1
-	 uint8_t RESERVED0[2]; // @2 
-	__IO uint8_t CR2; // @4 control register 2
-	 uint8_t RESERVED1[3]; // @5 
-	__IO uint16_t SMCR; // @8 slave mode control register
-	 uint8_t RESERVED2[2]; // @10 
-	__IO uint16_t DIER; // @12 DMA/Interrupt enable register
-	 uint8_t RESERVED3[2]; // @14 
-	__IO uint16_t SR; // @16 status register
-	 uint8_t RESERVED4[2]; // @18 
-	__O uint8_t EGR; // @20 event generation register
-	 uint8_t RESERVED5[3]; // @21 
-	union {  // @24
-		__IO uint16_t CCMR1_Output; // capture/compare mode register 1 (output mode)
-		__IO uint16_t CCMR1_Input; // capture/compare mode register 1 (input mode)
+	__IO uint16_t CR1;				 // @0 control register 1
+	uint8_t		  RESERVED0[2];		 // @2
+	__IO uint8_t  CR2;				 // @4 control register 2
+	uint8_t		  RESERVED1[3];		 // @5
+	__IO uint16_t SMCR;				 // @8 slave mode control register
+	uint8_t		  RESERVED2[2];		 // @10
+	__IO uint16_t DIER;				 // @12 DMA/Interrupt enable register
+	uint8_t		  RESERVED3[2];		 // @14
+	__IO uint16_t SR;				 // @16 status register
+	uint8_t		  RESERVED4[2];		 // @18
+	__O uint8_t	  EGR;				 // @20 event generation register
+	uint8_t		  RESERVED5[3];		 // @21
+	union {							 // @24
+		__IO uint16_t CCMR1_Output;	 // capture/compare mode register 1 (output mode)
+		__IO uint16_t CCMR1_Input;	 // capture/compare mode register 1 (input mode)
 	};
-	 uint8_t RESERVED6[2]; // @26 
-	union {  // @28
-		__IO uint16_t CCMR2_Output; // capture/compare mode register 2 (output mode)
-		__IO uint16_t CCMR2_Input; // capture/compare mode register 2 (input mode)
+	uint8_t RESERVED6[2];			 // @26
+	union {							 // @28
+		__IO uint16_t CCMR2_Output;	 // capture/compare mode register 2 (output mode)
+		__IO uint16_t CCMR2_Input;	 // capture/compare mode register 2 (input mode)
 	};
-	 uint8_t RESERVED7[2]; // @30 
-	__IO uint16_t CCER; // @32 capture/compare enable register
-	 uint8_t RESERVED8[2]; // @34 
-	__IO uint32_t CNT; // @36 counter
-	__IO uint16_t PSC; // @40 prescaler
-	 uint8_t RESERVED9[2]; // @42 
-	__IO uint32_t ARR; // @44 auto-reload register
-	 uint8_t RESERVED10[4]; // @48 
-	__IO uint32_t CCR1; // @52 capture/compare register 1
-	__IO uint32_t CCR2; // @56 capture/compare register 2
-	__IO uint32_t CCR3; // @60 capture/compare register 3
-	__IO uint32_t CCR4; // @64 capture/compare register 4
-	 uint8_t RESERVED11[4]; // @68 
-	__IO uint16_t DCR; // @72 DMA control register
-	 uint8_t RESERVED12[2]; // @74 
-	__IO uint16_t DMAR; // @76 DMA address for full transfer
-	 uint8_t RESERVED13[2]; // @78 
-	__IO uint8_t OR; // @80 TIM2 option register
+	uint8_t		  RESERVED7[2];	  // @30
+	__IO uint16_t CCER;			  // @32 capture/compare enable register
+	uint8_t		  RESERVED8[2];	  // @34
+	__IO uint32_t CNT;			  // @36 counter
+	__IO uint16_t PSC;			  // @40 prescaler
+	uint8_t		  RESERVED9[2];	  // @42
+	__IO uint32_t ARR;			  // @44 auto-reload register
+	uint8_t		  RESERVED10[4];  // @48
+	__IO uint32_t CCR1;			  // @52 capture/compare register 1
+	__IO uint32_t CCR2;			  // @56 capture/compare register 2
+	__IO uint32_t CCR3;			  // @60 capture/compare register 3
+	__IO uint32_t CCR4;			  // @64 capture/compare register 4
+	uint8_t		  RESERVED11[4];  // @68
+	__IO uint16_t DCR;			  // @72 DMA control register
+	uint8_t		  RESERVED12[2];  // @74
+	__IO uint16_t DMAR;			  // @76 DMA address for full transfer
+	uint8_t		  RESERVED13[2];  // @78
+	__IO uint8_t  OR;			  // @80 TIM2 option register
 };
-extern struct TIM2_Type	TIM2;	// @0x40000000 
-extern struct TIM2_Type 	TIM3;	// @0x40000400
+extern struct TIM2_Type TIM2;  // @0x40000000
+extern struct TIM2_Type TIM3;  // @0x40000400
 
 // TIM2->CR1 control register 1
 enum {
-	TIM2_CR1_CKD = ((1UL<<2)-1) << 8, // Clock division
-	TIM2_CR1_ARPE = 1UL<<7, // Auto-reload preload enable
-	TIM2_CR1_CMS = ((1UL<<2)-1) << 5, // Center-aligned mode selection
-	TIM2_CR1_DIR = 1UL<<4, // Direction
-	TIM2_CR1_OPM = 1UL<<3, // One-pulse mode
-	TIM2_CR1_URS = 1UL<<2, // Update request source
-	TIM2_CR1_UDIS = 1UL<<1, // Update disable
-	TIM2_CR1_CEN = 1UL<<0, // Counter enable		
+	TIM2_CR1_CKD  = ((1UL << 2) - 1) << 8,	// Clock division
+	TIM2_CR1_ARPE = 1UL << 7,				// Auto-reload preload enable
+	TIM2_CR1_CMS  = ((1UL << 2) - 1) << 5,	// Center-aligned mode selection
+	TIM2_CR1_DIR  = 1UL << 4,				// Direction
+	TIM2_CR1_OPM  = 1UL << 3,				// One-pulse mode
+	TIM2_CR1_URS  = 1UL << 2,				// Update request source
+	TIM2_CR1_UDIS = 1UL << 1,				// Update disable
+	TIM2_CR1_CEN  = 1UL << 0,				// Counter enable
 };
-static inline void tim2_cr1_set_ckd(struct TIM2_Type* p, uint32_t val) { p->CR1 = (p->CR1 & ~TIM2_CR1_CKD) | ((val<<8) & TIM2_CR1_CKD); }
-static inline void tim2_cr1_set_cms(struct TIM2_Type* p, uint32_t val) { p->CR1 = (p->CR1 & ~TIM2_CR1_CMS) | ((val<<5) & TIM2_CR1_CMS); }
-static inline uint32_t tim2_cr1_get_ckd(struct TIM2_Type* p) { return (p->CR1 & TIM2_CR1_CKD) >> 8 ; }
-static inline uint32_t tim2_cr1_get_cms(struct TIM2_Type* p) { return (p->CR1 & TIM2_CR1_CMS) >> 5 ; }
+static inline void tim2_cr1_set_ckd(struct TIM2_Type *p, uint32_t val) {
+	p->CR1 = (p->CR1 & ~TIM2_CR1_CKD) | ((val << 8) & TIM2_CR1_CKD);
+}
+static inline void tim2_cr1_set_cms(struct TIM2_Type *p, uint32_t val) {
+	p->CR1 = (p->CR1 & ~TIM2_CR1_CMS) | ((val << 5) & TIM2_CR1_CMS);
+}
+static inline uint32_t tim2_cr1_get_ckd(struct TIM2_Type *p) { return (p->CR1 & TIM2_CR1_CKD) >> 8; }
+static inline uint32_t tim2_cr1_get_cms(struct TIM2_Type *p) { return (p->CR1 & TIM2_CR1_CMS) >> 5; }
 
 // TIM2->CR2 control register 2
 enum {
-	TIM2_CR2_TI1S = 1UL<<7, // TI1 selection
-	TIM2_CR2_MMS = ((1UL<<3)-1) << 4, // Master mode selection
-	TIM2_CR2_CCDS = 1UL<<3, // Capture/compare DMA selection		
+	TIM2_CR2_TI1S = 1UL << 7,				// TI1 selection
+	TIM2_CR2_MMS  = ((1UL << 3) - 1) << 4,	// Master mode selection
+	TIM2_CR2_CCDS = 1UL << 3,				// Capture/compare DMA selection
 };
-static inline void tim2_cr2_set_mms(struct TIM2_Type* p, uint32_t val) { p->CR2 = (p->CR2 & ~TIM2_CR2_MMS) | ((val<<4) & TIM2_CR2_MMS); }
-static inline uint32_t tim2_cr2_get_mms(struct TIM2_Type* p) { return (p->CR2 & TIM2_CR2_MMS) >> 4 ; }
+static inline void tim2_cr2_set_mms(struct TIM2_Type *p, uint32_t val) {
+	p->CR2 = (p->CR2 & ~TIM2_CR2_MMS) | ((val << 4) & TIM2_CR2_MMS);
+}
+static inline uint32_t tim2_cr2_get_mms(struct TIM2_Type *p) { return (p->CR2 & TIM2_CR2_MMS) >> 4; }
 
 // TIM2->SMCR slave mode control register
 enum {
-	TIM2_SMCR_ETP = 1UL<<15, // External trigger polarity
-	TIM2_SMCR_ECE = 1UL<<14, // External clock enable
-	TIM2_SMCR_ETPS = ((1UL<<2)-1) << 12, // External trigger prescaler
-	TIM2_SMCR_ETF = ((1UL<<4)-1) << 8, // External trigger filter
-	TIM2_SMCR_MSM = 1UL<<7, // Master/Slave mode
-	TIM2_SMCR_TS = ((1UL<<3)-1) << 4, // Trigger selection
-	TIM2_SMCR_SMS = ((1UL<<3)-1) << 0, // Slave mode selection		
+	TIM2_SMCR_ETP  = 1UL << 15,				  // External trigger polarity
+	TIM2_SMCR_ECE  = 1UL << 14,				  // External clock enable
+	TIM2_SMCR_ETPS = ((1UL << 2) - 1) << 12,  // External trigger prescaler
+	TIM2_SMCR_ETF  = ((1UL << 4) - 1) << 8,	  // External trigger filter
+	TIM2_SMCR_MSM  = 1UL << 7,				  // Master/Slave mode
+	TIM2_SMCR_TS   = ((1UL << 3) - 1) << 4,	  // Trigger selection
+	TIM2_SMCR_SMS  = ((1UL << 3) - 1) << 0,	  // Slave mode selection
 };
-static inline void tim2_smcr_set_etps(struct TIM2_Type* p, uint32_t val) { p->SMCR = (p->SMCR & ~TIM2_SMCR_ETPS) | ((val<<12) & TIM2_SMCR_ETPS); }
-static inline void tim2_smcr_set_etf(struct TIM2_Type* p, uint32_t val) { p->SMCR = (p->SMCR & ~TIM2_SMCR_ETF) | ((val<<8) & TIM2_SMCR_ETF); }
-static inline void tim2_smcr_set_ts(struct TIM2_Type* p, uint32_t val) { p->SMCR = (p->SMCR & ~TIM2_SMCR_TS) | ((val<<4) & TIM2_SMCR_TS); }
-static inline void tim2_smcr_set_sms(struct TIM2_Type* p, uint32_t val) { p->SMCR = (p->SMCR & ~TIM2_SMCR_SMS) | ((val<<0) & TIM2_SMCR_SMS); }
-static inline uint32_t tim2_smcr_get_etps(struct TIM2_Type* p) { return (p->SMCR & TIM2_SMCR_ETPS) >> 12 ; }
-static inline uint32_t tim2_smcr_get_etf(struct TIM2_Type* p) { return (p->SMCR & TIM2_SMCR_ETF) >> 8 ; }
-static inline uint32_t tim2_smcr_get_ts(struct TIM2_Type* p) { return (p->SMCR & TIM2_SMCR_TS) >> 4 ; }
-static inline uint32_t tim2_smcr_get_sms(struct TIM2_Type* p) { return (p->SMCR & TIM2_SMCR_SMS) >> 0 ; }
+static inline void tim2_smcr_set_etps(struct TIM2_Type *p, uint32_t val) {
+	p->SMCR = (p->SMCR & ~TIM2_SMCR_ETPS) | ((val << 12) & TIM2_SMCR_ETPS);
+}
+static inline void tim2_smcr_set_etf(struct TIM2_Type *p, uint32_t val) {
+	p->SMCR = (p->SMCR & ~TIM2_SMCR_ETF) | ((val << 8) & TIM2_SMCR_ETF);
+}
+static inline void tim2_smcr_set_ts(struct TIM2_Type *p, uint32_t val) {
+	p->SMCR = (p->SMCR & ~TIM2_SMCR_TS) | ((val << 4) & TIM2_SMCR_TS);
+}
+static inline void tim2_smcr_set_sms(struct TIM2_Type *p, uint32_t val) {
+	p->SMCR = (p->SMCR & ~TIM2_SMCR_SMS) | ((val << 0) & TIM2_SMCR_SMS);
+}
+static inline uint32_t tim2_smcr_get_etps(struct TIM2_Type *p) { return (p->SMCR & TIM2_SMCR_ETPS) >> 12; }
+static inline uint32_t tim2_smcr_get_etf(struct TIM2_Type *p) { return (p->SMCR & TIM2_SMCR_ETF) >> 8; }
+static inline uint32_t tim2_smcr_get_ts(struct TIM2_Type *p) { return (p->SMCR & TIM2_SMCR_TS) >> 4; }
+static inline uint32_t tim2_smcr_get_sms(struct TIM2_Type *p) { return (p->SMCR & TIM2_SMCR_SMS) >> 0; }
 
 // TIM2->DIER DMA/Interrupt enable register
 enum {
-	TIM2_DIER_TDE = 1UL<<14, // Trigger DMA request enable
-	TIM2_DIER_COMDE = 1UL<<13, // COM DMA request enable
-	TIM2_DIER_CC4DE = 1UL<<12, // Capture/Compare 4 DMA request enable
-	TIM2_DIER_CC3DE = 1UL<<11, // Capture/Compare 3 DMA request enable
-	TIM2_DIER_CC2DE = 1UL<<10, // Capture/Compare 2 DMA request enable
-	TIM2_DIER_CC1DE = 1UL<<9, // Capture/Compare 1 DMA request enable
-	TIM2_DIER_UDE = 1UL<<8, // Update DMA request enable
-	TIM2_DIER_TIE = 1UL<<6, // Trigger interrupt enable
-	TIM2_DIER_CC4IE = 1UL<<4, // Capture/Compare 4 interrupt enable
-	TIM2_DIER_CC3IE = 1UL<<3, // Capture/Compare 3 interrupt enable
-	TIM2_DIER_CC2IE = 1UL<<2, // Capture/Compare 2 interrupt enable
-	TIM2_DIER_CC1IE = 1UL<<1, // Capture/Compare 1 interrupt enable
-	TIM2_DIER_UIE = 1UL<<0, // Update interrupt enable		
+	TIM2_DIER_TDE	= 1UL << 14,  // Trigger DMA request enable
+	TIM2_DIER_COMDE = 1UL << 13,  // COM DMA request enable
+	TIM2_DIER_CC4DE = 1UL << 12,  // Capture/Compare 4 DMA request enable
+	TIM2_DIER_CC3DE = 1UL << 11,  // Capture/Compare 3 DMA request enable
+	TIM2_DIER_CC2DE = 1UL << 10,  // Capture/Compare 2 DMA request enable
+	TIM2_DIER_CC1DE = 1UL << 9,	  // Capture/Compare 1 DMA request enable
+	TIM2_DIER_UDE	= 1UL << 8,	  // Update DMA request enable
+	TIM2_DIER_TIE	= 1UL << 6,	  // Trigger interrupt enable
+	TIM2_DIER_CC4IE = 1UL << 4,	  // Capture/Compare 4 interrupt enable
+	TIM2_DIER_CC3IE = 1UL << 3,	  // Capture/Compare 3 interrupt enable
+	TIM2_DIER_CC2IE = 1UL << 2,	  // Capture/Compare 2 interrupt enable
+	TIM2_DIER_CC1IE = 1UL << 1,	  // Capture/Compare 1 interrupt enable
+	TIM2_DIER_UIE	= 1UL << 0,	  // Update interrupt enable
 };
 
 // TIM2->SR status register
 enum {
-	TIM2_SR_CC4OF = 1UL<<12, // Capture/Compare 4 overcapture flag
-	TIM2_SR_CC3OF = 1UL<<11, // Capture/Compare 3 overcapture flag
-	TIM2_SR_CC2OF = 1UL<<10, // Capture/compare 2 overcapture flag
-	TIM2_SR_CC1OF = 1UL<<9, // Capture/Compare 1 overcapture flag
-	TIM2_SR_TIF = 1UL<<6, // Trigger interrupt flag
-	TIM2_SR_CC4IF = 1UL<<4, // Capture/Compare 4 interrupt flag
-	TIM2_SR_CC3IF = 1UL<<3, // Capture/Compare 3 interrupt flag
-	TIM2_SR_CC2IF = 1UL<<2, // Capture/Compare 2 interrupt flag
-	TIM2_SR_CC1IF = 1UL<<1, // Capture/compare 1 interrupt flag
-	TIM2_SR_UIF = 1UL<<0, // Update interrupt flag		
+	TIM2_SR_CC4OF = 1UL << 12,	// Capture/Compare 4 overcapture flag
+	TIM2_SR_CC3OF = 1UL << 11,	// Capture/Compare 3 overcapture flag
+	TIM2_SR_CC2OF = 1UL << 10,	// Capture/compare 2 overcapture flag
+	TIM2_SR_CC1OF = 1UL << 9,	// Capture/Compare 1 overcapture flag
+	TIM2_SR_TIF	  = 1UL << 6,	// Trigger interrupt flag
+	TIM2_SR_CC4IF = 1UL << 4,	// Capture/Compare 4 interrupt flag
+	TIM2_SR_CC3IF = 1UL << 3,	// Capture/Compare 3 interrupt flag
+	TIM2_SR_CC2IF = 1UL << 2,	// Capture/Compare 2 interrupt flag
+	TIM2_SR_CC1IF = 1UL << 1,	// Capture/compare 1 interrupt flag
+	TIM2_SR_UIF	  = 1UL << 0,	// Update interrupt flag
 };
 
 // TIM2->EGR event generation register
 enum {
-	TIM2_EGR_TG = 1UL<<6, // Trigger generation
-	TIM2_EGR_CC4G = 1UL<<4, // Capture/compare 4 generation
-	TIM2_EGR_CC3G = 1UL<<3, // Capture/compare 3 generation
-	TIM2_EGR_CC2G = 1UL<<2, // Capture/compare 2 generation
-	TIM2_EGR_CC1G = 1UL<<1, // Capture/compare 1 generation
-	TIM2_EGR_UG = 1UL<<0, // Update generation		
+	TIM2_EGR_TG	  = 1UL << 6,  // Trigger generation
+	TIM2_EGR_CC4G = 1UL << 4,  // Capture/compare 4 generation
+	TIM2_EGR_CC3G = 1UL << 3,  // Capture/compare 3 generation
+	TIM2_EGR_CC2G = 1UL << 2,  // Capture/compare 2 generation
+	TIM2_EGR_CC1G = 1UL << 1,  // Capture/compare 1 generation
+	TIM2_EGR_UG	  = 1UL << 0,  // Update generation
 };
 
 // TIM2->CCMR1_Output capture/compare mode register 1 (output mode)
 enum {
-	TIM2_CCMR1_OUTPUT_OC2CE = 1UL<<15, // Output compare 2 clear enable
-	TIM2_CCMR1_OUTPUT_OC2M = ((1UL<<3)-1) << 12, // Output compare 2 mode
-	TIM2_CCMR1_OUTPUT_OC2PE = 1UL<<11, // Output compare 2 preload enable
-	TIM2_CCMR1_OUTPUT_OC2FE = 1UL<<10, // Output compare 2 fast enable
-	TIM2_CCMR1_OUTPUT_CC2S = ((1UL<<2)-1) << 8, // Capture/Compare 2 selection
-	TIM2_CCMR1_OUTPUT_OC1CE = 1UL<<7, // Output compare 1 clear enable
-	TIM2_CCMR1_OUTPUT_OC1M = ((1UL<<3)-1) << 4, // Output compare 1 mode
-	TIM2_CCMR1_OUTPUT_OC1PE = 1UL<<3, // Output compare 1 preload enable
-	TIM2_CCMR1_OUTPUT_OC1FE = 1UL<<2, // Output compare 1 fast enable
-	TIM2_CCMR1_OUTPUT_CC1S = ((1UL<<2)-1) << 0, // Capture/Compare 1 selection		
+	TIM2_CCMR1_OUTPUT_OC2CE = 1UL << 15,			   // Output compare 2 clear enable
+	TIM2_CCMR1_OUTPUT_OC2M	= ((1UL << 3) - 1) << 12,  // Output compare 2 mode
+	TIM2_CCMR1_OUTPUT_OC2PE = 1UL << 11,			   // Output compare 2 preload enable
+	TIM2_CCMR1_OUTPUT_OC2FE = 1UL << 10,			   // Output compare 2 fast enable
+	TIM2_CCMR1_OUTPUT_CC2S	= ((1UL << 2) - 1) << 8,   // Capture/Compare 2 selection
+	TIM2_CCMR1_OUTPUT_OC1CE = 1UL << 7,				   // Output compare 1 clear enable
+	TIM2_CCMR1_OUTPUT_OC1M	= ((1UL << 3) - 1) << 4,   // Output compare 1 mode
+	TIM2_CCMR1_OUTPUT_OC1PE = 1UL << 3,				   // Output compare 1 preload enable
+	TIM2_CCMR1_OUTPUT_OC1FE = 1UL << 2,				   // Output compare 1 fast enable
+	TIM2_CCMR1_OUTPUT_CC1S	= ((1UL << 2) - 1) << 0,   // Capture/Compare 1 selection
 };
-static inline void tim2_ccmr1_output_set_oc2m(struct TIM2_Type* p, uint32_t val) { p->CCMR1_Output = (p->CCMR1_Output & ~TIM2_CCMR1_OUTPUT_OC2M) | ((val<<12) & TIM2_CCMR1_OUTPUT_OC2M); }
-static inline void tim2_ccmr1_output_set_cc2s(struct TIM2_Type* p, uint32_t val) { p->CCMR1_Output = (p->CCMR1_Output & ~TIM2_CCMR1_OUTPUT_CC2S) | ((val<<8) & TIM2_CCMR1_OUTPUT_CC2S); }
-static inline void tim2_ccmr1_output_set_oc1m(struct TIM2_Type* p, uint32_t val) { p->CCMR1_Output = (p->CCMR1_Output & ~TIM2_CCMR1_OUTPUT_OC1M) | ((val<<4) & TIM2_CCMR1_OUTPUT_OC1M); }
-static inline void tim2_ccmr1_output_set_cc1s(struct TIM2_Type* p, uint32_t val) { p->CCMR1_Output = (p->CCMR1_Output & ~TIM2_CCMR1_OUTPUT_CC1S) | ((val<<0) & TIM2_CCMR1_OUTPUT_CC1S); }
-static inline uint32_t tim2_ccmr1_output_get_oc2m(struct TIM2_Type* p) { return (p->CCMR1_Output & TIM2_CCMR1_OUTPUT_OC2M) >> 12 ; }
-static inline uint32_t tim2_ccmr1_output_get_cc2s(struct TIM2_Type* p) { return (p->CCMR1_Output & TIM2_CCMR1_OUTPUT_CC2S) >> 8 ; }
-static inline uint32_t tim2_ccmr1_output_get_oc1m(struct TIM2_Type* p) { return (p->CCMR1_Output & TIM2_CCMR1_OUTPUT_OC1M) >> 4 ; }
-static inline uint32_t tim2_ccmr1_output_get_cc1s(struct TIM2_Type* p) { return (p->CCMR1_Output & TIM2_CCMR1_OUTPUT_CC1S) >> 0 ; }
+static inline void tim2_ccmr1_output_set_oc2m(struct TIM2_Type *p, uint32_t val) {
+	p->CCMR1_Output = (p->CCMR1_Output & ~TIM2_CCMR1_OUTPUT_OC2M) | ((val << 12) & TIM2_CCMR1_OUTPUT_OC2M);
+}
+static inline void tim2_ccmr1_output_set_cc2s(struct TIM2_Type *p, uint32_t val) {
+	p->CCMR1_Output = (p->CCMR1_Output & ~TIM2_CCMR1_OUTPUT_CC2S) | ((val << 8) & TIM2_CCMR1_OUTPUT_CC2S);
+}
+static inline void tim2_ccmr1_output_set_oc1m(struct TIM2_Type *p, uint32_t val) {
+	p->CCMR1_Output = (p->CCMR1_Output & ~TIM2_CCMR1_OUTPUT_OC1M) | ((val << 4) & TIM2_CCMR1_OUTPUT_OC1M);
+}
+static inline void tim2_ccmr1_output_set_cc1s(struct TIM2_Type *p, uint32_t val) {
+	p->CCMR1_Output = (p->CCMR1_Output & ~TIM2_CCMR1_OUTPUT_CC1S) | ((val << 0) & TIM2_CCMR1_OUTPUT_CC1S);
+}
+static inline uint32_t tim2_ccmr1_output_get_oc2m(struct TIM2_Type *p) { return (p->CCMR1_Output & TIM2_CCMR1_OUTPUT_OC2M) >> 12; }
+static inline uint32_t tim2_ccmr1_output_get_cc2s(struct TIM2_Type *p) { return (p->CCMR1_Output & TIM2_CCMR1_OUTPUT_CC2S) >> 8; }
+static inline uint32_t tim2_ccmr1_output_get_oc1m(struct TIM2_Type *p) { return (p->CCMR1_Output & TIM2_CCMR1_OUTPUT_OC1M) >> 4; }
+static inline uint32_t tim2_ccmr1_output_get_cc1s(struct TIM2_Type *p) { return (p->CCMR1_Output & TIM2_CCMR1_OUTPUT_CC1S) >> 0; }
 
 // TIM2->CCMR2_Output capture/compare mode register 2 (output mode)
 enum {
-	TIM2_CCMR2_OUTPUT_OC4CE = 1UL<<15, // Output compare 4 clear enable
-	TIM2_CCMR2_OUTPUT_OC4M = ((1UL<<3)-1) << 12, // Output compare 4 mode
-	TIM2_CCMR2_OUTPUT_OC4PE = 1UL<<11, // Output compare 4 preload enable
-	TIM2_CCMR2_OUTPUT_OC4FE = 1UL<<10, // Output compare 4 fast enable
-	TIM2_CCMR2_OUTPUT_CC4S = ((1UL<<2)-1) << 8, // Capture/Compare 4 selection
-	TIM2_CCMR2_OUTPUT_OC3CE = 1UL<<7, // Output compare 3 clear enable
-	TIM2_CCMR2_OUTPUT_OC3M = ((1UL<<3)-1) << 4, // Output compare 3 mode
-	TIM2_CCMR2_OUTPUT_OC3PE = 1UL<<3, // Output compare 3 preload enable
-	TIM2_CCMR2_OUTPUT_OC3FE = 1UL<<2, // Output compare 3 fast enable
-	TIM2_CCMR2_OUTPUT_CC3S = ((1UL<<2)-1) << 0, // Capture/Compare 3 selection		
+	TIM2_CCMR2_OUTPUT_OC4CE = 1UL << 15,			   // Output compare 4 clear enable
+	TIM2_CCMR2_OUTPUT_OC4M	= ((1UL << 3) - 1) << 12,  // Output compare 4 mode
+	TIM2_CCMR2_OUTPUT_OC4PE = 1UL << 11,			   // Output compare 4 preload enable
+	TIM2_CCMR2_OUTPUT_OC4FE = 1UL << 10,			   // Output compare 4 fast enable
+	TIM2_CCMR2_OUTPUT_CC4S	= ((1UL << 2) - 1) << 8,   // Capture/Compare 4 selection
+	TIM2_CCMR2_OUTPUT_OC3CE = 1UL << 7,				   // Output compare 3 clear enable
+	TIM2_CCMR2_OUTPUT_OC3M	= ((1UL << 3) - 1) << 4,   // Output compare 3 mode
+	TIM2_CCMR2_OUTPUT_OC3PE = 1UL << 3,				   // Output compare 3 preload enable
+	TIM2_CCMR2_OUTPUT_OC3FE = 1UL << 2,				   // Output compare 3 fast enable
+	TIM2_CCMR2_OUTPUT_CC3S	= ((1UL << 2) - 1) << 0,   // Capture/Compare 3 selection
 };
-static inline void tim2_ccmr2_output_set_oc4m(struct TIM2_Type* p, uint32_t val) { p->CCMR2_Output = (p->CCMR2_Output & ~TIM2_CCMR2_OUTPUT_OC4M) | ((val<<12) & TIM2_CCMR2_OUTPUT_OC4M); }
-static inline void tim2_ccmr2_output_set_cc4s(struct TIM2_Type* p, uint32_t val) { p->CCMR2_Output = (p->CCMR2_Output & ~TIM2_CCMR2_OUTPUT_CC4S) | ((val<<8) & TIM2_CCMR2_OUTPUT_CC4S); }
-static inline void tim2_ccmr2_output_set_oc3m(struct TIM2_Type* p, uint32_t val) { p->CCMR2_Output = (p->CCMR2_Output & ~TIM2_CCMR2_OUTPUT_OC3M) | ((val<<4) & TIM2_CCMR2_OUTPUT_OC3M); }
-static inline void tim2_ccmr2_output_set_cc3s(struct TIM2_Type* p, uint32_t val) { p->CCMR2_Output = (p->CCMR2_Output & ~TIM2_CCMR2_OUTPUT_CC3S) | ((val<<0) & TIM2_CCMR2_OUTPUT_CC3S); }
-static inline uint32_t tim2_ccmr2_output_get_oc4m(struct TIM2_Type* p) { return (p->CCMR2_Output & TIM2_CCMR2_OUTPUT_OC4M) >> 12 ; }
-static inline uint32_t tim2_ccmr2_output_get_cc4s(struct TIM2_Type* p) { return (p->CCMR2_Output & TIM2_CCMR2_OUTPUT_CC4S) >> 8 ; }
-static inline uint32_t tim2_ccmr2_output_get_oc3m(struct TIM2_Type* p) { return (p->CCMR2_Output & TIM2_CCMR2_OUTPUT_OC3M) >> 4 ; }
-static inline uint32_t tim2_ccmr2_output_get_cc3s(struct TIM2_Type* p) { return (p->CCMR2_Output & TIM2_CCMR2_OUTPUT_CC3S) >> 0 ; }
+static inline void tim2_ccmr2_output_set_oc4m(struct TIM2_Type *p, uint32_t val) {
+	p->CCMR2_Output = (p->CCMR2_Output & ~TIM2_CCMR2_OUTPUT_OC4M) | ((val << 12) & TIM2_CCMR2_OUTPUT_OC4M);
+}
+static inline void tim2_ccmr2_output_set_cc4s(struct TIM2_Type *p, uint32_t val) {
+	p->CCMR2_Output = (p->CCMR2_Output & ~TIM2_CCMR2_OUTPUT_CC4S) | ((val << 8) & TIM2_CCMR2_OUTPUT_CC4S);
+}
+static inline void tim2_ccmr2_output_set_oc3m(struct TIM2_Type *p, uint32_t val) {
+	p->CCMR2_Output = (p->CCMR2_Output & ~TIM2_CCMR2_OUTPUT_OC3M) | ((val << 4) & TIM2_CCMR2_OUTPUT_OC3M);
+}
+static inline void tim2_ccmr2_output_set_cc3s(struct TIM2_Type *p, uint32_t val) {
+	p->CCMR2_Output = (p->CCMR2_Output & ~TIM2_CCMR2_OUTPUT_CC3S) | ((val << 0) & TIM2_CCMR2_OUTPUT_CC3S);
+}
+static inline uint32_t tim2_ccmr2_output_get_oc4m(struct TIM2_Type *p) { return (p->CCMR2_Output & TIM2_CCMR2_OUTPUT_OC4M) >> 12; }
+static inline uint32_t tim2_ccmr2_output_get_cc4s(struct TIM2_Type *p) { return (p->CCMR2_Output & TIM2_CCMR2_OUTPUT_CC4S) >> 8; }
+static inline uint32_t tim2_ccmr2_output_get_oc3m(struct TIM2_Type *p) { return (p->CCMR2_Output & TIM2_CCMR2_OUTPUT_OC3M) >> 4; }
+static inline uint32_t tim2_ccmr2_output_get_cc3s(struct TIM2_Type *p) { return (p->CCMR2_Output & TIM2_CCMR2_OUTPUT_CC3S) >> 0; }
 
 // TIM2->CCER capture/compare enable register
 enum {
-	TIM2_CCER_CC4NP = 1UL<<15, // Capture/Compare 4 output Polarity
-	TIM2_CCER_CC4P = 1UL<<13, // Capture/Compare 3 output Polarity
-	TIM2_CCER_CC4E = 1UL<<12, // Capture/Compare 4 output enable
-	TIM2_CCER_CC3NP = 1UL<<11, // Capture/Compare 3 output Polarity
-	TIM2_CCER_CC3P = 1UL<<9, // Capture/Compare 3 output Polarity
-	TIM2_CCER_CC3E = 1UL<<8, // Capture/Compare 3 output enable
-	TIM2_CCER_CC2NP = 1UL<<7, // Capture/Compare 2 output Polarity
-	TIM2_CCER_CC2P = 1UL<<5, // Capture/Compare 2 output Polarity
-	TIM2_CCER_CC2E = 1UL<<4, // Capture/Compare 2 output enable
-	TIM2_CCER_CC1NP = 1UL<<3, // Capture/Compare 1 output Polarity
-	TIM2_CCER_CC1P = 1UL<<1, // Capture/Compare 1 output Polarity
-	TIM2_CCER_CC1E = 1UL<<0, // Capture/Compare 1 output enable		
+	TIM2_CCER_CC4NP = 1UL << 15,  // Capture/Compare 4 output Polarity
+	TIM2_CCER_CC4P	= 1UL << 13,  // Capture/Compare 3 output Polarity
+	TIM2_CCER_CC4E	= 1UL << 12,  // Capture/Compare 4 output enable
+	TIM2_CCER_CC3NP = 1UL << 11,  // Capture/Compare 3 output Polarity
+	TIM2_CCER_CC3P	= 1UL << 9,	  // Capture/Compare 3 output Polarity
+	TIM2_CCER_CC3E	= 1UL << 8,	  // Capture/Compare 3 output enable
+	TIM2_CCER_CC2NP = 1UL << 7,	  // Capture/Compare 2 output Polarity
+	TIM2_CCER_CC2P	= 1UL << 5,	  // Capture/Compare 2 output Polarity
+	TIM2_CCER_CC2E	= 1UL << 4,	  // Capture/Compare 2 output enable
+	TIM2_CCER_CC1NP = 1UL << 3,	  // Capture/Compare 1 output Polarity
+	TIM2_CCER_CC1P	= 1UL << 1,	  // Capture/Compare 1 output Polarity
+	TIM2_CCER_CC1E	= 1UL << 0,	  // Capture/Compare 1 output enable
 };
 
 // TIM2->CNT counter
 enum {
-	TIM2_CNT_CNT_H = ((1UL<<16)-1) << 16, // High counter value (TIM2 only)
-	TIM2_CNT_CNT_L = ((1UL<<16)-1) << 0, // Low counter value		
+	TIM2_CNT_CNT_H = ((1UL << 16) - 1) << 16,  // High counter value (TIM2 only)
+	TIM2_CNT_CNT_L = ((1UL << 16) - 1) << 0,   // Low counter value
 };
-static inline void tim2_cnt_set_cnt_h(struct TIM2_Type* p, uint32_t val) { p->CNT = (p->CNT & ~TIM2_CNT_CNT_H) | ((val<<16) & TIM2_CNT_CNT_H); }
-static inline void tim2_cnt_set_cnt_l(struct TIM2_Type* p, uint32_t val) { p->CNT = (p->CNT & ~TIM2_CNT_CNT_L) | ((val<<0) & TIM2_CNT_CNT_L); }
-static inline uint32_t tim2_cnt_get_cnt_h(struct TIM2_Type* p) { return (p->CNT & TIM2_CNT_CNT_H) >> 16 ; }
-static inline uint32_t tim2_cnt_get_cnt_l(struct TIM2_Type* p) { return (p->CNT & TIM2_CNT_CNT_L) >> 0 ; }
+static inline void tim2_cnt_set_cnt_h(struct TIM2_Type *p, uint32_t val) {
+	p->CNT = (p->CNT & ~TIM2_CNT_CNT_H) | ((val << 16) & TIM2_CNT_CNT_H);
+}
+static inline void tim2_cnt_set_cnt_l(struct TIM2_Type *p, uint32_t val) {
+	p->CNT = (p->CNT & ~TIM2_CNT_CNT_L) | ((val << 0) & TIM2_CNT_CNT_L);
+}
+static inline uint32_t tim2_cnt_get_cnt_h(struct TIM2_Type *p) { return (p->CNT & TIM2_CNT_CNT_H) >> 16; }
+static inline uint32_t tim2_cnt_get_cnt_l(struct TIM2_Type *p) { return (p->CNT & TIM2_CNT_CNT_L) >> 0; }
 
 // TIM2->ARR auto-reload register
 enum {
-	TIM2_ARR_ARR_H = ((1UL<<16)-1) << 16, // High Auto-reload value (TIM2 only)
-	TIM2_ARR_ARR_L = ((1UL<<16)-1) << 0, // Low Auto-reload value		
+	TIM2_ARR_ARR_H = ((1UL << 16) - 1) << 16,  // High Auto-reload value (TIM2 only)
+	TIM2_ARR_ARR_L = ((1UL << 16) - 1) << 0,   // Low Auto-reload value
 };
-static inline void tim2_arr_set_arr_h(struct TIM2_Type* p, uint32_t val) { p->ARR = (p->ARR & ~TIM2_ARR_ARR_H) | ((val<<16) & TIM2_ARR_ARR_H); }
-static inline void tim2_arr_set_arr_l(struct TIM2_Type* p, uint32_t val) { p->ARR = (p->ARR & ~TIM2_ARR_ARR_L) | ((val<<0) & TIM2_ARR_ARR_L); }
-static inline uint32_t tim2_arr_get_arr_h(struct TIM2_Type* p) { return (p->ARR & TIM2_ARR_ARR_H) >> 16 ; }
-static inline uint32_t tim2_arr_get_arr_l(struct TIM2_Type* p) { return (p->ARR & TIM2_ARR_ARR_L) >> 0 ; }
+static inline void tim2_arr_set_arr_h(struct TIM2_Type *p, uint32_t val) {
+	p->ARR = (p->ARR & ~TIM2_ARR_ARR_H) | ((val << 16) & TIM2_ARR_ARR_H);
+}
+static inline void tim2_arr_set_arr_l(struct TIM2_Type *p, uint32_t val) {
+	p->ARR = (p->ARR & ~TIM2_ARR_ARR_L) | ((val << 0) & TIM2_ARR_ARR_L);
+}
+static inline uint32_t tim2_arr_get_arr_h(struct TIM2_Type *p) { return (p->ARR & TIM2_ARR_ARR_H) >> 16; }
+static inline uint32_t tim2_arr_get_arr_l(struct TIM2_Type *p) { return (p->ARR & TIM2_ARR_ARR_L) >> 0; }
 
 // TIM2->CCR1 capture/compare register 1
 enum {
-	TIM2_CCR1_CCR1_H = ((1UL<<16)-1) << 16, // High Capture/Compare 1 value (TIM2 only)
-	TIM2_CCR1_CCR1_L = ((1UL<<16)-1) << 0, // Low Capture/Compare 1 value		
+	TIM2_CCR1_CCR1_H = ((1UL << 16) - 1) << 16,	 // High Capture/Compare 1 value (TIM2 only)
+	TIM2_CCR1_CCR1_L = ((1UL << 16) - 1) << 0,	 // Low Capture/Compare 1 value
 };
-static inline void tim2_ccr1_set_ccr1_h(struct TIM2_Type* p, uint32_t val) { p->CCR1 = (p->CCR1 & ~TIM2_CCR1_CCR1_H) | ((val<<16) & TIM2_CCR1_CCR1_H); }
-static inline void tim2_ccr1_set_ccr1_l(struct TIM2_Type* p, uint32_t val) { p->CCR1 = (p->CCR1 & ~TIM2_CCR1_CCR1_L) | ((val<<0) & TIM2_CCR1_CCR1_L); }
-static inline uint32_t tim2_ccr1_get_ccr1_h(struct TIM2_Type* p) { return (p->CCR1 & TIM2_CCR1_CCR1_H) >> 16 ; }
-static inline uint32_t tim2_ccr1_get_ccr1_l(struct TIM2_Type* p) { return (p->CCR1 & TIM2_CCR1_CCR1_L) >> 0 ; }
+static inline void tim2_ccr1_set_ccr1_h(struct TIM2_Type *p, uint32_t val) {
+	p->CCR1 = (p->CCR1 & ~TIM2_CCR1_CCR1_H) | ((val << 16) & TIM2_CCR1_CCR1_H);
+}
+static inline void tim2_ccr1_set_ccr1_l(struct TIM2_Type *p, uint32_t val) {
+	p->CCR1 = (p->CCR1 & ~TIM2_CCR1_CCR1_L) | ((val << 0) & TIM2_CCR1_CCR1_L);
+}
+static inline uint32_t tim2_ccr1_get_ccr1_h(struct TIM2_Type *p) { return (p->CCR1 & TIM2_CCR1_CCR1_H) >> 16; }
+static inline uint32_t tim2_ccr1_get_ccr1_l(struct TIM2_Type *p) { return (p->CCR1 & TIM2_CCR1_CCR1_L) >> 0; }
 
 // TIM2->CCR2 capture/compare register 2
 enum {
-	TIM2_CCR2_CCR2_H = ((1UL<<16)-1) << 16, // High Capture/Compare 2 value (TIM2 only)
-	TIM2_CCR2_CCR2_L = ((1UL<<16)-1) << 0, // Low Capture/Compare 2 value		
+	TIM2_CCR2_CCR2_H = ((1UL << 16) - 1) << 16,	 // High Capture/Compare 2 value (TIM2 only)
+	TIM2_CCR2_CCR2_L = ((1UL << 16) - 1) << 0,	 // Low Capture/Compare 2 value
 };
-static inline void tim2_ccr2_set_ccr2_h(struct TIM2_Type* p, uint32_t val) { p->CCR2 = (p->CCR2 & ~TIM2_CCR2_CCR2_H) | ((val<<16) & TIM2_CCR2_CCR2_H); }
-static inline void tim2_ccr2_set_ccr2_l(struct TIM2_Type* p, uint32_t val) { p->CCR2 = (p->CCR2 & ~TIM2_CCR2_CCR2_L) | ((val<<0) & TIM2_CCR2_CCR2_L); }
-static inline uint32_t tim2_ccr2_get_ccr2_h(struct TIM2_Type* p) { return (p->CCR2 & TIM2_CCR2_CCR2_H) >> 16 ; }
-static inline uint32_t tim2_ccr2_get_ccr2_l(struct TIM2_Type* p) { return (p->CCR2 & TIM2_CCR2_CCR2_L) >> 0 ; }
+static inline void tim2_ccr2_set_ccr2_h(struct TIM2_Type *p, uint32_t val) {
+	p->CCR2 = (p->CCR2 & ~TIM2_CCR2_CCR2_H) | ((val << 16) & TIM2_CCR2_CCR2_H);
+}
+static inline void tim2_ccr2_set_ccr2_l(struct TIM2_Type *p, uint32_t val) {
+	p->CCR2 = (p->CCR2 & ~TIM2_CCR2_CCR2_L) | ((val << 0) & TIM2_CCR2_CCR2_L);
+}
+static inline uint32_t tim2_ccr2_get_ccr2_h(struct TIM2_Type *p) { return (p->CCR2 & TIM2_CCR2_CCR2_H) >> 16; }
+static inline uint32_t tim2_ccr2_get_ccr2_l(struct TIM2_Type *p) { return (p->CCR2 & TIM2_CCR2_CCR2_L) >> 0; }
 
 // TIM2->CCR3 capture/compare register 3
 enum {
-	TIM2_CCR3_CCR3_H = ((1UL<<16)-1) << 16, // High Capture/Compare value (TIM2 only)
-	TIM2_CCR3_CCR3_L = ((1UL<<16)-1) << 0, // Low Capture/Compare value		
+	TIM2_CCR3_CCR3_H = ((1UL << 16) - 1) << 16,	 // High Capture/Compare value (TIM2 only)
+	TIM2_CCR3_CCR3_L = ((1UL << 16) - 1) << 0,	 // Low Capture/Compare value
 };
-static inline void tim2_ccr3_set_ccr3_h(struct TIM2_Type* p, uint32_t val) { p->CCR3 = (p->CCR3 & ~TIM2_CCR3_CCR3_H) | ((val<<16) & TIM2_CCR3_CCR3_H); }
-static inline void tim2_ccr3_set_ccr3_l(struct TIM2_Type* p, uint32_t val) { p->CCR3 = (p->CCR3 & ~TIM2_CCR3_CCR3_L) | ((val<<0) & TIM2_CCR3_CCR3_L); }
-static inline uint32_t tim2_ccr3_get_ccr3_h(struct TIM2_Type* p) { return (p->CCR3 & TIM2_CCR3_CCR3_H) >> 16 ; }
-static inline uint32_t tim2_ccr3_get_ccr3_l(struct TIM2_Type* p) { return (p->CCR3 & TIM2_CCR3_CCR3_L) >> 0 ; }
+static inline void tim2_ccr3_set_ccr3_h(struct TIM2_Type *p, uint32_t val) {
+	p->CCR3 = (p->CCR3 & ~TIM2_CCR3_CCR3_H) | ((val << 16) & TIM2_CCR3_CCR3_H);
+}
+static inline void tim2_ccr3_set_ccr3_l(struct TIM2_Type *p, uint32_t val) {
+	p->CCR3 = (p->CCR3 & ~TIM2_CCR3_CCR3_L) | ((val << 0) & TIM2_CCR3_CCR3_L);
+}
+static inline uint32_t tim2_ccr3_get_ccr3_h(struct TIM2_Type *p) { return (p->CCR3 & TIM2_CCR3_CCR3_H) >> 16; }
+static inline uint32_t tim2_ccr3_get_ccr3_l(struct TIM2_Type *p) { return (p->CCR3 & TIM2_CCR3_CCR3_L) >> 0; }
 
 // TIM2->CCR4 capture/compare register 4
 enum {
-	TIM2_CCR4_CCR4_H = ((1UL<<16)-1) << 16, // High Capture/Compare value (TIM2 only)
-	TIM2_CCR4_CCR4_L = ((1UL<<16)-1) << 0, // Low Capture/Compare value		
+	TIM2_CCR4_CCR4_H = ((1UL << 16) - 1) << 16,	 // High Capture/Compare value (TIM2 only)
+	TIM2_CCR4_CCR4_L = ((1UL << 16) - 1) << 0,	 // Low Capture/Compare value
 };
-static inline void tim2_ccr4_set_ccr4_h(struct TIM2_Type* p, uint32_t val) { p->CCR4 = (p->CCR4 & ~TIM2_CCR4_CCR4_H) | ((val<<16) & TIM2_CCR4_CCR4_H); }
-static inline void tim2_ccr4_set_ccr4_l(struct TIM2_Type* p, uint32_t val) { p->CCR4 = (p->CCR4 & ~TIM2_CCR4_CCR4_L) | ((val<<0) & TIM2_CCR4_CCR4_L); }
-static inline uint32_t tim2_ccr4_get_ccr4_h(struct TIM2_Type* p) { return (p->CCR4 & TIM2_CCR4_CCR4_H) >> 16 ; }
-static inline uint32_t tim2_ccr4_get_ccr4_l(struct TIM2_Type* p) { return (p->CCR4 & TIM2_CCR4_CCR4_L) >> 0 ; }
+static inline void tim2_ccr4_set_ccr4_h(struct TIM2_Type *p, uint32_t val) {
+	p->CCR4 = (p->CCR4 & ~TIM2_CCR4_CCR4_H) | ((val << 16) & TIM2_CCR4_CCR4_H);
+}
+static inline void tim2_ccr4_set_ccr4_l(struct TIM2_Type *p, uint32_t val) {
+	p->CCR4 = (p->CCR4 & ~TIM2_CCR4_CCR4_L) | ((val << 0) & TIM2_CCR4_CCR4_L);
+}
+static inline uint32_t tim2_ccr4_get_ccr4_h(struct TIM2_Type *p) { return (p->CCR4 & TIM2_CCR4_CCR4_H) >> 16; }
+static inline uint32_t tim2_ccr4_get_ccr4_l(struct TIM2_Type *p) { return (p->CCR4 & TIM2_CCR4_CCR4_L) >> 0; }
 
 // TIM2->DCR DMA control register
 enum {
-	TIM2_DCR_DBL = ((1UL<<5)-1) << 8, // DMA burst length
-	TIM2_DCR_DBA = ((1UL<<5)-1) << 0, // DMA base address		
+	TIM2_DCR_DBL = ((1UL << 5) - 1) << 8,  // DMA burst length
+	TIM2_DCR_DBA = ((1UL << 5) - 1) << 0,  // DMA base address
 };
-static inline void tim2_dcr_set_dbl(struct TIM2_Type* p, uint32_t val) { p->DCR = (p->DCR & ~TIM2_DCR_DBL) | ((val<<8) & TIM2_DCR_DBL); }
-static inline void tim2_dcr_set_dba(struct TIM2_Type* p, uint32_t val) { p->DCR = (p->DCR & ~TIM2_DCR_DBA) | ((val<<0) & TIM2_DCR_DBA); }
-static inline uint32_t tim2_dcr_get_dbl(struct TIM2_Type* p) { return (p->DCR & TIM2_DCR_DBL) >> 8 ; }
-static inline uint32_t tim2_dcr_get_dba(struct TIM2_Type* p) { return (p->DCR & TIM2_DCR_DBA) >> 0 ; }
+static inline void tim2_dcr_set_dbl(struct TIM2_Type *p, uint32_t val) {
+	p->DCR = (p->DCR & ~TIM2_DCR_DBL) | ((val << 8) & TIM2_DCR_DBL);
+}
+static inline void tim2_dcr_set_dba(struct TIM2_Type *p, uint32_t val) {
+	p->DCR = (p->DCR & ~TIM2_DCR_DBA) | ((val << 0) & TIM2_DCR_DBA);
+}
+static inline uint32_t tim2_dcr_get_dbl(struct TIM2_Type *p) { return (p->DCR & TIM2_DCR_DBL) >> 8; }
+static inline uint32_t tim2_dcr_get_dba(struct TIM2_Type *p) { return (p->DCR & TIM2_DCR_DBA) >> 0; }
 
 // TIM2->OR TIM2 option register
 enum {
-	TIM2_OR_TI4_RMP = ((1UL<<2)-1) << 3, // Internal trigger
-	TIM2_OR_ETR_RMP = ((1UL<<3)-1) << 0, // Timer2 ETR remap		
+	TIM2_OR_TI4_RMP = ((1UL << 2) - 1) << 3,  // Internal trigger
+	TIM2_OR_ETR_RMP = ((1UL << 3) - 1) << 0,  // Timer2 ETR remap
 };
-static inline void tim2_or_set_ti4_rmp(struct TIM2_Type* p, uint32_t val) { p->OR = (p->OR & ~TIM2_OR_TI4_RMP) | ((val<<3) & TIM2_OR_TI4_RMP); }
-static inline void tim2_or_set_etr_rmp(struct TIM2_Type* p, uint32_t val) { p->OR = (p->OR & ~TIM2_OR_ETR_RMP) | ((val<<0) & TIM2_OR_ETR_RMP); }
-static inline uint32_t tim2_or_get_ti4_rmp(struct TIM2_Type* p) { return (p->OR & TIM2_OR_TI4_RMP) >> 3 ; }
-static inline uint32_t tim2_or_get_etr_rmp(struct TIM2_Type* p) { return (p->OR & TIM2_OR_ETR_RMP) >> 0 ; }
-
+static inline void tim2_or_set_ti4_rmp(struct TIM2_Type *p, uint32_t val) {
+	p->OR = (p->OR & ~TIM2_OR_TI4_RMP) | ((val << 3) & TIM2_OR_TI4_RMP);
+}
+static inline void tim2_or_set_etr_rmp(struct TIM2_Type *p, uint32_t val) {
+	p->OR = (p->OR & ~TIM2_OR_ETR_RMP) | ((val << 0) & TIM2_OR_ETR_RMP);
+}
+static inline uint32_t tim2_or_get_ti4_rmp(struct TIM2_Type *p) { return (p->OR & TIM2_OR_TI4_RMP) >> 3; }
+static inline uint32_t tim2_or_get_etr_rmp(struct TIM2_Type *p) { return (p->OR & TIM2_OR_ETR_RMP) >> 0; }
 
 /* Basic-timers */
 struct TIM6_Type {
-	__IO uint8_t CR1; // @0 control register 1
-	 uint8_t RESERVED0[3]; // @1 
-	__IO uint8_t CR2; // @4 control register 2
-	 uint8_t RESERVED1[7]; // @5 
-	__IO uint16_t DIER; // @12 DMA/Interrupt enable register
-	 uint8_t RESERVED2[2]; // @14 
-	__IO uint8_t SR; // @16 status register
-	 uint8_t RESERVED3[3]; // @17 
-	__O uint8_t EGR; // @20 event generation register
-	 uint8_t RESERVED4[15]; // @21 
-	__IO uint16_t CNT; // @36 counter
-	 uint8_t RESERVED5[2]; // @38 
-	__IO uint16_t PSC; // @40 prescaler
-	 uint8_t RESERVED6[2]; // @42 
-	__IO uint16_t ARR; // @44 auto-reload register
+	__IO uint8_t  CR1;			  // @0 control register 1
+	uint8_t		  RESERVED0[3];	  // @1
+	__IO uint8_t  CR2;			  // @4 control register 2
+	uint8_t		  RESERVED1[7];	  // @5
+	__IO uint16_t DIER;			  // @12 DMA/Interrupt enable register
+	uint8_t		  RESERVED2[2];	  // @14
+	__IO uint8_t  SR;			  // @16 status register
+	uint8_t		  RESERVED3[3];	  // @17
+	__O uint8_t	  EGR;			  // @20 event generation register
+	uint8_t		  RESERVED4[15];  // @21
+	__IO uint16_t CNT;			  // @36 counter
+	uint8_t		  RESERVED5[2];	  // @38
+	__IO uint16_t PSC;			  // @40 prescaler
+	uint8_t		  RESERVED6[2];	  // @42
+	__IO uint16_t ARR;			  // @44 auto-reload register
 };
-extern struct TIM6_Type	TIM6;	// @0x40001000 
-extern struct TIM6_Type 	TIM7;	// @0x40001400
+extern struct TIM6_Type TIM6;  // @0x40001000
+extern struct TIM6_Type TIM7;  // @0x40001400
 
 // TIM6->CR1 control register 1
 enum {
-	TIM6_CR1_ARPE = 1UL<<7, // Auto-reload preload enable
-	TIM6_CR1_OPM = 1UL<<3, // One-pulse mode
-	TIM6_CR1_URS = 1UL<<2, // Update request source
-	TIM6_CR1_UDIS = 1UL<<1, // Update disable
-	TIM6_CR1_CEN = 1UL<<0, // Counter enable		
+	TIM6_CR1_ARPE = 1UL << 7,  // Auto-reload preload enable
+	TIM6_CR1_OPM  = 1UL << 3,  // One-pulse mode
+	TIM6_CR1_URS  = 1UL << 2,  // Update request source
+	TIM6_CR1_UDIS = 1UL << 1,  // Update disable
+	TIM6_CR1_CEN  = 1UL << 0,  // Counter enable
 };
 
 // TIM6->CR2 control register 2
 enum {
-	TIM6_CR2_MMS = ((1UL<<3)-1) << 4, // Master mode selection		
+	TIM6_CR2_MMS = ((1UL << 3) - 1) << 4,  // Master mode selection
 };
-static inline void tim6_cr2_set_mms(struct TIM6_Type* p, uint32_t val) { p->CR2 = (p->CR2 & ~TIM6_CR2_MMS) | ((val<<4) & TIM6_CR2_MMS); }
-static inline uint32_t tim6_cr2_get_mms(struct TIM6_Type* p) { return (p->CR2 & TIM6_CR2_MMS) >> 4 ; }
+static inline void tim6_cr2_set_mms(struct TIM6_Type *p, uint32_t val) {
+	p->CR2 = (p->CR2 & ~TIM6_CR2_MMS) | ((val << 4) & TIM6_CR2_MMS);
+}
+static inline uint32_t tim6_cr2_get_mms(struct TIM6_Type *p) { return (p->CR2 & TIM6_CR2_MMS) >> 4; }
 
 // TIM6->DIER DMA/Interrupt enable register
 enum {
-	TIM6_DIER_UDE = 1UL<<8, // Update DMA request enable
-	TIM6_DIER_UIE = 1UL<<0, // Update interrupt enable		
+	TIM6_DIER_UDE = 1UL << 8,  // Update DMA request enable
+	TIM6_DIER_UIE = 1UL << 0,  // Update interrupt enable
 };
 
 // TIM6->SR status register
 enum {
-	TIM6_SR_UIF = 1UL<<0, // Update interrupt flag		
+	TIM6_SR_UIF = 1UL << 0,	 // Update interrupt flag
 };
 
 // TIM6->EGR event generation register
 enum {
-	TIM6_EGR_UG = 1UL<<0, // Update generation		
+	TIM6_EGR_UG = 1UL << 0,	 // Update generation
 };
-
-
 
 /* Universal synchronous asynchronous receiver transmitter */
 struct UART_Type {
-	__IO uint32_t CR1; // @0 Control register 1
-	__IO uint32_t CR2; // @4 Control register 2
-	__IO uint32_t CR3; // @8 Control register 3
-	__IO uint16_t BRR; // @12 Baud rate register
-	 uint8_t RESERVED0[2]; // @14 
-	__IO uint16_t GTPR; // @16 Guard time and prescaler register
-	 uint8_t RESERVED1[2]; // @18 
-	__IO uint32_t RTOR; // @20 Receiver timeout register
-	__O uint8_t RQR; // @24 Request register
-	 uint8_t RESERVED2[3]; // @25 
-	__I uint32_t ISR; // @28 Interrupt & status register
-	__O uint32_t ICR; // @32 Interrupt flag clear register
-	__I uint16_t RDR; // @36 Receive data register
-	 uint8_t RESERVED3[2]; // @38 
-	__IO uint16_t TDR; // @40 Transmit data register
+	__IO uint32_t CR1;			 // @0 Control register 1
+	__IO uint32_t CR2;			 // @4 Control register 2
+	__IO uint32_t CR3;			 // @8 Control register 3
+	__IO uint16_t BRR;			 // @12 Baud rate register
+	uint8_t		  RESERVED0[2];	 // @14
+	__IO uint16_t GTPR;			 // @16 Guard time and prescaler register
+	uint8_t		  RESERVED1[2];	 // @18
+	__IO uint32_t RTOR;			 // @20 Receiver timeout register
+	__O uint8_t	  RQR;			 // @24 Request register
+	uint8_t		  RESERVED2[3];	 // @25
+	__I uint32_t  ISR;			 // @28 Interrupt & status register
+	__O uint32_t  ICR;			 // @32 Interrupt flag clear register
+	__I uint16_t  RDR;			 // @36 Receive data register
+	uint8_t		  RESERVED3[2];	 // @38
+	__IO uint16_t TDR;			 // @40 Transmit data register
 };
-extern struct UART_Type	USART1;	// @0x40013800 
-extern struct UART_Type 	UART4;	// @0x40004C00
-extern struct UART_Type 	USART2;	// @0x40004400
-extern struct UART_Type 	USART3;	// @0x40004800
+extern struct UART_Type USART1;	 // @0x40013800
+extern struct UART_Type UART4;	 // @0x40004C00
+extern struct UART_Type USART2;	 // @0x40004400
+extern struct UART_Type USART3;	 // @0x40004800
 
 // UART->CR1 Control register 1
 enum {
-	UART_CR1_M1 = 1UL<<28, // Word length
-	UART_CR1_EOBIE = 1UL<<27, // End of Block interrupt enable
-	UART_CR1_RTOIE = 1UL<<26, // Receiver timeout interrupt enable
-	UART_CR1_DEAT = ((1UL<<5)-1) << 21, // DEAT0
-	UART_CR1_DEDT = ((1UL<<5)-1) << 16, // DEDT0
-	UART_CR1_OVER8 = 1UL<<15, // Oversampling mode
-	UART_CR1_CMIE = 1UL<<14, // Character match interrupt enable
-	UART_CR1_MME = 1UL<<13, // Mute mode enable
-	UART_CR1_M0 = 1UL<<12, // Word length
-	UART_CR1_WAKE = 1UL<<11, // Receiver wakeup method
-	UART_CR1_PCE = 1UL<<10, // Parity control enable
-	UART_CR1_PS = 1UL<<9, // Parity selection
-	UART_CR1_PEIE = 1UL<<8, // PE interrupt enable
-	UART_CR1_TXEIE = 1UL<<7, // interrupt enable
-	UART_CR1_TCIE = 1UL<<6, // Transmission complete interrupt enable
-	UART_CR1_RXNEIE = 1UL<<5, // RXNE interrupt enable
-	UART_CR1_IDLEIE = 1UL<<4, // IDLE interrupt enable
-	UART_CR1_TE = 1UL<<3, // Transmitter enable
-	UART_CR1_RE = 1UL<<2, // Receiver enable
-	UART_CR1_UESM = 1UL<<1, // USART enable in Stop mode
-	UART_CR1_UE = 1UL<<0, // USART enable		
+	UART_CR1_M1		= 1UL << 28,			   // Word length
+	UART_CR1_EOBIE	= 1UL << 27,			   // End of Block interrupt enable
+	UART_CR1_RTOIE	= 1UL << 26,			   // Receiver timeout interrupt enable
+	UART_CR1_DEAT	= ((1UL << 5) - 1) << 21,  // DEAT0
+	UART_CR1_DEDT	= ((1UL << 5) - 1) << 16,  // DEDT0
+	UART_CR1_OVER8	= 1UL << 15,			   // Oversampling mode
+	UART_CR1_CMIE	= 1UL << 14,			   // Character match interrupt enable
+	UART_CR1_MME	= 1UL << 13,			   // Mute mode enable
+	UART_CR1_M0		= 1UL << 12,			   // Word length
+	UART_CR1_WAKE	= 1UL << 11,			   // Receiver wakeup method
+	UART_CR1_PCE	= 1UL << 10,			   // Parity control enable
+	UART_CR1_PS		= 1UL << 9,				   // Parity selection
+	UART_CR1_PEIE	= 1UL << 8,				   // PE interrupt enable
+	UART_CR1_TXEIE	= 1UL << 7,				   // interrupt enable
+	UART_CR1_TCIE	= 1UL << 6,				   // Transmission complete interrupt enable
+	UART_CR1_RXNEIE = 1UL << 5,				   // RXNE interrupt enable
+	UART_CR1_IDLEIE = 1UL << 4,				   // IDLE interrupt enable
+	UART_CR1_TE		= 1UL << 3,				   // Transmitter enable
+	UART_CR1_RE		= 1UL << 2,				   // Receiver enable
+	UART_CR1_UESM	= 1UL << 1,				   // USART enable in Stop mode
+	UART_CR1_UE		= 1UL << 0,				   // USART enable
 };
-static inline void uart_cr1_set_deat(struct UART_Type* p, uint32_t val) { p->CR1 = (p->CR1 & ~UART_CR1_DEAT) | ((val<<21) & UART_CR1_DEAT); }
-static inline void uart_cr1_set_dedt(struct UART_Type* p, uint32_t val) { p->CR1 = (p->CR1 & ~UART_CR1_DEDT) | ((val<<16) & UART_CR1_DEDT); }
-static inline uint32_t uart_cr1_get_deat(struct UART_Type* p) { return (p->CR1 & UART_CR1_DEAT) >> 21 ; }
-static inline uint32_t uart_cr1_get_dedt(struct UART_Type* p) { return (p->CR1 & UART_CR1_DEDT) >> 16 ; }
+static inline void uart_cr1_set_deat(struct UART_Type *p, uint32_t val) {
+	p->CR1 = (p->CR1 & ~UART_CR1_DEAT) | ((val << 21) & UART_CR1_DEAT);
+}
+static inline void uart_cr1_set_dedt(struct UART_Type *p, uint32_t val) {
+	p->CR1 = (p->CR1 & ~UART_CR1_DEDT) | ((val << 16) & UART_CR1_DEDT);
+}
+static inline uint32_t uart_cr1_get_deat(struct UART_Type *p) { return (p->CR1 & UART_CR1_DEAT) >> 21; }
+static inline uint32_t uart_cr1_get_dedt(struct UART_Type *p) { return (p->CR1 & UART_CR1_DEDT) >> 16; }
 
 // UART->CR2 Control register 2
 enum {
-	UART_CR2_ADD = ((1UL<<8)-1) << 24, // Address of the USART node
-	UART_CR2_RTOEN = 1UL<<23, // Receiver timeout enable
-	UART_CR2_ABRMOD = ((1UL<<2)-1) << 21, // Auto baud rate mode
-	UART_CR2_ABREN = 1UL<<20, // Auto baud rate enable
-	UART_CR2_MSBFIRST = 1UL<<19, // Most significant bit first
-	UART_CR2_TAINV = 1UL<<18, // Binary data inversion
-	UART_CR2_TXINV = 1UL<<17, // TX pin active level inversion
-	UART_CR2_RXINV = 1UL<<16, // RX pin active level inversion
-	UART_CR2_SWAP = 1UL<<15, // Swap TX/RX pins
-	UART_CR2_LINEN = 1UL<<14, // LIN mode enable
-	UART_CR2_STOP = ((1UL<<2)-1) << 12, // STOP bits
-	UART_CR2_CLKEN = 1UL<<11, // Clock enable
-	UART_CR2_CPOL = 1UL<<10, // Clock polarity
-	UART_CR2_CPHA = 1UL<<9, // Clock phase
-	UART_CR2_LBCL = 1UL<<8, // Last bit clock pulse
-	UART_CR2_LBDIE = 1UL<<6, // LIN break detection interrupt enable
-	UART_CR2_LBDL = 1UL<<5, // LIN break detection length
-	UART_CR2_ADDM7 = 1UL<<4, // 7-bit Address Detection/4-bit Address Detection		
+	UART_CR2_ADD	  = ((1UL << 8) - 1) << 24,	 // Address of the USART node
+	UART_CR2_RTOEN	  = 1UL << 23,				 // Receiver timeout enable
+	UART_CR2_ABRMOD	  = ((1UL << 2) - 1) << 21,	 // Auto baud rate mode
+	UART_CR2_ABREN	  = 1UL << 20,				 // Auto baud rate enable
+	UART_CR2_MSBFIRST = 1UL << 19,				 // Most significant bit first
+	UART_CR2_TAINV	  = 1UL << 18,				 // Binary data inversion
+	UART_CR2_TXINV	  = 1UL << 17,				 // TX pin active level inversion
+	UART_CR2_RXINV	  = 1UL << 16,				 // RX pin active level inversion
+	UART_CR2_SWAP	  = 1UL << 15,				 // Swap TX/RX pins
+	UART_CR2_LINEN	  = 1UL << 14,				 // LIN mode enable
+	UART_CR2_STOP	  = ((1UL << 2) - 1) << 12,	 // STOP bits
+	UART_CR2_CLKEN	  = 1UL << 11,				 // Clock enable
+	UART_CR2_CPOL	  = 1UL << 10,				 // Clock polarity
+	UART_CR2_CPHA	  = 1UL << 9,				 // Clock phase
+	UART_CR2_LBCL	  = 1UL << 8,				 // Last bit clock pulse
+	UART_CR2_LBDIE	  = 1UL << 6,				 // LIN break detection interrupt enable
+	UART_CR2_LBDL	  = 1UL << 5,				 // LIN break detection length
+	UART_CR2_ADDM7	  = 1UL << 4,				 // 7-bit Address Detection/4-bit Address Detection
 };
-static inline void uart_cr2_set_add(struct UART_Type* p, uint32_t val) { p->CR2 = (p->CR2 & ~UART_CR2_ADD) | ((val<<24) & UART_CR2_ADD); }
-static inline void uart_cr2_set_abrmod(struct UART_Type* p, uint32_t val) { p->CR2 = (p->CR2 & ~UART_CR2_ABRMOD) | ((val<<21) & UART_CR2_ABRMOD); }
-static inline void uart_cr2_set_stop(struct UART_Type* p, uint32_t val) { p->CR2 = (p->CR2 & ~UART_CR2_STOP) | ((val<<12) & UART_CR2_STOP); }
-static inline uint32_t uart_cr2_get_add(struct UART_Type* p) { return (p->CR2 & UART_CR2_ADD) >> 24 ; }
-static inline uint32_t uart_cr2_get_abrmod(struct UART_Type* p) { return (p->CR2 & UART_CR2_ABRMOD) >> 21 ; }
-static inline uint32_t uart_cr2_get_stop(struct UART_Type* p) { return (p->CR2 & UART_CR2_STOP) >> 12 ; }
+static inline void uart_cr2_set_add(struct UART_Type *p, uint32_t val) {
+	p->CR2 = (p->CR2 & ~UART_CR2_ADD) | ((val << 24) & UART_CR2_ADD);
+}
+static inline void uart_cr2_set_abrmod(struct UART_Type *p, uint32_t val) {
+	p->CR2 = (p->CR2 & ~UART_CR2_ABRMOD) | ((val << 21) & UART_CR2_ABRMOD);
+}
+static inline void uart_cr2_set_stop(struct UART_Type *p, uint32_t val) {
+	p->CR2 = (p->CR2 & ~UART_CR2_STOP) | ((val << 12) & UART_CR2_STOP);
+}
+static inline uint32_t uart_cr2_get_add(struct UART_Type *p) { return (p->CR2 & UART_CR2_ADD) >> 24; }
+static inline uint32_t uart_cr2_get_abrmod(struct UART_Type *p) { return (p->CR2 & UART_CR2_ABRMOD) >> 21; }
+static inline uint32_t uart_cr2_get_stop(struct UART_Type *p) { return (p->CR2 & UART_CR2_STOP) >> 12; }
 
 // UART->CR3 Control register 3
 enum {
-	UART_CR3_WUFIE = 1UL<<22, // Wakeup from Stop mode interrupt enable
-	UART_CR3_WUS = ((1UL<<2)-1) << 20, // Wakeup from Stop mode interrupt flag selection
-	UART_CR3_SCARCNT = ((1UL<<3)-1) << 17, // Smartcard auto-retry count
-	UART_CR3_DEP = 1UL<<15, // Driver enable polarity selection
-	UART_CR3_DEM = 1UL<<14, // Driver enable mode
-	UART_CR3_DDRE = 1UL<<13, // DMA Disable on Reception Error
-	UART_CR3_OVRDIS = 1UL<<12, // Overrun Disable
-	UART_CR3_ONEBIT = 1UL<<11, // One sample bit method enable
-	UART_CR3_CTSIE = 1UL<<10, // CTS interrupt enable
-	UART_CR3_CTSE = 1UL<<9, // CTS enable
-	UART_CR3_RTSE = 1UL<<8, // RTS enable
-	UART_CR3_DMAT = 1UL<<7, // DMA enable transmitter
-	UART_CR3_DMAR = 1UL<<6, // DMA enable receiver
-	UART_CR3_SCEN = 1UL<<5, // Smartcard mode enable
-	UART_CR3_NACK = 1UL<<4, // Smartcard NACK enable
-	UART_CR3_HDSEL = 1UL<<3, // Half-duplex selection
-	UART_CR3_IRLP = 1UL<<2, // Ir low-power
-	UART_CR3_IREN = 1UL<<1, // Ir mode enable
-	UART_CR3_EIE = 1UL<<0, // Error interrupt enable		
+	UART_CR3_WUFIE	 = 1UL << 22,				// Wakeup from Stop mode interrupt enable
+	UART_CR3_WUS	 = ((1UL << 2) - 1) << 20,	// Wakeup from Stop mode interrupt flag selection
+	UART_CR3_SCARCNT = ((1UL << 3) - 1) << 17,	// Smartcard auto-retry count
+	UART_CR3_DEP	 = 1UL << 15,				// Driver enable polarity selection
+	UART_CR3_DEM	 = 1UL << 14,				// Driver enable mode
+	UART_CR3_DDRE	 = 1UL << 13,				// DMA Disable on Reception Error
+	UART_CR3_OVRDIS	 = 1UL << 12,				// Overrun Disable
+	UART_CR3_ONEBIT	 = 1UL << 11,				// One sample bit method enable
+	UART_CR3_CTSIE	 = 1UL << 10,				// CTS interrupt enable
+	UART_CR3_CTSE	 = 1UL << 9,				// CTS enable
+	UART_CR3_RTSE	 = 1UL << 8,				// RTS enable
+	UART_CR3_DMAT	 = 1UL << 7,				// DMA enable transmitter
+	UART_CR3_DMAR	 = 1UL << 6,				// DMA enable receiver
+	UART_CR3_SCEN	 = 1UL << 5,				// Smartcard mode enable
+	UART_CR3_NACK	 = 1UL << 4,				// Smartcard NACK enable
+	UART_CR3_HDSEL	 = 1UL << 3,				// Half-duplex selection
+	UART_CR3_IRLP	 = 1UL << 2,				// Ir low-power
+	UART_CR3_IREN	 = 1UL << 1,				// Ir mode enable
+	UART_CR3_EIE	 = 1UL << 0,				// Error interrupt enable
 };
-static inline void uart_cr3_set_wus(struct UART_Type* p, uint32_t val) { p->CR3 = (p->CR3 & ~UART_CR3_WUS) | ((val<<20) & UART_CR3_WUS); }
-static inline void uart_cr3_set_scarcnt(struct UART_Type* p, uint32_t val) { p->CR3 = (p->CR3 & ~UART_CR3_SCARCNT) | ((val<<17) & UART_CR3_SCARCNT); }
-static inline uint32_t uart_cr3_get_wus(struct UART_Type* p) { return (p->CR3 & UART_CR3_WUS) >> 20 ; }
-static inline uint32_t uart_cr3_get_scarcnt(struct UART_Type* p) { return (p->CR3 & UART_CR3_SCARCNT) >> 17 ; }
+static inline void uart_cr3_set_wus(struct UART_Type *p, uint32_t val) {
+	p->CR3 = (p->CR3 & ~UART_CR3_WUS) | ((val << 20) & UART_CR3_WUS);
+}
+static inline void uart_cr3_set_scarcnt(struct UART_Type *p, uint32_t val) {
+	p->CR3 = (p->CR3 & ~UART_CR3_SCARCNT) | ((val << 17) & UART_CR3_SCARCNT);
+}
+static inline uint32_t uart_cr3_get_wus(struct UART_Type *p) { return (p->CR3 & UART_CR3_WUS) >> 20; }
+static inline uint32_t uart_cr3_get_scarcnt(struct UART_Type *p) { return (p->CR3 & UART_CR3_SCARCNT) >> 17; }
 
 // UART->BRR Baud rate register
 enum {
-	UART_BRR_DIV_MANTISSA = ((1UL<<12)-1) << 4, // DIV_Mantissa
-	UART_BRR_DIV_FRACTION = ((1UL<<4)-1) << 0, // DIV_Fraction		
+	UART_BRR_DIV_MANTISSA = ((1UL << 12) - 1) << 4,	 // DIV_Mantissa
+	UART_BRR_DIV_FRACTION = ((1UL << 4) - 1) << 0,	 // DIV_Fraction
 };
-static inline void uart_brr_set_div_mantissa(struct UART_Type* p, uint32_t val) { p->BRR = (p->BRR & ~UART_BRR_DIV_MANTISSA) | ((val<<4) & UART_BRR_DIV_MANTISSA); }
-static inline void uart_brr_set_div_fraction(struct UART_Type* p, uint32_t val) { p->BRR = (p->BRR & ~UART_BRR_DIV_FRACTION) | ((val<<0) & UART_BRR_DIV_FRACTION); }
-static inline uint32_t uart_brr_get_div_mantissa(struct UART_Type* p) { return (p->BRR & UART_BRR_DIV_MANTISSA) >> 4 ; }
-static inline uint32_t uart_brr_get_div_fraction(struct UART_Type* p) { return (p->BRR & UART_BRR_DIV_FRACTION) >> 0 ; }
+static inline void uart_brr_set_div_mantissa(struct UART_Type *p, uint32_t val) {
+	p->BRR = (p->BRR & ~UART_BRR_DIV_MANTISSA) | ((val << 4) & UART_BRR_DIV_MANTISSA);
+}
+static inline void uart_brr_set_div_fraction(struct UART_Type *p, uint32_t val) {
+	p->BRR = (p->BRR & ~UART_BRR_DIV_FRACTION) | ((val << 0) & UART_BRR_DIV_FRACTION);
+}
+static inline uint32_t uart_brr_get_div_mantissa(struct UART_Type *p) { return (p->BRR & UART_BRR_DIV_MANTISSA) >> 4; }
+static inline uint32_t uart_brr_get_div_fraction(struct UART_Type *p) { return (p->BRR & UART_BRR_DIV_FRACTION) >> 0; }
 
 // UART->GTPR Guard time and prescaler register
 enum {
-	UART_GTPR_GT = ((1UL<<8)-1) << 8, // Guard time value
-	UART_GTPR_PSC = ((1UL<<8)-1) << 0, // Prescaler value		
+	UART_GTPR_GT  = ((1UL << 8) - 1) << 8,	// Guard time value
+	UART_GTPR_PSC = ((1UL << 8) - 1) << 0,	// Prescaler value
 };
-static inline void uart_gtpr_set_gt(struct UART_Type* p, uint32_t val) { p->GTPR = (p->GTPR & ~UART_GTPR_GT) | ((val<<8) & UART_GTPR_GT); }
-static inline void uart_gtpr_set_psc(struct UART_Type* p, uint32_t val) { p->GTPR = (p->GTPR & ~UART_GTPR_PSC) | ((val<<0) & UART_GTPR_PSC); }
-static inline uint32_t uart_gtpr_get_gt(struct UART_Type* p) { return (p->GTPR & UART_GTPR_GT) >> 8 ; }
-static inline uint32_t uart_gtpr_get_psc(struct UART_Type* p) { return (p->GTPR & UART_GTPR_PSC) >> 0 ; }
+static inline void uart_gtpr_set_gt(struct UART_Type *p, uint32_t val) {
+	p->GTPR = (p->GTPR & ~UART_GTPR_GT) | ((val << 8) & UART_GTPR_GT);
+}
+static inline void uart_gtpr_set_psc(struct UART_Type *p, uint32_t val) {
+	p->GTPR = (p->GTPR & ~UART_GTPR_PSC) | ((val << 0) & UART_GTPR_PSC);
+}
+static inline uint32_t uart_gtpr_get_gt(struct UART_Type *p) { return (p->GTPR & UART_GTPR_GT) >> 8; }
+static inline uint32_t uart_gtpr_get_psc(struct UART_Type *p) { return (p->GTPR & UART_GTPR_PSC) >> 0; }
 
 // UART->RTOR Receiver timeout register
 enum {
-	UART_RTOR_BLEN = ((1UL<<8)-1) << 24, // Block Length
-	UART_RTOR_RTO = ((1UL<<24)-1) << 0, // Receiver timeout value		
+	UART_RTOR_BLEN = ((1UL << 8) - 1) << 24,  // Block Length
+	UART_RTOR_RTO  = ((1UL << 24) - 1) << 0,  // Receiver timeout value
 };
-static inline void uart_rtor_set_blen(struct UART_Type* p, uint32_t val) { p->RTOR = (p->RTOR & ~UART_RTOR_BLEN) | ((val<<24) & UART_RTOR_BLEN); }
-static inline void uart_rtor_set_rto(struct UART_Type* p, uint32_t val) { p->RTOR = (p->RTOR & ~UART_RTOR_RTO) | ((val<<0) & UART_RTOR_RTO); }
-static inline uint32_t uart_rtor_get_blen(struct UART_Type* p) { return (p->RTOR & UART_RTOR_BLEN) >> 24 ; }
-static inline uint32_t uart_rtor_get_rto(struct UART_Type* p) { return (p->RTOR & UART_RTOR_RTO) >> 0 ; }
+static inline void uart_rtor_set_blen(struct UART_Type *p, uint32_t val) {
+	p->RTOR = (p->RTOR & ~UART_RTOR_BLEN) | ((val << 24) & UART_RTOR_BLEN);
+}
+static inline void uart_rtor_set_rto(struct UART_Type *p, uint32_t val) {
+	p->RTOR = (p->RTOR & ~UART_RTOR_RTO) | ((val << 0) & UART_RTOR_RTO);
+}
+static inline uint32_t uart_rtor_get_blen(struct UART_Type *p) { return (p->RTOR & UART_RTOR_BLEN) >> 24; }
+static inline uint32_t uart_rtor_get_rto(struct UART_Type *p) { return (p->RTOR & UART_RTOR_RTO) >> 0; }
 
 // UART->RQR Request register
 enum {
-	UART_RQR_TXFRQ = 1UL<<4, // Transmit data flush request
-	UART_RQR_RXFRQ = 1UL<<3, // Receive data flush request
-	UART_RQR_MMRQ = 1UL<<2, // Mute mode request
-	UART_RQR_SBKRQ = 1UL<<1, // Send break request
-	UART_RQR_ABRRQ = 1UL<<0, // Auto baud rate request		
+	UART_RQR_TXFRQ = 1UL << 4,	// Transmit data flush request
+	UART_RQR_RXFRQ = 1UL << 3,	// Receive data flush request
+	UART_RQR_MMRQ  = 1UL << 2,	// Mute mode request
+	UART_RQR_SBKRQ = 1UL << 1,	// Send break request
+	UART_RQR_ABRRQ = 1UL << 0,	// Auto baud rate request
 };
 
 // UART->ISR Interrupt & status register
 enum {
-	UART_ISR_TCBGT = 1UL<<25, // Transmission complete before guard time completion
-	UART_ISR_REACK = 1UL<<22, // REACK
-	UART_ISR_TEACK = 1UL<<21, // TEACK
-	UART_ISR_WUF = 1UL<<20, // WUF
-	UART_ISR_RWU = 1UL<<19, // RWU
-	UART_ISR_SBKF = 1UL<<18, // SBKF
-	UART_ISR_CMF = 1UL<<17, // CMF
-	UART_ISR_BUSY = 1UL<<16, // BUSY
-	UART_ISR_ABRF = 1UL<<15, // ABRF
-	UART_ISR_ABRE = 1UL<<14, // ABRE
-	UART_ISR_EOBF = 1UL<<12, // EOBF
-	UART_ISR_RTOF = 1UL<<11, // RTOF
-	UART_ISR_CTS = 1UL<<10, // CTS
-	UART_ISR_CTSIF = 1UL<<9, // CTSIF
-	UART_ISR_LBDF = 1UL<<8, // LBDF
-	UART_ISR_TXE = 1UL<<7, // TXE
-	UART_ISR_TC = 1UL<<6, // TC
-	UART_ISR_RXNE = 1UL<<5, // RXNE
-	UART_ISR_IDLE = 1UL<<4, // IDLE
-	UART_ISR_ORE = 1UL<<3, // ORE
-	UART_ISR_NF = 1UL<<2, // NF
-	UART_ISR_FE = 1UL<<1, // FE
-	UART_ISR_PE = 1UL<<0, // PE		
+	UART_ISR_TCBGT = 1UL << 25,	 // Transmission complete before guard time completion
+	UART_ISR_REACK = 1UL << 22,	 // REACK
+	UART_ISR_TEACK = 1UL << 21,	 // TEACK
+	UART_ISR_WUF   = 1UL << 20,	 // WUF
+	UART_ISR_RWU   = 1UL << 19,	 // RWU
+	UART_ISR_SBKF  = 1UL << 18,	 // SBKF
+	UART_ISR_CMF   = 1UL << 17,	 // CMF
+	UART_ISR_BUSY  = 1UL << 16,	 // BUSY
+	UART_ISR_ABRF  = 1UL << 15,	 // ABRF
+	UART_ISR_ABRE  = 1UL << 14,	 // ABRE
+	UART_ISR_EOBF  = 1UL << 12,	 // EOBF
+	UART_ISR_RTOF  = 1UL << 11,	 // RTOF
+	UART_ISR_CTS   = 1UL << 10,	 // CTS
+	UART_ISR_CTSIF = 1UL << 9,	 // CTSIF
+	UART_ISR_LBDF  = 1UL << 8,	 // LBDF
+	UART_ISR_TXE   = 1UL << 7,	 // TXE
+	UART_ISR_TC	   = 1UL << 6,	 // TC
+	UART_ISR_RXNE  = 1UL << 5,	 // RXNE
+	UART_ISR_IDLE  = 1UL << 4,	 // IDLE
+	UART_ISR_ORE   = 1UL << 3,	 // ORE
+	UART_ISR_NF	   = 1UL << 2,	 // NF
+	UART_ISR_FE	   = 1UL << 1,	 // FE
+	UART_ISR_PE	   = 1UL << 0,	 // PE
 };
 
 // UART->ICR Interrupt flag clear register
 enum {
-	UART_ICR_WUCF = 1UL<<20, // Wakeup from Stop mode clear flag
-	UART_ICR_CMCF = 1UL<<17, // Character match clear flag
-	UART_ICR_EOBCF = 1UL<<12, // End of block clear flag
-	UART_ICR_RTOCF = 1UL<<11, // Receiver timeout clear flag
-	UART_ICR_CTSCF = 1UL<<9, // CTS clear flag
-	UART_ICR_LBDCF = 1UL<<8, // LIN break detection clear flag
-	UART_ICR_TCCF = 1UL<<6, // Transmission complete clear flag
-	UART_ICR_IDLECF = 1UL<<4, // Idle line detected clear flag
-	UART_ICR_ORECF = 1UL<<3, // Overrun error clear flag
-	UART_ICR_NCF = 1UL<<2, // Noise detected clear flag
-	UART_ICR_FECF = 1UL<<1, // Framing error clear flag
-	UART_ICR_PECF = 1UL<<0, // Parity error clear flag		
+	UART_ICR_WUCF	= 1UL << 20,  // Wakeup from Stop mode clear flag
+	UART_ICR_CMCF	= 1UL << 17,  // Character match clear flag
+	UART_ICR_EOBCF	= 1UL << 12,  // End of block clear flag
+	UART_ICR_RTOCF	= 1UL << 11,  // Receiver timeout clear flag
+	UART_ICR_CTSCF	= 1UL << 9,	  // CTS clear flag
+	UART_ICR_LBDCF	= 1UL << 8,	  // LIN break detection clear flag
+	UART_ICR_TCCF	= 1UL << 6,	  // Transmission complete clear flag
+	UART_ICR_IDLECF = 1UL << 4,	  // Idle line detected clear flag
+	UART_ICR_ORECF	= 1UL << 3,	  // Overrun error clear flag
+	UART_ICR_NCF	= 1UL << 2,	  // Noise detected clear flag
+	UART_ICR_FECF	= 1UL << 1,	  // Framing error clear flag
+	UART_ICR_PECF	= 1UL << 0,	  // Parity error clear flag
 };
 
 // UART->RDR Receive data register
 enum {
-	UART_RDR_RDR = ((1UL<<9)-1) << 0, // Receive data value		
+	UART_RDR_RDR = ((1UL << 9) - 1) << 0,  // Receive data value
 };
-static inline uint32_t uart_rdr_get_rdr(struct UART_Type* p) { return (p->RDR & UART_RDR_RDR) >> 0 ; }
+static inline uint32_t uart_rdr_get_rdr(struct UART_Type *p) { return (p->RDR & UART_RDR_RDR) >> 0; }
 
 // UART->TDR Transmit data register
 enum {
-	UART_TDR_TDR = ((1UL<<9)-1) << 0, // Transmit data value		
+	UART_TDR_TDR = ((1UL << 9) - 1) << 0,  // Transmit data value
 };
-static inline void uart_tdr_set_tdr(struct UART_Type* p, uint32_t val) { p->TDR = (p->TDR & ~UART_TDR_TDR) | ((val<<0) & UART_TDR_TDR); }
-static inline uint32_t uart_tdr_get_tdr(struct UART_Type* p) { return (p->TDR & UART_TDR_TDR) >> 0 ; }
-
-
+static inline void uart_tdr_set_tdr(struct UART_Type *p, uint32_t val) {
+	p->TDR = (p->TDR & ~UART_TDR_TDR) | ((val << 0) & UART_TDR_TDR);
+}
+static inline uint32_t uart_tdr_get_tdr(struct UART_Type *p) { return (p->TDR & UART_TDR_TDR) >> 0; }
 
 /* Voltage reference buffer
 There is only one peripheral of type VREFBUF. */
 struct VREFBUF_Type {
-	__IO uint8_t CSR; // @0 VREF control and status register
-	 uint8_t RESERVED0[3]; // @1 
-	__IO uint8_t CCR; // @4 calibration control register
+	__IO uint8_t CSR;			// @0 VREF control and status register
+	uint8_t		 RESERVED0[3];	// @1
+	__IO uint8_t CCR;			// @4 calibration control register
 };
-extern struct VREFBUF_Type	VREFBUF;	// @0x40010030 
+extern struct VREFBUF_Type VREFBUF;	 // @0x40010030
 
 // VREFBUF->CSR VREF control and status register
 enum {
-	VREFBUF_CSR_VRR = 1UL<<3, // Voltage reference buffer ready
-	VREFBUF_CSR_VRS = 1UL<<2, // Voltage reference scale
-	VREFBUF_CSR_HIZ = 1UL<<1, // High impedance mode
-	VREFBUF_CSR_ENVR = 1UL<<0, // Voltage reference buffer enable		
+	VREFBUF_CSR_VRR	 = 1UL << 3,  // Voltage reference buffer ready
+	VREFBUF_CSR_VRS	 = 1UL << 2,  // Voltage reference scale
+	VREFBUF_CSR_HIZ	 = 1UL << 1,  // High impedance mode
+	VREFBUF_CSR_ENVR = 1UL << 0,  // Voltage reference buffer enable
 };
 
 // VREFBUF->CCR calibration control register
 enum {
-	VREFBUF_CCR_TRIM = ((1UL<<6)-1) << 0, // Trimming code		
+	VREFBUF_CCR_TRIM = ((1UL << 6) - 1) << 0,  // Trimming code
 };
-static inline void vrefbuf_ccr_set_trim(uint32_t val) { VREFBUF.CCR = (VREFBUF.CCR & ~VREFBUF_CCR_TRIM) | ((val<<0) & VREFBUF_CCR_TRIM); }
-static inline uint32_t vrefbuf_ccr_get_trim(void) { return (VREFBUF.CCR & VREFBUF_CCR_TRIM) >> 0 ; }
+static inline void vrefbuf_ccr_set_trim(uint32_t val) {
+	VREFBUF.CCR = (VREFBUF.CCR & ~VREFBUF_CCR_TRIM) | ((val << 0) & VREFBUF_CCR_TRIM);
+}
+static inline uint32_t vrefbuf_ccr_get_trim(void) { return (VREFBUF.CCR & VREFBUF_CCR_TRIM) >> 0; }
 
 /* System window watchdog
 There is only one peripheral of type WWDG. */
 struct WWDG_Type {
-	__IO uint8_t CR; // @0 Control register
-	 uint8_t RESERVED0[3]; // @1 
-	__IO uint16_t CFR; // @4 Configuration register
-	 uint8_t RESERVED1[2]; // @6 
-	__IO uint8_t SR; // @8 Status register
+	__IO uint8_t  CR;			 // @0 Control register
+	uint8_t		  RESERVED0[3];	 // @1
+	__IO uint16_t CFR;			 // @4 Configuration register
+	uint8_t		  RESERVED1[2];	 // @6
+	__IO uint8_t  SR;			 // @8 Status register
 };
-extern struct WWDG_Type	WWDG;	// @0x40002C00 
+extern struct WWDG_Type WWDG;  // @0x40002C00
 
 // WWDG->CR Control register
 enum {
-	WWDG_CR_WDGA = 1UL<<7, // Activation bit
-	WWDG_CR_T = ((1UL<<7)-1) << 0, // 7-bit counter (MSB to LSB)		
+	WWDG_CR_WDGA = 1UL << 7,			   // Activation bit
+	WWDG_CR_T	 = ((1UL << 7) - 1) << 0,  // 7-bit counter (MSB to LSB)
 };
-static inline void wwdg_cr_set_t(uint32_t val) { WWDG.CR = (WWDG.CR & ~WWDG_CR_T) | ((val<<0) & WWDG_CR_T); }
-static inline uint32_t wwdg_cr_get_t(void) { return (WWDG.CR & WWDG_CR_T) >> 0 ; }
+static inline void	   wwdg_cr_set_t(uint32_t val) { WWDG.CR = (WWDG.CR & ~WWDG_CR_T) | ((val << 0) & WWDG_CR_T); }
+static inline uint32_t wwdg_cr_get_t(void) { return (WWDG.CR & WWDG_CR_T) >> 0; }
 
 // WWDG->CFR Configuration register
 enum {
-	WWDG_CFR_EWI = 1UL<<9, // Early wakeup interrupt
-	WWDG_CFR_WDGTB = ((1UL<<2)-1) << 7, // Timer base
-	WWDG_CFR_W = ((1UL<<7)-1) << 0, // 7-bit window value		
+	WWDG_CFR_EWI   = 1UL << 9,				 // Early wakeup interrupt
+	WWDG_CFR_WDGTB = ((1UL << 2) - 1) << 7,	 // Timer base
+	WWDG_CFR_W	   = ((1UL << 7) - 1) << 0,	 // 7-bit window value
 };
-static inline void wwdg_cfr_set_wdgtb(uint32_t val) { WWDG.CFR = (WWDG.CFR & ~WWDG_CFR_WDGTB) | ((val<<7) & WWDG_CFR_WDGTB); }
-static inline void wwdg_cfr_set_w(uint32_t val) { WWDG.CFR = (WWDG.CFR & ~WWDG_CFR_W) | ((val<<0) & WWDG_CFR_W); }
-static inline uint32_t wwdg_cfr_get_wdgtb(void) { return (WWDG.CFR & WWDG_CFR_WDGTB) >> 7 ; }
-static inline uint32_t wwdg_cfr_get_w(void) { return (WWDG.CFR & WWDG_CFR_W) >> 0 ; }
+static inline void	   wwdg_cfr_set_wdgtb(uint32_t val) { WWDG.CFR = (WWDG.CFR & ~WWDG_CFR_WDGTB) | ((val << 7) & WWDG_CFR_WDGTB); }
+static inline void	   wwdg_cfr_set_w(uint32_t val) { WWDG.CFR = (WWDG.CFR & ~WWDG_CFR_W) | ((val << 0) & WWDG_CFR_W); }
+static inline uint32_t wwdg_cfr_get_wdgtb(void) { return (WWDG.CFR & WWDG_CFR_WDGTB) >> 7; }
+static inline uint32_t wwdg_cfr_get_w(void) { return (WWDG.CFR & WWDG_CFR_W) >> 0; }
 
 // WWDG->SR Status register
 enum {
-	WWDG_SR_EWIF = 1UL<<0, // Early wakeup interrupt flag		
+	WWDG_SR_EWIF = 1UL << 0,  // Early wakeup interrupt flag
 };
-
 
 #undef __I
 #undef __O
