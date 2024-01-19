@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "cortex_m4.h"
 #include "stm32l4xx.h"
 
@@ -100,8 +101,7 @@ void Reset_Handler(void) {
 
 	main();
 
-	for (;;)
-		__NOP();  // hang
+	assert(!"not reached");
 }
 
 volatile uint64_t clockticks = STK_LOAD_RELOAD + 1;

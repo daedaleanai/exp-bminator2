@@ -1,5 +1,6 @@
 #include "spi.h"
 
+#include <assert.h>
 #include <string.h>
 #include "cortex_m4.h"
 #include "nvic.h"
@@ -147,6 +148,7 @@ uint16_t spiq_xmit(struct SPIQ *q, uint16_t addr, size_t len, uint8_t *buf) {
 	memmove(x->buf, buf, len);
 	spiq_enq_head(q);
 	spi_wait(q);
+	assert(x == spiq_tail(q));
 	if (x != spiq_tail(q)) {
 		// someone else got our result, expect massive problems
 		return 0xfffe;
