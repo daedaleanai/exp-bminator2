@@ -1,3 +1,5 @@
+// Implemnenatation of assert_func so assert.h and assert() work
+
 #include "cortex_m4.h"
 #include "tprintf.h"
 
