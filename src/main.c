@@ -397,7 +397,7 @@ void TIM2_Handler(void) {
 
 	if (close_ts) {
 		shutter_count = (shutter_count | 1) + 1;  // next even number.
-		dropped_evq += output_shutter(&evq, EVENTID_SHUTTER_CLOSE, open_ts, shutter_count);
+		dropped_evq += output_shutter(&evq, EVENTID_SHUTTER_CLOSE, close_ts, shutter_count);
 	}
 	// if it was detected and we didn't already send it before
 	if (open_ts) {
