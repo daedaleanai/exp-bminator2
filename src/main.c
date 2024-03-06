@@ -35,10 +35,17 @@
 
 #define printf tprintf
 
+#define KAYA_PINOUT
+
 enum {
 	BMI_INT1A_PIN	  = PA1,
 	USART2_TX_PIN	  = PA2,
-	BMI_INT3G_PIN	  = PA3,  // TODO: kaya: USART2_RX
+#ifdef KAYA_PINOUT
+	USART2_RX_PIN	  = PA3,
+	BMI_INT3G_PIN	  = PA11,
+#else
+	BMI_INT3G_PIN	  = PA3,
+#endif
 	THERMISTOR_PIN	  = PA4,  // ADC1_IN9
 	HEATER_EN_PIN	  = PA5,
 	CURRENT_SENSE_PIN = PA6,  // ADC1_IN11
@@ -265,6 +272,18 @@ void EXTI1_Handler(void) {
 	rt_stop(&accelirq_rt, cycleCount());
 }
 
+#ifdef KAYA_PINOUT
+void EXTI15_10_Handler(void) {
+	uint64_t now = cycleCount();
+	if ((EXTI.PR1 & Pin_11) == 0) {
+		return;
+	}
+	EXTI.PR1 = Pin_11;
+	start_spix(now, GYRO, 0x80 | BMI08x_RATE_X_LSB, 10);
+	rt_start(&gyroirq_rt, now);
+	rt_stop(&gyroirq_rt, cycleCount());
+}
+#else
 void EXTI3_Handler(void) {
 	uint64_t now = cycleCount();
 	if ((EXTI.PR1 & Pin_3) == 0) {
@@ -275,6 +294,7 @@ void EXTI3_Handler(void) {
 	rt_start(&gyroirq_rt, now);
 	rt_stop(&gyroirq_rt, cycleCount());
 }
+#endif
 
 // the BME280 doesn't have an IRQ pin, we just kick it once a second
 // we don't bother timing this one
@@ -752,7 +772,11 @@ void main(void) {
 	if (gyro_ok) {
 		EXTI.IMR1 |= BMI_INT3G_PIN & Pin_All;
 		EXTI.FTSR1 |= BMI_INT3G_PIN & Pin_All;
+#ifdef KAYA_PINOUT
+		NVIC_EnableIRQ(EXTI15_10_IRQn);	 // Gyroscope ready interrupt
+#else
 		NVIC_EnableIRQ(EXTI3_IRQn);	 // Gyroscope ready interrupt
+#endif
 	}
 
 	// Initialize the independent watchdog
