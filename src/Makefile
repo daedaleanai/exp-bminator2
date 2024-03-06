@@ -56,6 +56,9 @@ flash2: main.elf
 		-f target/stm32l4x.cfg \
 		-f openocd.cfg
 
+release: main.elf main.hex
+	tar cvzf ../binaries/bminator-$(shell date "+%Y%m%d-%H%M%S")-$(REVISION).tgz $^
+
 clean:
 	rm -f *~ *.o *.hex *.bin *.elf *.map
 
