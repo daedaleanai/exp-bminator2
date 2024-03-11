@@ -337,13 +337,9 @@ void ADC1_Handler(void) {
 		adc_chan = 0;
 		ADC.ISR |= ADC_ISR_EOS;
 		//  printf("adc %u %u %u %u\n", adc_val[0], adc_val[1], adc_val[2], adc_val[3]);
-		if (adc_trig % 8 == 0) {
+		if (adc_trig++ % 8 == 0) {
 			dropped_evq += output_internaltemperature(&evq, adc_ts[0], adc_val[0], adc_val[3]);
 		}
-		if (adc_trig % 8 == 4) {
-			dropped_evq += output_adc(&evq, adc_ts[0], adc_val[0],  adc_val[1], adc_val[2], adc_val[3]);
-		}
-		++adc_trig;
 	}
 
 	if (isr & ADC_ISR_OVR) {
@@ -380,6 +376,9 @@ void TIM6_DACUNDER_Handler(void) {
 		break;
 	case 4:
 		dropped_evq += output_humidity(&evq);  // from last baro read
+		break;
+	case 5:
+		dropped_evq += output_adc(&evq, adc_ts[0], adc_val[0],  adc_val[1], adc_val[2], adc_val[3]);
 		break;
 	}
 
