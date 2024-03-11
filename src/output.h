@@ -6,6 +6,7 @@
 enum {
 	EVENTID_ID0			  = 0x8003,	 // [2]uint32 appinfo.revision, serial number [2]
 	EVENTID_ID1			  = 0x8004,	 // [2]uint32 Serial number[1][0]
+	EVENTID_ADC           = 0x8010,  // [4]uint16 4 raw adc measurements: vref, thermistor, current, internal temp
 	EVENTID_BARO		  = 0x8020,	 // [2]uint32 temperature[milliK] pressure[milliPa] bme280
 	EVENTID_HUMID		  = 0x8021,	 // humidity bme280 [TODO]
 	EVENTID_TEMP		  = 0x8022,	 // [2]uint32 temperature[milliK] (bmi085 accellerometer, stm32 microcontroller)
@@ -40,3 +41,4 @@ int output_humidity(struct MsgQueue *msgq);
 int output_internaltemperature(struct MsgQueue *msgq, uint64_t ts, uint16_t vref_adc_val, uint16_t ts_adc_val);
 int output_shutter(struct MsgQueue *msgq, uint16_t hdr, uint64_t ts, uint64_t counter);
 int output_periodic(struct MsgQueue *msgq, uint16_t hdr, uint64_t ts, uint32_t v1, uint32_t v2);
+int output_adc(struct MsgQueue *msgq, uint64_t ts, uint16_t v0, uint16_t v1, uint16_t v2, uint16_t v3 );

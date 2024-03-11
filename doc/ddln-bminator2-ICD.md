@@ -280,6 +280,7 @@ The BMInator generates messages with the following ID (Namespace + EventID) and 
 | -----: | ---: | -----------: | ---------: | :------------------------- | :-------- | :------------------------------------------------------------- |
 | 0x8003 |   20 |  00 14 80 03 |          1 | ID0                        | [2]uint32 | software revision:UUID[2]                                      |
 | 0x8004 |   20 |  00 14 80 04 |          1 | ID1                        | [2]uint32 | microcontroller UUID[1]:UUID[0]                                |
+| 0x8010 |   20 |  00 14 80 10 |          1 | ADC                        | [4]uint16 | ADC reading: Vref, thermistor, current sense, internaltemp.     |
 | 0x8020 |   20 |  00 14 80 20 |          1 | BARO                       | [2]uint32 | BME280 temperature (milli Kelvin) and pressure (milli Pascal)  |
 | 0x8021 |   20 |  00 14 80 21 |          1 | HUMID                      | [2]uint32 | BME280 humidity measurement                                    |
 | 0x8022 |   20 |  00 14 80 22 |          1 | TEMP                       | [2]uint32 | BMI088 temperature, STM32L43x temperature (milli Kelvin)       |
@@ -307,6 +308,15 @@ The bandwidth will be dominated by the 3600Hz messages of 20 bytes each, or 72 k
 The two padding bytes in the ACCEL and GYRO messages may be set to zero or may be used for an error correction code on the payload, TBD(lvd).
 
 The streaming event messages are all exactly 20 bytes in length to ease the framing and de-framing as described above. 
+
+The 4 sampled channels in the ADC message are, in order:
+
+| Chan | Signal                |
+| ---- | --------------------- |
+| 0    | Vref                  |
+| 9    | pin PA4 thermistor    |
+| 11   | pin PA6 current sense |
+| 17   | internal temperature  |
 
 ### Command Address Space
 

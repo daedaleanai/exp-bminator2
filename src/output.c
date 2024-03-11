@@ -181,3 +181,21 @@ int output_periodic(struct MsgQueue *msgq, uint16_t hdr, uint64_t ts, uint32_t v
 	msgq_push_head(msgq);
 	return 0;
 }
+
+int output_adc(struct MsgQueue *msgq, uint64_t ts, uint16_t v0, uint16_t v1, uint16_t v2, uint16_t v3 ) {
+	struct Msg *msg = msgq_head(msgq);
+	if (msg == NULL) {
+		return 1;
+	}
+	msg_reset(msg);
+	msg_append16(msg, 0);	 // len
+	msg_append16(msg, EVENTID_ADC);	 // header
+	msg_append64(msg, ts);
+	msg_append16(msg, v0);
+	msg_append16(msg, v1);
+	msg_append16(msg, v2);
+	msg_append16(msg, v3);
+	msg->buf[1] = msg->len;
+	msgq_push_head(msgq);
+	return 0;
+}
