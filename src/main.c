@@ -542,6 +542,10 @@ void TIM1_UP_TIM16_Handler(void) {
 	}
 	rt_report(&idle_rt, &lastreport);
 	printf("\e[K\n");
+
+	// DEBUG: toggle heater on/off
+	digitalToggle(HEATER_EN_PIN);
+
 	// account for reporting time outside of rt_report call
 	rt_start(&report_rt, now);
 	rt_stop(&report_rt, cycleCount());
