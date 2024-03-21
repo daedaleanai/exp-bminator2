@@ -73,6 +73,9 @@ Heater:  Thermistor, GND, Heater10W+, Heater10W-
 - [X] Accept commands over serial port
 - [X] Get/set BMI088, BME280
 - [ ] Firmware upgradeable atomically (through write command)
+- [ ] Send debug information in messages
+- [ ] Box averaged gyroscope and accelerometer data output with temperature, ID and debug information on UART2
+- [ ] Support multiplexing on UART2
 
 implementation:
 - [X] boot, clock, gpio, debug console for STM32L43x
@@ -83,6 +86,9 @@ implementation:
 debug tools:
 - [X] decoder
 - [X] commander
+
+calibration tool:
+- [] data recorder with multiplexed UART support
 
 TODO(lvd) 
 - [ ] convert temperatures to correct units, check/fix stm temperature conversion
