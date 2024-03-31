@@ -821,7 +821,7 @@ void main(void) {
 		rt_start(&mainloop_rt, now);
 
 		// if the spi result is a cmd packet, set it aside in the cmdq
-		while (x && (x->tag & 0xffffff00)) {
+		while (x && ((x->tag & 0xffffff00) != 0)) {
 			// disable the reception irq so we have exclusive access to cmdq
 			NVIC_DisableIRQ(DMA2_CH6_IRQn);	 // reception
 			struct Msg *msg = msgq_head(&cmdq);
@@ -892,7 +892,8 @@ void main(void) {
 			out->len = PACKETSIZE - packetlen;
 			bzero(out->buf, out->len);
 			packetlen += out->len;
-			// TODO check: adding zeros should not change crc16
+			// adding zeros changes the crc too
+			packetcrc16 = crc16_update(packetcrc16, out->buf, out->len);
 			start_outq();
 		}
 
