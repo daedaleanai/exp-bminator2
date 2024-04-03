@@ -6,6 +6,8 @@
 
 enum { CLOCKSPEED_HZ = 80000000, C_US = CLOCKSPEED_HZ / 1000000 };
 
+static inline uint32_t usart_brr(uint32_t baud) { return (CLOCKSPEED_HZ + baud / 2) / baud; }
+
 // in boot.c, updated by SysTick irq handler
 extern volatile uint64_t clockticks;
 
@@ -19,3 +21,4 @@ static inline void delay(uint32_t usec) {
 	while (cycleCount() < then)
 		;
 }
+

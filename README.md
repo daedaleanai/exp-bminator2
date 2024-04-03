@@ -108,7 +108,7 @@ A guide to the source code is [here](doc/design.md).
 
 the console can be displayed with 
 
-    reset; (stty $15200 raw && cat) < /dev/cu.usbmodem1103
+    reset; (stty 115200 raw && cat) < /dev/cu.usbmodem1103
 
 and looks like:
 

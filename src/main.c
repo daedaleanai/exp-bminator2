@@ -67,7 +67,11 @@ static struct gpio_config_t {
 	enum GPIO_Conf mode;
 } const pin_cfgs[] = {
 		{USART1_TX_PIN | USART1_RX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
+#ifdef KAYA_PINOUT
+		{USART2_TX_PIN|USART2_RX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
+#else
 		{USART2_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
+#endif
 		{SPI1_MOSI_PIN | SPI1_SCK_PIN | SPI1_MISO_PIN, GPIO_AF5_SPI12 | GPIO_HIGH},
 		{BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_INPUT},
 		{BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN, GPIO_OUTPUT | GPIO_FAST},
@@ -143,7 +147,9 @@ static struct {
 // wait.  the TIM16 handler dumps a report every second.
 static struct RunTimer spixmit_rt     = {"spiq_xmit", 0, 0, 0, 0, NULL};        // latency between enq and xmit done
 static struct RunTimer spiqdeq_rt 	  = {"spiq_deq", 0, 0, 0, 0, &spixmit_rt};  // latency between enq and deq
-static struct RunTimer spirxdma_rt	  = {"SPIRXDMA", 0, 0, 0, 0, &spiqdeq_rt};
+static struct RunTimer usart2rxdma_rt = {"USART2RXDMA", 0, 0, 0, 0, &spiqdeq_rt};
+static struct RunTimer usart2irq_rt	  = {"USART2IRQ", 0, 0, 0, 0, &usart2rxdma_rt};
+static struct RunTimer spirxdma_rt	  = {"SPIRXDMA", 0, 0, 0, 0, &usart2irq_rt};
 static struct RunTimer periodic8hz_rt = {"8HZTICK", 0, 0, 0, 0, &spirxdma_rt};
 static struct RunTimer accelirq_rt	  = {"ACCELIRQ", 0, 0, 0, 0, &periodic8hz_rt};
 static struct RunTimer gyroirq_rt	  = {"GYROIRQ", 0, 0, 0, 0, &accelirq_rt};
@@ -175,7 +181,64 @@ void _putchar(char character) {
 	return;
 }
 
-void USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
+static volatile uint32_t usart2rxpkt_cnt   = 0;
+static volatile uint32_t usart2rxstall_cnt = 0;
+static volatile uint32_t usart2rxerr_cnt   = 0;
+static uint8_t			 usart2rxbuf[32];
+
+// set up usart2 rx dma for reception of len characters to be appended to cmdbuf
+// set CC7 to run at higher priority level compared to ch6 (CCR PL bits)
+static void usart2_start_rx(void) {
+	DMA1.CCR6	= 0;
+	DMA1.CPAR6	= (uintptr_t)&USART2.RDR;
+	DMA1.CMAR6	= (uintptr_t)usart2rxbuf;
+	DMA1.CNDTR6 = sizeof usart2rxbuf;
+	DMA1.CCR6	= DMA_CCR6_MINC | DMA_CCR6_TEIE | DMA_CCR6_TCIE | DMA_CCR6_EN;
+}
+
+// USART2 RX: irq on dma error or reception complete
+void DMA1_CH6_Handler(void) {
+	rt_start(&usart2rxdma_rt, cycleCount());
+	uint32_t isr = DMA1.ISR;
+	DMA1.IFCR	 = isr & 0x00f00000;  // clear all pending
+	if (isr & DMA_ISR_TEIF6) {
+		++usart2rxerr_cnt;
+	}
+
+	if (isr & DMA_ISR_TCIF6) {
+		printf("USART2 RX[*]: %.*s'\e[K\n", sizeof usart2rxbuf, usart2rxbuf);
+		usart2_start_rx();
+	}
+
+	rt_stop(&usart2rxdma_rt, cycleCount());
+}
+
+void USART2_Handler(void) {
+	rt_start(&usart2irq_rt, cycleCount());
+
+	// first character received
+	if ((USART2.ISR & UART_ISR_RXNE) != 0) {
+		usart2_start_rx();	// first read will clear the RXNE
+		USART2.CR1 &= ~UART_CR1_RXNEIE;
+		USART2.CR2 |= UART_CR2_RTOEN;	// enable the timeout
+	}
+
+	// Reception Timeout
+	if ((USART2.ISR & UART_ISR_RTOF) != 0) {
+		DMA1.CCR6 = 0;
+		USART2.CR2 &= ~UART_CR2_RTOEN;	 // disable the timeout
+		USART2.ICR |= UART_ICR_RTOCF;	 // clear the flag
+		// send whatever we have
+		int l = sizeof usart2rxbuf - DMA1.CNDTR6;
+		printf("USART2 RX[%d]: %.*s'\e[K\n", l, l, usart2rxbuf);
+		USART2.CR1 |= UART_CR1_RXNEIE;	 // reenable waiting for first character
+		++usart2rxstall_cnt;
+	}
+	usart_tx_irq_handler(&USART2, &usart2tx); 
+	rt_stop(&usart2irq_rt, cycleCount());
+}
+
+
 
 // USART1 is the output datastream and command input
 static struct MsgQueue	 outq				= {0, 0, {}};
@@ -587,8 +650,17 @@ void main(void) {
 
 	// prepare USART2 for console and debug messages
 	ringbuffer_clear(&usart2tx);
-	usart_init(&USART2, 115200);
-	NVIC_EnableIRQ(USART2_IRQn);
+
+	USART2.CR1 = UART_CR1_RTOIE | UART_CR1_RXNEIE;  // irq on receiver timeout or first character
+	USART2.CR2 = 0;									  // dont enable receiver timeout yet
+	uart_rtor_set_rto(&USART2, 160);				  // in bit times
+	USART2.CR3 = UART_CR3_DMAR;
+	dma_cselr_set_c6s(&DMA1, 2);  // select usart2 for dma1 ch6 (Table 41)
+	USART2.BRR = usart_brr(115200);
+	USART2.CR1 |= UART_CR1_UE | UART_CR1_RE | UART_CR1_TE;
+	NVIC_EnableIRQ(DMA1_CH6_IRQn);	// reception
+	NVIC_EnableIRQ(USART2_IRQn);	// charactr transmit, start and timeout
+
 
 	printf("SWREV:%x\n", __REVISION__);
 	printf("CPUID:%08lx\n", SCB.CPUID);
@@ -679,10 +751,10 @@ void main(void) {
 	USART1.CR1 = 0;
 	USART1.CR2 = 0;
 	USART1.CR3 = 0;
-	USART1.BRR = ((80000000 + 921600 / 2) / 921600);
+	USART1.BRR = usart_brr(921600);
 	USART1.CR3 = UART_CR3_DMAT | UART_CR3_DMAR;	 // enable DMA output and input
 	usart1_start_rx(CMDMINSIZE);
-	USART1.CR1 = UART_CR1_UE | UART_CR1_TE | UART_CR1_RE;
+	USART1.CR1 = UART_CR1_UE | UART_CR1_RE | UART_CR1_TE;
 	NVIC_EnableIRQ(DMA2_CH6_IRQn);	// reception
 	NVIC_EnableIRQ(DMA2_CH7_IRQn);	// transmission
 	NVIC_EnableIRQ(USART1_IRQn);
@@ -751,6 +823,7 @@ void main(void) {
 	TIM6.CR1 |= TIM6_CR1_CEN;
 	NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
 
+	// set up TIM7 to poke the BME read. 
 	TIM7.DIER |= TIM6_DIER_UIE;
 	TIM7.PSC = (CLOCKSPEED_HZ / 10000) - 1;
 	TIM7.ARR = 10000 - 1;  // 10KHz/10000 = 1Hz
@@ -758,7 +831,7 @@ void main(void) {
 	TIM7.CR1 |= TIM6_CR1_CEN;
 	NVIC_EnableIRQ(TIM7_IRQn);
 
-	// set up TIM16 for a 1Hz report
+	// set up TIM16 for a 1Hz debug report
 	TIM16.DIER |= TIM16_DIER_UIE;
 	TIM16.PSC = (CLOCKSPEED_HZ / 10000) - 1;
 	TIM16.ARR = 10000 - 1;	// 10KHz/10000 = 1Hz
@@ -790,7 +863,7 @@ void main(void) {
 	IWDG.KR	 = 0x5555;	// enable watchdog config
 	IWDG.PR	 = 0;		// prescaler 32KHz/4 -> 8khz
 	IWDG.RLR = 128;		// count to 128 -> 1/(64Hz) timeout
-	IWDG.KR	 = 0xcccc;	// start watchdog countdown
+//	IWDG.KR	 = 0xcccc;	// start watchdog countdown
 
 	enum { PACKETSIZE = 960 };	// 48 messages of 20 bytes.
 	size_t	 packetlen   = 0;
