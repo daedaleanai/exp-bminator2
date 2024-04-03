@@ -1,5 +1,9 @@
 #include <string.h>
 
+#include "bmxspi.h"
+#include "bmi08x.h"
+#include "bme280.h"
+
 #include "clock.h"
 #include "crc16.h"
 #include "input.h"
@@ -96,13 +100,13 @@ static uint8_t checkcmdpacket() {
 	// write
 	if (buf[8] == 1) {
 		switch (addr & 0xffff) {
-		case 0x0140:
-		case 0x0141:
-		case 0x02f0:
-		case 0x0210:
-		case 0x0372:
-		case 0x0374:
-		case 0x0375:
+		case (GYRO  << 8) | BMI08x_GYRO_RANGE:     // 0x010f
+		case (GYRO  << 8) | BMI08x_GYRO_BANDWIDTH: // 0x0110
+		case (ACCEL << 8) | BMI08x_ACC_CONF:      // 0x0240
+		case (ACCEL << 8) | BMI08x_ACC_RANGE:     // 0x0241
+		case (HUMID << 8) | BME280_REG_CTRLHUM:   // 0x0372
+		case (HUMID << 8) | BME280_REG_CTRLMEAS:   // 0x0374
+		case (HUMID << 8) | BME280_REG_CONFIG:   // 0x0375
 			if (len == 1)
 				break;
 			// fallthrough
@@ -197,7 +201,7 @@ size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
 
 		x->ts	  = cycleCount();
 		x->tag	  = 0xff000000 | ((uint32_t)cmdbuf.buf[4] << 16) | x->buf[0];
-		x->addr	  = (addr >> 8) & 0x3;	// bits 10:9 are the device
+		x->addr	  = (addr >> 8) & 0x3;	// bits 10:9 are the device GYRO 1/ ACCEL 2/ HUMID 3
 		x->status = -1;
 		x->len	  = 1 + len;
 		spiq_enq_head(spiq);
