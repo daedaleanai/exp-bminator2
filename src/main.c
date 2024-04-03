@@ -314,7 +314,9 @@ static void start_spix(uint64_t now, uint16_t addr, uint32_t tagreg, size_t len)
 	}
 
 	x->buf[0] = tagreg;	 // lowest 8 bits: read flag 0x80 + register address
-	memset(x->buf + 1, 0xff, len - 1);
+	for (size_t i = 1; i < len; ++i)
+		x->buf[i] = 0xff;
+//	memset(x->buf + 1, 0xff, len - 1); // random crashes?
 
 	x->ts	  = now;
 	x->tag	  = tagreg;
