@@ -863,8 +863,8 @@ void main(void) {
 
 	// Initialize the independent watchdog
 	IWDG.KR	 = 0x5555;	// enable watchdog config
-	IWDG.PR	 = 0;		// prescaler 32KHz/4 -> 8khz
-	IWDG.RLR = 128;		// count to 128 -> 1/(64Hz) timeout
+	IWDG.PR	 = 3;		// prescaler 32KHz/32 -> 1khz
+	IWDG.RLR = 100;		// 100ms timeout
 	IWDG.KR	 = 0xcccc;	// start watchdog countdown
 
 	enum { PACKETSIZE = 960 };	// 48 messages of 20 bytes.

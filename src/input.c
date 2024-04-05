@@ -196,7 +196,10 @@ size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
 		if (sts) {
 			memmove(x->buf + 1, cmdbuf.buf + 16, len);
 		} else {
-			memset(x->buf + 1, 0xff, len);
+//			memset(x->buf + 1, 0xff, len);
+			for (size_t i = 1; i < len; ++i) {
+				x->buf[i] = 0xff;
+			}
 		}
 
 		x->ts	  = cycleCount();
