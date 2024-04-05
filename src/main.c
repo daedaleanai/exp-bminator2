@@ -865,7 +865,7 @@ void main(void) {
 	IWDG.KR	 = 0x5555;	// enable watchdog config
 	IWDG.PR	 = 0;		// prescaler 32KHz/4 -> 8khz
 	IWDG.RLR = 128;		// count to 128 -> 1/(64Hz) timeout
-//	IWDG.KR	 = 0xcccc;	// start watchdog countdown
+	IWDG.KR	 = 0xcccc;	// start watchdog countdown
 
 	enum { PACKETSIZE = 960 };	// 48 messages of 20 bytes.
 	size_t	 packetlen   = 0;
