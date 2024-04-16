@@ -217,16 +217,18 @@ size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
 		break;
 
 	default:
-		// queue error response packet on cmdq
-		struct Msg *msg = msgq_head(cmdq);
-		if (msg == NULL) {
-			printf("CMDRX: cmdq overflow\n");
-			break;
+		{
+			// queue error response packet on cmdq
+			struct Msg *msg = msgq_head(cmdq);
+			if (msg == NULL) {
+				printf("CMDRX: cmdq overflow\n");
+				break;
+			}
+			msg_reset(msg);
+			msg_append32(msg, bytex4(cmdbuf.buf[4]));  // the tag
+			msg_append32(msg, bytex4(sts));			   // the status
+			msgq_push_head(cmdq);
 		}
-		msg_reset(msg);
-		msg_append32(msg, bytex4(cmdbuf.buf[4]));  // the tag
-		msg_append32(msg, bytex4(sts));			   // the status
-		msgq_push_head(cmdq);
 	}
 
 	cmdbuf_state = RESYNC;

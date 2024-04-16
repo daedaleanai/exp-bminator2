@@ -129,7 +129,11 @@ static struct {
 		{DMA1_CH3_IRQn, PRIO(1, 0)},	   // SPI TX done DMA
 		{TIM6_DACUNDER_IRQn, PRIO(1, 0)},  // 8Hz periodic read BME shedules SPI xmit and push evq
 		{EXTI1_IRQn, PRIO(1, 1)},		   // BMI088 Accel IRQ schedules SPI xmit
+#ifdef KAYA_PINOUT
+		{EXTI15_10_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
+#else
 		{EXTI3_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
+#endif
 		{TIM7_IRQn, PRIO(1, 1)},		   // BME280 schedule SPI xmit
 		{TIM2_IRQn, PRIO(1, 2)},		   // Shutter open/close timer, push evq
 		{ADC1_IRQn, PRIO(1, 2)},		   // ADC conversions
