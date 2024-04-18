@@ -137,10 +137,11 @@ static struct {
 		{TIM7_IRQn, PRIO(1, 1)},		   // BME280 schedule SPI xmit
 		{TIM2_IRQn, PRIO(1, 2)},		   // Shutter open/close timer, push evq
 		{ADC1_IRQn, PRIO(1, 2)},		   // ADC conversions
-		{DMA2_CH7_IRQn, PRIO(2, 0)},	   // USART1 RX DMA
+		{DMA2_CH7_IRQn, PRIO(1, 3)},	   // USART1 RX DMA
 		{DMA2_CH6_IRQn, PRIO(2, 1)},	   // USART1 TX DMA done
 		{USART1_IRQn, PRIO(2, 2)},		   // USART1 TX schedule next DMA
 		{USART2_IRQn, PRIO(3, 1)},		   // USART2 TX send next character
+		{DMA1_CH6_IRQn, PRIO(3, 2)},		   // USART2 TX DMA done
 		{TIM1_UP_TIM16_IRQn, PRIO(3, 3)},  // TIM16 1Hz periodic debug report on usart2
 		{None_IRQn, 0xff},				   // sentinel
 };
@@ -761,8 +762,8 @@ void main(void) {
 	USART1.CR3 = UART_CR3_DMAT | UART_CR3_DMAR;	 // enable DMA output and input
 	usart1_start_rx(CMDMINSIZE);
 	USART1.CR1 = UART_CR1_UE | UART_CR1_RE | UART_CR1_TE;
-	NVIC_EnableIRQ(DMA2_CH6_IRQn);	// reception
-	NVIC_EnableIRQ(DMA2_CH7_IRQn);	// transmission
+	NVIC_EnableIRQ(DMA2_CH6_IRQn);	// transmission
+	NVIC_EnableIRQ(DMA2_CH7_IRQn);	// reception
 	NVIC_EnableIRQ(USART1_IRQn);
 
 	// TIM2 CH1 measures shutter open/close
@@ -902,7 +903,7 @@ void main(void) {
 		// if the spi result is a cmd packet, set it aside in the cmdq
 		while (x && ((x->tag & 0xffffff00) != 0)) {
 			// disable the reception irq so we have exclusive access to cmdq
-			NVIC_DisableIRQ(DMA2_CH6_IRQn);	 // reception
+			NVIC_DisableIRQ(DMA2_CH7_IRQn);	 // reception
 			struct Msg *msg = msgq_head(&cmdq);
 			if (!msg) {
 				++dropped_cmdq;
@@ -910,7 +911,7 @@ void main(void) {
 				output_bmx(msg, x);
 				msgq_push_head(&cmdq);
 			}
-			NVIC_EnableIRQ(DMA2_CH6_IRQn);	// reception
+			NVIC_EnableIRQ(DMA2_CH7_IRQn);	// reception
 
 			spiq_deq_tail(&spiq);
 			x = spiq_tail(&spiq);
@@ -1003,6 +1004,12 @@ void main(void) {
 
 				start_outq();
 			}
+		}
+
+		if (packetlen > PACKETSIZE) {
+			printf("PACKET OVERFLOW\n");
+			for (;;)
+				__NOP();
 		}
 
 		now = cycleCount();
