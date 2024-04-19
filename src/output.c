@@ -133,6 +133,7 @@ int output_internaltemperature(struct MsgQueue *msgq, uint64_t ts, uint16_t vref
 	msg_append16(msg, 0);			  // len
 	msg_append16(msg, EVENTID_TEMP);  // header
 	msg_append64(msg, ts);
+	msg_append32(msg, accel_temp_mk);  // old one but who cares
 	if ((vref_adc_val > 0) && (TS_CAL2 != TS_CAL1)) {
 		// TODO(lvd) this appears to be wrong, either with or without correcting for Vdd
 		int64_t x = ts_adc_val;
@@ -144,7 +145,6 @@ int output_internaltemperature(struct MsgQueue *msgq, uint64_t ts, uint16_t vref
 	} else {
 		msg_append32(msg, -1);
 	}
-	msg_append32(msg, accel_temp_mk);  // old one but who cares
 	msg->buf[1] = msg->len;
 	msgq_push_head(msgq);
 	return 0;
