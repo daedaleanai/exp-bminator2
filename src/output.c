@@ -52,7 +52,7 @@ void output_bmx(struct Msg *msg, struct SPIXmit *x) {
 			msg_append16(msg, decode_le_uint16(x->buf + 1));
 			msg_append16(msg, decode_le_uint16(x->buf + 3));
 			msg_append16(msg, decode_le_uint16(x->buf + 5));
-			msg_append16(msg, crc16_update(0, msg->buf + 12, 6));  // pad with crc16
+			msg_append16(msg, crc16_update(0, msg->buf + 4, 14));  // pad with crc16
 		} else {
 			msg_append64(msg, -1);
 		}
@@ -71,7 +71,7 @@ void output_bmx(struct Msg *msg, struct SPIXmit *x) {
 			msg_append16(msg, decode_le_uint16(x->buf + 2));
 			msg_append16(msg, decode_le_uint16(x->buf + 4));
 			msg_append16(msg, decode_le_uint16(x->buf + 6));
-			msg_append16(msg, crc16_update(0, msg->buf + 12, 6));  // pad with crc16
+			msg_append16(msg, crc16_update(0, msg->buf + 4, 14));  // pad with crc16
 		} else {
 			msg_append64(msg, -1);
 		}
