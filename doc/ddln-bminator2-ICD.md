@@ -327,11 +327,11 @@ The BMInator defines the following address layout, within a prefix meant to deco
 | ------------------ | --- | --------------------------------- |
 | 0x2300 xxxx        |     | Prefix defining a 64kb space      |
 | prefix 0100 - 017f | r/o | BMI088 Gyro Register map          |
-| prefix 0140        | rw  | BMI088 Gyro config register 0x40  |
-| prefix 0141        | rw  | BMI088 Gyro range register 0x41   |
+| prefix 010F        | rw  | BMI088 Gyro config register 0x0F  |
+| prefix 0110        | rw  | BMI088 Gyro range register 0x10   |
 | prefix 0200 - 027f | r/o | BMI088 Accel Register map         |
-| prefix 020F        | rw  | BMI088 Accel config register 0x0F |
-| prefix 0210        | rw  | BMI088 Accel range register 0x10  |
+| prefix 0240        | rw  | BMI088 Accel config register 0x40 |
+| prefix 0241        | rw  | BMI088 Accel range register 0x41  |
 | prefix 0300 - 047f | r/o | BME280 Register map               |
 | prefix 0372        | rw  | BME280 ctrl hum register 0x72     |
 | prefix 0374        | rw  | BME280 ctrl meas register 0x74    |
