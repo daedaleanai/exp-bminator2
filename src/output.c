@@ -66,7 +66,7 @@ void output_bmx(struct Msg *msg, struct SPIXmit *x) {
 		msg_append16(msg, accel_hdr);  // header
 		msg_append64(msg, x->ts);
 		if (x->buf[13] & 0x80) {
-			accel_temp_mk = bmi08x_decode_temp_mdegc(x->buf + 18) /*+ 273150*/;
+			accel_temp_mk = bmi08x_decode_temp_mdegc(x->buf + 18) + 273150;
 
 			msg_append16(msg, decode_le_uint16(x->buf + 2));
 			msg_append16(msg, decode_le_uint16(x->buf + 4));
@@ -86,7 +86,7 @@ void output_bmx(struct Msg *msg, struct SPIXmit *x) {
 			int32_t t_mdegc, p_mpa;
 			bme_decode(&bmeParam, x->buf + 1, &t_mdegc, &p_mpa, &bme_hume6);
 			bme_ts = x->ts;
-			msg_append32(msg, t_mdegc);	 // + 273150 to convert to milliKelvin
+			msg_append32(msg, t_mdegc + 273150);
 			msg_append32(msg, p_mpa);
 		}
 		msg->buf[1] = msg->len;
@@ -139,8 +139,7 @@ int output_internaltemperature(struct MsgQueue *msgq, uint64_t ts, uint16_t vref
 		int64_t x = ts_adc_val;
 		x *= VREFINT;
 		x /= vref_adc_val;
-		//		int64_t temp = ((x - TS_CAL1) * (130000+273150) - (x - TS_CAL2) * (30000+273150) ) / (TS_CAL2 - TS_CAL1);
-		int64_t temp = ((x - TS_CAL1) * (130000) - (x - TS_CAL2) * (30000)) / (TS_CAL2 - TS_CAL1);
+		int64_t temp = ((x - TS_CAL1) * (130000+273150) - (x - TS_CAL2) * (30000+273150) ) / (TS_CAL2 - TS_CAL1);
 		msg_append32(msg, temp);
 	} else {
 		msg_append32(msg, -1);

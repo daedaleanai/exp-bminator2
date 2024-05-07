@@ -85,6 +85,14 @@ func scalexyz(v [4]uint16, s float64) [3]float64 {
 	return [3]float64{float64(int16(v[0])) * s, float64(int16(v[1])) * s, float64(int16(v[2])) * s}
 }
 
+func toCelsius(milliK uint32) float64 {
+	return float64(int32(milliK) - 273150) / 1000
+}
+
+func toPascal(milliPa uint32) float64 {
+	return float64(milliPa) / 1000
+}
+
 func label(v interface{}) string {
 	return strings.TrimPrefix(strings.TrimSuffix(fmt.Sprintf("%T", v), "Msg"), "*main.")
 }
@@ -96,13 +104,13 @@ func (m *ID1Msg) String() string {
 	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 func (m *BAROMsg) String() string {
-	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
+	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), [2]float64{toCelsius(m.Val[0]), toPascal(m.Val[1])})
 }
 func (m *HUMIDMsg) String() string {
 	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 func (m *TEMPMsg) String() string {
-	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
+	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), [2]float64{toCelsius(m.Val[0]), toCelsius(m.Val[1])})
 }
 func (m *SHUTTER_OPENMsg) String() string {
 	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
