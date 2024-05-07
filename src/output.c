@@ -35,11 +35,15 @@ void output_bmx(struct Msg *msg, struct SPIXmit *x) {
 			code += 0x48;  // read (48) or write (49) failed
 		}
 		msg_append32(msg, bytex4(code));
-		if (x->tag & 0x80) {				// read
-			msg_append32(msg, x->len - 1);	// number of bytes read
+
+		uint8_t spiRead = x->tag & 0x80;
+		uint8_t dataStart = (x->addr == ACCEL && spiRead) ? 2 : 1; // accel SPI read has 1 extra byte of garbage after first
+		uint8_t dataSize = x->len - dataStart;
+		if (spiRead) {				// read
+			msg_append32(msg, dataSize);	// number of bytes read
 		}
-		msg_appendbuf(msg, x->buf, x->len - 1);
-		msg_appendbuf(msg, zeroes, (4 - (x->len - 1) % 4) % 4);
+		msg_appendbuf(msg, x->buf + dataStart, dataSize);
+		msg_appendbuf(msg, zeroes, (4 - dataSize % 4) % 4);
 		return;
 	}
 

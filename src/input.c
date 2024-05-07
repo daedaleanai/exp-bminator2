@@ -182,6 +182,10 @@ size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
 	case 1:	 // valid write command
 	{
 		uint32_t len  = decode_be_uint24(cmdbuf.buf + 9);
+		if (len > 30) {
+				printf("CMDRX: exceeding SPIXmit buffer size\n");
+				break;
+		}
 		uint32_t addr = decode_be_uint32(cmdbuf.buf + 12);
 		printf("CMDRX %s %ld bytes at address %lx", sts ? "write" : "read", len, addr);
 
@@ -206,7 +210,8 @@ size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
 		x->tag	  = 0xff000000 | ((uint32_t)cmdbuf.buf[4] << 16) | x->buf[0];
 		x->addr	  = (addr >> 8) & 0x3;	// bits 10:9 are the device GYRO 1/ ACCEL 2/ HUMID 3
 		x->status = -1;
-		x->len	  = 1 + len;
+
+		x->len	  = ((x->addr == ACCEL && !sts) ? 2 : 1) + len; // accel SPI read has 1 extra byte of garbage after first
 		spiq_enq_head(spiq);
 
 	} break;
