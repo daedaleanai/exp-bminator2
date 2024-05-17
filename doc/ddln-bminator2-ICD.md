@@ -208,6 +208,7 @@ A packet may contain a single command message with the following layout:
 Control command message format – with tag -- cf CoaXPress Standard Version 2.1 p.61 Table 24.
 
 The maximum number supported of bytes to read or write in this is 16, making for a maximum message size of 8 32-bit words or 32 bytes.
+The maximum number supported of bytes to write is further limited for some memory addresses (see in Command Address Space section).
 
 Note: The CRC32 defined in CoaxPress Standard v 2.2 section 9.2.2.2. is not appended here.
 
@@ -327,19 +328,21 @@ The BMInator defines the following address layout, within a prefix meant to deco
 | ------------------ | --- | --------------------------------- |
 | 0x2300 xxxx        |     | Prefix defining a 64kb space      |
 | prefix 0100 - 017f | r/o | BMI088 Gyro Register map          |
-| prefix 010F        | rw  | BMI088 Gyro config register 0x0F  |
-| prefix 0110        | rw  | BMI088 Gyro range register 0x10   |
+| prefix 010F        | rw* | BMI088 Gyro range register 0x0F   |
+| prefix 0110        | rw* | BMI088 Gyro config register 0x10  |
 | prefix 0200 - 027f | r/o | BMI088 Accel Register map         |
-| prefix 0240        | rw  | BMI088 Accel config register 0x40 |
-| prefix 0241        | rw  | BMI088 Accel range register 0x41  |
+| prefix 0240        | rw* | BMI088 Accel config register 0x40 |
+| prefix 0241        | rw* | BMI088 Accel range register 0x41  |
 | prefix 0300 - 047f | r/o | BME280 Register map               |
-| prefix 0372        | rw  | BME280 ctrl hum register 0x72     |
-| prefix 0374        | rw  | BME280 ctrl meas register 0x74    |
-| prefix 0375        | rw  | BME280 config register 0x75       |
+| prefix 0372        | rw* | BME280 ctrl hum register 0x72     |
+| prefix 0374        | rw* | BME280 ctrl meas register 0x74    |
+| prefix 0375        | rw* | BME280 config register 0x75       |
 | prefix 1xxx        | ro  | TODO uC internal variables        |
 | prefix 2xxx        | rw  | TODO Heater Temperature control   |
 | prefix 2xxx        | rw  | TODO Heater Temperature control   |
 | prefix 8xxx        | w   | TODO firmware image update        |
+
+w* - Address space write is limited to 1 byte.
 
 ### Firmware updates
 
@@ -347,4 +350,4 @@ The firmware exists in 2 copies, selected by a small bootloader in flash.  The a
 has a facility to update the alternate copy through the write command.  The bootloader checks the crc32
 of both images and boots the one with the highest serial number.
 
-TODO define crc32 and serial number. 
+TODO define crc32 and serial number.

@@ -128,7 +128,7 @@ static uint8_t checkcmdpacket() {
 		return 0x46;
 	}
 
-	return buf[8] & ~1;	 // 0: ok to read, 1: ok to write
+	return buf[8];	 // 0: ok to read, 1: ok to write
 }
 
 size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
