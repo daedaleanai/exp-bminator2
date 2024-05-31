@@ -12,7 +12,18 @@ static inline uint32_t usart_brr(uint32_t baud) { return (CLOCKSPEED_HZ + baud /
 extern volatile uint64_t clockticks;
 
 // return the current time as measured in cpu cycles since initCycleCount was called.
-static inline uint64_t cycleCount(void) { return clockticks - stk_val_get_current(); }
+static inline uint64_t cycleCount(void) {
+    uint32_t dum = STK.CTRL;
+    (void)dum;
+    uint32_t val = stk_val_get_current();
+    uint64_t cc = clockticks;
+    if (STK.CTRL & STK_CTRL_COUNTFLAG) {
+				// Rare event when overflow happens during access to 'clockticks' and timer counter value
+        val = stk_val_get_current();
+        cc = clockticks;
+    }
+    return cc - val;
+}
 
 // spinlock using the systick
 // usec = 10...1000000 (.01 ms ..  1s)
@@ -21,4 +32,3 @@ static inline void delay(uint32_t usec) {
 	while (cycleCount() < then)
 		;
 }
-
