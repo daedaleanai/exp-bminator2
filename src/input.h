@@ -12,4 +12,4 @@ extern struct CommandBuffer cmdbuf;
 
 enum { CMDMINSIZE = 16 };  // shortest command is 16 characters
 
-size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq);
+size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq, struct Scratch *scratch);

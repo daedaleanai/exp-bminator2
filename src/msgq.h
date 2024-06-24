@@ -10,6 +10,11 @@ struct Msg {
 	uint8_t buf[32];
 };
 
+struct Scratch {
+	uint8_t buf[128];
+};
+
+
 inline void msg_reset(struct Msg *msg) { msg->len = 0; }
 
 // binary encoding big endian numbers

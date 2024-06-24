@@ -92,7 +92,7 @@ static uint8_t checkcmdpacket() {
 	}
 
 	uint32_t addr = decode_be_uint32(cmdbuf.buf + 12);
-	if ((addr & 0xfffffc80) != 0x23000000) {
+	if ((addr & 0xffff7c80) != 0x23000000) {
 		printf("CMDRX: invalid address 0x%08lx\n", addr);
 		return 0x40;
 	}
@@ -111,6 +111,10 @@ static uint8_t checkcmdpacket() {
 				break;
 			// fallthrough
 		default:
+			if (addr & 0x8000) {
+				printf("CMDRX: write packet for %ld bytes in sxratch buffer at address 0x%08lx\n", len, addr);
+				break;
+			}
 			printf("CMDRX: write packet for %ld bytes at readonly address 0x%08lx\n", len, addr);
 			return 0x44;
 		}
@@ -131,7 +135,7 @@ static uint8_t checkcmdpacket() {
 	return buf[8];	 // 0: ok to read, 1: ok to write
 }
 
-size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
+size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq, struct Scratch *scratch) {
 	switch (cmdbuf_state) {
 	case RESYNC:
 		while (!haspfx(cmdbuf.buf, cmdbuf.head, "IRON", 4)) {
@@ -189,30 +193,56 @@ size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
 		uint32_t addr = decode_be_uint32(cmdbuf.buf + 12);
 		printf("CMDRX %s %ld bytes at address %lx", sts ? "write" : "read", len, addr);
 
-		// schedule the read or write on the spiq
-		struct SPIXmit *x = spiq_head(spiq);
-		if (x == NULL) {
-			printf("CMDRX: spiq overflow\n");
-			break;
-		}
-
-		x->buf[0] = (addr & 0x7f) | ((sts) ? 0 : 0x80);	// lowest 8 bits: read flag 0x80 + register address
-		if (sts) {
-			memmove(x->buf + 1, cmdbuf.buf + 16, len);
-		} else {
-//			memset(x->buf + 1, 0xff, len);
-			for (size_t i = 1; i < len; ++i) {
-				x->buf[i] = 0xff;
+		if (addr & 0x8000) {
+			struct Msg *msg = msgq_head(cmdq);
+			if (msg == NULL) {
+				printf("CMDRX: cmdq overflow\n");
+				break;
 			}
+			msg_reset(msg);
+			msg_append32(msg, bytex4(cmdbuf.buf[4]));  // the tag
+			msg_append32(msg, bytex4(sts));			   // the status
+
+			if (sts) {  // write
+				memmove(scratch->buf + (addr ^ 0x8000), cmdbuf.buf+16, len);
+				msgq_push_head(cmdq);
+
+				printf("writing to scratch buf.");
+
+
+			} else { // read
+				msg_append32(msg,4); // number of bytes read
+				msg_appendbuf(msg, scratch->buf + (addr^0x8000), 4); // data
+				printf("reading to scratch buf.");
+			}
+			msgq_push_head(cmdq);
+		} else {
+
+			// schedule the read or write on the spiq
+			struct SPIXmit *x = spiq_head(spiq);
+			if (x == NULL) {
+				printf("CMDRX: spiq overflow\n");
+				break;
+			}
+
+			x->buf[0] = (addr & 0x7f) | ((sts) ? 0 : 0x80);	// lowest 8 bits: read flag 0x80 + register address
+			if (sts) {
+				memmove(x->buf + 1, cmdbuf.buf + 16, len);
+			} else {
+//				memset(x->buf + 1, 0xff, len);
+				for (size_t i = 1; i < len; ++i) {
+					x->buf[i] = 0xff;
+				}
+			}
+
+			x->ts	  = cycleCount();
+			x->tag	  = 0xff000000 | ((uint32_t)cmdbuf.buf[4] << 16) | x->buf[0];
+			x->addr	  = (addr >> 8) & 0x3;	// bits 10:9 are the device GYRO 1/ ACCEL 2/ HUMID 3
+			x->status = -1;
+
+			x->len	  = ((x->addr == ACCEL && !sts) ? 2 : 1) + len; // accel SPI read has 1 extra byte of garbage after first
+			spiq_enq_head(spiq);
 		}
-
-		x->ts	  = cycleCount();
-		x->tag	  = 0xff000000 | ((uint32_t)cmdbuf.buf[4] << 16) | x->buf[0];
-		x->addr	  = (addr >> 8) & 0x3;	// bits 10:9 are the device GYRO 1/ ACCEL 2/ HUMID 3
-		x->status = -1;
-
-		x->len	  = ((x->addr == ACCEL && !sts) ? 2 : 1) + len; // accel SPI read has 1 extra byte of garbage after first
-		spiq_enq_head(spiq);
 
 	} break;
 

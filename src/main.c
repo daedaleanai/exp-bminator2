@@ -239,7 +239,7 @@ void USART2_Handler(void) {
 		USART2.CR1 |= UART_CR1_RXNEIE;	 // reenable waiting for first character
 		++usart2rxstall_cnt;
 	}
-	usart_tx_irq_handler(&USART2, &usart2tx); 
+	usart_tx_irq_handler(&USART2, &usart2tx);
 	rt_stop(&usart2irq_rt, cycleCount());
 }
 
@@ -267,6 +267,8 @@ static volatile uint32_t dropped_spi1	  = 0;	// how often we tried to submit a s
 static volatile uint32_t spi1rxdmaerr_cnt = 0;
 static volatile uint32_t spi1txdmaerr_cnt = 0;
 
+static struct Scratch scratch;
+
 // spi1_ss is the callback that maps spi addresses {GYRO, ACCEL, HUMID} to signals on the CSBx pins.
 static const enum GPIO_Pin spiaddr2pin[3] = {BMI_CSB2G_PIN, BMI_CSB1A_PIN, BME_CSB_PIN};
 
@@ -291,7 +293,7 @@ void DMA1_CH2_Handler(void) {
 	}
 	DMA1.IFCR = isr & 0x00000f0;  // clear pending flags
 
-	// account for spiq time spent between enq and deq 
+	// account for spiq time spent between enq and deq
 	rt_start(&spixmit_rt, spiq.elem[spiq.curr % 8].ts);
 	rt_stop(&spixmit_rt, now);
 
@@ -569,7 +571,7 @@ void DMA2_CH7_Handler(void) {
 	}
 
 	if (isr & DMA_ISR_TCIF7) {
-		size_t n = input_cmdrx(&cmdq, &spiq);
+		size_t n = input_cmdrx(&cmdq, &spiq, &scratch);
 		usart1_start_rx(n);
 	}
 
@@ -830,7 +832,7 @@ void main(void) {
 	TIM6.CR1 |= TIM6_CR1_CEN;
 	NVIC_EnableIRQ(TIM6_DACUNDER_IRQn);
 
-	// set up TIM7 to poke the BME read. 
+	// set up TIM7 to poke the BME read.
 	TIM7.DIER |= TIM6_DIER_UIE;
 	TIM7.PSC = (CLOCKSPEED_HZ / 10000) - 1;
 	TIM7.ARR = 10000 - 1;  // 10KHz/10000 = 1Hz
@@ -936,7 +938,7 @@ void main(void) {
 
 			// at 3600 message per second, packets of 48 messages of 20 bytes each should happen at 75Hz
 			// the watchdog will trigger if we drop below 64Hz, so we have time to insert a command response
-			IWDG.KR = 0xAAAA;  // pet the watchdog 
+			IWDG.KR = 0xAAAA;  // pet the watchdog
 		}
 
 		struct Msg *out = wait_outq();
@@ -945,7 +947,7 @@ void main(void) {
 			output_bmx(out, x);
 			spiq_deq_tail(&spiq);
 
-			// account for spiq time spent between enq and deq 
+			// account for spiq time spent between enq and deq
 			rt_start(&spiqdeq_rt, x->ts);
 			rt_stop(&spiqdeq_rt, cycleCount());
 

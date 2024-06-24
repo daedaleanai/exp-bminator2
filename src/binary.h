@@ -16,7 +16,7 @@ inline uint32_t decode_le_uint32(uint8_t *buf) {
 }
 
 inline uint64_t decode_le_uint64(uint8_t *buf) {
-    return ((uint64_t)(buf[0])) | (((uint64_t)(buf[1])) << 8) | (((uint64_t)(buf[2])) << 16) | (((uint64_t)(buf[3])) << 24) 
+    return ((uint64_t)(buf[0])) | (((uint64_t)(buf[1])) << 8) | (((uint64_t)(buf[2])) << 16) | (((uint64_t)(buf[3])) << 24)
          | (((uint64_t)(buf[4])) << 32) | (((uint64_t)(buf[5])) << 40) | (((uint64_t)(buf[6])) << 48) | (((uint64_t)(buf[7])) << 56);
 }
 
@@ -34,7 +34,7 @@ inline uint32_t decode_be_uint32(uint8_t *buf) {
 }
 
 inline uint64_t decode_be_uint64(uint8_t *buf) {
-    return ((uint64_t)(buf[0]) << 56) | (((uint64_t)(buf[1])) << 48) | (((uint64_t)(buf[2])) << 40) | (((uint64_t)(buf[3])) << 32) 
+    return ((uint64_t)(buf[0]) << 56) | (((uint64_t)(buf[1])) << 48) | (((uint64_t)(buf[2])) << 40) | (((uint64_t)(buf[3])) << 32)
          | ((uint64_t)(buf[4]) << 24) | (((uint64_t)(buf[5])) << 16) | (((uint64_t)(buf[6])) << 8) | ((uint64_t)(buf[7]));
 }
 
