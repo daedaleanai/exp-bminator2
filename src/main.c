@@ -16,6 +16,7 @@
 #include "cortex_m4.h"
 #include "stm32l4xx.h"
 
+#include <assert.h>
 #include <string.h>
 
 #include "binary.h"
@@ -35,23 +36,19 @@
 
 #define printf tprintf
 
-#define KAYA_PINOUT
+#undef CALIBRATINATOR
+#undef SWAPUART
 
 enum {
 	BMI_INT1A_PIN	  = PA1,
 	USART2_TX_PIN	  = PA2,
-#ifdef KAYA_PINOUT
 	USART2_RX_PIN	  = PA3,
-	BMI_INT3G_PIN	  = PA11,
-#else
-	BMI_INT3G_PIN	  = PA3,
-#endif
 	THERMISTOR_PIN	  = PA4,  // ADC1_IN9
 	HEATER_EN_PIN	  = PA5,
 	CURRENT_SENSE_PIN = PA6,  // ADC1_IN11
 	USART1_TX_PIN	  = PA9,
 	USART1_RX_PIN	  = PA10,
-	// TODO: kaya PA11 is BMI_INT3G
+	BMI_INT3G_PIN	  = PA11,
 	TIMEPULSE_PIN	  = PA15,
 
 	BMI_CSB2G_PIN = PB0,
@@ -67,11 +64,7 @@ static struct gpio_config_t {
 	enum GPIO_Conf mode;
 } const pin_cfgs[] = {
 		{USART1_TX_PIN | USART1_RX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
-#ifdef KAYA_PINOUT
-		{USART2_TX_PIN|USART2_RX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
-#else
-		{USART2_TX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
-#endif
+		{USART2_TX_PIN | USART2_RX_PIN, GPIO_AF7_USART123 | GPIO_HIGH},
 		{SPI1_MOSI_PIN | SPI1_SCK_PIN | SPI1_MISO_PIN, GPIO_AF5_SPI12 | GPIO_HIGH},
 		{BMI_INT1A_PIN | BMI_INT3G_PIN, GPIO_INPUT},
 		{BMI_CSB1A_PIN | BMI_CSB2G_PIN | BME_CSB_PIN, GPIO_OUTPUT | GPIO_FAST},
@@ -124,24 +117,26 @@ static struct {
 	enum IRQn_Type irq;
 	uint8_t		   prio;
 } const irqprios[] = {
-		{SysTick_IRQn, PRIO(0, 0)},		   // cycleCount 24 bit overflow
+		{SysTick_IRQn, 	PRIO(0, 0)},	   // cycleCount 24 bit overflow
 		{DMA1_CH2_IRQn, PRIO(1, 0)},	   // SPI RX done DMA pushes evq
 		{DMA1_CH3_IRQn, PRIO(1, 0)},	   // SPI TX done DMA
 		{TIM6_DACUNDER_IRQn, PRIO(1, 0)},  // 8Hz periodic read BME shedules SPI xmit and push evq
-		{EXTI1_IRQn, PRIO(1, 1)},		   // BMI088 Accel IRQ schedules SPI xmit
-#ifdef KAYA_PINOUT
-		{EXTI15_10_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
-#else
-		{EXTI3_IRQn, PRIO(1, 1)},		   // BMI088 Gyro IRQ schedule SPI xmit
-#endif
-		{TIM7_IRQn, PRIO(1, 1)},		   // BME280 schedule SPI xmit
-		{TIM2_IRQn, PRIO(1, 2)},		   // Shutter open/close timer, push evq
-		{ADC1_IRQn, PRIO(1, 2)},		   // ADC conversions
-		{DMA2_CH7_IRQn, PRIO(1, 3)},	   // USART1 RX DMA
+		{EXTI1_IRQn, 	PRIO(1, 1)},	   // BMI088 Accel IRQ schedules SPI xmit
+		{EXTI15_10_IRQn, PRIO(1, 1)},	   // BMI088 Gyro IRQ schedule SPI xmit
+		{TIM7_IRQn, 	PRIO(1, 1)},	   // BME280 schedule SPI xmit
+		{TIM2_IRQn, 	PRIO(1, 2)},	   // Shutter open/close timer, push evq
+		{ADC1_IRQn, 	PRIO(1, 2)},	   // ADC conversions
+#ifndef SWAPUART
+		{DMA2_CH7_IRQn, PRIO(1, 3)},	   // USART1 RX DMA done
 		{DMA2_CH6_IRQn, PRIO(2, 1)},	   // USART1 TX DMA done
-		{USART1_IRQn, PRIO(2, 2)},		   // USART1 TX schedule next DMA
-		{USART2_IRQn, PRIO(3, 1)},		   // USART2 TX send next character
-		{DMA1_CH6_IRQn, PRIO(3, 2)},		   // USART2 TX DMA done
+		{USART1_IRQn, 	PRIO(2, 2)},	   // USART1 TX schedule next DMA
+		{USART2_IRQn, 	PRIO(3, 1)},	   // USART2 TX send next character
+#else
+		{DMA1_CH6_IRQn, PRIO(1, 3)},	   // USART2 RX DMA done
+		{DMA1_CH7_IRQn, PRIO(2, 1)},	   // USART2 TX DMA done
+		{USART2_IRQn, 	PRIO(2, 2)},	   // USART2 TX schedule next DMA
+		{USART1_IRQn, 	PRIO(3, 1)},	   // USART1 TX send next character
+#endif
 		{TIM1_UP_TIM16_IRQn, PRIO(3, 3)},  // TIM16 1Hz periodic debug report on usart2
 		{None_IRQn, 0xff},				   // sentinel
 };
@@ -152,104 +147,67 @@ static struct {
 // wait.  the TIM16 handler dumps a report every second.
 static struct RunTimer spixmit_rt     = {"spiq_xmit", 0, 0, 0, 0, NULL};        // latency between enq and xmit done
 static struct RunTimer spiqdeq_rt 	  = {"spiq_deq", 0, 0, 0, 0, &spixmit_rt};  // latency between enq and deq
-static struct RunTimer usart2rxdma_rt = {"USART2RXDMA", 0, 0, 0, 0, &spiqdeq_rt};
-static struct RunTimer usart2irq_rt	  = {"USART2IRQ", 0, 0, 0, 0, &usart2rxdma_rt};
-static struct RunTimer spirxdma_rt	  = {"SPIRXDMA", 0, 0, 0, 0, &usart2irq_rt};
+static struct RunTimer spirxdma_rt	  = {"SPIRXDMA", 0, 0, 0, 0, &spiqdeq_rt};
 static struct RunTimer periodic8hz_rt = {"8HZTICK", 0, 0, 0, 0, &spirxdma_rt};
 static struct RunTimer accelirq_rt	  = {"ACCELIRQ", 0, 0, 0, 0, &periodic8hz_rt};
 static struct RunTimer gyroirq_rt	  = {"GYROIRQ", 0, 0, 0, 0, &accelirq_rt};
 static struct RunTimer shutterirq_rt  = {"SHUTTER", 0, 0, 0, 0, &gyroirq_rt};
-static struct RunTimer usart1rxdma_rt = {"USART1RXDMA", 0, 0, 0, 0, &shutterirq_rt};
-static struct RunTimer usart1txdma_rt = {"USART1TXDMA", 0, 0, 0, 0, &usart1rxdma_rt};
-static struct RunTimer usart1irq_rt	  = {"USART1IRQ", 0, 0, 0, 0, &usart1txdma_rt};
-static struct RunTimer adcirq_rt	  = {"ADCIRQ", 0, 0, 0, 0, &usart1irq_rt};
+static struct RunTimer usartrxdma_rt  = {"USARTRXDMA", 0, 0, 0, 0, &shutterirq_rt};
+static struct RunTimer usarttxdma_rt  = {"USARTTXDMA", 0, 0, 0, 0, &usartrxdma_rt};
+static struct RunTimer usartirq_rt	  = {"USARTIRQ", 0, 0, 0, 0, &usarttxdma_rt};
+static struct RunTimer adcirq_rt	  = {"ADCIRQ", 0, 0, 0, 0, &usartirq_rt};
 static struct RunTimer report_rt	  = {"REPORT", 0, 0, 0, 0, &adcirq_rt};
 static struct RunTimer mainloop_rt	  = {"MAIN", 0, 0, 0, 0, &report_rt};
 static struct RunTimer wait_rt		  = {"WAIT", 0, 0, 0, 0, &mainloop_rt};
 static struct RunTimer idle_rt		  = {"IDLE", 0, 0, 0, 0, &wait_rt};
 uint64_t			   lastreport	  = 0;
 
-// USART2 is the console, for debug messages, it runs IRQ driven.
-static struct Ringbuffer usart2tx;
+#ifndef SWAPUART
+static struct USART_Type* const USART_IO = &USART1;
+static struct USART_Type* const USART_CONSOLE = &USART2;
+#else
+static struct USART_Type* const USART_IO = &USART2;
+static struct USART_Type* const USART_CONSOLE = &USART1;
+#endif
+
+// the console for debug messages runs IRQ driven.
+static struct Ringbuffer consoletxbuf = {{}, 0, 0};
 
 void _putchar(char character) {
-	if (!ringbuffer_full(&usart2tx)) {
-		ringbuffer_put_head(&usart2tx, character);
+	if (!ringbuffer_full(&consoletxbuf)) {
+		ringbuffer_put_head(&consoletxbuf, character);
 	} else {
 		// overflow, tell the user we are losing messages.
-		ringbuffer_clear(&usart2tx);
+		ringbuffer_clear(&consoletxbuf);
 		for (const char *p = "!OVFL!"; *p != 0; ++p) {
-			ringbuffer_put_head(&usart2tx, *p);
+			ringbuffer_put_head(&consoletxbuf, *p);
 		}
 	}
-	usart_start(&USART2);
+	usart_start(USART_CONSOLE);
 	return;
 }
 
-static volatile uint32_t usart2rxpkt_cnt   = 0;
-static volatile uint32_t usart2rxstall_cnt = 0;
-static volatile uint32_t usart2rxerr_cnt   = 0;
-static uint8_t			 usart2rxbuf[32];
+static inline void flush(void) { usart_wait(USART_CONSOLE); }
 
-// set up usart2 rx dma for reception of len characters to be appended to cmdbuf
-// set CC7 to run at higher priority level compared to ch6 (CCR PL bits)
-static void usart2_start_rx(void) {
-	DMA1.CCR6	= 0;
-	DMA1.CPAR6	= (uintptr_t)&USART2.RDR;
-	DMA1.CMAR6	= (uintptr_t)usart2rxbuf;
-	DMA1.CNDTR6 = sizeof usart2rxbuf;
-	DMA1.CCR6	= DMA_CCR6_MINC | DMA_CCR6_TEIE | DMA_CCR6_TCIE | DMA_CCR6_EN;
+// fallback putc used in fault.c
+void fault_putc(char c) {
+	while ((USART_CONSOLE->ISR & USART_ISR_TXE) == 0) {
+		__NOP();
+	}
+	USART_CONSOLE->TDR = c;
 }
 
-// USART2 RX: irq on dma error or reception complete
-void DMA1_CH6_Handler(void) {
-	rt_start(&usart2rxdma_rt, cycleCount());
-	uint32_t isr = DMA1.ISR;
-	DMA1.IFCR	 = isr & 0x00f00000;  // clear all pending
-	if (isr & DMA_ISR_TEIF6) {
-		++usart2rxerr_cnt;
-	}
+#ifndef SWAPUART
+void USART2_Handler(void) {	usart_tx_irq_handler(USART_CONSOLE, &consoletxbuf); }
+#else
+void USART1_Handler(void) {	usart_tx_irq_handler(USART_CONSOLE, &consoletxbuf); }
+#endif
 
-	if (isr & DMA_ISR_TCIF6) {
-		printf("USART2 RX[*]: %.*s'\e[K\n", sizeof usart2rxbuf, usart2rxbuf);
-		usart2_start_rx();
-	}
-
-	rt_stop(&usart2rxdma_rt, cycleCount());
-}
-
-void USART2_Handler(void) {
-	rt_start(&usart2irq_rt, cycleCount());
-
-	// first character received
-	if ((USART2.ISR & UART_ISR_RXNE) != 0) {
-		usart2_start_rx();	// first read will clear the RXNE
-		USART2.CR1 &= ~UART_CR1_RXNEIE;
-		USART2.CR2 |= UART_CR2_RTOEN;	// enable the timeout
-	}
-
-	// Reception Timeout
-	if ((USART2.ISR & UART_ISR_RTOF) != 0) {
-		DMA1.CCR6 = 0;
-		USART2.CR2 &= ~UART_CR2_RTOEN;	 // disable the timeout
-		USART2.ICR |= UART_ICR_RTOCF;	 // clear the flag
-		// send whatever we have
-		int l = sizeof usart2rxbuf - DMA1.CNDTR6;
-		printf("USART2 RX[%d]: %.*s'\e[K\n", l, l, usart2rxbuf);
-		USART2.CR1 |= UART_CR1_RXNEIE;	 // reenable waiting for first character
-		++usart2rxstall_cnt;
-	}
-	usart_tx_irq_handler(&USART2, &usart2tx); 
-	rt_stop(&usart2irq_rt, cycleCount());
-}
-
-
-
-// USART1 is the output datastream and command input
+// the output datastream and command input is dma driven over USARTx
 static struct MsgQueue	 outq				= {0, 0, {}};
 static volatile uint32_t dropped_outq		= 0;  // queue full, msqq_head returned NULL
-static volatile uint32_t usart1txdmaerr_cnt = 0;
-static volatile uint32_t usart1rxdmaerr_cnt = 0;
+static volatile uint32_t usartiotxdmaerr_cnt = 0;
+static volatile uint32_t usartiorxdmaerr_cnt = 0;
 
 // Most events go to the event message queue, which the mainloop copies into the output stream.
 static struct MsgQueue	 evq		 = {0, 0, {}};
@@ -342,7 +300,6 @@ void EXTI1_Handler(void) {
 	rt_stop(&accelirq_rt, cycleCount());
 }
 
-#ifdef KAYA_PINOUT
 void EXTI15_10_Handler(void) {
 	uint64_t now = cycleCount();
 	if ((EXTI.PR1 & Pin_11) == 0) {
@@ -353,18 +310,6 @@ void EXTI15_10_Handler(void) {
 	rt_start(&gyroirq_rt, now);
 	rt_stop(&gyroirq_rt, cycleCount());
 }
-#else
-void EXTI3_Handler(void) {
-	uint64_t now = cycleCount();
-	if ((EXTI.PR1 & Pin_3) == 0) {
-		return;
-	}
-	EXTI.PR1 = Pin_3;
-	start_spix(now, GYRO, 0x80 | BMI08x_RATE_X_LSB, 10);
-	rt_start(&gyroirq_rt, now);
-	rt_stop(&gyroirq_rt, cycleCount());
-}
-#endif
 
 // the BME280 doesn't have an IRQ pin, we just kick it once a second
 // we don't bother timing this one
@@ -480,7 +425,7 @@ void TIM2_Handler(void) {
 		close_ts		 = now - latency;
 	}
 
-	printf("open %lld close %lld\n", open_ts, close_ts);
+//	printf("open %lld close %lld\n", open_ts, close_ts);
 
 	if ((open_ts && close_ts) && (open_ts <= close_ts)) {
 		shutter_count = (shutter_count + 1) | 1;  // next odd number.
@@ -501,13 +446,15 @@ void TIM2_Handler(void) {
 	rt_stop(&shutterirq_rt, cycleCount());
 }
 
+#ifndef SWAPUART
+
 // USART1 TX: irq on dma error or transmission complete
 void DMA2_CH6_Handler(void) {
-	rt_start(&usart1txdma_rt, cycleCount());
+	rt_start(&usarttxdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
 	DMA2.IFCR	 = isr & 0x00f00000;
 	if (isr & DMA_ISR_TEIF6) {
-		++usart1txdmaerr_cnt;
+		++usartiotxdmaerr_cnt;
 	}
 
 	if (isr & DMA_ISR_TCIF6) {
@@ -516,43 +463,43 @@ void DMA2_CH6_Handler(void) {
 		}
 	}
 
-	rt_stop(&usart1txdma_rt, cycleCount());
+	rt_stop(&usarttxdma_rt, cycleCount());
 }
 
 void USART1_Handler(void) {
 	// Transmission Complete
-	if ((USART1.ISR & UART_ISR_TC) == 0) {
+	if ((USART_IO->ISR & USART_ISR_TC) == 0) {
 		return;
 	}
-	rt_start(&usart1irq_rt, cycleCount());
+	rt_start(&usartirq_rt, cycleCount());
 
 	struct Msg *msg = msgq_tail(&outq);
 	if (msg == NULL) {
 		// queue empty, clear IRQ Enable
-		USART1.CR1 &= ~UART_CR1_TCIE;
+		USART_IO->CR1 &= ~USART_CR1_TCIE;
 
 	} else {
 		// queue not empty, start a new transfer
 		// TODO(lvd) it's not entirely clear to me why we must only clear TC flag in this case
-		USART1.ICR |= UART_ICR_TCCF;	// clear irq flag
+		USART_IO->ICR |= USART_ICR_TCCF;	// clear irq flag
 
 		DMA2.CCR6 = 0;
 		dma_cselr_set_c6s(&DMA2, 2);  // select usart1 for dma2 ch6
-		DMA2.CPAR6	= (uintptr_t)&USART1.TDR;
+		DMA2.CPAR6	= (uintptr_t)&(USART_IO->TDR);
 		DMA2.CMAR6	= (uintptr_t)msg->buf;
 		DMA2.CNDTR6 = msg->len;
 		DMA2.CCR6	= DMA_CCR6_DIR | DMA_CCR6_TEIE | DMA_CCR6_TCIE | DMA_CCR6_EN | DMA_CCR6_MINC;
 	}
 
-	rt_stop(&usart1irq_rt, cycleCount());
+	rt_stop(&usartirq_rt, cycleCount());
 }
 
 // set up usart1 rx dma for reception of len characters to be appended to cmdbuf
-// set CC7 to run at higher priority level compared to ch6 (CCR PL bits)
-static void usart1_start_rx(size_t len) {
+// set the rx dma channel to run at higher priority level compared to the tx channel (CCR PL bits)
+static void usart_start_dma_rx(size_t len) {
 	DMA2.CCR7 = 0;
 	dma_cselr_set_c7s(&DMA2, 2);  // select usart1 for dma2 ch7
-	DMA2.CPAR7 = (uintptr_t)&USART1.RDR;
+	DMA2.CPAR7 = (uintptr_t)&(USART_IO->RDR);
 	DMA2.CMAR7 = (uintptr_t)cmdbuf.buf + cmdbuf.head;
 	cmdbuf.head += len;
 	DMA2.CNDTR7 = len;
@@ -561,22 +508,124 @@ static void usart1_start_rx(size_t len) {
 
 // USART1 RX: irq on dma error or reception complete
 void DMA2_CH7_Handler(void) {
-	rt_start(&usart1rxdma_rt, cycleCount());
+	rt_start(&usartrxdma_rt, cycleCount());
 	uint32_t isr = DMA2.ISR;
 	DMA2.IFCR	 = isr & 0x0f000000;  // clear all pending
 	if (isr & DMA_ISR_TEIF7) {
-		++usart1rxdmaerr_cnt;
+		++usartiorxdmaerr_cnt;
 	}
 
 	if (isr & DMA_ISR_TCIF7) {
 		size_t n = input_cmdrx(&cmdq, &spiq);
-		usart1_start_rx(n);
+		usart_start_dma_rx(n);
 	}
 
-	rt_stop(&usart1rxdma_rt, cycleCount());
+	rt_stop(&usartrxdma_rt, cycleCount());
 }
 
+#else
+
+// USART2 TX: irq on dma error or transmission complete
+void DMA1_CH7_Handler(void) {
+	rt_start(&usarttxdma_rt, cycleCount());
+	uint32_t isr = DMA1.ISR;
+	DMA1.IFCR	 = isr & 0x0f000000;
+	if (isr & DMA_ISR_TEIF7) {
+		++usartiotxdmaerr_cnt;
+	}
+
+	if (isr & DMA_ISR_TCIF7) {
+		if (msgq_tail(&outq)) {
+			msgq_pop_tail(&outq);
+		}
+	}
+
+	rt_stop(&usarttxdma_rt, cycleCount());
+}
+
+void USART2_Handler(void) {
+	// Transmission Complete
+	if ((USART_IO->ISR & USART_ISR_TC) == 0) {
+		return;
+	}
+	rt_start(&usartirq_rt, cycleCount());
+
+	struct Msg *msg = msgq_tail(&outq);
+	if (msg == NULL) {
+		// queue empty, clear IRQ Enable
+		USART_IO->CR1 &= ~USART_CR1_TCIE;
+
+	} else {
+		// queue not empty, start a new transfer
+		// TODO(lvd) it's not entirely clear to me why we must only clear TC flag in this case
+		USART_IO->ICR |= USART_ICR_TCCF;	// clear irq flag
+
+		DMA1.CCR7 = 0;
+		dma_cselr_set_c7s(&DMA1, 2);  // select usart2 tx for dma1 ch7
+		DMA1.CPAR7	= (uintptr_t)&(USART_IO->TDR);
+		DMA1.CMAR7	= (uintptr_t)msg->buf;
+		DMA1.CNDTR7 = msg->len;
+		DMA1.CCR7	= DMA_CCR7_DIR | DMA_CCR7_TEIE | DMA_CCR7_TCIE | DMA_CCR7_EN | DMA_CCR7_MINC;
+	}
+
+	rt_stop(&usartirq_rt, cycleCount());
+}
+
+// set up usart2 rx dma for reception of len characters to be appended to cmdbuf
+// set CC6 to run at higher priority level compared to ch7 (CCR PL bits)
+static void usart_start_dma_rx(size_t len) {
+	DMA1.CCR6 = 0;
+	dma_cselr_set_c6s(&DMA1, 2);  // select usart2 rx for dma1 ch6
+	DMA1.CPAR6 = (uintptr_t)&(USART_IO->RDR);
+	DMA1.CMAR6 = (uintptr_t)cmdbuf.buf + cmdbuf.head;
+	cmdbuf.head += len;
+	DMA1.CNDTR6 = len;
+	DMA1.CCR6	= DMA_CCR6_PL | DMA_CCR6_TEIE | DMA_CCR6_TCIE | DMA_CCR6_EN | DMA_CCR6_MINC;
+}
+
+// USART2 RX: irq on dma error or reception complete
+void DMA1_CH6_Handler(void) {
+	rt_start(&usartrxdma_rt, cycleCount());
+	uint32_t isr = DMA1.ISR;
+	DMA1.IFCR	 = isr & 0x00f00000;  // clear all pending
+	if (isr & DMA_ISR_TEIF6) {
+		++usartiorxdmaerr_cnt;
+	}
+
+	if (isr & DMA_ISR_TCIF6) {
+		size_t n = input_cmdrx(&cmdq, &spiq);
+		usart_start_dma_rx(n);
+	}
+
+	rt_stop(&usartrxdma_rt, cycleCount());
+}
+
+
+#endif
+
+#ifdef CALIBRATINATOR
+// address of the last calibration trigger command
+enum CalibrationState_t { CALIB_WAITING = 0, CALIB_ACTIVE } calibrate_state = CALIB_WAITING;
+
+// the thermistor adc input is tied to a voltage divider of  VCC - <stnid> KOhm --- 100 KOhm - GND
+// boundaries at  4096 * 100 / (100.5 + i)
+static const uint16_t boundaries[] = {4075, /*1*/ 4035,  /*2*/ 3996, /*3*/ 3957, /*4*/ 3919, /*5*/ 3882, /*6*/ 3846, /*7*/ 3810, /*8*/ 3775, /*9*/ 3740, /*10*/ 3706};
+
+static int is_our_calib_station(void) {
+	if (calibrate_stationid <= 0) {
+		return 0;
+	}
+	if (calibrate_stationid > 10) {
+		return 1; // for debug purposes, without thermistor connected
+	}
+	uint16_t adc_th = adc_val[1]; // last sample of adc 
+	return (boundaries[calibrate_stationid-1] > adc_th) && (adc_th > boundaries[calibrate_stationid] );
+}
+#endif
+
+
 // wait_outq loops until outq has room for a new message to enqueue
+// return the reset message to use for the next push_outq
 static inline struct Msg *wait_outq(void) {
 	struct Msg *m;
 	while ((m = msgq_head(&outq)) == NULL) {
@@ -584,13 +633,14 @@ static inline struct Msg *wait_outq(void) {
 		__WFI();
 		rt_stop(&wait_rt, cycleCount());
 	}
+	msg_reset(m);
 	return m;
 }
 // little helper for the main loop
-static inline void start_outq(void) {
+static inline void push_outq(void) {
 	__DMB();						// make sure all writes are committed so the DMA sees them
 	msgq_push_head(&outq);			// enqueue the message at the head
-	USART1.CR1 |= UART_CR1_TCIE;	// if necessary start USART1
+	USART_IO->CR1 |= USART_CR1_TCIE;	// if necessary start USART1
 }
 
 // A 1Hz report on the queues and all the handlers
@@ -601,12 +651,14 @@ void TIM1_UP_TIM16_Handler(void) {
 
 	uint64_t us	 = now / C_US;	// microseconds
 	uint32_t vdd = adc_val[0] ? ((3000UL * VREFINT) / adc_val[0]) : 0;
+	uint32_t vth = (adc_val[1] * vdd) / 4096UL;
+	uint32_t vcs = (adc_val[2] * vdd) / 4096UL;
 
-	printf("\e[Huptime %llu.%06llu  Vdd %lu mV\e[K\n", us / 1000000, us % 1000000, vdd);
+	printf("\e[Huptime %llu.%06llu   Vdd %lu mV    Vth %lu mV    Vcs %lu mV\e[K\n", us / 1000000, us % 1000000, vdd, vth, vcs);
 	printf("enqueued spiq: %8lu evq:%8lu cmdq: %2lu outq: %8lu\e[K\n", spiq.head, evq.head, cmdq.head, outq.head);
 	printf("dropped  spiq: %8lu evq:%8lu cmdq: %2lu outq: %8lu\e[K\n", dropped_spi1, dropped_evq, dropped_cmdq, dropped_outq);
 	printf("spi1   err tx: %8lu  rx:%8lu\e[K\n", spi1txdmaerr_cnt, spi1rxdmaerr_cnt);
-	printf("usart1 err tx: %8lu  rx:%8lu\e[K\n", usart1txdmaerr_cnt, usart1rxdmaerr_cnt);
+	printf("usart  err tx: %8lu  rx:%8lu\e[K\n", usartiotxdmaerr_cnt, usartiorxdmaerr_cnt);
 	if (adc_ovfl) {
 		printf("adc ovfl %lu\e[K\n", adc_ovfl);
 	}
@@ -622,6 +674,16 @@ void TIM1_UP_TIM16_Handler(void) {
 }
 
 static const char *pplsrcstr[] = {"NONE", "MSI", "HSI16", "HSE"};
+static const char* memmodestr[] = {
+	"FLASH", // 000: Main Flash memory mapped at 0x00000000.
+	"SYS",   // 001: System Flash memory mapped at 0x00000000.
+	"<2>",   // 010: Reserved
+	"SRAM1", // 011: SRAM1 mapped at 0x00000000.
+	"<4>",   // 100: Reserved
+	"<5>",   // 101: Reserved
+	"QSPI",  // 110: QUADSPI memory mapped at 0x00000000.
+	"<7>",   // 111: Reserved
+};
 
 void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
@@ -656,18 +718,12 @@ void main(void) {
 	}
 
 	// prepare USART2 for console and debug messages
-	ringbuffer_clear(&usart2tx);
-
-	USART2.CR1 = UART_CR1_RTOIE | UART_CR1_RXNEIE;  // irq on receiver timeout or first character
-	USART2.CR2 = 0;									  // dont enable receiver timeout yet
-	uart_rtor_set_rto(&USART2, 160);				  // in bit times
-	USART2.CR3 = UART_CR3_DMAR;
-	dma_cselr_set_c6s(&DMA1, 2);  // select usart2 for dma1 ch6 (Table 41)
-	USART2.BRR = usart_brr(115200);
-	USART2.CR1 |= UART_CR1_UE | UART_CR1_RE | UART_CR1_TE;
-	NVIC_EnableIRQ(DMA1_CH6_IRQn);	// reception
-	NVIC_EnableIRQ(USART2_IRQn);	// charactr transmit, start and timeout
-
+	usart_init(USART_CONSOLE, 115200);
+#ifndef SWAPUART
+	NVIC_EnableIRQ(USART2_IRQn);
+#else
+	NVIC_EnableIRQ(USART1_IRQn);
+#endif
 
 	printf("SWREV:%x\n", __REVISION__);
 	printf("CPUID:%08lx\n", SCB.CPUID);
@@ -677,9 +733,16 @@ void main(void) {
 		   rf & 0x10 ? " SFT" : "", rf & 0x08 ? " POR" : "", rf & 0x04 ? " PIN" : "");
 	printf("PPLSRC: %s%s\n", pplsrcstr[rcc_pllcfgr_get_pllsrc()],
 		   (RCC.CR & RCC_CR_HSEBYP) && (rcc_pllcfgr_get_pllsrc() == 3) ? " (CK_IN)" : "");
+	printf("MEM: %s vtbl:%08lx\n", memmodestr[syscfg_memrmp_get_mem_mode()], SCB.VTOR);
 	printf("cal ts %u %u vref %u\n", TS_CAL1, TS_CAL2, VREFINT);
-	usart_wait(&USART2);
+#ifdef SWAPUART
+		printf("SWAPUART\n");
+#endif
+#ifdef CALIBRATINATOR
+		printf("CALIBRATINATOR\n");
+#endif
 
+	flush();
 
 	// Set up SPI1 for talking to all the connected chips.
 	spiq_init(&spiq, &SPI1, SPI_5MHz, SPI1_DMA1_CH23, spi1_ss);
@@ -694,7 +757,7 @@ void main(void) {
 	}
 
 	bmi088_self_test(&spiq);
-	usart_wait(&USART2);
+	flush();
 
 	if (bmi_accel_poweron(&spiq) != 0) {
 		printf("BMI088 Accel failed to reset.\n");
@@ -707,18 +770,18 @@ void main(void) {
 	if (bmx_config(&spiq, GYRO, gyro_cfg) != 0) {
 		printf("BMI088 error configuring Gyro\n");
 	}
-	usart_wait(&USART2);
+	flush();
 
 	int accel_ok = (bmx_check_config(&spiq, ACCEL, accel_cfg) == 0);
 	if (!accel_ok) {
 		printf("BMI Accel not properly configured\n");
 	}
-	usart_wait(&USART2);
+	flush();
 	int gyro_ok = (bmx_check_config(&spiq, GYRO, gyro_cfg) == 0);
 	if (!gyro_ok) {
 		printf("BMI Gyro not properly configured\n");
 	}
-	usart_wait(&USART2);
+	flush();
 
 	// test and config BME280
 
@@ -741,30 +804,36 @@ void main(void) {
 		}
 		printf("\n");
 	}
-	usart_wait(&USART2);
+	flush();
 
 	if (bmx_config(&spiq, HUMID, humid_cfg) != 0) {
 		printf("error configuring BME humidity sensor\n");
 	}
-	usart_wait(&USART2);
+	flush();
 
 	int humid_ok = (bmx_check_config(&spiq, HUMID, humid_cfg) == 0);
 	if (!humid_ok) {
 		printf("BME humidity sensor not properly configured.\n");
 	}
-	usart_wait(&USART2);
+	flush();
 
-	// Prepare USART1 for high speed DMA driven output of the measurement data
-	USART1.CR1 = 0;
-	USART1.CR2 = 0;
-	USART1.CR3 = 0;
-	USART1.BRR = usart_brr(921600);
-	USART1.CR3 = UART_CR3_DMAT | UART_CR3_DMAR;	 // enable DMA output and input
-	usart1_start_rx(CMDMINSIZE);
-	USART1.CR1 = UART_CR1_UE | UART_CR1_RE | UART_CR1_TE;
+	// Prepare USARTx for high speed DMA driven output of the measurement data
+	USART_IO->CR1 = 0;
+	USART_IO->CR2 = 0;
+	USART_IO->CR3 = 0;
+	USART_IO->BRR = usart_brr(921600);
+	USART_IO->CR3 = USART_CR3_DMAT | USART_CR3_DMAR;	 // enable DMA output and input
+	usart_start_dma_rx(CMDMINSIZE);
+	USART_IO->CR1 = USART_CR1_UE | USART_CR1_RE | USART_CR1_TE;
+#ifndef SWAPUART
 	NVIC_EnableIRQ(DMA2_CH6_IRQn);	// transmission
 	NVIC_EnableIRQ(DMA2_CH7_IRQn);	// reception
 	NVIC_EnableIRQ(USART1_IRQn);
+#else
+	NVIC_EnableIRQ(DMA1_CH7_IRQn);	// transmission
+	NVIC_EnableIRQ(DMA1_CH6_IRQn);	// reception
+	NVIC_EnableIRQ(USART2_IRQn);
+#endif
 
 	// TIM2 CH1 measures shutter open/close
 	// See RM0394 section 27.3.5
@@ -781,7 +850,7 @@ void main(void) {
 	NVIC_EnableIRQ(TIM2_IRQn);
 
 	// ADC
-	rcc_ccipr_set_adcsel(3);					// System clock selected as ADCs clock  6.4.27
+	rcc_ccipr_set_adcsel(3);		// System clock selected as ADCs clock  6.4.27
 	adc_common_ccr_set_ckmode(1);	// HCLK, 80MHz
 
 	ADC.CR &= ~ADC_CR_DEEPPWD;	// end deep power down
@@ -859,11 +928,7 @@ void main(void) {
 	if (gyro_ok) {
 		EXTI.IMR1 |= BMI_INT3G_PIN & Pin_All;
 		EXTI.FTSR1 |= BMI_INT3G_PIN & Pin_All;
-#ifdef KAYA_PINOUT
 		NVIC_EnableIRQ(EXTI15_10_IRQn);	 // Gyroscope ready interrupt
-#else
-		NVIC_EnableIRQ(EXTI3_IRQn);	 // Gyroscope ready interrupt
-#endif
 	}
 
 	// Initialize the independent watchdog
@@ -900,10 +965,34 @@ void main(void) {
 
 		rt_start(&mainloop_rt, now);
 
+#ifdef CALIBRATINATOR
+		switch (calibrate_state) {
+		case CALIB_ACTIVE:
+			break;
+
+		case CALIB_WAITING:
+			if (is_our_calib_station()) {
+				calibrate_state = CALIB_ACTIVE;
+				calibrate_stationid = 0; 
+				USART_IO->CR1 &= ~USART_CR1_RE;  // disable reception
+				break;
+			}
+			if (x) spiq_deq_tail(&spiq);
+			if (ev) msgq_pop_tail(&evq);
+			IWDG.KR = 0xAAAA;  // pet the watchdog 
+
+			continue;
+		}
+#endif
+
 		// if the spi result is a cmd packet, set it aside in the cmdq
 		while (x && ((x->tag & 0xffffff00) != 0)) {
 			// disable the reception irq so we have exclusive access to cmdq
+#ifndef SWAPUART
 			NVIC_DisableIRQ(DMA2_CH7_IRQn);	 // reception
+#else
+			NVIC_DisableIRQ(DMA1_CH6_IRQn);	 // reception
+#endif
 			struct Msg *msg = msgq_head(&cmdq);
 			if (!msg) {
 				++dropped_cmdq;
@@ -911,7 +1000,11 @@ void main(void) {
 				output_bmx(msg, x);
 				msgq_push_head(&cmdq);
 			}
+#ifndef SWAPUART
 			NVIC_EnableIRQ(DMA2_CH7_IRQn);	// reception
+#else
+			NVIC_EnableIRQ(DMA1_CH6_IRQn);	 // reception
+#endif
 
 			spiq_deq_tail(&spiq);
 			x = spiq_tail(&spiq);
@@ -923,16 +1016,40 @@ void main(void) {
 			continue;
 		}
 
+		// before start of packet
 		if (packetlen == 0) {
+
+			// if we have a cmdq message, send that first
+			struct Msg *rsp = msgq_tail(&cmdq);
+			if (rsp != NULL) {
+				// first chunk: header
+				struct Msg *out = wait_outq();
+				msg_append32(out, 0x49524F4E);	// 'IRON'
+				msg_append16(out, 4 + rsp->len);
+				msg_append32(out, 0x06060606);	// tagged command response
+				uint16_t crc = crc16_update(0, out->buf + out->len - 4, 4);  // 0x06060606 that was sent out above
+				push_outq();
+
+				// second chunk: command response
+				out = wait_outq();
+				out->len = rsp->len;
+				memmove(out->buf, rsp->buf, rsp->len);
+				msgq_pop_tail(&cmdq);
+				crc = crc16_update(crc, out->buf, out->len);
+				push_outq();
+
+				// third chunk: crc trailer
+				out = wait_outq();
+				msg_append16(out, crc);
+				push_outq();
+			}
+
+
 			// send header
 			struct Msg *out = wait_outq();
-			msg_reset(out);
-			msg_append16(out, packetcrc16);	// crc16 of previous packet
 			msg_append32(out, 0x49524F4E);	// 'IRON'
-			msg_append16(out, PACKETSIZE);	// of the next packet
-			start_outq();
-
-			packetcrc16 = 0;
+			msg_append16(out, PACKETSIZE);	// of the coming packet
+			push_outq();
 
 			// at 3600 message per second, packets of 48 messages of 20 bytes each should happen at 75Hz
 			// the watchdog will trigger if we drop below 64Hz, so we have time to insert a command response
@@ -954,15 +1071,13 @@ void main(void) {
 			memmove(out->buf, ev->buf, ev->len);
 			msgq_pop_tail(&evq);
 		} else {
-			printf("PANIC\n");
-			for (;;)
-				__NOP();
+			assert(!"no x/ev");
 		}
 
 		packetlen += out->len;
 		packetcrc16 = crc16_update(packetcrc16, out->buf, out->len);
 
-		start_outq();
+		push_outq();
 
 		// not enough space for next message, pad with zeros
 		// (this shouldn't' happen as long as all normal messages are 20 bytes
@@ -974,43 +1089,26 @@ void main(void) {
 			packetlen += out->len;
 			// adding zeros changes the crc too
 			packetcrc16 = crc16_update(packetcrc16, out->buf, out->len);
-			start_outq();
+			push_outq();
 		}
 
+		// after end of packet
 		if (packetlen == PACKETSIZE) {
-			packetlen = 0;	// cause footer & header to be sent next time round
 
-			struct Msg *rsp = msgq_tail(&cmdq);
-			if (rsp != NULL) {
-				// send header
-				out = wait_outq();
-				msg_reset(out);
-				msg_append16(out, packetcrc16);
-				msg_append32(out, 0x49524F4E);	// 'IRON'
-				msg_append16(out, 4 + rsp->len);
-				msg_append32(out, 0x06060606);	// tagged command response
-				packetcrc16 = crc16_update(0, out->buf + out->len - 4, 4);  // 0x06060606 that was sent out above
+			// send crc trailer
+			out = wait_outq();
+			msg_append16(out, packetcrc16);
+			push_outq();
 
-				start_outq();
-
-				out = wait_outq();
-				msg_reset(out);
-				out->len = rsp->len;
-				memmove(out->buf, rsp->buf, rsp->len);
-				msgq_pop_tail(&cmdq);
-
-				// the chk16 will be sent out with next footer/header
-				packetcrc16 = crc16_update(packetcrc16, out->buf, out->len);
-
-				start_outq();
-			}
+			packetlen   = 0;	// cause packet header to be sent next time round
+			packetcrc16 = 0;
+#ifdef CALIBRATINATOR
+			calibrate_state = CALIB_WAITING;  // one shot
+			USART_IO->CR1 |= USART_CR1_RE;    // enable reception
+#endif
 		}
 
-		if (packetlen > PACKETSIZE) {
-			printf("PACKET OVERFLOW\n");
-			for (;;)
-				__NOP();
-		}
+		assert(packetlen <= PACKETSIZE);
 
 		now = cycleCount();
 		rt_stop(&mainloop_rt, now);

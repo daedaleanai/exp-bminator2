@@ -3,8 +3,9 @@
 static uint32_t maskn(uint16_t pins, uint8_t bits, uint32_t val) {
 	uint32_t mask = 0;
 	while (pins) {
-		if (pins & 1)
+		if (pins & 1) {
 			mask |= val;
+		}
 		pins >>= 1;
 		val <<= bits;
 	}
@@ -12,9 +13,12 @@ static uint32_t maskn(uint16_t pins, uint8_t bits, uint32_t val) {
 }
 
 void gpioConfig(enum GPIO_Pin pins, enum GPIO_Conf conf) {
-	assert(!((pins>>24) & ((pins>>24)-1)));
+	// assert(!((pins>>24) & ((pins>>24)-1)));
+	while ((pins >> 24) & ((pins >> 24) - 1)) {
+		;  // hang if mixed gpios
+	}
 
-	struct GPIOE_Type *gpio = &GPIO_ALL[(pins >> 16) & 7].gpio;
+	struct GPIOA_Type *gpio = &GPIO_ALL[(pins >> 16) & 7].gpio;
 
 	pins &= Pin_All;
 
@@ -56,9 +60,12 @@ void gpioConfig(enum GPIO_Pin pins, enum GPIO_Conf conf) {
 }
 
 uint32_t gpioLock(enum GPIO_Pin pins) {
-	assert(!((pins>>24) & ((pins>>24)-1)));
+	// assert(!((pins>>24) & ((pins>>24)-1)));
+	while ((pins >> 24) & ((pins >> 24) - 1)) {
+		;  // hang if mixed gpios
+	}
 
-	struct GPIOE_Type *gpio = &GPIO_ALL[(pins >> 16) & 7].gpio;
+	struct GPIOA_Type *gpio = &GPIO_ALL[(pins >> 16) & 7].gpio;
 
 	pins &= Pin_All;
 	gpio->LCKR = pins | (1 << 16);

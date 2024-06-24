@@ -58,17 +58,12 @@ enum IRQn_Type {
 	TIM3_IRQn			= 29,  // TIM3 global interrupt
 	I2C1_EV_IRQn		= 31,  // I2C1 event interrupt
 	I2C1_ER_IRQn		= 32,  // I2C1 error interrupt
-	I2C2_EV_IRQn		= 33,  // I2C2 event interrupt
-	I2C2_ER_IRQn		= 34,  // I2C2 error interrupt
 	SPI1_IRQn			= 35,  // SPI1 global interrupt
-	SPI2_IRQn			= 36,  // SPI2 global interrupt
 	USART1_IRQn			= 37,  // USART1 global interrupt
 	USART2_IRQn			= 38,  // USART2 global interrupt
-	USART3_IRQn			= 39,  // USART2 global interrupt
 	EXTI15_10_IRQn		= 40,  // EXTI Lines 10 to 15 interrupts
 	RTC_ALARM_IRQn		= 41,  // RTC alarms through EXTI line 18 interrupts
 	SPI3_IRQn			= 51,  // SPI3 global Interrupt
-	UART4_IRQn			= 52,  // UART4 global Interrupt
 	TIM6_DACUNDER_IRQn	= 54,  // TIM6 global and DAC1 and 2 underrun error interrupts
 	TIM7_IRQn			= 55,  // TIM7 global interrupt
 	DMA2_CH1_IRQn		= 56,  // DMA2 Channel 1 global Interrupt
@@ -76,7 +71,6 @@ enum IRQn_Type {
 	DMA2_CH3_IRQn		= 58,  // DMA2 Channel 3 global Interrupt
 	DMA2_CH4_IRQn		= 59,  // DMA2 Channel 4 global Interrupt
 	DMA2_CH5_IRQn		= 60,  // DMA2 Channel 5 global Interrupt
-	COMP_IRQn			= 64,  // COMP1 and COMP2 interrupts
 	LPTIM1_IRQn			= 65,  // LP TIM1 interrupt
 	LPTIM2_IRQn			= 66,  // LP TIM2 interrupt
 	DMA2_CH6_IRQn		= 68,  // DMA2 Channel 6 global Interrupt
@@ -84,9 +78,9 @@ enum IRQn_Type {
 	LPUART1_IRQn		= 70,  // LPUART1 global interrupt
 	I2C3_EV_IRQn		= 72,  // I2C3 event interrupt
 	I2C3_ER_IRQn		= 73,  // I2C3 error interrupt
-	FPU_IRQn			= 81,  // Floating point interrupt
+	RNG_IRQn			= 80,  // RNG global interrupt
+	FPU_IRQn			= 81,  // Floating point unit interrupt
 	CRS_IRQn			= 82,  // CRS interrupt
-	I2C4_EV_IRQn		= 83,  // I2C4 event interrupt, wakeup through EXTI
 };
 
 #define __I volatile const	// 'read only' permissions
@@ -96,48 +90,41 @@ enum IRQn_Type {
 /* Analog-to-Digital Converter
 There is only one peripheral of type ADC. */
 struct ADC_Type {
-	__IO uint16_t ISR;			   // @0 interrupt and status register
-	uint8_t		  RESERVED0[2];	   // @2
-	__IO uint16_t IER;			   // @4 interrupt enable register
-	uint8_t		  RESERVED1[2];	   // @6
-	__IO uint32_t CR;			   // @8 control register
-	__IO uint32_t CFGR;			   // @12 configuration register
-	__IO uint16_t CFGR2;		   // @16 configuration register
-	uint8_t		  RESERVED2[2];	   // @18
-	__IO uint32_t SMPR1;		   // @20 sample time register 1
-	__IO uint32_t SMPR2;		   // @24 sample time register 2
-	uint8_t		  RESERVED3[4];	   // @28
-	__IO uint32_t TR1;			   // @32 watchdog threshold register 1
-	__IO uint32_t TR2;			   // @36 watchdog threshold register
-	__IO uint32_t TR3;			   // @40 watchdog threshold register 3
-	uint8_t		  RESERVED4[4];	   // @44
-	__IO uint32_t SQR1;			   // @48 regular sequence register 1
-	__IO uint32_t SQR2;			   // @52 regular sequence register 2
-	__IO uint32_t SQR3;			   // @56 regular sequence register 3
-	__IO uint16_t SQR4;			   // @60 regular sequence register 4
-	uint8_t		  RESERVED5[2];	   // @62
-	__I uint16_t  DR;			   // @64 regular Data Register
-	uint8_t		  RESERVED6[10];   // @66
-	__IO uint32_t JSQR;			   // @76 injected sequence register
-	uint8_t		  RESERVED7[16];   // @80
-	__IO uint32_t OFR1;			   // @96 offset register 1
-	__IO uint32_t OFR2;			   // @100 offset register 2
-	__IO uint32_t OFR3;			   // @104 offset register 3
-	__IO uint32_t OFR4;			   // @108 offset register 4
-	uint8_t		  RESERVED8[16];   // @112
-	__I uint16_t  JDR1;			   // @128 injected data register 1
-	uint8_t		  RESERVED9[2];	   // @130
-	__I uint16_t  JDR2;			   // @132 injected data register 2
-	uint8_t		  RESERVED10[2];   // @134
-	__I uint16_t  JDR3;			   // @136 injected data register 3
-	uint8_t		  RESERVED11[2];   // @138
-	__I uint16_t  JDR4;			   // @140 injected data register 4
-	uint8_t		  RESERVED12[18];  // @142
-	__IO uint32_t AWD2CR;		   // @160 Analog Watchdog 2 Configuration Register
-	__IO uint32_t AWD3CR;		   // @164 Analog Watchdog 3 Configuration Register
-	uint8_t		  RESERVED13[8];   // @168
-	__IO uint32_t DIFSEL;		   // @176 Differential Mode Selection Register 2
-	__IO uint32_t CALFACT;		   // @180 Calibration Factors
+	__IO uint32_t ISR;			  // @0 interrupt and status register
+	__IO uint32_t IER;			  // @4 interrupt enable register
+	__IO uint32_t CR;			  // @8 control register
+	__IO uint32_t CFGR;			  // @12 configuration register
+	__IO uint32_t CFGR2;		  // @16 configuration register
+	__IO uint32_t SMPR1;		  // @20 sample time register 1
+	__IO uint32_t SMPR2;		  // @24 sample time register 2
+	uint8_t		  RESERVED0[4];	  // @28
+	__IO uint32_t TR1;			  // @32 watchdog threshold register 1
+	__IO uint32_t TR2;			  // @36 watchdog threshold register
+	__IO uint32_t TR3;			  // @40 watchdog threshold register 3
+	uint8_t		  RESERVED1[4];	  // @44
+	__IO uint32_t SQR1;			  // @48 regular sequence register 1
+	__IO uint32_t SQR2;			  // @52 regular sequence register 2
+	__IO uint32_t SQR3;			  // @56 regular sequence register 3
+	__IO uint32_t SQR4;			  // @60 regular sequence register 4
+	__I uint32_t  DR;			  // @64 regular Data Register
+	uint8_t		  RESERVED2[8];	  // @68
+	__IO uint32_t JSQR;			  // @76 injected sequence register
+	uint8_t		  RESERVED3[16];  // @80
+	__IO uint32_t OFR1;			  // @96 offset register 1
+	__IO uint32_t OFR2;			  // @100 offset register 2
+	__IO uint32_t OFR3;			  // @104 offset register 3
+	__IO uint32_t OFR4;			  // @108 offset register 4
+	uint8_t		  RESERVED4[16];  // @112
+	__I uint32_t  JDR1;			  // @128 injected data register 1
+	__I uint32_t  JDR2;			  // @132 injected data register 2
+	__I uint32_t  JDR3;			  // @136 injected data register 3
+	__I uint32_t  JDR4;			  // @140 injected data register 4
+	uint8_t		  RESERVED5[16];  // @144
+	__IO uint32_t AWD2CR;		  // @160 Analog Watchdog 2 Configuration Register
+	__IO uint32_t AWD3CR;		  // @164 Analog Watchdog 3 Configuration Register
+	uint8_t		  RESERVED6[8];	  // @168
+	__IO uint32_t DIFSEL;		  // @176 Differential Mode Selection Register 2
+	__IO uint32_t CALFACT;		  // @180 Calibration Factors
 };
 extern struct ADC_Type ADC;	 // @0x50040000
 
@@ -416,6 +403,12 @@ static inline void	   adc_sqr4_set_sq15(uint32_t val) { ADC.SQR4 = (ADC.SQR4 & ~
 static inline uint32_t adc_sqr4_get_sq16(void) { return (ADC.SQR4 & ADC_SQR4_SQ16) >> 6; }
 static inline uint32_t adc_sqr4_get_sq15(void) { return (ADC.SQR4 & ADC_SQR4_SQ15) >> 0; }
 
+// ADC->DR regular Data Register
+enum {
+	ADC_DR_REGULARDATA = ((1UL << 16) - 1) << 0,  // regularDATA
+};
+static inline uint32_t adc_dr_get_regulardata(void) { return (ADC.DR & ADC_DR_REGULARDATA) >> 0; }
+
 // ADC->JSQR injected sequence register
 enum {
 	ADC_JSQR_JSQ4	 = ((1UL << 5) - 1) << 26,	// JSQ4
@@ -502,6 +495,30 @@ static inline void adc_ofr4_set_offset4(uint32_t val) {
 }
 static inline uint32_t adc_ofr4_get_offset4_ch(void) { return (ADC.OFR4 & ADC_OFR4_OFFSET4_CH) >> 26; }
 static inline uint32_t adc_ofr4_get_offset4(void) { return (ADC.OFR4 & ADC_OFR4_OFFSET4) >> 0; }
+
+// ADC->JDR1 injected data register 1
+enum {
+	ADC_JDR1_JDATA1 = ((1UL << 16) - 1) << 0,  // JDATA1
+};
+static inline uint32_t adc_jdr1_get_jdata1(void) { return (ADC.JDR1 & ADC_JDR1_JDATA1) >> 0; }
+
+// ADC->JDR2 injected data register 2
+enum {
+	ADC_JDR2_JDATA2 = ((1UL << 16) - 1) << 0,  // JDATA2
+};
+static inline uint32_t adc_jdr2_get_jdata2(void) { return (ADC.JDR2 & ADC_JDR2_JDATA2) >> 0; }
+
+// ADC->JDR3 injected data register 3
+enum {
+	ADC_JDR3_JDATA3 = ((1UL << 16) - 1) << 0,  // JDATA3
+};
+static inline uint32_t adc_jdr3_get_jdata3(void) { return (ADC.JDR3 & ADC_JDR3_JDATA3) >> 0; }
+
+// ADC->JDR4 injected data register 4
+enum {
+	ADC_JDR4_JDATA4 = ((1UL << 16) - 1) << 0,  // JDATA4
+};
+static inline uint32_t adc_jdr4_get_jdata4(void) { return (ADC.JDR4 & ADC_JDR4_JDATA4) >> 0; }
 
 // ADC->AWD2CR Analog Watchdog 2 Configuration Register
 enum {
@@ -630,17 +647,14 @@ static inline uint32_t adc_common_cdr_get_rdata_mst(void) { return (ADC12_Common
 There is only one peripheral of type CAN. */
 struct CAN_Type {
 	__IO uint32_t MCR;			   // @0 master control register
-	__IO uint16_t MSR;			   // @4 master status register
-	uint8_t		  RESERVED0[2];	   // @6
+	__IO uint32_t MSR;			   // @4 master status register
 	__IO uint32_t TSR;			   // @8 transmit status register
-	__IO uint8_t  RF0R;			   // @12 receive FIFO 0 register
-	uint8_t		  RESERVED1[3];	   // @13
-	__IO uint8_t  RF1R;			   // @16 receive FIFO 1 register
-	uint8_t		  RESERVED2[3];	   // @17
+	__IO uint32_t RF0R;			   // @12 receive FIFO 0 register
+	__IO uint32_t RF1R;			   // @16 receive FIFO 1 register
 	__IO uint32_t IER;			   // @20 interrupt enable register
 	__IO uint32_t ESR;			   // @24 interrupt enable register
 	__IO uint32_t BTR;			   // @28 bit timing register
-	uint8_t		  RESERVED3[352];  // @32
+	uint8_t		  RESERVED0[352];  // @32
 	__IO uint32_t TI0R;			   // @384 TX mailbox identifier register
 	__IO uint32_t TDT0R;		   // @388 mailbox data length control and time stamp register
 	__IO uint32_t TDL0R;		   // @392 mailbox data low register
@@ -661,17 +675,16 @@ struct CAN_Type {
 	__I uint32_t  RDT1R;		   // @452 mailbox data high register
 	__I uint32_t  RDL1R;		   // @456 mailbox data high register
 	__I uint32_t  RDH1R;		   // @460 mailbox data high register
-	uint8_t		  RESERVED4[48];   // @464
-	__IO uint8_t  FMR;			   // @512 filter master register
-	uint8_t		  RESERVED5[3];	   // @513
-	__IO uint16_t FM1R;			   // @516 filter mode register
-	uint8_t		  RESERVED6[6];	   // @518
-	__IO uint16_t FS1R;			   // @524 filter scale register
-	uint8_t		  RESERVED7[6];	   // @526
-	__IO uint16_t FFA1R;		   // @532 filter FIFO assignment register
-	uint8_t		  RESERVED8[6];	   // @534
-	__IO uint16_t FA1R;			   // @540 filter activation register
-	uint8_t		  RESERVED9[34];   // @542
+	uint8_t		  RESERVED1[48];   // @464
+	__IO uint32_t FMR;			   // @512 filter master register
+	__IO uint32_t FM1R;			   // @516 filter mode register
+	uint8_t		  RESERVED2[4];	   // @520
+	__IO uint32_t FS1R;			   // @524 filter scale register
+	uint8_t		  RESERVED3[4];	   // @528
+	__IO uint32_t FFA1R;		   // @532 filter FIFO assignment register
+	uint8_t		  RESERVED4[4];	   // @536
+	__IO uint32_t FA1R;			   // @540 filter activation register
+	uint8_t		  RESERVED5[32];   // @544
 	__IO uint32_t F0R1;			   // @576 Filter bank 0 register 1
 	__IO uint32_t F0R2;			   // @580 Filter bank 0 register 2
 	__IO uint32_t F1R1;			   // @584 Filter bank 1 register 1
@@ -1201,107 +1214,24 @@ enum {
 static inline void can_fa1r_set_factx(uint32_t val) { CAN1.FA1R = (CAN1.FA1R & ~CAN_FA1R_FACTX) | ((val << 0) & CAN_FA1R_FACTX); }
 static inline uint32_t can_fa1r_get_factx(void) { return (CAN1.FA1R & CAN_FA1R_FACTX) >> 0; }
 
-/* Comparator
-There is only one peripheral of type COMP. */
-struct COMP_Type {
-	__IO uint32_t COMP1_CSR;  // @0 Comparator 1 control and status register
-	__IO uint32_t COMP2_CSR;  // @4 Comparator 2 control and status register
-};
-extern struct COMP_Type COMP;  // @0x40010200
-
-// COMP->COMP1_CSR Comparator 1 control and status register
-enum {
-	COMP_COMP1_CSR_COMP1_LOCK	  = 1UL << 31,				 // COMP1_CSR register lock bit
-	COMP_COMP1_CSR_COMP1_VALUE	  = 1UL << 30,				 // Comparator 1 output status bit
-	COMP_COMP1_CSR_COMP1_INMESEL  = ((1UL << 2) - 1) << 25,	 // comparator 1 input minus extended selection bits
-	COMP_COMP1_CSR_COMP1_SCALEN	  = 1UL << 23,				 // Voltage scaler enable bit
-	COMP_COMP1_CSR_COMP1_BRGEN	  = 1UL << 22,				 // Scaler bridge enable
-	COMP_COMP1_CSR_COMP1_BLANKING = ((1UL << 3) - 1) << 18,	 // Comparator 1 blanking source selection bits
-	COMP_COMP1_CSR_COMP1_HYST	  = ((1UL << 2) - 1) << 16,	 // Comparator 1 hysteresis selection bits
-	COMP_COMP1_CSR_COMP1_POLARITY = 1UL << 15,				 // Comparator 1 polarity selection bit
-	COMP_COMP1_CSR_COMP1_INPSEL	  = ((1UL << 2) - 1) << 7,	 // Comparator1 input plus selection bit
-	COMP_COMP1_CSR_COMP1_INMSEL	  = ((1UL << 3) - 1) << 4,	 // Comparator 1 Input Minus connection configuration bit
-	COMP_COMP1_CSR_COMP1_PWRMODE  = ((1UL << 2) - 1) << 2,	 // Power Mode of the comparator 1
-	COMP_COMP1_CSR_COMP1_EN		  = 1UL << 0,				 // Comparator 1 enable bit
-};
-static inline void comp_comp1_csr_set_comp1_inmesel(uint32_t val) {
-	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_INMESEL) | ((val << 25) & COMP_COMP1_CSR_COMP1_INMESEL);
-}
-static inline void comp_comp1_csr_set_comp1_blanking(uint32_t val) {
-	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_BLANKING) | ((val << 18) & COMP_COMP1_CSR_COMP1_BLANKING);
-}
-static inline void comp_comp1_csr_set_comp1_hyst(uint32_t val) {
-	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_HYST) | ((val << 16) & COMP_COMP1_CSR_COMP1_HYST);
-}
-static inline void comp_comp1_csr_set_comp1_inpsel(uint32_t val) {
-	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_INPSEL) | ((val << 7) & COMP_COMP1_CSR_COMP1_INPSEL);
-}
-static inline void comp_comp1_csr_set_comp1_inmsel(uint32_t val) {
-	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_INMSEL) | ((val << 4) & COMP_COMP1_CSR_COMP1_INMSEL);
-}
-static inline void comp_comp1_csr_set_comp1_pwrmode(uint32_t val) {
-	COMP.COMP1_CSR = (COMP.COMP1_CSR & ~COMP_COMP1_CSR_COMP1_PWRMODE) | ((val << 2) & COMP_COMP1_CSR_COMP1_PWRMODE);
-}
-static inline uint32_t comp_comp1_csr_get_comp1_inmesel(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_INMESEL) >> 25; }
-static inline uint32_t comp_comp1_csr_get_comp1_blanking(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_BLANKING) >> 18; }
-static inline uint32_t comp_comp1_csr_get_comp1_hyst(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_HYST) >> 16; }
-static inline uint32_t comp_comp1_csr_get_comp1_inpsel(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_INPSEL) >> 7; }
-static inline uint32_t comp_comp1_csr_get_comp1_inmsel(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_INMSEL) >> 4; }
-static inline uint32_t comp_comp1_csr_get_comp1_pwrmode(void) { return (COMP.COMP1_CSR & COMP_COMP1_CSR_COMP1_PWRMODE) >> 2; }
-
-// COMP->COMP2_CSR Comparator 2 control and status register
-enum {
-	COMP_COMP2_CSR_COMP2_LOCK	  = 1UL << 31,				 // COMP2_CSR register lock bit
-	COMP_COMP2_CSR_COMP2_VALUE	  = 1UL << 30,				 // Comparator 2 output status bit
-	COMP_COMP2_CSR_COMP2_INMESEL  = ((1UL << 2) - 1) << 25,	 // comparator 2 input minus extended selection bits
-	COMP_COMP2_CSR_COMP2_SCALEN	  = 1UL << 23,				 // Voltage scaler enable bit
-	COMP_COMP2_CSR_COMP2_BRGEN	  = 1UL << 22,				 // Scaler bridge enable
-	COMP_COMP2_CSR_COMP2_BLANKING = ((1UL << 3) - 1) << 18,	 // Comparator 2 blanking source selection bits
-	COMP_COMP2_CSR_COMP2_HYST	  = ((1UL << 2) - 1) << 16,	 // Comparator 2 hysteresis selection bits
-	COMP_COMP2_CSR_COMP2_POLARITY = 1UL << 15,				 // Comparator 2 polarity selection bit
-	COMP_COMP2_CSR_COMP2_WINMODE  = 1UL << 9,				 // Windows mode selection bit
-	COMP_COMP2_CSR_COMP2_INPSEL	  = ((1UL << 2) - 1) << 7,	 // Comparator 2 Input Plus connection configuration bit
-	COMP_COMP2_CSR_COMP2_INMSEL	  = ((1UL << 3) - 1) << 4,	 // Comparator 2 Input Minus connection configuration bit
-	COMP_COMP2_CSR_COMP2_PWRMODE  = ((1UL << 2) - 1) << 2,	 // Power Mode of the comparator 2
-	COMP_COMP2_CSR_COMP2_EN		  = 1UL << 0,				 // Comparator 2 enable bit
-};
-static inline void comp_comp2_csr_set_comp2_inmesel(uint32_t val) {
-	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_INMESEL) | ((val << 25) & COMP_COMP2_CSR_COMP2_INMESEL);
-}
-static inline void comp_comp2_csr_set_comp2_blanking(uint32_t val) {
-	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_BLANKING) | ((val << 18) & COMP_COMP2_CSR_COMP2_BLANKING);
-}
-static inline void comp_comp2_csr_set_comp2_hyst(uint32_t val) {
-	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_HYST) | ((val << 16) & COMP_COMP2_CSR_COMP2_HYST);
-}
-static inline void comp_comp2_csr_set_comp2_inpsel(uint32_t val) {
-	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_INPSEL) | ((val << 7) & COMP_COMP2_CSR_COMP2_INPSEL);
-}
-static inline void comp_comp2_csr_set_comp2_inmsel(uint32_t val) {
-	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_INMSEL) | ((val << 4) & COMP_COMP2_CSR_COMP2_INMSEL);
-}
-static inline void comp_comp2_csr_set_comp2_pwrmode(uint32_t val) {
-	COMP.COMP2_CSR = (COMP.COMP2_CSR & ~COMP_COMP2_CSR_COMP2_PWRMODE) | ((val << 2) & COMP_COMP2_CSR_COMP2_PWRMODE);
-}
-static inline uint32_t comp_comp2_csr_get_comp2_inmesel(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_INMESEL) >> 25; }
-static inline uint32_t comp_comp2_csr_get_comp2_blanking(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_BLANKING) >> 18; }
-static inline uint32_t comp_comp2_csr_get_comp2_hyst(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_HYST) >> 16; }
-static inline uint32_t comp_comp2_csr_get_comp2_inpsel(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_INPSEL) >> 7; }
-static inline uint32_t comp_comp2_csr_get_comp2_inmsel(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_INMSEL) >> 4; }
-static inline uint32_t comp_comp2_csr_get_comp2_pwrmode(void) { return (COMP.COMP2_CSR & COMP_COMP2_CSR_COMP2_PWRMODE) >> 2; }
-
 /* Cyclic redundancy check calculation unit
 There is only one peripheral of type CRC. */
 struct CRC_Type {
 	__IO uint32_t DR;			 // @0 Data register
-	__IO uint8_t  IDR;			 // @4 Independent data register
-	uint8_t		  RESERVED0[3];	 // @5
-	__IO uint8_t  CR;			 // @8 Control register
-	uint8_t		  RESERVED1[7];	 // @9
+	__IO uint32_t IDR;			 // @4 Independent data register
+	__IO uint32_t CR;			 // @8 Control register
+	uint8_t		  RESERVED0[4];	 // @12
 	__IO uint32_t INIT;			 // @16 Initial CRC value
 	__IO uint32_t POL;			 // @20 polynomial
 };
 extern struct CRC_Type CRC;	 // @0x40023000
+
+// CRC->IDR Independent data register
+enum {
+	CRC_IDR_IDR = ((1UL << 8) - 1) << 0,  // General-purpose 8-bit data register bits
+};
+static inline void	   crc_idr_set_idr(uint32_t val) { CRC.IDR = (CRC.IDR & ~CRC_IDR_IDR) | ((val << 0) & CRC_IDR_IDR); }
+static inline uint32_t crc_idr_get_idr(void) { return (CRC.IDR & CRC_IDR_IDR) >> 0; }
 
 // CRC->CR Control register
 enum {
@@ -1318,11 +1248,10 @@ static inline uint32_t crc_cr_get_polysize(void) { return (CRC.CR & CRC_CR_POLYS
 /* Clock recovery system
 There is only one peripheral of type CRS. */
 struct CRS_Type {
-	__IO uint16_t CR;			 // @0 control register
-	uint8_t		  RESERVED0[2];	 // @2
-	__IO uint32_t CFGR;			 // @4 configuration register
-	__I uint32_t  ISR;			 // @8 interrupt and status register
-	__IO uint8_t  ICR;			 // @12 interrupt flag clear register
+	__IO uint32_t CR;	 // @0 control register
+	__IO uint32_t CFGR;	 // @4 configuration register
+	__I uint32_t  ISR;	 // @8 interrupt and status register
+	__IO uint32_t ICR;	 // @12 interrupt flag clear register
 };
 extern struct CRS_Type CRS;	 // @0x40006000
 
@@ -1383,261 +1312,14 @@ enum {
 	CRS_ICR_SYNCOKC	  = 1UL << 0,  // SYNC event OK clear flag
 };
 
-/* Digital-to-analog converter
-There is only one peripheral of type DAC. */
-struct DAC_Type {
-	__IO uint32_t CR;			  // @0 control register
-	__O uint8_t	  SWTRIGR;		  // @4 software trigger register
-	uint8_t		  RESERVED0[3];	  // @5
-	__IO uint16_t DHR12R1;		  // @8 channel1 12-bit right-aligned data holding register
-	uint8_t		  RESERVED1[2];	  // @10
-	__IO uint16_t DHR12L1;		  // @12 channel1 12-bit left-aligned data holding register
-	uint8_t		  RESERVED2[2];	  // @14
-	__IO uint8_t  DHR8R1;		  // @16 channel1 8-bit right-aligned data holding register
-	uint8_t		  RESERVED3[3];	  // @17
-	__IO uint16_t DHR12R2;		  // @20 channel2 12-bit right aligned data holding register
-	uint8_t		  RESERVED4[2];	  // @22
-	__IO uint16_t DHR12L2;		  // @24 channel2 12-bit left aligned data holding register
-	uint8_t		  RESERVED5[2];	  // @26
-	__IO uint8_t  DHR8R2;		  // @28 channel2 8-bit right-aligned data holding register
-	uint8_t		  RESERVED6[3];	  // @29
-	__IO uint32_t DHR12RD;		  // @32 Dual DAC 12-bit right-aligned data holding register
-	__IO uint32_t DHR12LD;		  // @36 DUAL DAC 12-bit left aligned data holding register
-	__IO uint16_t DHR8RD;		  // @40 DUAL DAC 8-bit right aligned data holding register
-	uint8_t		  RESERVED7[2];	  // @42
-	__I uint16_t  DOR1;			  // @44 channel1 data output register
-	uint8_t		  RESERVED8[2];	  // @46
-	__I uint16_t  DOR2;			  // @48 channel2 data output register
-	uint8_t		  RESERVED9[2];	  // @50
-	__IO uint32_t SR;			  // @52 status register
-	__IO uint32_t CCR;			  // @56 calibration control register
-	__IO uint32_t MCR;			  // @60 mode control register
-	__IO uint16_t SHSR1;		  // @64 Sample and Hold sample time register 1
-	uint8_t		  RESERVED10[2];  // @66
-	__IO uint16_t SHSR2;		  // @68 Sample and Hold sample time register 2
-	uint8_t		  RESERVED11[2];  // @70
-	__IO uint32_t SHHR;			  // @72 Sample and Hold hold time register
-	__IO uint32_t SHRR;			  // @76 Sample and Hold refresh time register
-};
-extern struct DAC_Type DAC1;  // @0x40007400
-
-// DAC->CR control register
-enum {
-	DAC_CR_CEN2		 = 1UL << 30,				// DAC Channel 2 calibration enable
-	DAC_CR_DMAUDRIE2 = 1UL << 29,				// DAC channel2 DMA underrun interrupt enable
-	DAC_CR_DMAEN2	 = 1UL << 28,				// DAC channel2 DMA enable
-	DAC_CR_MAMP2	 = ((1UL << 4) - 1) << 24,	// DAC channel2 mask/amplitude selector
-	DAC_CR_WAVE2	 = ((1UL << 2) - 1) << 22,	// DAC channel2 noise/triangle wave generation enable
-	DAC_CR_TSEL2	 = ((1UL << 3) - 1) << 19,	// DAC channel2 trigger selection
-	DAC_CR_TEN2		 = 1UL << 18,				// DAC channel2 trigger enable
-	DAC_CR_EN2		 = 1UL << 16,				// DAC channel2 enable
-	DAC_CR_CEN1		 = 1UL << 14,				// DAC Channel 1 calibration enable
-	DAC_CR_DMAUDRIE1 = 1UL << 13,				// DAC channel1 DMA Underrun Interrupt enable
-	DAC_CR_DMAEN1	 = 1UL << 12,				// DAC channel1 DMA enable
-	DAC_CR_MAMP1	 = ((1UL << 4) - 1) << 8,	// DAC channel1 mask/amplitude selector
-	DAC_CR_WAVE1	 = ((1UL << 2) - 1) << 6,	// DAC channel1 noise/triangle wave generation enable
-	DAC_CR_TSEL1	 = ((1UL << 3) - 1) << 3,	// DAC channel1 trigger selection
-	DAC_CR_TEN1		 = 1UL << 2,				// DAC channel1 trigger enable
-	DAC_CR_EN1		 = 1UL << 0,				// DAC channel1 enable
-};
-static inline void	   dac_cr_set_mamp2(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_MAMP2) | ((val << 24) & DAC_CR_MAMP2); }
-static inline void	   dac_cr_set_wave2(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_WAVE2) | ((val << 22) & DAC_CR_WAVE2); }
-static inline void	   dac_cr_set_tsel2(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_TSEL2) | ((val << 19) & DAC_CR_TSEL2); }
-static inline void	   dac_cr_set_mamp1(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_MAMP1) | ((val << 8) & DAC_CR_MAMP1); }
-static inline void	   dac_cr_set_wave1(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_WAVE1) | ((val << 6) & DAC_CR_WAVE1); }
-static inline void	   dac_cr_set_tsel1(uint32_t val) { DAC1.CR = (DAC1.CR & ~DAC_CR_TSEL1) | ((val << 3) & DAC_CR_TSEL1); }
-static inline uint32_t dac_cr_get_mamp2(void) { return (DAC1.CR & DAC_CR_MAMP2) >> 24; }
-static inline uint32_t dac_cr_get_wave2(void) { return (DAC1.CR & DAC_CR_WAVE2) >> 22; }
-static inline uint32_t dac_cr_get_tsel2(void) { return (DAC1.CR & DAC_CR_TSEL2) >> 19; }
-static inline uint32_t dac_cr_get_mamp1(void) { return (DAC1.CR & DAC_CR_MAMP1) >> 8; }
-static inline uint32_t dac_cr_get_wave1(void) { return (DAC1.CR & DAC_CR_WAVE1) >> 6; }
-static inline uint32_t dac_cr_get_tsel1(void) { return (DAC1.CR & DAC_CR_TSEL1) >> 3; }
-
-// DAC->SWTRIGR software trigger register
-enum {
-	DAC_SWTRIGR_SWTRIGX = ((1UL << 2) - 1) << 0,  // Merged DAC channel2 software trigger
-};
-static inline void dac_swtrigr_set_swtrigx(uint32_t val) {
-	DAC1.SWTRIGR = (DAC1.SWTRIGR & ~DAC_SWTRIGR_SWTRIGX) | ((val << 0) & DAC_SWTRIGR_SWTRIGX);
-}
-static inline uint32_t dac_swtrigr_get_swtrigx(void) { return (DAC1.SWTRIGR & DAC_SWTRIGR_SWTRIGX) >> 0; }
-
-// DAC->DHR12R1 channel1 12-bit right-aligned data holding register
-enum {
-	DAC_DHR12R1_DACC1DHR = ((1UL << 12) - 1) << 0,	// DAC channel1 12-bit right-aligned data
-};
-static inline void dac_dhr12r1_set_dacc1dhr(uint32_t val) {
-	DAC1.DHR12R1 = (DAC1.DHR12R1 & ~DAC_DHR12R1_DACC1DHR) | ((val << 0) & DAC_DHR12R1_DACC1DHR);
-}
-static inline uint32_t dac_dhr12r1_get_dacc1dhr(void) { return (DAC1.DHR12R1 & DAC_DHR12R1_DACC1DHR) >> 0; }
-
-// DAC->DHR12L1 channel1 12-bit left-aligned data holding register
-enum {
-	DAC_DHR12L1_DACC1DHR = ((1UL << 12) - 1) << 4,	// DAC channel1 12-bit left-aligned data
-};
-static inline void dac_dhr12l1_set_dacc1dhr(uint32_t val) {
-	DAC1.DHR12L1 = (DAC1.DHR12L1 & ~DAC_DHR12L1_DACC1DHR) | ((val << 4) & DAC_DHR12L1_DACC1DHR);
-}
-static inline uint32_t dac_dhr12l1_get_dacc1dhr(void) { return (DAC1.DHR12L1 & DAC_DHR12L1_DACC1DHR) >> 4; }
-
-// DAC->DHR12R2 channel2 12-bit right aligned data holding register
-enum {
-	DAC_DHR12R2_DACC2DHR = ((1UL << 12) - 1) << 0,	// DAC channel2 12-bit right-aligned data
-};
-static inline void dac_dhr12r2_set_dacc2dhr(uint32_t val) {
-	DAC1.DHR12R2 = (DAC1.DHR12R2 & ~DAC_DHR12R2_DACC2DHR) | ((val << 0) & DAC_DHR12R2_DACC2DHR);
-}
-static inline uint32_t dac_dhr12r2_get_dacc2dhr(void) { return (DAC1.DHR12R2 & DAC_DHR12R2_DACC2DHR) >> 0; }
-
-// DAC->DHR12L2 channel2 12-bit left aligned data holding register
-enum {
-	DAC_DHR12L2_DACC2DHR = ((1UL << 12) - 1) << 4,	// DAC channel2 12-bit left-aligned data
-};
-static inline void dac_dhr12l2_set_dacc2dhr(uint32_t val) {
-	DAC1.DHR12L2 = (DAC1.DHR12L2 & ~DAC_DHR12L2_DACC2DHR) | ((val << 4) & DAC_DHR12L2_DACC2DHR);
-}
-static inline uint32_t dac_dhr12l2_get_dacc2dhr(void) { return (DAC1.DHR12L2 & DAC_DHR12L2_DACC2DHR) >> 4; }
-
-// DAC->DHR12RD Dual DAC 12-bit right-aligned data holding register
-enum {
-	DAC_DHR12RD_DACC2DHR = ((1UL << 12) - 1) << 16,	 // DAC channel2 12-bit right-aligned data
-	DAC_DHR12RD_DACC1DHR = ((1UL << 12) - 1) << 0,	 // DAC channel1 12-bit right-aligned data
-};
-static inline void dac_dhr12rd_set_dacc2dhr(uint32_t val) {
-	DAC1.DHR12RD = (DAC1.DHR12RD & ~DAC_DHR12RD_DACC2DHR) | ((val << 16) & DAC_DHR12RD_DACC2DHR);
-}
-static inline void dac_dhr12rd_set_dacc1dhr(uint32_t val) {
-	DAC1.DHR12RD = (DAC1.DHR12RD & ~DAC_DHR12RD_DACC1DHR) | ((val << 0) & DAC_DHR12RD_DACC1DHR);
-}
-static inline uint32_t dac_dhr12rd_get_dacc2dhr(void) { return (DAC1.DHR12RD & DAC_DHR12RD_DACC2DHR) >> 16; }
-static inline uint32_t dac_dhr12rd_get_dacc1dhr(void) { return (DAC1.DHR12RD & DAC_DHR12RD_DACC1DHR) >> 0; }
-
-// DAC->DHR12LD DUAL DAC 12-bit left aligned data holding register
-enum {
-	DAC_DHR12LD_DACC2DHR = ((1UL << 12) - 1) << 20,	 // DAC channel2 12-bit left-aligned data
-	DAC_DHR12LD_DACC1DHR = ((1UL << 12) - 1) << 4,	 // DAC channel1 12-bit left-aligned data
-};
-static inline void dac_dhr12ld_set_dacc2dhr(uint32_t val) {
-	DAC1.DHR12LD = (DAC1.DHR12LD & ~DAC_DHR12LD_DACC2DHR) | ((val << 20) & DAC_DHR12LD_DACC2DHR);
-}
-static inline void dac_dhr12ld_set_dacc1dhr(uint32_t val) {
-	DAC1.DHR12LD = (DAC1.DHR12LD & ~DAC_DHR12LD_DACC1DHR) | ((val << 4) & DAC_DHR12LD_DACC1DHR);
-}
-static inline uint32_t dac_dhr12ld_get_dacc2dhr(void) { return (DAC1.DHR12LD & DAC_DHR12LD_DACC2DHR) >> 20; }
-static inline uint32_t dac_dhr12ld_get_dacc1dhr(void) { return (DAC1.DHR12LD & DAC_DHR12LD_DACC1DHR) >> 4; }
-
-// DAC->DHR8RD DUAL DAC 8-bit right aligned data holding register
-enum {
-	DAC_DHR8RD_DACC2DHR = ((1UL << 8) - 1) << 8,  // DAC channel2 8-bit right-aligned data
-	DAC_DHR8RD_DACC1DHR = ((1UL << 8) - 1) << 0,  // DAC channel1 8-bit right-aligned data
-};
-static inline void dac_dhr8rd_set_dacc2dhr(uint32_t val) {
-	DAC1.DHR8RD = (DAC1.DHR8RD & ~DAC_DHR8RD_DACC2DHR) | ((val << 8) & DAC_DHR8RD_DACC2DHR);
-}
-static inline void dac_dhr8rd_set_dacc1dhr(uint32_t val) {
-	DAC1.DHR8RD = (DAC1.DHR8RD & ~DAC_DHR8RD_DACC1DHR) | ((val << 0) & DAC_DHR8RD_DACC1DHR);
-}
-static inline uint32_t dac_dhr8rd_get_dacc2dhr(void) { return (DAC1.DHR8RD & DAC_DHR8RD_DACC2DHR) >> 8; }
-static inline uint32_t dac_dhr8rd_get_dacc1dhr(void) { return (DAC1.DHR8RD & DAC_DHR8RD_DACC1DHR) >> 0; }
-
-// DAC->DOR1 channel1 data output register
-enum {
-	DAC_DOR1_DACC1DOR = ((1UL << 12) - 1) << 0,	 // DAC channel1 data output
-};
-static inline uint32_t dac_dor1_get_dacc1dor(void) { return (DAC1.DOR1 & DAC_DOR1_DACC1DOR) >> 0; }
-
-// DAC->DOR2 channel2 data output register
-enum {
-	DAC_DOR2_DACC2DOR = ((1UL << 12) - 1) << 0,	 // DAC channel2 data output
-};
-static inline uint32_t dac_dor2_get_dacc2dor(void) { return (DAC1.DOR2 & DAC_DOR2_DACC2DOR) >> 0; }
-
-// DAC->SR status register
-enum {
-	DAC_SR_BWST2	 = 1UL << 31,  // DAC Channel 2 busy writing sample time flag
-	DAC_SR_CAL_FLAG2 = 1UL << 30,  // DAC Channel 2 calibration offset status
-	DAC_SR_DMAUDR2	 = 1UL << 29,  // DAC channel2 DMA underrun flag
-	DAC_SR_BWST1	 = 1UL << 15,  // DAC Channel 1 busy writing sample time flag
-	DAC_SR_CAL_FLAG1 = 1UL << 14,  // DAC Channel 1 calibration offset status
-	DAC_SR_DMAUDR1	 = 1UL << 13,  // DAC channel1 DMA underrun flag
-};
-
-// DAC->CCR calibration control register
-enum {
-	DAC_CCR_OTRIM2 = ((1UL << 5) - 1) << 16,  // DAC Channel 2 offset trimming value
-	DAC_CCR_OTRIM1 = ((1UL << 5) - 1) << 0,	  // DAC Channel 1 offset trimming value
-};
-static inline void dac_ccr_set_otrim2(uint32_t val) { DAC1.CCR = (DAC1.CCR & ~DAC_CCR_OTRIM2) | ((val << 16) & DAC_CCR_OTRIM2); }
-static inline void dac_ccr_set_otrim1(uint32_t val) { DAC1.CCR = (DAC1.CCR & ~DAC_CCR_OTRIM1) | ((val << 0) & DAC_CCR_OTRIM1); }
-static inline uint32_t dac_ccr_get_otrim2(void) { return (DAC1.CCR & DAC_CCR_OTRIM2) >> 16; }
-static inline uint32_t dac_ccr_get_otrim1(void) { return (DAC1.CCR & DAC_CCR_OTRIM1) >> 0; }
-
-// DAC->MCR mode control register
-enum {
-	DAC_MCR_MODE2 = ((1UL << 3) - 1) << 16,	 // DAC Channel 2 mode
-	DAC_MCR_MODE1 = ((1UL << 3) - 1) << 0,	 // DAC Channel 1 mode
-};
-static inline void	   dac_mcr_set_mode2(uint32_t val) { DAC1.MCR = (DAC1.MCR & ~DAC_MCR_MODE2) | ((val << 16) & DAC_MCR_MODE2); }
-static inline void	   dac_mcr_set_mode1(uint32_t val) { DAC1.MCR = (DAC1.MCR & ~DAC_MCR_MODE1) | ((val << 0) & DAC_MCR_MODE1); }
-static inline uint32_t dac_mcr_get_mode2(void) { return (DAC1.MCR & DAC_MCR_MODE2) >> 16; }
-static inline uint32_t dac_mcr_get_mode1(void) { return (DAC1.MCR & DAC_MCR_MODE1) >> 0; }
-
-// DAC->SHSR1 Sample and Hold sample time register 1
-enum {
-	DAC_SHSR1_TSAMPLE1 = ((1UL << 10) - 1) << 0,  // DAC Channel 1 sample Time
-};
-static inline void dac_shsr1_set_tsample1(uint32_t val) {
-	DAC1.SHSR1 = (DAC1.SHSR1 & ~DAC_SHSR1_TSAMPLE1) | ((val << 0) & DAC_SHSR1_TSAMPLE1);
-}
-static inline uint32_t dac_shsr1_get_tsample1(void) { return (DAC1.SHSR1 & DAC_SHSR1_TSAMPLE1) >> 0; }
-
-// DAC->SHSR2 Sample and Hold sample time register 2
-enum {
-	DAC_SHSR2_TSAMPLE2 = ((1UL << 10) - 1) << 0,  // DAC Channel 2 sample Time
-};
-static inline void dac_shsr2_set_tsample2(uint32_t val) {
-	DAC1.SHSR2 = (DAC1.SHSR2 & ~DAC_SHSR2_TSAMPLE2) | ((val << 0) & DAC_SHSR2_TSAMPLE2);
-}
-static inline uint32_t dac_shsr2_get_tsample2(void) { return (DAC1.SHSR2 & DAC_SHSR2_TSAMPLE2) >> 0; }
-
-// DAC->SHHR Sample and Hold hold time register
-enum {
-	DAC_SHHR_THOLD2 = ((1UL << 10) - 1) << 16,	// DAC Channel 2 hold time
-	DAC_SHHR_THOLD1 = ((1UL << 10) - 1) << 0,	// DAC Channel 1 hold Time
-};
-static inline void dac_shhr_set_thold2(uint32_t val) {
-	DAC1.SHHR = (DAC1.SHHR & ~DAC_SHHR_THOLD2) | ((val << 16) & DAC_SHHR_THOLD2);
-}
-static inline void dac_shhr_set_thold1(uint32_t val) {
-	DAC1.SHHR = (DAC1.SHHR & ~DAC_SHHR_THOLD1) | ((val << 0) & DAC_SHHR_THOLD1);
-}
-static inline uint32_t dac_shhr_get_thold2(void) { return (DAC1.SHHR & DAC_SHHR_THOLD2) >> 16; }
-static inline uint32_t dac_shhr_get_thold1(void) { return (DAC1.SHHR & DAC_SHHR_THOLD1) >> 0; }
-
-// DAC->SHRR Sample and Hold refresh time register
-enum {
-	DAC_SHRR_TREFRESH2 = ((1UL << 8) - 1) << 16,  // DAC Channel 2 refresh Time
-	DAC_SHRR_TREFRESH1 = ((1UL << 8) - 1) << 0,	  // DAC Channel 1 refresh Time
-};
-static inline void dac_shrr_set_trefresh2(uint32_t val) {
-	DAC1.SHRR = (DAC1.SHRR & ~DAC_SHRR_TREFRESH2) | ((val << 16) & DAC_SHRR_TREFRESH2);
-}
-static inline void dac_shrr_set_trefresh1(uint32_t val) {
-	DAC1.SHRR = (DAC1.SHRR & ~DAC_SHRR_TREFRESH1) | ((val << 0) & DAC_SHRR_TREFRESH1);
-}
-static inline uint32_t dac_shrr_get_trefresh2(void) { return (DAC1.SHRR & DAC_SHRR_TREFRESH2) >> 16; }
-static inline uint32_t dac_shrr_get_trefresh1(void) { return (DAC1.SHRR & DAC_SHRR_TREFRESH1) >> 0; }
-
 /* MCU debug component
 There is only one peripheral of type DBGMCU. */
 struct DBGMCU_Type {
-	__I uint32_t  IDCODE;		 // @0 DBGMCU_IDCODE
-	__IO uint8_t  CR;			 // @4 Debug MCU configuration register
-	uint8_t		  RESERVED0[3];	 // @5
-	__IO uint32_t APB1FZR1;		 // @8 Debug MCU APB1 freeze register1
-	__IO uint8_t  APB1FZR2;		 // @12 Debug MCU APB1 freeze register 2
-	uint8_t		  RESERVED1[3];	 // @13
-	__IO uint32_t APB2FZR;		 // @16 Debug MCU APB2 freeze register
+	__I uint32_t  IDCODE;	 // @0 DBGMCU_IDCODE
+	__IO uint32_t CR;		 // @4 Debug MCU configuration register
+	__IO uint32_t APB1FZR1;	 // @8 Debug MCU APB1 freeze register1
+	__IO uint32_t APB1FZR2;	 // @12 Debug MCU APB1 freeze register 2
+	__IO uint32_t APB2FZR;	 // @16 Debug MCU APB2 freeze register
 };
 extern struct DBGMCU_Type DBGMCU;  // @0xE0042000
 
@@ -2049,17 +1731,12 @@ struct EXTI_Type {
 	__IO uint32_t SWIER1;		 // @16 Software interrupt event register
 	__IO uint32_t PR1;			 // @20 Pending register
 	uint8_t		  RESERVED0[8];	 // @24
-	__IO uint8_t  IMR2;			 // @32 Interrupt mask register
-	uint8_t		  RESERVED1[3];	 // @33
-	__IO uint8_t  EMR2;			 // @36 Event mask register
-	uint8_t		  RESERVED2[3];	 // @37
-	__IO uint8_t  RTSR2;		 // @40 Rising Trigger selection register
-	uint8_t		  RESERVED3[3];	 // @41
-	__IO uint8_t  FTSR2;		 // @44 Falling Trigger selection register
-	uint8_t		  RESERVED4[3];	 // @45
-	__IO uint8_t  SWIER2;		 // @48 Software interrupt event register
-	uint8_t		  RESERVED5[3];	 // @49
-	__IO uint8_t  PR2;			 // @52 Pending register
+	__IO uint32_t IMR2;			 // @32 Interrupt mask register
+	__IO uint32_t EMR2;			 // @36 Event mask register
+	__IO uint32_t RTSR2;		 // @40 Rising Trigger selection register
+	__IO uint32_t FTSR2;		 // @44 Falling Trigger selection register
+	__IO uint32_t SWIER2;		 // @48 Software interrupt event register
+	__IO uint32_t PR2;			 // @52 Pending register
 };
 extern struct EXTI_Type EXTI;  // @0x40010400
 
@@ -2167,6 +1844,20 @@ enum {
 	EXTI_PR1_PR0  = 1UL << 0,	// Pending bit 0
 };
 
+// EXTI->IMR2 Interrupt mask register
+enum {
+	EXTI_IMR2_MRX = ((1UL << 8) - 1) << 0,	// Merged Interrupt Mask on external/internal line 39
+};
+static inline void	   exti_imr2_set_mrx(uint32_t val) { EXTI.IMR2 = (EXTI.IMR2 & ~EXTI_IMR2_MRX) | ((val << 0) & EXTI_IMR2_MRX); }
+static inline uint32_t exti_imr2_get_mrx(void) { return (EXTI.IMR2 & EXTI_IMR2_MRX) >> 0; }
+
+// EXTI->EMR2 Event mask register
+enum {
+	EXTI_EMR2_MRX = ((1UL << 8) - 1) << 0,	// Merged Event mask on external/internal line 39
+};
+static inline void	   exti_emr2_set_mrx(uint32_t val) { EXTI.EMR2 = (EXTI.EMR2 & ~EXTI_EMR2_MRX) | ((val << 0) & EXTI_EMR2_MRX); }
+static inline uint32_t exti_emr2_get_mrx(void) { return (EXTI.EMR2 & EXTI_EMR2_MRX) >> 0; }
+
 // EXTI->RTSR2 Rising Trigger selection register
 enum {
 	EXTI_RTSR2_RT38 = 1UL << 6,	 // Rising trigger event configuration bit of line 38
@@ -2199,29 +1890,100 @@ enum {
 	EXTI_PR2_PIF35 = 1UL << 3,	// Pending interrupt flag on line 35
 };
 
+/* Firewall
+There is only one peripheral of type FIREWALL. */
+struct FIREWALL_Type {
+	__IO uint32_t CSSA;			 // @0 Code segment start address
+	__IO uint32_t CSL;			 // @4 Code segment length
+	__IO uint32_t NVDSSA;		 // @8 Non-volatile data segment start address
+	__IO uint32_t NVDSL;		 // @12 Non-volatile data segment length
+	__IO uint32_t VDSSA;		 // @16 Volatile data segment start address
+	__IO uint32_t VDSL;			 // @20 Volatile data segment length
+	uint8_t		  RESERVED0[8];	 // @24
+	__IO uint32_t CR;			 // @32 Configuration register
+};
+extern struct FIREWALL_Type FIREWALL;  // @0x40011C00
+
+// FIREWALL->CSSA Code segment start address
+enum {
+	FIREWALL_CSSA_ADD = ((1UL << 16) - 1) << 8,	 // code segment start address
+};
+static inline void firewall_cssa_set_add(uint32_t val) {
+	FIREWALL.CSSA = (FIREWALL.CSSA & ~FIREWALL_CSSA_ADD) | ((val << 8) & FIREWALL_CSSA_ADD);
+}
+static inline uint32_t firewall_cssa_get_add(void) { return (FIREWALL.CSSA & FIREWALL_CSSA_ADD) >> 8; }
+
+// FIREWALL->CSL Code segment length
+enum {
+	FIREWALL_CSL_LENG = ((1UL << 14) - 1) << 8,	 // code segment length
+};
+static inline void firewall_csl_set_leng(uint32_t val) {
+	FIREWALL.CSL = (FIREWALL.CSL & ~FIREWALL_CSL_LENG) | ((val << 8) & FIREWALL_CSL_LENG);
+}
+static inline uint32_t firewall_csl_get_leng(void) { return (FIREWALL.CSL & FIREWALL_CSL_LENG) >> 8; }
+
+// FIREWALL->NVDSSA Non-volatile data segment start address
+enum {
+	FIREWALL_NVDSSA_ADD = ((1UL << 16) - 1) << 8,  // Non-volatile data segment start address
+};
+static inline void firewall_nvdssa_set_add(uint32_t val) {
+	FIREWALL.NVDSSA = (FIREWALL.NVDSSA & ~FIREWALL_NVDSSA_ADD) | ((val << 8) & FIREWALL_NVDSSA_ADD);
+}
+static inline uint32_t firewall_nvdssa_get_add(void) { return (FIREWALL.NVDSSA & FIREWALL_NVDSSA_ADD) >> 8; }
+
+// FIREWALL->NVDSL Non-volatile data segment length
+enum {
+	FIREWALL_NVDSL_LENG = ((1UL << 14) - 1) << 8,  // Non-volatile data segment length
+};
+static inline void firewall_nvdsl_set_leng(uint32_t val) {
+	FIREWALL.NVDSL = (FIREWALL.NVDSL & ~FIREWALL_NVDSL_LENG) | ((val << 8) & FIREWALL_NVDSL_LENG);
+}
+static inline uint32_t firewall_nvdsl_get_leng(void) { return (FIREWALL.NVDSL & FIREWALL_NVDSL_LENG) >> 8; }
+
+// FIREWALL->VDSSA Volatile data segment start address
+enum {
+	FIREWALL_VDSSA_ADD = ((1UL << 10) - 1) << 6,  // Volatile data segment start address
+};
+static inline void firewall_vdssa_set_add(uint32_t val) {
+	FIREWALL.VDSSA = (FIREWALL.VDSSA & ~FIREWALL_VDSSA_ADD) | ((val << 6) & FIREWALL_VDSSA_ADD);
+}
+static inline uint32_t firewall_vdssa_get_add(void) { return (FIREWALL.VDSSA & FIREWALL_VDSSA_ADD) >> 6; }
+
+// FIREWALL->VDSL Volatile data segment length
+enum {
+	FIREWALL_VDSL_LENG = ((1UL << 10) - 1) << 6,  // Non-volatile data segment length
+};
+static inline void firewall_vdsl_set_leng(uint32_t val) {
+	FIREWALL.VDSL = (FIREWALL.VDSL & ~FIREWALL_VDSL_LENG) | ((val << 6) & FIREWALL_VDSL_LENG);
+}
+static inline uint32_t firewall_vdsl_get_leng(void) { return (FIREWALL.VDSL & FIREWALL_VDSL_LENG) >> 6; }
+
+// FIREWALL->CR Configuration register
+enum {
+	FIREWALL_CR_VDE = 1UL << 2,	 // Volatile data execution
+	FIREWALL_CR_VDS = 1UL << 1,	 // Volatile data shared
+	FIREWALL_CR_FPA = 1UL << 0,	 // Firewall pre alarm
+};
+
 /* Flash
 There is only one peripheral of type FLASH. */
 struct FLASH_Type {
-	__IO uint16_t ACR;			  // @0 Access control register
-	uint8_t		  RESERVED0[2];	  // @2
+	__IO uint32_t ACR;			  // @0 Access control register
 	__O uint32_t  PDKEYR;		  // @4 Power down key register
 	__O uint32_t  KEYR;			  // @8 Flash key register
 	__O uint32_t  OPTKEYR;		  // @12 Option byte key register
 	__IO uint32_t SR;			  // @16 Status register
 	__IO uint32_t CR;			  // @20 Flash control register
 	__IO uint32_t ECCR;			  // @24 Flash ECC register
-	uint8_t		  RESERVED1[4];	  // @28
+	uint8_t		  RESERVED0[4];	  // @28
 	__IO uint32_t OPTR;			  // @32 Flash option register
-	__IO uint16_t PCROP1SR;		  // @36 Flash Bank 1 PCROP Start address register
-	uint8_t		  RESERVED2[2];	  // @38
+	__IO uint32_t PCROP1SR;		  // @36 Flash Bank 1 PCROP Start address register
 	__IO uint32_t PCROP1ER;		  // @40 Flash Bank 1 PCROP End address register
 	__IO uint32_t WRP1AR;		  // @44 Flash Bank 1 WRP area A address register
 	__IO uint32_t WRP1BR;		  // @48 Flash Bank 1 WRP area B address register
-	uint8_t		  RESERVED3[16];  // @52
-	__IO uint16_t PCROP2SR;		  // @68 Flash Bank 2 PCROP Start address register
-	uint8_t		  RESERVED4[2];	  // @70
-	__IO uint16_t PCROP2ER;		  // @72 Flash Bank 2 PCROP End address register
-	uint8_t		  RESERVED5[2];	  // @74
+	uint8_t		  RESERVED1[16];  // @52
+	__IO uint32_t PCROP2SR;		  // @68 Flash Bank 2 PCROP Start address register
+	__IO uint32_t PCROP2ER;		  // @72 Flash Bank 2 PCROP End address register
 	__IO uint32_t WRP2AR;		  // @76 Flash Bank 2 WRP area A address register
 	__IO uint32_t WRP2BR;		  // @80 Flash Bank 2 WRP area B address register
 };
@@ -2317,6 +2079,15 @@ static inline void flash_optr_set_rdp(uint32_t val) { FLASH.OPTR = (FLASH.OPTR &
 static inline uint32_t flash_optr_get_bor_lev(void) { return (FLASH.OPTR & FLASH_OPTR_BOR_LEV) >> 8; }
 static inline uint32_t flash_optr_get_rdp(void) { return (FLASH.OPTR & FLASH_OPTR_RDP) >> 0; }
 
+// FLASH->PCROP1SR Flash Bank 1 PCROP Start address register
+enum {
+	FLASH_PCROP1SR_PCROP1_STRT = ((1UL << 16) - 1) << 0,  // Bank 1 PCROP area start offset
+};
+static inline void flash_pcrop1sr_set_pcrop1_strt(uint32_t val) {
+	FLASH.PCROP1SR = (FLASH.PCROP1SR & ~FLASH_PCROP1SR_PCROP1_STRT) | ((val << 0) & FLASH_PCROP1SR_PCROP1_STRT);
+}
+static inline uint32_t flash_pcrop1sr_get_pcrop1_strt(void) { return (FLASH.PCROP1SR & FLASH_PCROP1SR_PCROP1_STRT) >> 0; }
+
 // FLASH->PCROP1ER Flash Bank 1 PCROP End address register
 enum {
 	FLASH_PCROP1ER_PCROP_RDP  = 1UL << 31,				 // PCROP area preserved when RDP level decreased
@@ -2355,6 +2126,24 @@ static inline void flash_wrp1br_set_wrp1b_end(uint32_t val) {
 static inline uint32_t flash_wrp1br_get_wrp1b_strt(void) { return (FLASH.WRP1BR & FLASH_WRP1BR_WRP1B_STRT) >> 16; }
 static inline uint32_t flash_wrp1br_get_wrp1b_end(void) { return (FLASH.WRP1BR & FLASH_WRP1BR_WRP1B_END) >> 0; }
 
+// FLASH->PCROP2SR Flash Bank 2 PCROP Start address register
+enum {
+	FLASH_PCROP2SR_PCROP2_STRT = ((1UL << 16) - 1) << 0,  // Bank 2 PCROP area start offset
+};
+static inline void flash_pcrop2sr_set_pcrop2_strt(uint32_t val) {
+	FLASH.PCROP2SR = (FLASH.PCROP2SR & ~FLASH_PCROP2SR_PCROP2_STRT) | ((val << 0) & FLASH_PCROP2SR_PCROP2_STRT);
+}
+static inline uint32_t flash_pcrop2sr_get_pcrop2_strt(void) { return (FLASH.PCROP2SR & FLASH_PCROP2SR_PCROP2_STRT) >> 0; }
+
+// FLASH->PCROP2ER Flash Bank 2 PCROP End address register
+enum {
+	FLASH_PCROP2ER_PCROP2_END = ((1UL << 16) - 1) << 0,	 // Bank 2 PCROP area end offset
+};
+static inline void flash_pcrop2er_set_pcrop2_end(uint32_t val) {
+	FLASH.PCROP2ER = (FLASH.PCROP2ER & ~FLASH_PCROP2ER_PCROP2_END) | ((val << 0) & FLASH_PCROP2ER_PCROP2_END);
+}
+static inline uint32_t flash_pcrop2er_get_pcrop2_end(void) { return (FLASH.PCROP2ER & FLASH_PCROP2ER_PCROP2_END) >> 0; }
+
 // FLASH->WRP2AR Flash Bank 2 WRP area A address register
 enum {
 	FLASH_WRP2AR_WRP2A_END	= ((1UL << 8) - 1) << 16,  // Bank 2 WRP first area A end offset
@@ -2383,6 +2172,59 @@ static inline void flash_wrp2br_set_wrp2b_strt(uint32_t val) {
 static inline uint32_t flash_wrp2br_get_wrp2b_end(void) { return (FLASH.WRP2BR & FLASH_WRP2BR_WRP2B_END) >> 16; }
 static inline uint32_t flash_wrp2br_get_wrp2b_strt(void) { return (FLASH.WRP2BR & FLASH_WRP2BR_WRP2B_STRT) >> 0; }
 
+/* Floting point unit
+There is only one peripheral of type FPU. */
+struct FPU_Type {
+	__IO uint32_t FPCCR;  // @0 Floating-point context control register
+	__IO uint32_t FPCAR;  // @4 Floating-point context address register
+	__IO uint32_t FPSCR;  // @8 Floating-point status control register
+};
+extern struct FPU_Type FPU;	 // @0xE000EF34
+
+// FPU->FPCCR Floating-point context control register
+enum {
+	FPU_FPCCR_ASPEN	 = 1UL << 31,  // ASPEN
+	FPU_FPCCR_LSPEN	 = 1UL << 30,  // LSPEN
+	FPU_FPCCR_MONRDY = 1UL << 8,   // MONRDY
+	FPU_FPCCR_BFRDY	 = 1UL << 6,   // BFRDY
+	FPU_FPCCR_MMRDY	 = 1UL << 5,   // MMRDY
+	FPU_FPCCR_HFRDY	 = 1UL << 4,   // HFRDY
+	FPU_FPCCR_THREAD = 1UL << 3,   // THREAD
+	FPU_FPCCR_USER	 = 1UL << 1,   // USER
+	FPU_FPCCR_LSPACT = 1UL << 0,   // LSPACT
+};
+
+// FPU->FPCAR Floating-point context address register
+enum {
+	FPU_FPCAR_ADDRESS = ((1UL << 29) - 1) << 3,	 // Location of unpopulated floating-point
+};
+static inline void fpu_fpcar_set_address(uint32_t val) {
+	FPU.FPCAR = (FPU.FPCAR & ~FPU_FPCAR_ADDRESS) | ((val << 3) & FPU_FPCAR_ADDRESS);
+}
+static inline uint32_t fpu_fpcar_get_address(void) { return (FPU.FPCAR & FPU_FPCAR_ADDRESS) >> 3; }
+
+// FPU->FPSCR Floating-point status control register
+enum {
+	FPU_FPSCR_N		= 1UL << 31,			   // Negative condition code flag
+	FPU_FPSCR_Z		= 1UL << 30,			   // Zero condition code flag
+	FPU_FPSCR_C		= 1UL << 29,			   // Carry condition code flag
+	FPU_FPSCR_V		= 1UL << 28,			   // Overflow condition code flag
+	FPU_FPSCR_AHP	= 1UL << 26,			   // Alternative half-precision control bit
+	FPU_FPSCR_DN	= 1UL << 25,			   // Default NaN mode control bit
+	FPU_FPSCR_FZ	= 1UL << 24,			   // Flush-to-zero mode control bit:
+	FPU_FPSCR_RMODE = ((1UL << 2) - 1) << 22,  // Rounding Mode control field
+	FPU_FPSCR_IDC	= 1UL << 7,				   // Input denormal cumulative exception bit.
+	FPU_FPSCR_IXC	= 1UL << 4,				   // Inexact cumulative exception bit
+	FPU_FPSCR_UFC	= 1UL << 3,				   // Underflow cumulative exception bit
+	FPU_FPSCR_OFC	= 1UL << 2,				   // Overflow cumulative exception bit
+	FPU_FPSCR_DZC	= 1UL << 1,				   // Division by zero cumulative exception bit.
+	FPU_FPSCR_IOC	= 1UL << 0,				   // Invalid operation cumulative exception bit
+};
+static inline void fpu_fpscr_set_rmode(uint32_t val) {
+	FPU.FPSCR = (FPU.FPSCR & ~FPU_FPSCR_RMODE) | ((val << 22) & FPU_FPSCR_RMODE);
+}
+static inline uint32_t fpu_fpscr_get_rmode(void) { return (FPU.FPSCR & FPU_FPSCR_RMODE) >> 22; }
+
 /* Floating point unit CPACR
 There is only one peripheral of type FPU_CPACR. */
 struct FPU_CPACR_Type {
@@ -2400,448 +2242,462 @@ static inline void fpu_cpacr_cpacr_set_cp(uint32_t val) {
 static inline uint32_t fpu_cpacr_cpacr_get_cp(void) { return (FPU_CPACR.CPACR & FPU_CPACR_CPACR_CP) >> 20; }
 
 /* General-purpose I/Os */
-struct GPIOE_Type {
-	__IO uint32_t MODER;		 // @0 GPIO port mode register
-	__IO uint16_t OTYPER;		 // @4 GPIO port output type register
-	uint8_t		  RESERVED0[2];	 // @6
-	__IO uint32_t OSPEEDR;		 // @8 GPIO port output speed register
-	__IO uint32_t PUPDR;		 // @12 GPIO port pull-up/pull-down register
-	__I uint16_t  IDR;			 // @16 GPIO port input data register
-	uint8_t		  RESERVED1[2];	 // @18
-	__IO uint16_t ODR;			 // @20 GPIO port output data register
-	uint8_t		  RESERVED2[2];	 // @22
-	__O uint32_t  BSRR;			 // @24 GPIO port bit set/reset register
-	__IO uint32_t LCKR;			 // @28 GPIO port configuration lock register
-	__IO uint32_t AFRL;			 // @32 GPIO alternate function low register
-	__IO uint32_t AFRH;			 // @36 GPIO alternate function high register
+struct GPIOA_Type {
+	__IO uint32_t MODER;	// @0 GPIO port mode register
+	__IO uint32_t OTYPER;	// @4 GPIO port output type register
+	__IO uint32_t OSPEEDR;	// @8 GPIO port output speed register
+	__IO uint32_t PUPDR;	// @12 GPIO port pull-up/pull-down register
+	__I uint32_t  IDR;		// @16 GPIO port input data register
+	__IO uint32_t ODR;		// @20 GPIO port output data register
+	__O uint32_t  BSRR;		// @24 GPIO port bit set/reset register
+	__IO uint32_t LCKR;		// @28 GPIO port configuration lock register
+	__IO uint32_t AFRL;		// @32 GPIO alternate function low register
+	__IO uint32_t AFRH;		// @36 GPIO alternate function high register
 };
-extern struct GPIOE_Type GPIOA;	 // @0x48000000
-extern struct GPIOE_Type GPIOB;	 // @0x48000400
-extern struct GPIOE_Type GPIOC;	 // @0x48000800
-extern struct GPIOE_Type GPIOD;	 // @0x48000C00
-extern struct GPIOE_Type GPIOE;	 // @0x48001000
-extern struct GPIOE_Type GPIOH;	 // @0x48001C00
+extern struct GPIOA_Type GPIOA;	 // @0x48000000
+extern struct GPIOA_Type GPIOB;	 // @0x48000400
+extern struct GPIOA_Type GPIOC;	 // @0x48000800
+extern struct GPIOA_Type GPIOD;	 // @0x48000C00
+extern struct GPIOA_Type GPIOE;	 // @0x48001000
+extern struct GPIOA_Type GPIOH;	 // @0x48001C00
 
-// GPIOE->MODER GPIO port mode register
+// GPIOA->MODER GPIO port mode register
 enum {
-	GPIOE_MODER_MODER15 = ((1UL << 2) - 1) << 30,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER14 = ((1UL << 2) - 1) << 28,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER13 = ((1UL << 2) - 1) << 26,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER12 = ((1UL << 2) - 1) << 24,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER11 = ((1UL << 2) - 1) << 22,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER10 = ((1UL << 2) - 1) << 20,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER9	= ((1UL << 2) - 1) << 18,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER8	= ((1UL << 2) - 1) << 16,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER7	= ((1UL << 2) - 1) << 14,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER6	= ((1UL << 2) - 1) << 12,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER5	= ((1UL << 2) - 1) << 10,  // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER4	= ((1UL << 2) - 1) << 8,   // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER3	= ((1UL << 2) - 1) << 6,   // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER2	= ((1UL << 2) - 1) << 4,   // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER1	= ((1UL << 2) - 1) << 2,   // Port x configuration bits (y = 0..15)
-	GPIOE_MODER_MODER0	= ((1UL << 2) - 1) << 0,   // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER15 = ((1UL << 2) - 1) << 30,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER14 = ((1UL << 2) - 1) << 28,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER13 = ((1UL << 2) - 1) << 26,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER12 = ((1UL << 2) - 1) << 24,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER11 = ((1UL << 2) - 1) << 22,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER10 = ((1UL << 2) - 1) << 20,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER9	= ((1UL << 2) - 1) << 18,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER8	= ((1UL << 2) - 1) << 16,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER7	= ((1UL << 2) - 1) << 14,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER6	= ((1UL << 2) - 1) << 12,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER5	= ((1UL << 2) - 1) << 10,  // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER4	= ((1UL << 2) - 1) << 8,   // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER3	= ((1UL << 2) - 1) << 6,   // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER2	= ((1UL << 2) - 1) << 4,   // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER1	= ((1UL << 2) - 1) << 2,   // Port x configuration bits (y = 0..15)
+	GPIOA_MODER_MODER0	= ((1UL << 2) - 1) << 0,   // Port x configuration bits (y = 0..15)
 };
-static inline void gpioe_moder_set_moder15(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER15) | ((val << 30) & GPIOE_MODER_MODER15);
+static inline void gpioa_moder_set_moder15(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER15) | ((val << 30) & GPIOA_MODER_MODER15);
 }
-static inline void gpioe_moder_set_moder14(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER14) | ((val << 28) & GPIOE_MODER_MODER14);
+static inline void gpioa_moder_set_moder14(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER14) | ((val << 28) & GPIOA_MODER_MODER14);
 }
-static inline void gpioe_moder_set_moder13(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER13) | ((val << 26) & GPIOE_MODER_MODER13);
+static inline void gpioa_moder_set_moder13(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER13) | ((val << 26) & GPIOA_MODER_MODER13);
 }
-static inline void gpioe_moder_set_moder12(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER12) | ((val << 24) & GPIOE_MODER_MODER12);
+static inline void gpioa_moder_set_moder12(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER12) | ((val << 24) & GPIOA_MODER_MODER12);
 }
-static inline void gpioe_moder_set_moder11(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER11) | ((val << 22) & GPIOE_MODER_MODER11);
+static inline void gpioa_moder_set_moder11(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER11) | ((val << 22) & GPIOA_MODER_MODER11);
 }
-static inline void gpioe_moder_set_moder10(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER10) | ((val << 20) & GPIOE_MODER_MODER10);
+static inline void gpioa_moder_set_moder10(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER10) | ((val << 20) & GPIOA_MODER_MODER10);
 }
-static inline void gpioe_moder_set_moder9(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER9) | ((val << 18) & GPIOE_MODER_MODER9);
+static inline void gpioa_moder_set_moder9(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER9) | ((val << 18) & GPIOA_MODER_MODER9);
 }
-static inline void gpioe_moder_set_moder8(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER8) | ((val << 16) & GPIOE_MODER_MODER8);
+static inline void gpioa_moder_set_moder8(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER8) | ((val << 16) & GPIOA_MODER_MODER8);
 }
-static inline void gpioe_moder_set_moder7(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER7) | ((val << 14) & GPIOE_MODER_MODER7);
+static inline void gpioa_moder_set_moder7(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER7) | ((val << 14) & GPIOA_MODER_MODER7);
 }
-static inline void gpioe_moder_set_moder6(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER6) | ((val << 12) & GPIOE_MODER_MODER6);
+static inline void gpioa_moder_set_moder6(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER6) | ((val << 12) & GPIOA_MODER_MODER6);
 }
-static inline void gpioe_moder_set_moder5(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER5) | ((val << 10) & GPIOE_MODER_MODER5);
+static inline void gpioa_moder_set_moder5(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER5) | ((val << 10) & GPIOA_MODER_MODER5);
 }
-static inline void gpioe_moder_set_moder4(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER4) | ((val << 8) & GPIOE_MODER_MODER4);
+static inline void gpioa_moder_set_moder4(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER4) | ((val << 8) & GPIOA_MODER_MODER4);
 }
-static inline void gpioe_moder_set_moder3(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER3) | ((val << 6) & GPIOE_MODER_MODER3);
+static inline void gpioa_moder_set_moder3(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER3) | ((val << 6) & GPIOA_MODER_MODER3);
 }
-static inline void gpioe_moder_set_moder2(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER2) | ((val << 4) & GPIOE_MODER_MODER2);
+static inline void gpioa_moder_set_moder2(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER2) | ((val << 4) & GPIOA_MODER_MODER2);
 }
-static inline void gpioe_moder_set_moder1(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER1) | ((val << 2) & GPIOE_MODER_MODER1);
+static inline void gpioa_moder_set_moder1(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER1) | ((val << 2) & GPIOA_MODER_MODER1);
 }
-static inline void gpioe_moder_set_moder0(struct GPIOE_Type *p, uint32_t val) {
-	p->MODER = (p->MODER & ~GPIOE_MODER_MODER0) | ((val << 0) & GPIOE_MODER_MODER0);
+static inline void gpioa_moder_set_moder0(struct GPIOA_Type *p, uint32_t val) {
+	p->MODER = (p->MODER & ~GPIOA_MODER_MODER0) | ((val << 0) & GPIOA_MODER_MODER0);
 }
-static inline uint32_t gpioe_moder_get_moder15(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER15) >> 30; }
-static inline uint32_t gpioe_moder_get_moder14(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER14) >> 28; }
-static inline uint32_t gpioe_moder_get_moder13(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER13) >> 26; }
-static inline uint32_t gpioe_moder_get_moder12(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER12) >> 24; }
-static inline uint32_t gpioe_moder_get_moder11(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER11) >> 22; }
-static inline uint32_t gpioe_moder_get_moder10(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER10) >> 20; }
-static inline uint32_t gpioe_moder_get_moder9(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER9) >> 18; }
-static inline uint32_t gpioe_moder_get_moder8(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER8) >> 16; }
-static inline uint32_t gpioe_moder_get_moder7(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER7) >> 14; }
-static inline uint32_t gpioe_moder_get_moder6(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER6) >> 12; }
-static inline uint32_t gpioe_moder_get_moder5(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER5) >> 10; }
-static inline uint32_t gpioe_moder_get_moder4(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER4) >> 8; }
-static inline uint32_t gpioe_moder_get_moder3(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER3) >> 6; }
-static inline uint32_t gpioe_moder_get_moder2(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER2) >> 4; }
-static inline uint32_t gpioe_moder_get_moder1(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER1) >> 2; }
-static inline uint32_t gpioe_moder_get_moder0(struct GPIOE_Type *p) { return (p->MODER & GPIOE_MODER_MODER0) >> 0; }
+static inline uint32_t gpioa_moder_get_moder15(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER15) >> 30; }
+static inline uint32_t gpioa_moder_get_moder14(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER14) >> 28; }
+static inline uint32_t gpioa_moder_get_moder13(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER13) >> 26; }
+static inline uint32_t gpioa_moder_get_moder12(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER12) >> 24; }
+static inline uint32_t gpioa_moder_get_moder11(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER11) >> 22; }
+static inline uint32_t gpioa_moder_get_moder10(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER10) >> 20; }
+static inline uint32_t gpioa_moder_get_moder9(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER9) >> 18; }
+static inline uint32_t gpioa_moder_get_moder8(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER8) >> 16; }
+static inline uint32_t gpioa_moder_get_moder7(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER7) >> 14; }
+static inline uint32_t gpioa_moder_get_moder6(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER6) >> 12; }
+static inline uint32_t gpioa_moder_get_moder5(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER5) >> 10; }
+static inline uint32_t gpioa_moder_get_moder4(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER4) >> 8; }
+static inline uint32_t gpioa_moder_get_moder3(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER3) >> 6; }
+static inline uint32_t gpioa_moder_get_moder2(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER2) >> 4; }
+static inline uint32_t gpioa_moder_get_moder1(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER1) >> 2; }
+static inline uint32_t gpioa_moder_get_moder0(struct GPIOA_Type *p) { return (p->MODER & GPIOA_MODER_MODER0) >> 0; }
 
-// GPIOE->OSPEEDR GPIO port output speed register
+// GPIOA->OTYPER GPIO port output type register
 enum {
-	GPIOE_OSPEEDR_OSPEEDR15 = ((1UL << 2) - 1) << 30,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR14 = ((1UL << 2) - 1) << 28,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR13 = ((1UL << 2) - 1) << 26,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR12 = ((1UL << 2) - 1) << 24,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR11 = ((1UL << 2) - 1) << 22,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR10 = ((1UL << 2) - 1) << 20,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR9	= ((1UL << 2) - 1) << 18,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR8	= ((1UL << 2) - 1) << 16,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR7	= ((1UL << 2) - 1) << 14,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR6	= ((1UL << 2) - 1) << 12,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR5	= ((1UL << 2) - 1) << 10,  // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR4	= ((1UL << 2) - 1) << 8,   // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR3	= ((1UL << 2) - 1) << 6,   // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR2	= ((1UL << 2) - 1) << 4,   // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR1	= ((1UL << 2) - 1) << 2,   // Port x configuration bits (y = 0..15)
-	GPIOE_OSPEEDR_OSPEEDR0	= ((1UL << 2) - 1) << 0,   // Port x configuration bits (y = 0..15)
+	GPIOA_OTYPER_OTX = ((1UL << 16) - 1) << 0,	// Merged Port x configuration bits (y = 0..15)
 };
-static inline void gpioe_ospeedr_set_ospeedr15(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR15) | ((val << 30) & GPIOE_OSPEEDR_OSPEEDR15);
+static inline void gpioa_otyper_set_otx(struct GPIOA_Type *p, uint32_t val) {
+	p->OTYPER = (p->OTYPER & ~GPIOA_OTYPER_OTX) | ((val << 0) & GPIOA_OTYPER_OTX);
 }
-static inline void gpioe_ospeedr_set_ospeedr14(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR14) | ((val << 28) & GPIOE_OSPEEDR_OSPEEDR14);
-}
-static inline void gpioe_ospeedr_set_ospeedr13(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR13) | ((val << 26) & GPIOE_OSPEEDR_OSPEEDR13);
-}
-static inline void gpioe_ospeedr_set_ospeedr12(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR12) | ((val << 24) & GPIOE_OSPEEDR_OSPEEDR12);
-}
-static inline void gpioe_ospeedr_set_ospeedr11(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR11) | ((val << 22) & GPIOE_OSPEEDR_OSPEEDR11);
-}
-static inline void gpioe_ospeedr_set_ospeedr10(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR10) | ((val << 20) & GPIOE_OSPEEDR_OSPEEDR10);
-}
-static inline void gpioe_ospeedr_set_ospeedr9(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR9) | ((val << 18) & GPIOE_OSPEEDR_OSPEEDR9);
-}
-static inline void gpioe_ospeedr_set_ospeedr8(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR8) | ((val << 16) & GPIOE_OSPEEDR_OSPEEDR8);
-}
-static inline void gpioe_ospeedr_set_ospeedr7(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR7) | ((val << 14) & GPIOE_OSPEEDR_OSPEEDR7);
-}
-static inline void gpioe_ospeedr_set_ospeedr6(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR6) | ((val << 12) & GPIOE_OSPEEDR_OSPEEDR6);
-}
-static inline void gpioe_ospeedr_set_ospeedr5(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR5) | ((val << 10) & GPIOE_OSPEEDR_OSPEEDR5);
-}
-static inline void gpioe_ospeedr_set_ospeedr4(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR4) | ((val << 8) & GPIOE_OSPEEDR_OSPEEDR4);
-}
-static inline void gpioe_ospeedr_set_ospeedr3(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR3) | ((val << 6) & GPIOE_OSPEEDR_OSPEEDR3);
-}
-static inline void gpioe_ospeedr_set_ospeedr2(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR2) | ((val << 4) & GPIOE_OSPEEDR_OSPEEDR2);
-}
-static inline void gpioe_ospeedr_set_ospeedr1(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR1) | ((val << 2) & GPIOE_OSPEEDR_OSPEEDR1);
-}
-static inline void gpioe_ospeedr_set_ospeedr0(struct GPIOE_Type *p, uint32_t val) {
-	p->OSPEEDR = (p->OSPEEDR & ~GPIOE_OSPEEDR_OSPEEDR0) | ((val << 0) & GPIOE_OSPEEDR_OSPEEDR0);
-}
-static inline uint32_t gpioe_ospeedr_get_ospeedr15(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR15) >> 30; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr14(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR14) >> 28; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr13(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR13) >> 26; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr12(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR12) >> 24; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr11(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR11) >> 22; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr10(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR10) >> 20; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr9(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR9) >> 18; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr8(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR8) >> 16; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr7(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR7) >> 14; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr6(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR6) >> 12; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr5(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR5) >> 10; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr4(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR4) >> 8; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr3(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR3) >> 6; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr2(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR2) >> 4; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr1(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR1) >> 2; }
-static inline uint32_t gpioe_ospeedr_get_ospeedr0(struct GPIOE_Type *p) { return (p->OSPEEDR & GPIOE_OSPEEDR_OSPEEDR0) >> 0; }
+static inline uint32_t gpioa_otyper_get_otx(struct GPIOA_Type *p) { return (p->OTYPER & GPIOA_OTYPER_OTX) >> 0; }
 
-// GPIOE->PUPDR GPIO port pull-up/pull-down register
+// GPIOA->OSPEEDR GPIO port output speed register
 enum {
-	GPIOE_PUPDR_PUPDR15 = ((1UL << 2) - 1) << 30,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR14 = ((1UL << 2) - 1) << 28,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR13 = ((1UL << 2) - 1) << 26,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR12 = ((1UL << 2) - 1) << 24,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR11 = ((1UL << 2) - 1) << 22,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR10 = ((1UL << 2) - 1) << 20,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR9	= ((1UL << 2) - 1) << 18,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR8	= ((1UL << 2) - 1) << 16,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR7	= ((1UL << 2) - 1) << 14,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR6	= ((1UL << 2) - 1) << 12,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR5	= ((1UL << 2) - 1) << 10,  // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR4	= ((1UL << 2) - 1) << 8,   // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR3	= ((1UL << 2) - 1) << 6,   // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR2	= ((1UL << 2) - 1) << 4,   // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR1	= ((1UL << 2) - 1) << 2,   // Port x configuration bits (y = 0..15)
-	GPIOE_PUPDR_PUPDR0	= ((1UL << 2) - 1) << 0,   // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR15 = ((1UL << 2) - 1) << 30,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR14 = ((1UL << 2) - 1) << 28,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR13 = ((1UL << 2) - 1) << 26,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR12 = ((1UL << 2) - 1) << 24,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR11 = ((1UL << 2) - 1) << 22,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR10 = ((1UL << 2) - 1) << 20,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR9	= ((1UL << 2) - 1) << 18,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR8	= ((1UL << 2) - 1) << 16,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR7	= ((1UL << 2) - 1) << 14,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR6	= ((1UL << 2) - 1) << 12,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR5	= ((1UL << 2) - 1) << 10,  // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR4	= ((1UL << 2) - 1) << 8,   // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR3	= ((1UL << 2) - 1) << 6,   // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR2	= ((1UL << 2) - 1) << 4,   // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR1	= ((1UL << 2) - 1) << 2,   // Port x configuration bits (y = 0..15)
+	GPIOA_OSPEEDR_OSPEEDR0	= ((1UL << 2) - 1) << 0,   // Port x configuration bits (y = 0..15)
 };
-static inline void gpioe_pupdr_set_pupdr15(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR15) | ((val << 30) & GPIOE_PUPDR_PUPDR15);
+static inline void gpioa_ospeedr_set_ospeedr15(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR15) | ((val << 30) & GPIOA_OSPEEDR_OSPEEDR15);
 }
-static inline void gpioe_pupdr_set_pupdr14(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR14) | ((val << 28) & GPIOE_PUPDR_PUPDR14);
+static inline void gpioa_ospeedr_set_ospeedr14(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR14) | ((val << 28) & GPIOA_OSPEEDR_OSPEEDR14);
 }
-static inline void gpioe_pupdr_set_pupdr13(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR13) | ((val << 26) & GPIOE_PUPDR_PUPDR13);
+static inline void gpioa_ospeedr_set_ospeedr13(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR13) | ((val << 26) & GPIOA_OSPEEDR_OSPEEDR13);
 }
-static inline void gpioe_pupdr_set_pupdr12(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR12) | ((val << 24) & GPIOE_PUPDR_PUPDR12);
+static inline void gpioa_ospeedr_set_ospeedr12(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR12) | ((val << 24) & GPIOA_OSPEEDR_OSPEEDR12);
 }
-static inline void gpioe_pupdr_set_pupdr11(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR11) | ((val << 22) & GPIOE_PUPDR_PUPDR11);
+static inline void gpioa_ospeedr_set_ospeedr11(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR11) | ((val << 22) & GPIOA_OSPEEDR_OSPEEDR11);
 }
-static inline void gpioe_pupdr_set_pupdr10(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR10) | ((val << 20) & GPIOE_PUPDR_PUPDR10);
+static inline void gpioa_ospeedr_set_ospeedr10(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR10) | ((val << 20) & GPIOA_OSPEEDR_OSPEEDR10);
 }
-static inline void gpioe_pupdr_set_pupdr9(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR9) | ((val << 18) & GPIOE_PUPDR_PUPDR9);
+static inline void gpioa_ospeedr_set_ospeedr9(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR9) | ((val << 18) & GPIOA_OSPEEDR_OSPEEDR9);
 }
-static inline void gpioe_pupdr_set_pupdr8(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR8) | ((val << 16) & GPIOE_PUPDR_PUPDR8);
+static inline void gpioa_ospeedr_set_ospeedr8(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR8) | ((val << 16) & GPIOA_OSPEEDR_OSPEEDR8);
 }
-static inline void gpioe_pupdr_set_pupdr7(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR7) | ((val << 14) & GPIOE_PUPDR_PUPDR7);
+static inline void gpioa_ospeedr_set_ospeedr7(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR7) | ((val << 14) & GPIOA_OSPEEDR_OSPEEDR7);
 }
-static inline void gpioe_pupdr_set_pupdr6(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR6) | ((val << 12) & GPIOE_PUPDR_PUPDR6);
+static inline void gpioa_ospeedr_set_ospeedr6(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR6) | ((val << 12) & GPIOA_OSPEEDR_OSPEEDR6);
 }
-static inline void gpioe_pupdr_set_pupdr5(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR5) | ((val << 10) & GPIOE_PUPDR_PUPDR5);
+static inline void gpioa_ospeedr_set_ospeedr5(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR5) | ((val << 10) & GPIOA_OSPEEDR_OSPEEDR5);
 }
-static inline void gpioe_pupdr_set_pupdr4(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR4) | ((val << 8) & GPIOE_PUPDR_PUPDR4);
+static inline void gpioa_ospeedr_set_ospeedr4(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR4) | ((val << 8) & GPIOA_OSPEEDR_OSPEEDR4);
 }
-static inline void gpioe_pupdr_set_pupdr3(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR3) | ((val << 6) & GPIOE_PUPDR_PUPDR3);
+static inline void gpioa_ospeedr_set_ospeedr3(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR3) | ((val << 6) & GPIOA_OSPEEDR_OSPEEDR3);
 }
-static inline void gpioe_pupdr_set_pupdr2(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR2) | ((val << 4) & GPIOE_PUPDR_PUPDR2);
+static inline void gpioa_ospeedr_set_ospeedr2(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR2) | ((val << 4) & GPIOA_OSPEEDR_OSPEEDR2);
 }
-static inline void gpioe_pupdr_set_pupdr1(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR1) | ((val << 2) & GPIOE_PUPDR_PUPDR1);
+static inline void gpioa_ospeedr_set_ospeedr1(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR1) | ((val << 2) & GPIOA_OSPEEDR_OSPEEDR1);
 }
-static inline void gpioe_pupdr_set_pupdr0(struct GPIOE_Type *p, uint32_t val) {
-	p->PUPDR = (p->PUPDR & ~GPIOE_PUPDR_PUPDR0) | ((val << 0) & GPIOE_PUPDR_PUPDR0);
+static inline void gpioa_ospeedr_set_ospeedr0(struct GPIOA_Type *p, uint32_t val) {
+	p->OSPEEDR = (p->OSPEEDR & ~GPIOA_OSPEEDR_OSPEEDR0) | ((val << 0) & GPIOA_OSPEEDR_OSPEEDR0);
 }
-static inline uint32_t gpioe_pupdr_get_pupdr15(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR15) >> 30; }
-static inline uint32_t gpioe_pupdr_get_pupdr14(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR14) >> 28; }
-static inline uint32_t gpioe_pupdr_get_pupdr13(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR13) >> 26; }
-static inline uint32_t gpioe_pupdr_get_pupdr12(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR12) >> 24; }
-static inline uint32_t gpioe_pupdr_get_pupdr11(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR11) >> 22; }
-static inline uint32_t gpioe_pupdr_get_pupdr10(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR10) >> 20; }
-static inline uint32_t gpioe_pupdr_get_pupdr9(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR9) >> 18; }
-static inline uint32_t gpioe_pupdr_get_pupdr8(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR8) >> 16; }
-static inline uint32_t gpioe_pupdr_get_pupdr7(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR7) >> 14; }
-static inline uint32_t gpioe_pupdr_get_pupdr6(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR6) >> 12; }
-static inline uint32_t gpioe_pupdr_get_pupdr5(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR5) >> 10; }
-static inline uint32_t gpioe_pupdr_get_pupdr4(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR4) >> 8; }
-static inline uint32_t gpioe_pupdr_get_pupdr3(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR3) >> 6; }
-static inline uint32_t gpioe_pupdr_get_pupdr2(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR2) >> 4; }
-static inline uint32_t gpioe_pupdr_get_pupdr1(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR1) >> 2; }
-static inline uint32_t gpioe_pupdr_get_pupdr0(struct GPIOE_Type *p) { return (p->PUPDR & GPIOE_PUPDR_PUPDR0) >> 0; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr15(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR15) >> 30; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr14(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR14) >> 28; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr13(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR13) >> 26; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr12(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR12) >> 24; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr11(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR11) >> 22; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr10(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR10) >> 20; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr9(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR9) >> 18; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr8(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR8) >> 16; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr7(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR7) >> 14; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr6(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR6) >> 12; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr5(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR5) >> 10; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr4(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR4) >> 8; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr3(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR3) >> 6; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr2(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR2) >> 4; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr1(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR1) >> 2; }
+static inline uint32_t gpioa_ospeedr_get_ospeedr0(struct GPIOA_Type *p) { return (p->OSPEEDR & GPIOA_OSPEEDR_OSPEEDR0) >> 0; }
 
-// GPIOE->BSRR GPIO port bit set/reset register
+// GPIOA->PUPDR GPIO port pull-up/pull-down register
 enum {
-	GPIOE_BSRR_BR15 = 1UL << 31,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR14 = 1UL << 30,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR13 = 1UL << 29,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR12 = 1UL << 28,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR11 = 1UL << 27,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR10 = 1UL << 26,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR9	= 1UL << 25,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR8	= 1UL << 24,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR7	= 1UL << 23,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR6	= 1UL << 22,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR5	= 1UL << 21,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR4	= 1UL << 20,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR3	= 1UL << 19,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR2	= 1UL << 18,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR1	= 1UL << 17,  // Port x reset bit y (y = 0..15)
-	GPIOE_BSRR_BR0	= 1UL << 16,  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS15 = 1UL << 15,  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS14 = 1UL << 14,  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS13 = 1UL << 13,  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS12 = 1UL << 12,  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS11 = 1UL << 11,  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS10 = 1UL << 10,  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS9	= 1UL << 9,	  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS8	= 1UL << 8,	  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS7	= 1UL << 7,	  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS6	= 1UL << 6,	  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS5	= 1UL << 5,	  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS4	= 1UL << 4,	  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS3	= 1UL << 3,	  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS2	= 1UL << 2,	  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS1	= 1UL << 1,	  // Port x set bit y (y= 0..15)
-	GPIOE_BSRR_BS0	= 1UL << 0,	  // Port x set bit y (y= 0..15)
+	GPIOA_PUPDR_PUPDR15 = ((1UL << 2) - 1) << 30,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR14 = ((1UL << 2) - 1) << 28,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR13 = ((1UL << 2) - 1) << 26,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR12 = ((1UL << 2) - 1) << 24,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR11 = ((1UL << 2) - 1) << 22,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR10 = ((1UL << 2) - 1) << 20,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR9	= ((1UL << 2) - 1) << 18,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR8	= ((1UL << 2) - 1) << 16,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR7	= ((1UL << 2) - 1) << 14,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR6	= ((1UL << 2) - 1) << 12,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR5	= ((1UL << 2) - 1) << 10,  // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR4	= ((1UL << 2) - 1) << 8,   // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR3	= ((1UL << 2) - 1) << 6,   // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR2	= ((1UL << 2) - 1) << 4,   // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR1	= ((1UL << 2) - 1) << 2,   // Port x configuration bits (y = 0..15)
+	GPIOA_PUPDR_PUPDR0	= ((1UL << 2) - 1) << 0,   // Port x configuration bits (y = 0..15)
+};
+static inline void gpioa_pupdr_set_pupdr15(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR15) | ((val << 30) & GPIOA_PUPDR_PUPDR15);
+}
+static inline void gpioa_pupdr_set_pupdr14(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR14) | ((val << 28) & GPIOA_PUPDR_PUPDR14);
+}
+static inline void gpioa_pupdr_set_pupdr13(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR13) | ((val << 26) & GPIOA_PUPDR_PUPDR13);
+}
+static inline void gpioa_pupdr_set_pupdr12(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR12) | ((val << 24) & GPIOA_PUPDR_PUPDR12);
+}
+static inline void gpioa_pupdr_set_pupdr11(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR11) | ((val << 22) & GPIOA_PUPDR_PUPDR11);
+}
+static inline void gpioa_pupdr_set_pupdr10(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR10) | ((val << 20) & GPIOA_PUPDR_PUPDR10);
+}
+static inline void gpioa_pupdr_set_pupdr9(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR9) | ((val << 18) & GPIOA_PUPDR_PUPDR9);
+}
+static inline void gpioa_pupdr_set_pupdr8(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR8) | ((val << 16) & GPIOA_PUPDR_PUPDR8);
+}
+static inline void gpioa_pupdr_set_pupdr7(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR7) | ((val << 14) & GPIOA_PUPDR_PUPDR7);
+}
+static inline void gpioa_pupdr_set_pupdr6(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR6) | ((val << 12) & GPIOA_PUPDR_PUPDR6);
+}
+static inline void gpioa_pupdr_set_pupdr5(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR5) | ((val << 10) & GPIOA_PUPDR_PUPDR5);
+}
+static inline void gpioa_pupdr_set_pupdr4(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR4) | ((val << 8) & GPIOA_PUPDR_PUPDR4);
+}
+static inline void gpioa_pupdr_set_pupdr3(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR3) | ((val << 6) & GPIOA_PUPDR_PUPDR3);
+}
+static inline void gpioa_pupdr_set_pupdr2(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR2) | ((val << 4) & GPIOA_PUPDR_PUPDR2);
+}
+static inline void gpioa_pupdr_set_pupdr1(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR1) | ((val << 2) & GPIOA_PUPDR_PUPDR1);
+}
+static inline void gpioa_pupdr_set_pupdr0(struct GPIOA_Type *p, uint32_t val) {
+	p->PUPDR = (p->PUPDR & ~GPIOA_PUPDR_PUPDR0) | ((val << 0) & GPIOA_PUPDR_PUPDR0);
+}
+static inline uint32_t gpioa_pupdr_get_pupdr15(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR15) >> 30; }
+static inline uint32_t gpioa_pupdr_get_pupdr14(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR14) >> 28; }
+static inline uint32_t gpioa_pupdr_get_pupdr13(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR13) >> 26; }
+static inline uint32_t gpioa_pupdr_get_pupdr12(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR12) >> 24; }
+static inline uint32_t gpioa_pupdr_get_pupdr11(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR11) >> 22; }
+static inline uint32_t gpioa_pupdr_get_pupdr10(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR10) >> 20; }
+static inline uint32_t gpioa_pupdr_get_pupdr9(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR9) >> 18; }
+static inline uint32_t gpioa_pupdr_get_pupdr8(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR8) >> 16; }
+static inline uint32_t gpioa_pupdr_get_pupdr7(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR7) >> 14; }
+static inline uint32_t gpioa_pupdr_get_pupdr6(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR6) >> 12; }
+static inline uint32_t gpioa_pupdr_get_pupdr5(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR5) >> 10; }
+static inline uint32_t gpioa_pupdr_get_pupdr4(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR4) >> 8; }
+static inline uint32_t gpioa_pupdr_get_pupdr3(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR3) >> 6; }
+static inline uint32_t gpioa_pupdr_get_pupdr2(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR2) >> 4; }
+static inline uint32_t gpioa_pupdr_get_pupdr1(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR1) >> 2; }
+static inline uint32_t gpioa_pupdr_get_pupdr0(struct GPIOA_Type *p) { return (p->PUPDR & GPIOA_PUPDR_PUPDR0) >> 0; }
+
+// GPIOA->IDR GPIO port input data register
+enum {
+	GPIOA_IDR_IDRX = ((1UL << 16) - 1) << 0,  // Merged Port input data (y = 0..15)
+};
+static inline uint32_t gpioa_idr_get_idrx(struct GPIOA_Type *p) { return (p->IDR & GPIOA_IDR_IDRX) >> 0; }
+
+// GPIOA->ODR GPIO port output data register
+enum {
+	GPIOA_ODR_ODRX = ((1UL << 16) - 1) << 0,  // Merged Port output data (y = 0..15)
+};
+static inline void gpioa_odr_set_odrx(struct GPIOA_Type *p, uint32_t val) {
+	p->ODR = (p->ODR & ~GPIOA_ODR_ODRX) | ((val << 0) & GPIOA_ODR_ODRX);
+}
+static inline uint32_t gpioa_odr_get_odrx(struct GPIOA_Type *p) { return (p->ODR & GPIOA_ODR_ODRX) >> 0; }
+
+// GPIOA->BSRR GPIO port bit set/reset register
+enum {
+	GPIOA_BSRR_BR15 = 1UL << 31,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR14 = 1UL << 30,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR13 = 1UL << 29,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR12 = 1UL << 28,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR11 = 1UL << 27,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR10 = 1UL << 26,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR9	= 1UL << 25,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR8	= 1UL << 24,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR7	= 1UL << 23,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR6	= 1UL << 22,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR5	= 1UL << 21,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR4	= 1UL << 20,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR3	= 1UL << 19,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR2	= 1UL << 18,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR1	= 1UL << 17,  // Port x reset bit y (y = 0..15)
+	GPIOA_BSRR_BR0	= 1UL << 16,  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS15 = 1UL << 15,  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS14 = 1UL << 14,  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS13 = 1UL << 13,  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS12 = 1UL << 12,  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS11 = 1UL << 11,  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS10 = 1UL << 10,  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS9	= 1UL << 9,	  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS8	= 1UL << 8,	  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS7	= 1UL << 7,	  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS6	= 1UL << 6,	  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS5	= 1UL << 5,	  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS4	= 1UL << 4,	  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS3	= 1UL << 3,	  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS2	= 1UL << 2,	  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS1	= 1UL << 1,	  // Port x set bit y (y= 0..15)
+	GPIOA_BSRR_BS0	= 1UL << 0,	  // Port x set bit y (y= 0..15)
 };
 
-// GPIOE->LCKR GPIO port configuration lock register
+// GPIOA->LCKR GPIO port configuration lock register
 enum {
-	GPIOE_LCKR_LCKK	 = 1UL << 16,  // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK15 = 1UL << 15,  // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK14 = 1UL << 14,  // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK13 = 1UL << 13,  // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK12 = 1UL << 12,  // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK11 = 1UL << 11,  // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK10 = 1UL << 10,  // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK9	 = 1UL << 9,   // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK8	 = 1UL << 8,   // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK7	 = 1UL << 7,   // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK6	 = 1UL << 6,   // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK5	 = 1UL << 5,   // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK4	 = 1UL << 4,   // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK3	 = 1UL << 3,   // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK2	 = 1UL << 2,   // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK1	 = 1UL << 1,   // Port x lock bit y (y= 0..15)
-	GPIOE_LCKR_LCK0	 = 1UL << 0,   // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCKK	 = 1UL << 16,  // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK15 = 1UL << 15,  // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK14 = 1UL << 14,  // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK13 = 1UL << 13,  // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK12 = 1UL << 12,  // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK11 = 1UL << 11,  // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK10 = 1UL << 10,  // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK9	 = 1UL << 9,   // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK8	 = 1UL << 8,   // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK7	 = 1UL << 7,   // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK6	 = 1UL << 6,   // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK5	 = 1UL << 5,   // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK4	 = 1UL << 4,   // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK3	 = 1UL << 3,   // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK2	 = 1UL << 2,   // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK1	 = 1UL << 1,   // Port x lock bit y (y= 0..15)
+	GPIOA_LCKR_LCK0	 = 1UL << 0,   // Port x lock bit y (y= 0..15)
 };
 
-// GPIOE->AFRL GPIO alternate function low register
+// GPIOA->AFRL GPIO alternate function low register
 enum {
-	GPIOE_AFRL_AFRL7 = ((1UL << 4) - 1) << 28,	// Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL6 = ((1UL << 4) - 1) << 24,	// Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL5 = ((1UL << 4) - 1) << 20,	// Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL4 = ((1UL << 4) - 1) << 16,	// Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL3 = ((1UL << 4) - 1) << 12,	// Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL2 = ((1UL << 4) - 1) << 8,	// Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL1 = ((1UL << 4) - 1) << 4,	// Alternate function selection for port x bit y (y = 0..7)
-	GPIOE_AFRL_AFRL0 = ((1UL << 4) - 1) << 0,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOA_AFRL_AFRL7 = ((1UL << 4) - 1) << 28,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOA_AFRL_AFRL6 = ((1UL << 4) - 1) << 24,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOA_AFRL_AFRL5 = ((1UL << 4) - 1) << 20,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOA_AFRL_AFRL4 = ((1UL << 4) - 1) << 16,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOA_AFRL_AFRL3 = ((1UL << 4) - 1) << 12,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOA_AFRL_AFRL2 = ((1UL << 4) - 1) << 8,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOA_AFRL_AFRL1 = ((1UL << 4) - 1) << 4,	// Alternate function selection for port x bit y (y = 0..7)
+	GPIOA_AFRL_AFRL0 = ((1UL << 4) - 1) << 0,	// Alternate function selection for port x bit y (y = 0..7)
 };
-static inline void gpioe_afrl_set_afrl7(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL7) | ((val << 28) & GPIOE_AFRL_AFRL7);
+static inline void gpioa_afrl_set_afrl7(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOA_AFRL_AFRL7) | ((val << 28) & GPIOA_AFRL_AFRL7);
 }
-static inline void gpioe_afrl_set_afrl6(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL6) | ((val << 24) & GPIOE_AFRL_AFRL6);
+static inline void gpioa_afrl_set_afrl6(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOA_AFRL_AFRL6) | ((val << 24) & GPIOA_AFRL_AFRL6);
 }
-static inline void gpioe_afrl_set_afrl5(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL5) | ((val << 20) & GPIOE_AFRL_AFRL5);
+static inline void gpioa_afrl_set_afrl5(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOA_AFRL_AFRL5) | ((val << 20) & GPIOA_AFRL_AFRL5);
 }
-static inline void gpioe_afrl_set_afrl4(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL4) | ((val << 16) & GPIOE_AFRL_AFRL4);
+static inline void gpioa_afrl_set_afrl4(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOA_AFRL_AFRL4) | ((val << 16) & GPIOA_AFRL_AFRL4);
 }
-static inline void gpioe_afrl_set_afrl3(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL3) | ((val << 12) & GPIOE_AFRL_AFRL3);
+static inline void gpioa_afrl_set_afrl3(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOA_AFRL_AFRL3) | ((val << 12) & GPIOA_AFRL_AFRL3);
 }
-static inline void gpioe_afrl_set_afrl2(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL2) | ((val << 8) & GPIOE_AFRL_AFRL2);
+static inline void gpioa_afrl_set_afrl2(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOA_AFRL_AFRL2) | ((val << 8) & GPIOA_AFRL_AFRL2);
 }
-static inline void gpioe_afrl_set_afrl1(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL1) | ((val << 4) & GPIOE_AFRL_AFRL1);
+static inline void gpioa_afrl_set_afrl1(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOA_AFRL_AFRL1) | ((val << 4) & GPIOA_AFRL_AFRL1);
 }
-static inline void gpioe_afrl_set_afrl0(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRL = (p->AFRL & ~GPIOE_AFRL_AFRL0) | ((val << 0) & GPIOE_AFRL_AFRL0);
+static inline void gpioa_afrl_set_afrl0(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRL = (p->AFRL & ~GPIOA_AFRL_AFRL0) | ((val << 0) & GPIOA_AFRL_AFRL0);
 }
-static inline uint32_t gpioe_afrl_get_afrl7(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL7) >> 28; }
-static inline uint32_t gpioe_afrl_get_afrl6(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL6) >> 24; }
-static inline uint32_t gpioe_afrl_get_afrl5(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL5) >> 20; }
-static inline uint32_t gpioe_afrl_get_afrl4(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL4) >> 16; }
-static inline uint32_t gpioe_afrl_get_afrl3(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL3) >> 12; }
-static inline uint32_t gpioe_afrl_get_afrl2(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL2) >> 8; }
-static inline uint32_t gpioe_afrl_get_afrl1(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL1) >> 4; }
-static inline uint32_t gpioe_afrl_get_afrl0(struct GPIOE_Type *p) { return (p->AFRL & GPIOE_AFRL_AFRL0) >> 0; }
+static inline uint32_t gpioa_afrl_get_afrl7(struct GPIOA_Type *p) { return (p->AFRL & GPIOA_AFRL_AFRL7) >> 28; }
+static inline uint32_t gpioa_afrl_get_afrl6(struct GPIOA_Type *p) { return (p->AFRL & GPIOA_AFRL_AFRL6) >> 24; }
+static inline uint32_t gpioa_afrl_get_afrl5(struct GPIOA_Type *p) { return (p->AFRL & GPIOA_AFRL_AFRL5) >> 20; }
+static inline uint32_t gpioa_afrl_get_afrl4(struct GPIOA_Type *p) { return (p->AFRL & GPIOA_AFRL_AFRL4) >> 16; }
+static inline uint32_t gpioa_afrl_get_afrl3(struct GPIOA_Type *p) { return (p->AFRL & GPIOA_AFRL_AFRL3) >> 12; }
+static inline uint32_t gpioa_afrl_get_afrl2(struct GPIOA_Type *p) { return (p->AFRL & GPIOA_AFRL_AFRL2) >> 8; }
+static inline uint32_t gpioa_afrl_get_afrl1(struct GPIOA_Type *p) { return (p->AFRL & GPIOA_AFRL_AFRL1) >> 4; }
+static inline uint32_t gpioa_afrl_get_afrl0(struct GPIOA_Type *p) { return (p->AFRL & GPIOA_AFRL_AFRL0) >> 0; }
 
-// GPIOE->AFRH GPIO alternate function high register
+// GPIOA->AFRH GPIO alternate function high register
 enum {
-	GPIOE_AFRH_AFRH15 = ((1UL << 4) - 1) << 28,	 // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH14 = ((1UL << 4) - 1) << 24,	 // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH13 = ((1UL << 4) - 1) << 20,	 // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH12 = ((1UL << 4) - 1) << 16,	 // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH11 = ((1UL << 4) - 1) << 12,	 // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH10 = ((1UL << 4) - 1) << 8,	 // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH9  = ((1UL << 4) - 1) << 4,	 // Alternate function selection for port x bit y (y = 8..15)
-	GPIOE_AFRH_AFRH8  = ((1UL << 4) - 1) << 0,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOA_AFRH_AFRH15 = ((1UL << 4) - 1) << 28,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOA_AFRH_AFRH14 = ((1UL << 4) - 1) << 24,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOA_AFRH_AFRH13 = ((1UL << 4) - 1) << 20,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOA_AFRH_AFRH12 = ((1UL << 4) - 1) << 16,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOA_AFRH_AFRH11 = ((1UL << 4) - 1) << 12,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOA_AFRH_AFRH10 = ((1UL << 4) - 1) << 8,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOA_AFRH_AFRH9  = ((1UL << 4) - 1) << 4,	 // Alternate function selection for port x bit y (y = 8..15)
+	GPIOA_AFRH_AFRH8  = ((1UL << 4) - 1) << 0,	 // Alternate function selection for port x bit y (y = 8..15)
 };
-static inline void gpioe_afrh_set_afrh15(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH15) | ((val << 28) & GPIOE_AFRH_AFRH15);
+static inline void gpioa_afrh_set_afrh15(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOA_AFRH_AFRH15) | ((val << 28) & GPIOA_AFRH_AFRH15);
 }
-static inline void gpioe_afrh_set_afrh14(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH14) | ((val << 24) & GPIOE_AFRH_AFRH14);
+static inline void gpioa_afrh_set_afrh14(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOA_AFRH_AFRH14) | ((val << 24) & GPIOA_AFRH_AFRH14);
 }
-static inline void gpioe_afrh_set_afrh13(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH13) | ((val << 20) & GPIOE_AFRH_AFRH13);
+static inline void gpioa_afrh_set_afrh13(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOA_AFRH_AFRH13) | ((val << 20) & GPIOA_AFRH_AFRH13);
 }
-static inline void gpioe_afrh_set_afrh12(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH12) | ((val << 16) & GPIOE_AFRH_AFRH12);
+static inline void gpioa_afrh_set_afrh12(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOA_AFRH_AFRH12) | ((val << 16) & GPIOA_AFRH_AFRH12);
 }
-static inline void gpioe_afrh_set_afrh11(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH11) | ((val << 12) & GPIOE_AFRH_AFRH11);
+static inline void gpioa_afrh_set_afrh11(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOA_AFRH_AFRH11) | ((val << 12) & GPIOA_AFRH_AFRH11);
 }
-static inline void gpioe_afrh_set_afrh10(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH10) | ((val << 8) & GPIOE_AFRH_AFRH10);
+static inline void gpioa_afrh_set_afrh10(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOA_AFRH_AFRH10) | ((val << 8) & GPIOA_AFRH_AFRH10);
 }
-static inline void gpioe_afrh_set_afrh9(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH9) | ((val << 4) & GPIOE_AFRH_AFRH9);
+static inline void gpioa_afrh_set_afrh9(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOA_AFRH_AFRH9) | ((val << 4) & GPIOA_AFRH_AFRH9);
 }
-static inline void gpioe_afrh_set_afrh8(struct GPIOE_Type *p, uint32_t val) {
-	p->AFRH = (p->AFRH & ~GPIOE_AFRH_AFRH8) | ((val << 0) & GPIOE_AFRH_AFRH8);
+static inline void gpioa_afrh_set_afrh8(struct GPIOA_Type *p, uint32_t val) {
+	p->AFRH = (p->AFRH & ~GPIOA_AFRH_AFRH8) | ((val << 0) & GPIOA_AFRH_AFRH8);
 }
-static inline uint32_t gpioe_afrh_get_afrh15(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH15) >> 28; }
-static inline uint32_t gpioe_afrh_get_afrh14(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH14) >> 24; }
-static inline uint32_t gpioe_afrh_get_afrh13(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH13) >> 20; }
-static inline uint32_t gpioe_afrh_get_afrh12(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH12) >> 16; }
-static inline uint32_t gpioe_afrh_get_afrh11(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH11) >> 12; }
-static inline uint32_t gpioe_afrh_get_afrh10(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH10) >> 8; }
-static inline uint32_t gpioe_afrh_get_afrh9(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH9) >> 4; }
-static inline uint32_t gpioe_afrh_get_afrh8(struct GPIOE_Type *p) { return (p->AFRH & GPIOE_AFRH_AFRH8) >> 0; }
+static inline uint32_t gpioa_afrh_get_afrh15(struct GPIOA_Type *p) { return (p->AFRH & GPIOA_AFRH_AFRH15) >> 28; }
+static inline uint32_t gpioa_afrh_get_afrh14(struct GPIOA_Type *p) { return (p->AFRH & GPIOA_AFRH_AFRH14) >> 24; }
+static inline uint32_t gpioa_afrh_get_afrh13(struct GPIOA_Type *p) { return (p->AFRH & GPIOA_AFRH_AFRH13) >> 20; }
+static inline uint32_t gpioa_afrh_get_afrh12(struct GPIOA_Type *p) { return (p->AFRH & GPIOA_AFRH_AFRH12) >> 16; }
+static inline uint32_t gpioa_afrh_get_afrh11(struct GPIOA_Type *p) { return (p->AFRH & GPIOA_AFRH_AFRH11) >> 12; }
+static inline uint32_t gpioa_afrh_get_afrh10(struct GPIOA_Type *p) { return (p->AFRH & GPIOA_AFRH_AFRH10) >> 8; }
+static inline uint32_t gpioa_afrh_get_afrh9(struct GPIOA_Type *p) { return (p->AFRH & GPIOA_AFRH_AFRH9) >> 4; }
+static inline uint32_t gpioa_afrh_get_afrh8(struct GPIOA_Type *p) { return (p->AFRH & GPIOA_AFRH_AFRH8) >> 0; }
 
 /* Inter-integrated circuit */
 struct I2C_Type {
-	__IO uint32_t CR1;			 // @0 Control register 1
-	__IO uint32_t CR2;			 // @4 Control register 2
-	__IO uint16_t OAR1;			 // @8 Own address register 1
-	uint8_t		  RESERVED0[2];	 // @10
-	__IO uint16_t OAR2;			 // @12 Own address register 2
-	uint8_t		  RESERVED1[2];	 // @14
-	__IO uint32_t TIMINGR;		 // @16 Timing register
-	__IO uint32_t TIMEOUTR;		 // @20 Status register 1
-	__IO uint32_t ISR;			 // @24 Interrupt and Status register
-	__O uint16_t  ICR;			 // @28 Interrupt clear register
-	uint8_t		  RESERVED2[2];	 // @30
-	__I uint8_t	  PECR;			 // @32 PEC register
-	uint8_t		  RESERVED3[3];	 // @33
-	__I uint8_t	  RXDR;			 // @36 Receive data register
-	uint8_t		  RESERVED4[3];	 // @37
-	__IO uint8_t  TXDR;			 // @40 Transmit data register
+	__IO uint32_t CR1;		 // @0 Control register 1
+	__IO uint32_t CR2;		 // @4 Control register 2
+	__IO uint32_t OAR1;		 // @8 Own address register 1
+	__IO uint32_t OAR2;		 // @12 Own address register 2
+	__IO uint32_t TIMINGR;	 // @16 Timing register
+	__IO uint32_t TIMEOUTR;	 // @20 Status register 1
+	__IO uint32_t ISR;		 // @24 Interrupt and Status register
+	__O uint32_t  ICR;		 // @28 Interrupt clear register
+	__I uint32_t  PECR;		 // @32 PEC register
+	__I uint32_t  RXDR;		 // @36 Receive data register
+	__IO uint32_t TXDR;		 // @40 Transmit data register
 };
 extern struct I2C_Type I2C1;  // @0x40005400
-extern struct I2C_Type I2C2;  // @0x40005800
 extern struct I2C_Type I2C3;  // @0x40005C00
-extern struct I2C_Type I2C4;  // @0x40008400
 
 // I2C->CR1 Control register 1
 enum {
@@ -3004,20 +2860,44 @@ enum {
 	I2C_ICR_ADDRCF	 = 1UL << 3,   // Address Matched flag clear
 };
 
+// I2C->PECR PEC register
+enum {
+	I2C_PECR_PEC = ((1UL << 8) - 1) << 0,  // Packet error checking register
+};
+static inline uint32_t i2c_pecr_get_pec(struct I2C_Type *p) { return (p->PECR & I2C_PECR_PEC) >> 0; }
+
+// I2C->RXDR Receive data register
+enum {
+	I2C_RXDR_RXDATA = ((1UL << 8) - 1) << 0,  // 8-bit receive data
+};
+static inline uint32_t i2c_rxdr_get_rxdata(struct I2C_Type *p) { return (p->RXDR & I2C_RXDR_RXDATA) >> 0; }
+
+// I2C->TXDR Transmit data register
+enum {
+	I2C_TXDR_TXDATA = ((1UL << 8) - 1) << 0,  // 8-bit transmit data
+};
+static inline void i2c_txdr_set_txdata(struct I2C_Type *p, uint32_t val) {
+	p->TXDR = (p->TXDR & ~I2C_TXDR_TXDATA) | ((val << 0) & I2C_TXDR_TXDATA);
+}
+static inline uint32_t i2c_txdr_get_txdata(struct I2C_Type *p) { return (p->TXDR & I2C_TXDR_TXDATA) >> 0; }
+
 /* Independent watchdog
 There is only one peripheral of type IWDG. */
 struct IWDG_Type {
-	__O uint16_t  KR;			 // @0 Key register
-	uint8_t		  RESERVED0[2];	 // @2
-	__IO uint8_t  PR;			 // @4 Prescaler register
-	uint8_t		  RESERVED1[3];	 // @5
-	__IO uint16_t RLR;			 // @8 Reload register
-	uint8_t		  RESERVED2[2];	 // @10
-	__I uint8_t	  SR;			 // @12 Status register
-	uint8_t		  RESERVED3[3];	 // @13
-	__IO uint16_t WINR;			 // @16 Window register
+	__O uint32_t  KR;	 // @0 Key register
+	__IO uint32_t PR;	 // @4 Prescaler register
+	__IO uint32_t RLR;	 // @8 Reload register
+	__I uint32_t  SR;	 // @12 Status register
+	__IO uint32_t WINR;	 // @16 Window register
 };
 extern struct IWDG_Type IWDG;  // @0x40003000
+
+// IWDG->KR Key register
+enum {
+	IWDG_KR_KEY = ((1UL << 16) - 1) << 0,  // Key value (write only, read 0x0000)
+};
+static inline void	   iwdg_kr_set_key(uint32_t val) { IWDG.KR = (IWDG.KR & ~IWDG_KR_KEY) | ((val << 0) & IWDG_KR_KEY); }
+static inline uint32_t iwdg_kr_get_key(void) { return (IWDG.KR & IWDG_KR_KEY) >> 0; }
 
 // IWDG->PR Prescaler register
 enum {
@@ -3049,20 +2929,14 @@ static inline uint32_t iwdg_winr_get_win(void) { return (IWDG.WINR & IWDG_WINR_W
 
 /* Low power timer */
 struct LPTIM_Type {
-	__I uint8_t	  ISR;			 // @0 Interrupt and Status Register
-	uint8_t		  RESERVED0[3];	 // @1
-	__O uint8_t	  ICR;			 // @4 Interrupt Clear Register
-	uint8_t		  RESERVED1[3];	 // @5
-	__IO uint8_t  IER;			 // @8 Interrupt Enable Register
-	uint8_t		  RESERVED2[3];	 // @9
-	__IO uint32_t CFGR;			 // @12 Configuration Register
-	__IO uint8_t  CR;			 // @16 Control Register
-	uint8_t		  RESERVED3[3];	 // @17
-	__IO uint16_t CMP;			 // @20 Compare Register
-	uint8_t		  RESERVED4[2];	 // @22
-	__IO uint16_t ARR;			 // @24 Autoreload Register
-	uint8_t		  RESERVED5[2];	 // @26
-	__I uint16_t  CNT;			 // @28 Counter Register
+	__I uint32_t  ISR;	 // @0 Interrupt and Status Register
+	__O uint32_t  ICR;	 // @4 Interrupt Clear Register
+	__IO uint32_t IER;	 // @8 Interrupt Enable Register
+	__IO uint32_t CFGR;	 // @12 Configuration Register
+	__IO uint32_t CR;	 // @16 Control Register
+	__IO uint32_t CMP;	 // @20 Compare Register
+	__IO uint32_t ARR;	 // @24 Autoreload Register
+	__I uint32_t  CNT;	 // @28 Counter Register
 };
 extern struct LPTIM_Type LPTIM1;  // @0x40007C00
 extern struct LPTIM_Type LPTIM2;  // @0x40009400
@@ -3148,6 +3022,30 @@ enum {
 	LPTIM_CR_ENABLE	 = 1UL << 0,  // LPTIM Enable
 };
 
+// LPTIM->CMP Compare Register
+enum {
+	LPTIM_CMP_CMP = ((1UL << 16) - 1) << 0,	 // Compare value
+};
+static inline void lptim_cmp_set_cmp(struct LPTIM_Type *p, uint32_t val) {
+	p->CMP = (p->CMP & ~LPTIM_CMP_CMP) | ((val << 0) & LPTIM_CMP_CMP);
+}
+static inline uint32_t lptim_cmp_get_cmp(struct LPTIM_Type *p) { return (p->CMP & LPTIM_CMP_CMP) >> 0; }
+
+// LPTIM->ARR Autoreload Register
+enum {
+	LPTIM_ARR_ARR = ((1UL << 16) - 1) << 0,	 // Auto reload value
+};
+static inline void lptim_arr_set_arr(struct LPTIM_Type *p, uint32_t val) {
+	p->ARR = (p->ARR & ~LPTIM_ARR_ARR) | ((val << 0) & LPTIM_ARR_ARR);
+}
+static inline uint32_t lptim_arr_get_arr(struct LPTIM_Type *p) { return (p->ARR & LPTIM_ARR_ARR) >> 0; }
+
+// LPTIM->CNT Counter Register
+enum {
+	LPTIM_CNT_CNT = ((1UL << 16) - 1) << 0,	 // Counter value
+};
+static inline uint32_t lptim_cnt_get_cnt(struct LPTIM_Type *p) { return (p->CNT & LPTIM_CNT_CNT) >> 0; }
+
 /* Universal synchronous asynchronous receiver transmitter
 There is only one peripheral of type LPUART. */
 struct LPUART_Type {
@@ -3156,13 +3054,11 @@ struct LPUART_Type {
 	__IO uint32_t CR3;			 // @8 Control register 3
 	__IO uint32_t BRR;			 // @12 Baud rate register
 	uint8_t		  RESERVED0[8];	 // @16
-	__O uint8_t	  RQR;			 // @24 Request register
-	uint8_t		  RESERVED1[3];	 // @25
+	__O uint32_t  RQR;			 // @24 Request register
 	__I uint32_t  ISR;			 // @28 Interrupt & status register
 	__O uint32_t  ICR;			 // @32 Interrupt flag clear register
-	__I uint16_t  RDR;			 // @36 Receive data register
-	uint8_t		  RESERVED2[2];	 // @38
-	__IO uint16_t TDR;			 // @40 Transmit data register
+	__I uint32_t  RDR;			 // @36 Receive data register
+	__IO uint32_t TDR;			 // @40 Transmit data register
 };
 extern struct LPUART_Type LPUART1;	// @0x40008000
 
@@ -3307,6 +3203,72 @@ static inline void lpuart_tdr_set_tdr(uint32_t val) {
 	LPUART1.TDR = (LPUART1.TDR & ~LPUART_TDR_TDR) | ((val << 0) & LPUART_TDR_TDR);
 }
 static inline uint32_t lpuart_tdr_get_tdr(void) { return (LPUART1.TDR & LPUART_TDR_TDR) >> 0; }
+
+/* Memory protection unit
+There is only one peripheral of type MPU. */
+struct MPU_Type {
+	__I uint32_t  TYPER;  // @0 MPU type register
+	__I uint32_t  CTRL;	  // @4 MPU control register
+	__IO uint32_t RNR;	  // @8 MPU region number register
+	__IO uint32_t RBAR;	  // @12 MPU region base address register
+	__IO uint32_t RASR;	  // @16 MPU region attribute and size register
+};
+extern struct MPU_Type MPU;	 // @0xE000ED90
+
+// MPU->TYPER MPU type register
+enum {
+	MPU_TYPER_IREGION  = ((1UL << 8) - 1) << 16,  // Number of MPU instruction regions
+	MPU_TYPER_DREGION  = ((1UL << 8) - 1) << 8,	  // Number of MPU data regions
+	MPU_TYPER_SEPARATE = 1UL << 0,				  // Separate flag
+};
+static inline uint32_t mpu_typer_get_iregion(void) { return (MPU.TYPER & MPU_TYPER_IREGION) >> 16; }
+static inline uint32_t mpu_typer_get_dregion(void) { return (MPU.TYPER & MPU_TYPER_DREGION) >> 8; }
+
+// MPU->CTRL MPU control register
+enum {
+	MPU_CTRL_PRIVDEFENA = 1UL << 2,	 // Enable priviliged software access to default memory map
+	MPU_CTRL_HFNMIENA	= 1UL << 1,	 // Enables the operation of MPU during hard fault
+	MPU_CTRL_ENABLE		= 1UL << 0,	 // Enables the MPU
+};
+
+// MPU->RNR MPU region number register
+enum {
+	MPU_RNR_REGION = ((1UL << 8) - 1) << 0,	 // MPU region
+};
+static inline void	   mpu_rnr_set_region(uint32_t val) { MPU.RNR = (MPU.RNR & ~MPU_RNR_REGION) | ((val << 0) & MPU_RNR_REGION); }
+static inline uint32_t mpu_rnr_get_region(void) { return (MPU.RNR & MPU_RNR_REGION) >> 0; }
+
+// MPU->RBAR MPU region base address register
+enum {
+	MPU_RBAR_ADDR	= ((1UL << 27) - 1) << 5,  // Region base address field
+	MPU_RBAR_VALID	= 1UL << 4,				   // MPU region number valid
+	MPU_RBAR_REGION = ((1UL << 4) - 1) << 0,   // MPU region field
+};
+static inline void mpu_rbar_set_addr(uint32_t val) { MPU.RBAR = (MPU.RBAR & ~MPU_RBAR_ADDR) | ((val << 5) & MPU_RBAR_ADDR); }
+static inline void mpu_rbar_set_region(uint32_t val) { MPU.RBAR = (MPU.RBAR & ~MPU_RBAR_REGION) | ((val << 0) & MPU_RBAR_REGION); }
+static inline uint32_t mpu_rbar_get_addr(void) { return (MPU.RBAR & MPU_RBAR_ADDR) >> 5; }
+static inline uint32_t mpu_rbar_get_region(void) { return (MPU.RBAR & MPU_RBAR_REGION) >> 0; }
+
+// MPU->RASR MPU region attribute and size register
+enum {
+	MPU_RASR_XN		= 1UL << 28,			   // Instruction access disable bit
+	MPU_RASR_AP		= ((1UL << 3) - 1) << 24,  // Access permission
+	MPU_RASR_TEX	= ((1UL << 3) - 1) << 19,  // memory attribute
+	MPU_RASR_S		= 1UL << 18,			   // Shareable memory attribute
+	MPU_RASR_C		= 1UL << 17,			   // memory attribute
+	MPU_RASR_B		= 1UL << 16,			   // memory attribute
+	MPU_RASR_SRD	= ((1UL << 8) - 1) << 8,   // Subregion disable bits
+	MPU_RASR_SIZE	= ((1UL << 5) - 1) << 1,   // Size of the MPU protection region
+	MPU_RASR_ENABLE = 1UL << 0,				   // Region enable bit.
+};
+static inline void	   mpu_rasr_set_ap(uint32_t val) { MPU.RASR = (MPU.RASR & ~MPU_RASR_AP) | ((val << 24) & MPU_RASR_AP); }
+static inline void	   mpu_rasr_set_tex(uint32_t val) { MPU.RASR = (MPU.RASR & ~MPU_RASR_TEX) | ((val << 19) & MPU_RASR_TEX); }
+static inline void	   mpu_rasr_set_srd(uint32_t val) { MPU.RASR = (MPU.RASR & ~MPU_RASR_SRD) | ((val << 8) & MPU_RASR_SRD); }
+static inline void	   mpu_rasr_set_size(uint32_t val) { MPU.RASR = (MPU.RASR & ~MPU_RASR_SIZE) | ((val << 1) & MPU_RASR_SIZE); }
+static inline uint32_t mpu_rasr_get_ap(void) { return (MPU.RASR & MPU_RASR_AP) >> 24; }
+static inline uint32_t mpu_rasr_get_tex(void) { return (MPU.RASR & MPU_RASR_TEX) >> 19; }
+static inline uint32_t mpu_rasr_get_srd(void) { return (MPU.RASR & MPU_RASR_SRD) >> 8; }
+static inline uint32_t mpu_rasr_get_size(void) { return (MPU.RASR & MPU_RASR_SIZE) >> 1; }
 
 /* Nested Vectored Interrupt Controller
 There is only one peripheral of type NVIC. */
@@ -3862,7 +3824,7 @@ static inline uint32_t nvic_ipr20_get_ipr_n0(void) { return (NVIC.IPR20 & NVIC_I
 /* Nested vectored interrupt controller
 There is only one peripheral of type NVIC_STIR. */
 struct NVIC_STIR_Type {
-	__IO uint16_t STIR;	 // @0 Software trigger interrupt register
+	__IO uint32_t STIR;	 // @0 Software trigger interrupt register
 };
 extern struct NVIC_STIR_Type NVIC_STIR;	 // @0xE000EF00
 
@@ -3878,51 +3840,30 @@ static inline uint32_t nvic_stir_stir_get_intid(void) { return (NVIC_STIR.STIR &
 /* Power control
 There is only one peripheral of type PWR. */
 struct PWR_Type {
-	__IO uint16_t CR1;			  // @0 Power control register 1
-	uint8_t		  RESERVED0[2];	  // @2
-	__IO uint16_t CR2;			  // @4 Power control register 2
-	uint8_t		  RESERVED1[2];	  // @6
-	__IO uint16_t CR3;			  // @8 Power control register 3
-	uint8_t		  RESERVED2[2];	  // @10
-	__IO uint16_t CR4;			  // @12 Power control register 4
-	uint8_t		  RESERVED3[2];	  // @14
-	__I uint16_t  SR1;			  // @16 Power status register 1
-	uint8_t		  RESERVED4[2];	  // @18
-	__I uint16_t  SR2;			  // @20 Power status register 2
-	uint8_t		  RESERVED5[2];	  // @22
-	__O uint16_t  SCR;			  // @24 Power status clear register
-	uint8_t		  RESERVED6[6];	  // @26
-	__IO uint16_t PUCRA;		  // @32 Power Port A pull-up control register
-	uint8_t		  RESERVED7[2];	  // @34
-	__IO uint16_t PDCRA;		  // @36 Power Port A pull-down control register
-	uint8_t		  RESERVED8[2];	  // @38
-	__IO uint16_t PUCRB;		  // @40 Power Port B pull-up control register
-	uint8_t		  RESERVED9[2];	  // @42
-	__IO uint16_t PDCRB;		  // @44 Power Port B pull-down control register
-	uint8_t		  RESERVED10[2];  // @46
-	__IO uint16_t PUCRC;		  // @48 Power Port C pull-up control register
-	uint8_t		  RESERVED11[2];  // @50
-	__IO uint16_t PDCRC;		  // @52 Power Port C pull-down control register
-	uint8_t		  RESERVED12[2];  // @54
-	__IO uint16_t PUCRD;		  // @56 Power Port D pull-up control register
-	uint8_t		  RESERVED13[2];  // @58
-	__IO uint16_t PDCRD;		  // @60 Power Port D pull-down control register
-	uint8_t		  RESERVED14[2];  // @62
-	__IO uint16_t PUCRE;		  // @64 Power Port E pull-up control register
-	uint8_t		  RESERVED15[2];  // @66
-	__IO uint16_t PDCRE;		  // @68 Power Port E pull-down control register
-	uint8_t		  RESERVED16[2];  // @70
-	__IO uint16_t PUCRF;		  // @72 Power Port F pull-up control register
-	uint8_t		  RESERVED17[2];  // @74
-	__IO uint16_t PDCRF;		  // @76 Power Port F pull-down control register
-	uint8_t		  RESERVED18[2];  // @78
-	__IO uint16_t PUCRG;		  // @80 Power Port G pull-up control register
-	uint8_t		  RESERVED19[2];  // @82
-	__IO uint16_t PDCRG;		  // @84 Power Port G pull-down control register
-	uint8_t		  RESERVED20[2];  // @86
-	__IO uint8_t  PUCRH;		  // @88 Power Port H pull-up control register
-	uint8_t		  RESERVED21[3];  // @89
-	__IO uint8_t  PDCRH;		  // @92 Power Port H pull-down control register
+	__IO uint32_t CR1;			 // @0 Power control register 1
+	__IO uint32_t CR2;			 // @4 Power control register 2
+	__IO uint32_t CR3;			 // @8 Power control register 3
+	__IO uint32_t CR4;			 // @12 Power control register 4
+	__I uint32_t  SR1;			 // @16 Power status register 1
+	__I uint32_t  SR2;			 // @20 Power status register 2
+	__O uint32_t  SCR;			 // @24 Power status clear register
+	uint8_t		  RESERVED0[4];	 // @28
+	__IO uint32_t PUCRA;		 // @32 Power Port A pull-up control register
+	__IO uint32_t PDCRA;		 // @36 Power Port A pull-down control register
+	__IO uint32_t PUCRB;		 // @40 Power Port B pull-up control register
+	__IO uint32_t PDCRB;		 // @44 Power Port B pull-down control register
+	__IO uint32_t PUCRC;		 // @48 Power Port C pull-up control register
+	__IO uint32_t PDCRC;		 // @52 Power Port C pull-down control register
+	__IO uint32_t PUCRD;		 // @56 Power Port D pull-up control register
+	__IO uint32_t PDCRD;		 // @60 Power Port D pull-down control register
+	__IO uint32_t PUCRE;		 // @64 Power Port E pull-up control register
+	__IO uint32_t PDCRE;		 // @68 Power Port E pull-down control register
+	__IO uint32_t PUCRF;		 // @72 Power Port F pull-up control register
+	__IO uint32_t PDCRF;		 // @76 Power Port F pull-down control register
+	__IO uint32_t PUCRG;		 // @80 Power Port G pull-up control register
+	__IO uint32_t PDCRG;		 // @84 Power Port G pull-down control register
+	__IO uint32_t PUCRH;		 // @88 Power Port H pull-up control register
+	__IO uint32_t PDCRH;		 // @92 Power Port H pull-down control register
 };
 extern struct PWR_Type PWR;	 // @0x40007000
 
@@ -4008,6 +3949,104 @@ enum {
 	PWR_SCR_WUF1 = 1UL << 0,  // Clear wakeup flag 1
 };
 
+// PWR->PUCRA Power Port A pull-up control register
+enum {
+	PWR_PUCRA_PUX = ((1UL << 16) - 1) << 0,	 // Merged Port A pull-up bit y (y=0..15)
+};
+static inline void	   pwr_pucra_set_pux(uint32_t val) { PWR.PUCRA = (PWR.PUCRA & ~PWR_PUCRA_PUX) | ((val << 0) & PWR_PUCRA_PUX); }
+static inline uint32_t pwr_pucra_get_pux(void) { return (PWR.PUCRA & PWR_PUCRA_PUX) >> 0; }
+
+// PWR->PDCRA Power Port A pull-down control register
+enum {
+	PWR_PDCRA_PDX = ((1UL << 16) - 1) << 0,	 // Merged Port A pull-down bit y (y=0..15)
+};
+static inline void	   pwr_pdcra_set_pdx(uint32_t val) { PWR.PDCRA = (PWR.PDCRA & ~PWR_PDCRA_PDX) | ((val << 0) & PWR_PDCRA_PDX); }
+static inline uint32_t pwr_pdcra_get_pdx(void) { return (PWR.PDCRA & PWR_PDCRA_PDX) >> 0; }
+
+// PWR->PUCRB Power Port B pull-up control register
+enum {
+	PWR_PUCRB_PUX = ((1UL << 16) - 1) << 0,	 // Merged Port B pull-up bit y (y=0..15)
+};
+static inline void	   pwr_pucrb_set_pux(uint32_t val) { PWR.PUCRB = (PWR.PUCRB & ~PWR_PUCRB_PUX) | ((val << 0) & PWR_PUCRB_PUX); }
+static inline uint32_t pwr_pucrb_get_pux(void) { return (PWR.PUCRB & PWR_PUCRB_PUX) >> 0; }
+
+// PWR->PDCRB Power Port B pull-down control register
+enum {
+	PWR_PDCRB_PDX = ((1UL << 16) - 1) << 0,	 // Merged Port B pull-down bit y (y=0..15)
+};
+static inline void	   pwr_pdcrb_set_pdx(uint32_t val) { PWR.PDCRB = (PWR.PDCRB & ~PWR_PDCRB_PDX) | ((val << 0) & PWR_PDCRB_PDX); }
+static inline uint32_t pwr_pdcrb_get_pdx(void) { return (PWR.PDCRB & PWR_PDCRB_PDX) >> 0; }
+
+// PWR->PUCRC Power Port C pull-up control register
+enum {
+	PWR_PUCRC_PUX = ((1UL << 16) - 1) << 0,	 // Merged Port C pull-up bit y (y=0..15)
+};
+static inline void	   pwr_pucrc_set_pux(uint32_t val) { PWR.PUCRC = (PWR.PUCRC & ~PWR_PUCRC_PUX) | ((val << 0) & PWR_PUCRC_PUX); }
+static inline uint32_t pwr_pucrc_get_pux(void) { return (PWR.PUCRC & PWR_PUCRC_PUX) >> 0; }
+
+// PWR->PDCRC Power Port C pull-down control register
+enum {
+	PWR_PDCRC_PDX = ((1UL << 16) - 1) << 0,	 // Merged Port C pull-down bit y (y=0..15)
+};
+static inline void	   pwr_pdcrc_set_pdx(uint32_t val) { PWR.PDCRC = (PWR.PDCRC & ~PWR_PDCRC_PDX) | ((val << 0) & PWR_PDCRC_PDX); }
+static inline uint32_t pwr_pdcrc_get_pdx(void) { return (PWR.PDCRC & PWR_PDCRC_PDX) >> 0; }
+
+// PWR->PUCRD Power Port D pull-up control register
+enum {
+	PWR_PUCRD_PUX = ((1UL << 16) - 1) << 0,	 // Merged Port D pull-up bit y (y=0..15)
+};
+static inline void	   pwr_pucrd_set_pux(uint32_t val) { PWR.PUCRD = (PWR.PUCRD & ~PWR_PUCRD_PUX) | ((val << 0) & PWR_PUCRD_PUX); }
+static inline uint32_t pwr_pucrd_get_pux(void) { return (PWR.PUCRD & PWR_PUCRD_PUX) >> 0; }
+
+// PWR->PDCRD Power Port D pull-down control register
+enum {
+	PWR_PDCRD_PDX = ((1UL << 16) - 1) << 0,	 // Merged Port D pull-down bit y (y=0..15)
+};
+static inline void	   pwr_pdcrd_set_pdx(uint32_t val) { PWR.PDCRD = (PWR.PDCRD & ~PWR_PDCRD_PDX) | ((val << 0) & PWR_PDCRD_PDX); }
+static inline uint32_t pwr_pdcrd_get_pdx(void) { return (PWR.PDCRD & PWR_PDCRD_PDX) >> 0; }
+
+// PWR->PUCRE Power Port E pull-up control register
+enum {
+	PWR_PUCRE_PUX = ((1UL << 16) - 1) << 0,	 // Merged Port E pull-up bit y (y=0..15)
+};
+static inline void	   pwr_pucre_set_pux(uint32_t val) { PWR.PUCRE = (PWR.PUCRE & ~PWR_PUCRE_PUX) | ((val << 0) & PWR_PUCRE_PUX); }
+static inline uint32_t pwr_pucre_get_pux(void) { return (PWR.PUCRE & PWR_PUCRE_PUX) >> 0; }
+
+// PWR->PDCRE Power Port E pull-down control register
+enum {
+	PWR_PDCRE_PDX = ((1UL << 16) - 1) << 0,	 // Merged Port E pull-down bit y (y=0..15)
+};
+static inline void	   pwr_pdcre_set_pdx(uint32_t val) { PWR.PDCRE = (PWR.PDCRE & ~PWR_PDCRE_PDX) | ((val << 0) & PWR_PDCRE_PDX); }
+static inline uint32_t pwr_pdcre_get_pdx(void) { return (PWR.PDCRE & PWR_PDCRE_PDX) >> 0; }
+
+// PWR->PUCRF Power Port F pull-up control register
+enum {
+	PWR_PUCRF_PUX = ((1UL << 16) - 1) << 0,	 // Merged Port F pull-up bit y (y=0..15)
+};
+static inline void	   pwr_pucrf_set_pux(uint32_t val) { PWR.PUCRF = (PWR.PUCRF & ~PWR_PUCRF_PUX) | ((val << 0) & PWR_PUCRF_PUX); }
+static inline uint32_t pwr_pucrf_get_pux(void) { return (PWR.PUCRF & PWR_PUCRF_PUX) >> 0; }
+
+// PWR->PDCRF Power Port F pull-down control register
+enum {
+	PWR_PDCRF_PDX = ((1UL << 16) - 1) << 0,	 // Merged Port F pull-down bit y (y=0..15)
+};
+static inline void	   pwr_pdcrf_set_pdx(uint32_t val) { PWR.PDCRF = (PWR.PDCRF & ~PWR_PDCRF_PDX) | ((val << 0) & PWR_PDCRF_PDX); }
+static inline uint32_t pwr_pdcrf_get_pdx(void) { return (PWR.PDCRF & PWR_PDCRF_PDX) >> 0; }
+
+// PWR->PUCRG Power Port G pull-up control register
+enum {
+	PWR_PUCRG_PUX = ((1UL << 16) - 1) << 0,	 // Merged Port G pull-up bit y (y=0..15)
+};
+static inline void	   pwr_pucrg_set_pux(uint32_t val) { PWR.PUCRG = (PWR.PUCRG & ~PWR_PUCRG_PUX) | ((val << 0) & PWR_PUCRG_PUX); }
+static inline uint32_t pwr_pucrg_get_pux(void) { return (PWR.PUCRG & PWR_PUCRG_PUX) >> 0; }
+
+// PWR->PDCRG Power Port G pull-down control register
+enum {
+	PWR_PDCRG_PDX = ((1UL << 16) - 1) << 0,	 // Merged Port G pull-down bit y (y=0..15)
+};
+static inline void	   pwr_pdcrg_set_pdx(uint32_t val) { PWR.PDCRG = (PWR.PDCRG & ~PWR_PDCRG_PDX) | ((val << 0) & PWR_PDCRG_PDX); }
+static inline uint32_t pwr_pdcrg_get_pdx(void) { return (PWR.PDCRG & PWR_PDCRG_PDX) >> 0; }
+
 // PWR->PUCRH Power Port H pull-up control register
 enum {
 	PWR_PUCRH_PUX = ((1UL << 2) - 1) << 0,	// Merged Port H pull-up bit y (y=0..1)
@@ -4025,49 +4064,45 @@ static inline uint32_t pwr_pdcrh_get_pdx(void) { return (PWR.PDCRH & PWR_PDCRH_P
 /* Reset and clock control
 There is only one peripheral of type RCC. */
 struct RCC_Type {
-	__IO uint32_t CR;			  // @0 Clock control register
-	__IO uint32_t ICSCR;		  // @4 Internal clock sources calibration register
-	__IO uint32_t CFGR;			  // @8 Clock configuration register
-	__IO uint32_t PLLCFGR;		  // @12 PLL configuration register
-	__IO uint32_t PLLSAI1CFGR;	  // @16 PLLSAI1 configuration register
-	uint8_t		  RESERVED0[4];	  // @20
-	__IO uint16_t CIER;			  // @24 Clock interrupt enable register
-	uint8_t		  RESERVED1[2];	  // @26
-	__I uint16_t  CIFR;			  // @28 Clock interrupt flag register
-	uint8_t		  RESERVED2[2];	  // @30
-	__O uint16_t  CICR;			  // @32 Clock interrupt clear register
-	uint8_t		  RESERVED3[6];	  // @34
-	__IO uint32_t AHB1RSTR;		  // @40 AHB1 peripheral reset register
-	__IO uint32_t AHB2RSTR;		  // @44 AHB2 peripheral reset register
-	__IO uint16_t AHB3RSTR;		  // @48 AHB3 peripheral reset register
-	uint8_t		  RESERVED4[6];	  // @50
-	__IO uint32_t APB1RSTR1;	  // @56 APB1 peripheral reset register 1
-	__IO uint8_t  APB1RSTR2;	  // @60 APB1 peripheral reset register 2
-	uint8_t		  RESERVED5[3];	  // @61
-	__IO uint32_t APB2RSTR;		  // @64 APB2 peripheral reset register
-	uint8_t		  RESERVED6[4];	  // @68
-	__IO uint32_t AHB1ENR;		  // @72 AHB1 peripheral clock enable register
-	__IO uint32_t AHB2ENR;		  // @76 AHB2 peripheral clock enable register
-	__IO uint16_t AHB3ENR;		  // @80 AHB3 peripheral clock enable register
-	uint8_t		  RESERVED7[6];	  // @82
-	__IO uint32_t APB1ENR1;		  // @88 APB1ENR1
-	__IO uint32_t APB1ENR2;		  // @92 APB1 peripheral clock enable register 2
-	__IO uint32_t APB2ENR;		  // @96 APB2ENR
-	uint8_t		  RESERVED8[4];	  // @100
-	__IO uint32_t AHB1SMENR;	  // @104 AHB1 peripheral clocks enable in Sleep and Stop modes register
-	__IO uint32_t AHB2SMENR;	  // @108 AHB2 peripheral clocks enable in Sleep and Stop modes register
-	__IO uint16_t AHB3SMENR;	  // @112 AHB3 peripheral clocks enable in Sleep and Stop modes register
-	uint8_t		  RESERVED9[6];	  // @114
-	__IO uint32_t APB1SMENR1;	  // @120 APB1SMENR1
-	__IO uint8_t  APB1SMENR2;	  // @124 APB1 peripheral clocks enable in Sleep and Stop modes register 2
-	uint8_t		  RESERVED10[3];  // @125
-	__IO uint32_t APB2SMENR;	  // @128 APB2SMENR
-	uint8_t		  RESERVED11[4];  // @132
-	__IO uint32_t CCIPR;		  // @136 CCIPR
-	uint8_t		  RESERVED12[4];  // @140
-	__IO uint32_t BDCR;			  // @144 BDCR
-	__IO uint32_t CSR;			  // @148 CSR
-	__IO uint16_t CRRCR;		  // @152 Clock recovery RC register
+	__IO uint32_t CR;			 // @0 Clock control register
+	__IO uint32_t ICSCR;		 // @4 Internal clock sources calibration register
+	__IO uint32_t CFGR;			 // @8 Clock configuration register
+	__IO uint32_t PLLCFGR;		 // @12 PLL configuration register
+	__IO uint32_t PLLSAI1CFGR;	 // @16 PLLSAI1 configuration register
+	uint8_t		  RESERVED0[4];	 // @20
+	__IO uint32_t CIER;			 // @24 Clock interrupt enable register
+	__I uint32_t  CIFR;			 // @28 Clock interrupt flag register
+	__O uint32_t  CICR;			 // @32 Clock interrupt clear register
+	uint8_t		  RESERVED1[4];	 // @36
+	__IO uint32_t AHB1RSTR;		 // @40 AHB1 peripheral reset register
+	__IO uint32_t AHB2RSTR;		 // @44 AHB2 peripheral reset register
+	__IO uint32_t AHB3RSTR;		 // @48 AHB3 peripheral reset register
+	uint8_t		  RESERVED2[4];	 // @52
+	__IO uint32_t APB1RSTR1;	 // @56 APB1 peripheral reset register 1
+	__IO uint32_t APB1RSTR2;	 // @60 APB1 peripheral reset register 2
+	__IO uint32_t APB2RSTR;		 // @64 APB2 peripheral reset register
+	uint8_t		  RESERVED3[4];	 // @68
+	__IO uint32_t AHB1ENR;		 // @72 AHB1 peripheral clock enable register
+	__IO uint32_t AHB2ENR;		 // @76 AHB2 peripheral clock enable register
+	__IO uint32_t AHB3ENR;		 // @80 AHB3 peripheral clock enable register
+	uint8_t		  RESERVED4[4];	 // @84
+	__IO uint32_t APB1ENR1;		 // @88 APB1ENR1
+	__IO uint32_t APB1ENR2;		 // @92 APB1 peripheral clock enable register 2
+	__IO uint32_t APB2ENR;		 // @96 APB2ENR
+	uint8_t		  RESERVED5[4];	 // @100
+	__IO uint32_t AHB1SMENR;	 // @104 AHB1 peripheral clocks enable in Sleep and Stop modes register
+	__IO uint32_t AHB2SMENR;	 // @108 AHB2 peripheral clocks enable in Sleep and Stop modes register
+	__IO uint32_t AHB3SMENR;	 // @112 AHB3 peripheral clocks enable in Sleep and Stop modes register
+	uint8_t		  RESERVED6[4];	 // @116
+	__IO uint32_t APB1SMENR1;	 // @120 APB1SMENR1
+	__IO uint32_t APB1SMENR2;	 // @124 APB1 peripheral clocks enable in Sleep and Stop modes register 2
+	__IO uint32_t APB2SMENR;	 // @128 APB2SMENR
+	uint8_t		  RESERVED7[4];	 // @132
+	__IO uint32_t CCIPR;		 // @136 CCIPR
+	uint8_t		  RESERVED8[4];	 // @140
+	__IO uint32_t BDCR;			 // @144 BDCR
+	__IO uint32_t CSR;			 // @148 CSR
+	__IO uint32_t CRRCR;		 // @152 Clock recovery RC register
 };
 extern struct RCC_Type RCC;	 // @0x40021000
 
@@ -4589,6 +4624,30 @@ static inline void rcc_crrcr_set_hsi48cal(uint32_t val) {
 }
 static inline uint32_t rcc_crrcr_get_hsi48cal(void) { return (RCC.CRRCR & RCC_CRRCR_HSI48CAL) >> 7; }
 
+/* Random number generator
+There is only one peripheral of type RNG. */
+struct RNG_Type {
+	__IO uint32_t CR;  // @0 control register
+	__IO uint32_t SR;  // @4 status register
+	__I uint32_t  DR;  // @8 data register
+};
+extern struct RNG_Type RNG;	 // @0x50060800
+
+// RNG->CR control register
+enum {
+	RNG_CR_IE	 = 1UL << 3,  // Interrupt enable
+	RNG_CR_RNGEN = 1UL << 2,  // Random number generator enable
+};
+
+// RNG->SR status register
+enum {
+	RNG_SR_SEIS = 1UL << 6,	 // Seed error interrupt status
+	RNG_SR_CEIS = 1UL << 5,	 // Clock error interrupt status
+	RNG_SR_SECS = 1UL << 2,	 // Seed error current status
+	RNG_SR_CECS = 1UL << 1,	 // Clock error current status
+	RNG_SR_DRDY = 1UL << 0,	 // Data ready
+};
+
 /* Real-time clock
 There is only one peripheral of type RTC. */
 struct RTC_Type {
@@ -4597,27 +4656,21 @@ struct RTC_Type {
 	__IO uint32_t CR;			 // @8 control register
 	__IO uint32_t ISR;			 // @12 initialization and status register
 	__IO uint32_t PRER;			 // @16 prescaler register
-	__IO uint16_t WUTR;			 // @20 wakeup timer register
-	uint8_t		  RESERVED0[6];	 // @22
+	__IO uint32_t WUTR;			 // @20 wakeup timer register
+	uint8_t		  RESERVED0[4];	 // @24
 	__IO uint32_t ALRMAR;		 // @28 alarm A register
 	__IO uint32_t ALRMBR;		 // @32 alarm B register
-	__O uint8_t	  WPR;			 // @36 write protection register
-	uint8_t		  RESERVED1[3];	 // @37
-	__I uint16_t  SSR;			 // @40 sub second register
-	uint8_t		  RESERVED2[2];	 // @42
+	__O uint32_t  WPR;			 // @36 write protection register
+	__I uint32_t  SSR;			 // @40 sub second register
 	__O uint32_t  SHIFTR;		 // @44 shift control register
 	__I uint32_t  TSTR;			 // @48 time stamp time register
-	__I uint16_t  TSDR;			 // @52 time stamp date register
-	uint8_t		  RESERVED3[2];	 // @54
-	__I uint16_t  TSSSR;		 // @56 timestamp sub second register
-	uint8_t		  RESERVED4[2];	 // @58
-	__IO uint16_t CALR;			 // @60 calibration register
-	uint8_t		  RESERVED5[2];	 // @62
+	__I uint32_t  TSDR;			 // @52 time stamp date register
+	__I uint32_t  TSSSR;		 // @56 timestamp sub second register
+	__IO uint32_t CALR;			 // @60 calibration register
 	__IO uint32_t TAMPCR;		 // @64 tamper configuration register
 	__IO uint32_t ALRMASSR;		 // @68 alarm A sub second register
 	__IO uint32_t ALRMBSSR;		 // @72 alarm B sub second register
-	__IO uint8_t  OR;			 // @76 option register
-	uint8_t		  RESERVED6[3];	 // @77
+	__IO uint32_t OR;			 // @76 option register
 	__IO uint32_t BKP0R;		 // @80 backup register
 	__IO uint32_t BKP1R;		 // @84 backup register
 	__IO uint32_t BKP2R;		 // @88 backup register
@@ -4763,6 +4816,13 @@ static inline void rtc_prer_set_prediv_s(uint32_t val) {
 static inline uint32_t rtc_prer_get_prediv_a(void) { return (RTC.PRER & RTC_PRER_PREDIV_A) >> 16; }
 static inline uint32_t rtc_prer_get_prediv_s(void) { return (RTC.PRER & RTC_PRER_PREDIV_S) >> 0; }
 
+// RTC->WUTR wakeup timer register
+enum {
+	RTC_WUTR_WUT = ((1UL << 16) - 1) << 0,	// Wakeup auto-reload value bits
+};
+static inline void	   rtc_wutr_set_wut(uint32_t val) { RTC.WUTR = (RTC.WUTR & ~RTC_WUTR_WUT) | ((val << 0) & RTC_WUTR_WUT); }
+static inline uint32_t rtc_wutr_get_wut(void) { return (RTC.WUTR & RTC_WUTR_WUT) >> 0; }
+
 // RTC->ALRMAR alarm A register
 enum {
 	RTC_ALRMAR_MSK4	 = 1UL << 31,				// Alarm A date mask
@@ -4835,6 +4895,19 @@ static inline uint32_t rtc_alrmbr_get_mnu(void) { return (RTC.ALRMBR & RTC_ALRMB
 static inline uint32_t rtc_alrmbr_get_st(void) { return (RTC.ALRMBR & RTC_ALRMBR_ST) >> 4; }
 static inline uint32_t rtc_alrmbr_get_su(void) { return (RTC.ALRMBR & RTC_ALRMBR_SU) >> 0; }
 
+// RTC->WPR write protection register
+enum {
+	RTC_WPR_KEY = ((1UL << 8) - 1) << 0,  // Write protection key
+};
+static inline void	   rtc_wpr_set_key(uint32_t val) { RTC.WPR = (RTC.WPR & ~RTC_WPR_KEY) | ((val << 0) & RTC_WPR_KEY); }
+static inline uint32_t rtc_wpr_get_key(void) { return (RTC.WPR & RTC_WPR_KEY) >> 0; }
+
+// RTC->SSR sub second register
+enum {
+	RTC_SSR_SS = ((1UL << 16) - 1) << 0,  // Sub second value
+};
+static inline uint32_t rtc_ssr_get_ss(void) { return (RTC.SSR & RTC_SSR_SS) >> 0; }
+
 // RTC->SHIFTR shift control register
 enum {
 	RTC_SHIFTR_ADD1S = 1UL << 31,				// Add one second
@@ -4874,6 +4947,12 @@ static inline uint32_t rtc_tsdr_get_wdu(void) { return (RTC.TSDR & RTC_TSDR_WDU)
 static inline uint32_t rtc_tsdr_get_mu(void) { return (RTC.TSDR & RTC_TSDR_MU) >> 8; }
 static inline uint32_t rtc_tsdr_get_dt(void) { return (RTC.TSDR & RTC_TSDR_DT) >> 4; }
 static inline uint32_t rtc_tsdr_get_du(void) { return (RTC.TSDR & RTC_TSDR_DU) >> 0; }
+
+// RTC->TSSSR timestamp sub second register
+enum {
+	RTC_TSSSR_SS = ((1UL << 16) - 1) << 0,	// Sub second value
+};
+static inline uint32_t rtc_tsssr_get_ss(void) { return (RTC.TSSSR & RTC_TSSSR_SS) >> 0; }
 
 // RTC->CALR calibration register
 enum {
@@ -4963,17 +5042,15 @@ struct SCB_Type {
 	__IO uint32_t ICSR;					 // @4 Interrupt control and state register
 	__IO uint32_t VTOR;					 // @8 Vector table offset register
 	__IO uint32_t AIRCR;				 // @12 Application interrupt and reset control register
-	__IO uint8_t  SCR;					 // @16 System control register
-	uint8_t		  RESERVED0[3];			 // @17
-	__IO uint16_t CCR;					 // @20 Configuration and control register
-	uint8_t		  RESERVED1[2];			 // @22
+	__IO uint32_t SCR;					 // @16 System control register
+	__IO uint32_t CCR;					 // @20 Configuration and control register
 	__IO uint32_t SHPR1;				 // @24 System handler priority registers
 	__IO uint32_t SHPR2;				 // @28 System handler priority registers
 	__IO uint32_t SHPR3;				 // @32 System handler priority registers
 	__IO uint32_t SHCSR;				 // @36 System handler control and state register
 	__IO uint32_t CFSR_UFSR_BFSR_MMFSR;	 // @40 Configurable fault status register
 	__IO uint32_t HFSR;					 // @44 Hard fault status register
-	uint8_t		  RESERVED2[4];			 // @48
+	uint8_t		  RESERVED0[4];			 // @48
 	__IO uint32_t MMFAR;				 // @52 Memory management fault address register
 	__IO uint32_t BFAR;					 // @56 Bus fault address register
 	__IO uint32_t AFSR;					 // @60 Auxiliary fault status register
@@ -5149,7 +5226,7 @@ enum {
 /* System control block ACTLR
 There is only one peripheral of type SCB_ACTRL. */
 struct SCB_ACTRL_Type {
-	__IO uint16_t ACTRL;  // @0 Auxiliary control register
+	__IO uint32_t ACTRL;  // @0 Auxiliary control register
 };
 extern struct SCB_ACTRL_Type SCB_ACTRL;	 // @0xE000E008
 
@@ -5164,22 +5241,15 @@ enum {
 
 /* Serial peripheral interface/Inter-IC sound */
 struct SPI_Type {
-	__IO uint16_t CR1;			 // @0 control register 1
-	uint8_t		  RESERVED0[2];	 // @2
-	__IO uint16_t CR2;			 // @4 control register 2
-	uint8_t		  RESERVED1[2];	 // @6
-	__IO uint16_t SR;			 // @8 status register
-	uint8_t		  RESERVED2[2];	 // @10
-	__IO uint16_t DR;			 // @12 data register
-	uint8_t		  RESERVED3[2];	 // @14
-	__IO uint16_t CRCPR;		 // @16 CRC polynomial register
-	uint8_t		  RESERVED4[2];	 // @18
-	__I uint16_t  RXCRCR;		 // @20 RX CRC register
-	uint8_t		  RESERVED5[2];	 // @22
-	__I uint16_t  TXCRCR;		 // @24 TX CRC register
+	__IO uint32_t CR1;	   // @0 control register 1
+	__IO uint32_t CR2;	   // @4 control register 2
+	__IO uint32_t SR;	   // @8 status register
+	__IO uint32_t DR;	   // @12 data register
+	__IO uint32_t CRCPR;   // @16 CRC polynomial register
+	__I uint32_t  RXCRCR;  // @20 RX CRC register
+	__I uint32_t  TXCRCR;  // @24 TX CRC register
 };
 extern struct SPI_Type SPI1;  // @0x40013000
-extern struct SPI_Type SPI2;  // @0x40003800
 extern struct SPI_Type SPI3;  // @0x40003C00
 
 // SPI->CR1 control register 1
@@ -5241,6 +5311,34 @@ static inline void spi_sr_set_frlvl(struct SPI_Type *p, uint32_t val) {
 static inline uint32_t spi_sr_get_ftlvl(struct SPI_Type *p) { return (p->SR & SPI_SR_FTLVL) >> 11; }
 static inline uint32_t spi_sr_get_frlvl(struct SPI_Type *p) { return (p->SR & SPI_SR_FRLVL) >> 9; }
 
+// SPI->DR data register
+enum {
+	SPI_DR_DR = ((1UL << 16) - 1) << 0,	 // Data register
+};
+static inline void	   spi_dr_set_dr(struct SPI_Type *p, uint32_t val) { p->DR = (p->DR & ~SPI_DR_DR) | ((val << 0) & SPI_DR_DR); }
+static inline uint32_t spi_dr_get_dr(struct SPI_Type *p) { return (p->DR & SPI_DR_DR) >> 0; }
+
+// SPI->CRCPR CRC polynomial register
+enum {
+	SPI_CRCPR_CRCPOLY = ((1UL << 16) - 1) << 0,	 // CRC polynomial register
+};
+static inline void spi_crcpr_set_crcpoly(struct SPI_Type *p, uint32_t val) {
+	p->CRCPR = (p->CRCPR & ~SPI_CRCPR_CRCPOLY) | ((val << 0) & SPI_CRCPR_CRCPOLY);
+}
+static inline uint32_t spi_crcpr_get_crcpoly(struct SPI_Type *p) { return (p->CRCPR & SPI_CRCPR_CRCPOLY) >> 0; }
+
+// SPI->RXCRCR RX CRC register
+enum {
+	SPI_RXCRCR_RXCRC = ((1UL << 16) - 1) << 0,	// Rx CRC register
+};
+static inline uint32_t spi_rxcrcr_get_rxcrc(struct SPI_Type *p) { return (p->RXCRCR & SPI_RXCRCR_RXCRC) >> 0; }
+
+// SPI->TXCRCR TX CRC register
+enum {
+	SPI_TXCRCR_TXCRC = ((1UL << 16) - 1) << 0,	// Tx CRC register
+};
+static inline uint32_t spi_txcrcr_get_txcrc(struct SPI_Type *p) { return (p->TXCRCR & SPI_TXCRCR_TXCRC) >> 0; }
+
 /* SysTick timer
 There is only one peripheral of type STK. */
 struct STK_Type {
@@ -5287,23 +5385,16 @@ static inline uint32_t stk_calib_get_tenms(void) { return (STK.CALIB & STK_CALIB
 /* System configuration controller
 There is only one peripheral of type SYSCFG. */
 struct SYSCFG_Type {
-	__IO uint16_t MEMRMP;		 // @0 memory remap register
-	uint8_t		  RESERVED0[2];	 // @2
-	__IO uint32_t CFGR1;		 // @4 configuration register 1
-	__IO uint16_t EXTICR1;		 // @8 external interrupt configuration register 1
-	uint8_t		  RESERVED1[2];	 // @10
-	__IO uint16_t EXTICR2;		 // @12 external interrupt configuration register 2
-	uint8_t		  RESERVED2[2];	 // @14
-	__IO uint16_t EXTICR3;		 // @16 external interrupt configuration register 3
-	uint8_t		  RESERVED3[2];	 // @18
-	__IO uint16_t EXTICR4;		 // @20 external interrupt configuration register 4
-	uint8_t		  RESERVED4[2];	 // @22
-	__IO uint8_t  SCSR;			 // @24 SCSR
-	uint8_t		  RESERVED5[3];	 // @25
-	__IO uint16_t CFGR2;		 // @28 CFGR2
-	uint8_t		  RESERVED6[2];	 // @30
-	__O uint32_t  SWPR;			 // @32 SWPR
-	__O uint8_t	  SKR;			 // @36 SKR
+	__IO uint32_t MEMRMP;	// @0 memory remap register
+	__IO uint32_t CFGR1;	// @4 configuration register 1
+	__IO uint32_t EXTICR1;	// @8 external interrupt configuration register 1
+	__IO uint32_t EXTICR2;	// @12 external interrupt configuration register 2
+	__IO uint32_t EXTICR3;	// @16 external interrupt configuration register 3
+	__IO uint32_t EXTICR4;	// @20 external interrupt configuration register 4
+	__IO uint32_t SCSR;		// @24 SCSR
+	__IO uint32_t CFGR2;	// @28 CFGR2
+	__O uint32_t  SWPR;		// @32 SWPR
+	__O uint32_t  SKR;		// @36 SKR
 };
 extern struct SYSCFG_Type SYSCFG;  // @0x40010000
 
@@ -5447,63 +5538,48 @@ enum {
 	SYSCFG_CFGR2_CLL  = 1UL << 0,  // OCKUP (Hardfault) output enable bit
 };
 
+// SYSCFG->SKR SKR
+enum {
+	SYSCFG_SKR_KEY = ((1UL << 8) - 1) << 0,	 // SRAM2 write protection key for software erase
+};
+static inline void syscfg_skr_set_key(uint32_t val) { SYSCFG.SKR = (SYSCFG.SKR & ~SYSCFG_SKR_KEY) | ((val << 0) & SYSCFG_SKR_KEY); }
+static inline uint32_t syscfg_skr_get_key(void) { return (SYSCFG.SKR & SYSCFG_SKR_KEY) >> 0; }
+
 /* Advanced-timers
 There is only one peripheral of type TIM1. */
 struct TIM1_Type {
-	__IO uint16_t CR1;				 // @0 control register 1
-	uint8_t		  RESERVED0[2];		 // @2
-	__IO uint16_t CR2;				 // @4 control register 2
-	uint8_t		  RESERVED1[2];		 // @6
-	__IO uint16_t SMCR;				 // @8 slave mode control register
-	uint8_t		  RESERVED2[2];		 // @10
-	__IO uint16_t DIER;				 // @12 DMA/Interrupt enable register
-	uint8_t		  RESERVED3[2];		 // @14
-	__IO uint16_t SR;				 // @16 status register
-	uint8_t		  RESERVED4[2];		 // @18
-	__O uint8_t	  EGR;				 // @20 event generation register
-	uint8_t		  RESERVED5[3];		 // @21
+	__IO uint32_t CR1;				 // @0 control register 1
+	__IO uint32_t CR2;				 // @4 control register 2
+	__IO uint32_t SMCR;				 // @8 slave mode control register
+	__IO uint32_t DIER;				 // @12 DMA/Interrupt enable register
+	__IO uint32_t SR;				 // @16 status register
+	__O uint32_t  EGR;				 // @20 event generation register
 	union {							 // @24
-		__IO uint16_t CCMR1_Output;	 // capture/compare mode register 1 (output mode)
-		__IO uint16_t CCMR1_Input;	 // capture/compare mode register 1 (input mode)
+		__IO uint32_t CCMR1_Output;	 // capture/compare mode register 1 (output mode)
+		__IO uint32_t CCMR1_Input;	 // capture/compare mode register 1 (input mode)
 	};
-	uint8_t RESERVED6[2];			 // @26
 	union {							 // @28
-		__IO uint16_t CCMR2_Output;	 // capture/compare mode register 2 (output mode)
-		__IO uint16_t CCMR2_Input;	 // capture/compare mode register 2 (input mode)
+		__IO uint32_t CCMR2_Output;	 // capture/compare mode register 2 (output mode)
+		__IO uint32_t CCMR2_Input;	 // capture/compare mode register 2 (input mode)
 	};
-	uint8_t		  RESERVED7[2];	  // @30
-	__IO uint16_t CCER;			  // @32 capture/compare enable register
-	uint8_t		  RESERVED8[2];	  // @34
-	__IO uint16_t CNT;			  // @36 counter
-	uint8_t		  RESERVED9[2];	  // @38
-	__IO uint16_t PSC;			  // @40 prescaler
-	uint8_t		  RESERVED10[2];  // @42
-	__IO uint16_t ARR;			  // @44 auto-reload register
-	uint8_t		  RESERVED11[2];  // @46
-	__IO uint8_t  RCR;			  // @48 repetition counter register
-	uint8_t		  RESERVED12[3];  // @49
-	__IO uint16_t CCR1;			  // @52 capture/compare register 1
-	uint8_t		  RESERVED13[2];  // @54
-	__IO uint16_t CCR2;			  // @56 capture/compare register 2
-	uint8_t		  RESERVED14[2];  // @58
-	__IO uint16_t CCR3;			  // @60 capture/compare register 3
-	uint8_t		  RESERVED15[2];  // @62
-	__IO uint16_t CCR4;			  // @64 capture/compare register 4
-	uint8_t		  RESERVED16[2];  // @66
-	__IO uint16_t BDTR;			  // @68 break and dead-time register
-	uint8_t		  RESERVED17[2];  // @70
-	__IO uint16_t DCR;			  // @72 DMA control register
-	uint8_t		  RESERVED18[2];  // @74
-	__IO uint16_t DMAR;			  // @76 DMA address for full transfer
-	uint8_t		  RESERVED19[2];  // @78
-	__IO uint8_t  OR1;			  // @80 DMA address for full transfer
-	uint8_t		  RESERVED20[3];  // @81
-	__IO uint32_t CCMR3_Output;	  // @84 capture/compare mode register 2 (output mode)
-	__IO uint32_t CCR5;			  // @88 capture/compare register 4
-	__IO uint16_t CCR6;			  // @92 capture/compare register 4
-	uint8_t		  RESERVED21[2];  // @94
-	__IO uint32_t OR2;			  // @96 DMA address for full transfer
-	__IO uint16_t OR3;			  // @100 DMA address for full transfer
+	__IO uint32_t CCER;			 // @32 capture/compare enable register
+	__IO uint32_t CNT;			 // @36 counter
+	__IO uint32_t PSC;			 // @40 prescaler
+	__IO uint32_t ARR;			 // @44 auto-reload register
+	__IO uint32_t RCR;			 // @48 repetition counter register
+	__IO uint32_t CCR1;			 // @52 capture/compare register 1
+	__IO uint32_t CCR2;			 // @56 capture/compare register 2
+	__IO uint32_t CCR3;			 // @60 capture/compare register 3
+	__IO uint32_t CCR4;			 // @64 capture/compare register 4
+	__IO uint32_t BDTR;			 // @68 break and dead-time register
+	__IO uint32_t DCR;			 // @72 DMA control register
+	__IO uint32_t DMAR;			 // @76 DMA address for full transfer
+	__IO uint32_t OR1;			 // @80 DMA address for full transfer
+	__IO uint32_t CCMR3_Output;	 // @84 capture/compare mode register 2 (output mode)
+	__IO uint32_t CCR5;			 // @88 capture/compare register 4
+	__IO uint32_t CCR6;			 // @92 capture/compare register 4
+	__IO uint32_t OR2;			 // @96 DMA address for full transfer
+	__IO uint32_t OR3;			 // @100 DMA address for full transfer
 };
 extern struct TIM1_Type TIM1;  // @0x40012C00 Also: TIM6_Type
 
@@ -5685,6 +5761,62 @@ enum {
 	TIM1_CCER_CC1E	= 1UL << 0,	  // Capture/Compare 1 output enable
 };
 
+// TIM1->CNT counter
+enum {
+	TIM1_CNT_CNT = ((1UL << 16) - 1) << 0,	// counter value
+};
+static inline void	   tim1_cnt_set_cnt(uint32_t val) { TIM1.CNT = (TIM1.CNT & ~TIM1_CNT_CNT) | ((val << 0) & TIM1_CNT_CNT); }
+static inline uint32_t tim1_cnt_get_cnt(void) { return (TIM1.CNT & TIM1_CNT_CNT) >> 0; }
+
+// TIM1->PSC prescaler
+enum {
+	TIM1_PSC_PSC = ((1UL << 16) - 1) << 0,	// Prescaler value
+};
+static inline void	   tim1_psc_set_psc(uint32_t val) { TIM1.PSC = (TIM1.PSC & ~TIM1_PSC_PSC) | ((val << 0) & TIM1_PSC_PSC); }
+static inline uint32_t tim1_psc_get_psc(void) { return (TIM1.PSC & TIM1_PSC_PSC) >> 0; }
+
+// TIM1->ARR auto-reload register
+enum {
+	TIM1_ARR_ARR = ((1UL << 16) - 1) << 0,	// Auto-reload value
+};
+static inline void	   tim1_arr_set_arr(uint32_t val) { TIM1.ARR = (TIM1.ARR & ~TIM1_ARR_ARR) | ((val << 0) & TIM1_ARR_ARR); }
+static inline uint32_t tim1_arr_get_arr(void) { return (TIM1.ARR & TIM1_ARR_ARR) >> 0; }
+
+// TIM1->RCR repetition counter register
+enum {
+	TIM1_RCR_REP = ((1UL << 8) - 1) << 0,  // Repetition counter value
+};
+static inline void	   tim1_rcr_set_rep(uint32_t val) { TIM1.RCR = (TIM1.RCR & ~TIM1_RCR_REP) | ((val << 0) & TIM1_RCR_REP); }
+static inline uint32_t tim1_rcr_get_rep(void) { return (TIM1.RCR & TIM1_RCR_REP) >> 0; }
+
+// TIM1->CCR1 capture/compare register 1
+enum {
+	TIM1_CCR1_CCR1 = ((1UL << 16) - 1) << 0,  // Capture/Compare 1 value
+};
+static inline void tim1_ccr1_set_ccr1(uint32_t val) { TIM1.CCR1 = (TIM1.CCR1 & ~TIM1_CCR1_CCR1) | ((val << 0) & TIM1_CCR1_CCR1); }
+static inline uint32_t tim1_ccr1_get_ccr1(void) { return (TIM1.CCR1 & TIM1_CCR1_CCR1) >> 0; }
+
+// TIM1->CCR2 capture/compare register 2
+enum {
+	TIM1_CCR2_CCR2 = ((1UL << 16) - 1) << 0,  // Capture/Compare 2 value
+};
+static inline void tim1_ccr2_set_ccr2(uint32_t val) { TIM1.CCR2 = (TIM1.CCR2 & ~TIM1_CCR2_CCR2) | ((val << 0) & TIM1_CCR2_CCR2); }
+static inline uint32_t tim1_ccr2_get_ccr2(void) { return (TIM1.CCR2 & TIM1_CCR2_CCR2) >> 0; }
+
+// TIM1->CCR3 capture/compare register 3
+enum {
+	TIM1_CCR3_CCR3 = ((1UL << 16) - 1) << 0,  // Capture/Compare value
+};
+static inline void tim1_ccr3_set_ccr3(uint32_t val) { TIM1.CCR3 = (TIM1.CCR3 & ~TIM1_CCR3_CCR3) | ((val << 0) & TIM1_CCR3_CCR3); }
+static inline uint32_t tim1_ccr3_get_ccr3(void) { return (TIM1.CCR3 & TIM1_CCR3_CCR3) >> 0; }
+
+// TIM1->CCR4 capture/compare register 4
+enum {
+	TIM1_CCR4_CCR4 = ((1UL << 16) - 1) << 0,  // Capture/Compare value
+};
+static inline void tim1_ccr4_set_ccr4(uint32_t val) { TIM1.CCR4 = (TIM1.CCR4 & ~TIM1_CCR4_CCR4) | ((val << 0) & TIM1_CCR4_CCR4); }
+static inline uint32_t tim1_ccr4_get_ccr4(void) { return (TIM1.CCR4 & TIM1_CCR4_CCR4) >> 0; }
+
 // TIM1->BDTR break and dead-time register
 enum {
 	TIM1_BDTR_MOE  = 1UL << 15,				 // Main output enable
@@ -5710,6 +5842,13 @@ static inline void	   tim1_dcr_set_dbl(uint32_t val) { TIM1.DCR = (TIM1.DCR & ~T
 static inline void	   tim1_dcr_set_dba(uint32_t val) { TIM1.DCR = (TIM1.DCR & ~TIM1_DCR_DBA) | ((val << 0) & TIM1_DCR_DBA); }
 static inline uint32_t tim1_dcr_get_dbl(void) { return (TIM1.DCR & TIM1_DCR_DBL) >> 8; }
 static inline uint32_t tim1_dcr_get_dba(void) { return (TIM1.DCR & TIM1_DCR_DBA) >> 0; }
+
+// TIM1->DMAR DMA address for full transfer
+enum {
+	TIM1_DMAR_DMAB = ((1UL << 16) - 1) << 0,  // DMA register for burst accesses
+};
+static inline void tim1_dmar_set_dmab(uint32_t val) { TIM1.DMAR = (TIM1.DMAR & ~TIM1_DMAR_DMAB) | ((val << 0) & TIM1_DMAR_DMAB); }
+static inline uint32_t tim1_dmar_get_dmab(void) { return (TIM1.DMAR & TIM1_DMAR_DMAB) >> 0; }
 
 // TIM1->OR1 DMA address for full transfer
 enum {
@@ -5762,6 +5901,13 @@ enum {
 static inline void tim1_ccr5_set_ccr5(uint32_t val) { TIM1.CCR5 = (TIM1.CCR5 & ~TIM1_CCR5_CCR5) | ((val << 0) & TIM1_CCR5_CCR5); }
 static inline uint32_t tim1_ccr5_get_ccr5(void) { return (TIM1.CCR5 & TIM1_CCR5_CCR5) >> 0; }
 
+// TIM1->CCR6 capture/compare register 4
+enum {
+	TIM1_CCR6_CCR6 = ((1UL << 16) - 1) << 0,  // Capture/Compare value
+};
+static inline void tim1_ccr6_set_ccr6(uint32_t val) { TIM1.CCR6 = (TIM1.CCR6 & ~TIM1_CCR6_CCR6) | ((val << 0) & TIM1_CCR6_CCR6); }
+static inline uint32_t tim1_ccr6_get_ccr6(void) { return (TIM1.CCR6 & TIM1_CCR6_CCR6) >> 0; }
+
 // TIM1->OR2 DMA address for full transfer
 enum {
 	TIM1_OR2_ETRSEL	  = ((1UL << 3) - 1) << 14,	 // ETR source selection
@@ -5794,36 +5940,30 @@ static inline struct TIM6_Type *TIM1_as_TIM6_Type(struct TIM1_Type *p) { return 
 /* General purpose timers
 There is only one peripheral of type TIM15. */
 struct TIM15_Type {
-	__IO uint16_t CR1;				 // @0 control register 1
-	uint8_t		  RESERVED0[2];		 // @2
-	__IO uint16_t CR2;				 // @4 control register 2
-	uint8_t		  RESERVED1[6];		 // @6
-	__IO uint16_t DIER;				 // @12 DMA/Interrupt enable register
-	uint8_t		  RESERVED2[2];		 // @14
-	__IO uint16_t SR;				 // @16 status register
-	uint8_t		  RESERVED3[2];		 // @18
-	__O uint8_t	  EGR;				 // @20 event generation register
-	uint8_t		  RESERVED4[3];		 // @21
+	__IO uint32_t CR1;				 // @0 control register 1
+	__IO uint32_t CR2;				 // @4 control register 2
+	uint8_t		  RESERVED0[4];		 // @8
+	__IO uint32_t DIER;				 // @12 DMA/Interrupt enable register
+	__IO uint32_t SR;				 // @16 status register
+	__O uint32_t  EGR;				 // @20 event generation register
 	union {							 // @24
 		__IO uint32_t CCMR1_Output;	 // capture/compare mode register (output mode)
-		__IO uint8_t  CCMR1_Input;	 // capture/compare mode register 1 (input mode)
+		__IO uint32_t CCMR1_Input;	 // capture/compare mode register 1 (input mode)
 	};
-	uint8_t		  RESERVED5[4];	   // @28
-	__IO uint8_t  CCER;			   // @32 capture/compare enable register
-	uint8_t		  RESERVED6[3];	   // @33
-	__IO uint32_t CNT;			   // @36 counter
-	__IO uint16_t PSC;			   // @40 prescaler
-	uint8_t		  RESERVED7[2];	   // @42
-	__IO uint16_t ARR;			   // @44 auto-reload register
-	uint8_t		  RESERVED8[2];	   // @46
-	__IO uint8_t  RCR;			   // @48 repetition counter register
-	uint8_t		  RESERVED9[3];	   // @49
-	__IO uint16_t CCR1;			   // @52 capture/compare register 1
-	uint8_t		  RESERVED10[14];  // @54
-	__IO uint32_t BDTR;			   // @68 break and dead-time register
-	__IO uint16_t DCR;			   // @72 DMA control register
-	uint8_t		  RESERVED11[2];   // @74
-	__IO uint16_t DMAR;			   // @76 DMA address for full transfer
+	uint8_t		  RESERVED1[4];	  // @28
+	__IO uint32_t CCER;			  // @32 capture/compare enable register
+	__IO uint32_t CNT;			  // @36 counter
+	__IO uint32_t PSC;			  // @40 prescaler
+	__IO uint32_t ARR;			  // @44 auto-reload register
+	__IO uint32_t RCR;			  // @48 repetition counter register
+	__IO uint32_t CCR1;			  // @52 capture/compare register 1
+	uint8_t		  RESERVED2[12];  // @56
+	__IO uint32_t BDTR;			  // @68 break and dead-time register
+	__IO uint32_t DCR;			  // @72 DMA control register
+	__IO uint32_t DMAR;			  // @76 DMA address for full transfer
+	__IO uint32_t OR1;			  // @80 Option Register 1
+	uint8_t		  RESERVED3[12];  // @84
+	__IO uint32_t OR2;			  // @96 Option Register 2
 };
 extern struct TIM15_Type TIM15;	 // @0x40014000
 
@@ -5914,6 +6054,36 @@ enum {
 static inline void	   tim15_cnt_set_cnt(uint32_t val) { TIM15.CNT = (TIM15.CNT & ~TIM15_CNT_CNT) | ((val << 0) & TIM15_CNT_CNT); }
 static inline uint32_t tim15_cnt_get_cnt(void) { return (TIM15.CNT & TIM15_CNT_CNT) >> 0; }
 
+// TIM15->PSC prescaler
+enum {
+	TIM15_PSC_PSC = ((1UL << 16) - 1) << 0,	 // Prescaler value
+};
+static inline void	   tim15_psc_set_psc(uint32_t val) { TIM15.PSC = (TIM15.PSC & ~TIM15_PSC_PSC) | ((val << 0) & TIM15_PSC_PSC); }
+static inline uint32_t tim15_psc_get_psc(void) { return (TIM15.PSC & TIM15_PSC_PSC) >> 0; }
+
+// TIM15->ARR auto-reload register
+enum {
+	TIM15_ARR_ARR = ((1UL << 16) - 1) << 0,	 // Auto-reload value
+};
+static inline void	   tim15_arr_set_arr(uint32_t val) { TIM15.ARR = (TIM15.ARR & ~TIM15_ARR_ARR) | ((val << 0) & TIM15_ARR_ARR); }
+static inline uint32_t tim15_arr_get_arr(void) { return (TIM15.ARR & TIM15_ARR_ARR) >> 0; }
+
+// TIM15->RCR repetition counter register
+enum {
+	TIM15_RCR_REP = ((1UL << 8) - 1) << 0,	// Repetition counter value
+};
+static inline void	   tim15_rcr_set_rep(uint32_t val) { TIM15.RCR = (TIM15.RCR & ~TIM15_RCR_REP) | ((val << 0) & TIM15_RCR_REP); }
+static inline uint32_t tim15_rcr_get_rep(void) { return (TIM15.RCR & TIM15_RCR_REP) >> 0; }
+
+// TIM15->CCR1 capture/compare register 1
+enum {
+	TIM15_CCR1_CCR1 = ((1UL << 16) - 1) << 0,  // Capture/Compare 1 value
+};
+static inline void tim15_ccr1_set_ccr1(uint32_t val) {
+	TIM15.CCR1 = (TIM15.CCR1 & ~TIM15_CCR1_CCR1) | ((val << 0) & TIM15_CCR1_CCR1);
+}
+static inline uint32_t tim15_ccr1_get_ccr1(void) { return (TIM15.CCR1 & TIM15_CCR1_CCR1) >> 0; }
+
 // TIM15->BDTR break and dead-time register
 enum {
 	TIM15_BDTR_BKF	= ((1UL << 4) - 1) << 16,  // Break filter
@@ -5947,45 +6117,55 @@ static inline void	   tim15_dcr_set_dba(uint32_t val) { TIM15.DCR = (TIM15.DCR &
 static inline uint32_t tim15_dcr_get_dbl(void) { return (TIM15.DCR & TIM15_DCR_DBL) >> 8; }
 static inline uint32_t tim15_dcr_get_dba(void) { return (TIM15.DCR & TIM15_DCR_DBA) >> 0; }
 
+// TIM15->DMAR DMA address for full transfer
+enum {
+	TIM15_DMAR_DMAB = ((1UL << 16) - 1) << 0,  // DMA register for burst accesses
+};
+static inline void tim15_dmar_set_dmab(uint32_t val) {
+	TIM15.DMAR = (TIM15.DMAR & ~TIM15_DMAR_DMAB) | ((val << 0) & TIM15_DMAR_DMAB);
+}
+static inline uint32_t tim15_dmar_get_dmab(void) { return (TIM15.DMAR & TIM15_DMAR_DMAB) >> 0; }
+
+// TIM15->OR1 Option Register 1
+enum {
+	TIM15_OR1_ENCMODE = ((1UL << 2) - 1) << 1,	// 00: No redirection 01:TIM2 IC1 and TIM2 IC2 are connected to TIM15 IC1 and TIM15
+												// IC2 respectively 10:Reserved 11:Reserved
+	TIM15_OR1_TI1_RMP = 1UL << 0,  // 0: TIM15 input capture 1 is connected to I/O 1: TIM15 input capture 1 is connected to LSE
+};
+static inline void tim15_or1_set_encmode(uint32_t val) {
+	TIM15.OR1 = (TIM15.OR1 & ~TIM15_OR1_ENCMODE) | ((val << 1) & TIM15_OR1_ENCMODE);
+}
+static inline uint32_t tim15_or1_get_encmode(void) { return (TIM15.OR1 & TIM15_OR1_ENCMODE) >> 1; }
+
 /* General purpose timers
 There is only one peripheral of type TIM16. */
 struct TIM16_Type {
-	__IO uint16_t CR1;				 // @0 control register 1
-	uint8_t		  RESERVED0[2];		 // @2
-	__IO uint16_t CR2;				 // @4 control register 2
-	uint8_t		  RESERVED1[6];		 // @6
-	__IO uint16_t DIER;				 // @12 DMA/Interrupt enable register
-	uint8_t		  RESERVED2[2];		 // @14
-	__IO uint16_t SR;				 // @16 status register
-	uint8_t		  RESERVED3[2];		 // @18
-	__O uint8_t	  EGR;				 // @20 event generation register
-	uint8_t		  RESERVED4[3];		 // @21
+	__IO uint32_t CR1;				 // @0 control register 1
+	__IO uint32_t CR2;				 // @4 control register 2
+	uint8_t		  RESERVED0[4];		 // @8
+	__IO uint32_t DIER;				 // @12 DMA/Interrupt enable register
+	__IO uint32_t SR;				 // @16 status register
+	__O uint32_t  EGR;				 // @20 event generation register
 	union {							 // @24
 		__IO uint32_t CCMR1_Output;	 // capture/compare mode register (output mode)
-		__IO uint8_t  CCMR1_Input;	 // capture/compare mode register 1 (input mode)
+		__IO uint32_t CCMR1_Input;	 // capture/compare mode register 1 (input mode)
 	};
-	uint8_t		  RESERVED5[4];	   // @28
-	__IO uint8_t  CCER;			   // @32 capture/compare enable register
-	uint8_t		  RESERVED6[3];	   // @33
-	__IO uint32_t CNT;			   // @36 counter
-	__IO uint16_t PSC;			   // @40 prescaler
-	uint8_t		  RESERVED7[2];	   // @42
-	__IO uint16_t ARR;			   // @44 auto-reload register
-	uint8_t		  RESERVED8[2];	   // @46
-	__IO uint8_t  RCR;			   // @48 repetition counter register
-	uint8_t		  RESERVED9[3];	   // @49
-	__IO uint16_t CCR1;			   // @52 capture/compare register 1
-	uint8_t		  RESERVED10[14];  // @54
-	__IO uint32_t BDTR;			   // @68 break and dead-time register
-	__IO uint16_t DCR;			   // @72 DMA control register
-	uint8_t		  RESERVED11[2];   // @74
-	__IO uint16_t DMAR;			   // @76 DMA address for full transfer
-	uint8_t		  RESERVED12[2];   // @78
-	__IO uint8_t  OR1;			   // @80 TIM16 option register 1
-	uint8_t		  RESERVED13[15];  // @81
-	__IO uint16_t OR2;			   // @96 TIM17 option register 1
+	uint8_t		  RESERVED1[4];	  // @28
+	__IO uint32_t CCER;			  // @32 capture/compare enable register
+	__IO uint32_t CNT;			  // @36 counter
+	__IO uint32_t PSC;			  // @40 prescaler
+	__IO uint32_t ARR;			  // @44 auto-reload register
+	__IO uint32_t RCR;			  // @48 repetition counter register
+	__IO uint32_t CCR1;			  // @52 capture/compare register 1
+	uint8_t		  RESERVED2[12];  // @56
+	__IO uint32_t BDTR;			  // @68 break and dead-time register
+	__IO uint32_t DCR;			  // @72 DMA control register
+	__IO uint32_t DMAR;			  // @76 DMA address for full transfer
+	__IO uint32_t OR1;			  // @80 TIM16 option register 1
+	uint8_t		  RESERVED3[12];  // @84
+	__IO uint32_t OR2;			  // @96 TIM17 option register 1
 };
-extern struct TIM16_Type TIM16;	 // @0x40014400 Also: TIM15_Type
+extern struct TIM16_Type TIM16;	 // @0x40014400
 
 // TIM16->CR1 control register 1
 enum {
@@ -6074,6 +6254,36 @@ enum {
 static inline void	   tim16_cnt_set_cnt(uint32_t val) { TIM16.CNT = (TIM16.CNT & ~TIM16_CNT_CNT) | ((val << 0) & TIM16_CNT_CNT); }
 static inline uint32_t tim16_cnt_get_cnt(void) { return (TIM16.CNT & TIM16_CNT_CNT) >> 0; }
 
+// TIM16->PSC prescaler
+enum {
+	TIM16_PSC_PSC = ((1UL << 16) - 1) << 0,	 // Prescaler value
+};
+static inline void	   tim16_psc_set_psc(uint32_t val) { TIM16.PSC = (TIM16.PSC & ~TIM16_PSC_PSC) | ((val << 0) & TIM16_PSC_PSC); }
+static inline uint32_t tim16_psc_get_psc(void) { return (TIM16.PSC & TIM16_PSC_PSC) >> 0; }
+
+// TIM16->ARR auto-reload register
+enum {
+	TIM16_ARR_ARR = ((1UL << 16) - 1) << 0,	 // Auto-reload value
+};
+static inline void	   tim16_arr_set_arr(uint32_t val) { TIM16.ARR = (TIM16.ARR & ~TIM16_ARR_ARR) | ((val << 0) & TIM16_ARR_ARR); }
+static inline uint32_t tim16_arr_get_arr(void) { return (TIM16.ARR & TIM16_ARR_ARR) >> 0; }
+
+// TIM16->RCR repetition counter register
+enum {
+	TIM16_RCR_REP = ((1UL << 8) - 1) << 0,	// Repetition counter value
+};
+static inline void	   tim16_rcr_set_rep(uint32_t val) { TIM16.RCR = (TIM16.RCR & ~TIM16_RCR_REP) | ((val << 0) & TIM16_RCR_REP); }
+static inline uint32_t tim16_rcr_get_rep(void) { return (TIM16.RCR & TIM16_RCR_REP) >> 0; }
+
+// TIM16->CCR1 capture/compare register 1
+enum {
+	TIM16_CCR1_CCR1 = ((1UL << 16) - 1) << 0,  // Capture/Compare 1 value
+};
+static inline void tim16_ccr1_set_ccr1(uint32_t val) {
+	TIM16.CCR1 = (TIM16.CCR1 & ~TIM16_CCR1_CCR1) | ((val << 0) & TIM16_CCR1_CCR1);
+}
+static inline uint32_t tim16_ccr1_get_ccr1(void) { return (TIM16.CCR1 & TIM16_CCR1_CCR1) >> 0; }
+
 // TIM16->BDTR break and dead-time register
 enum {
 	TIM16_BDTR_BKF	= ((1UL << 4) - 1) << 16,  // Break filter
@@ -6107,6 +6317,15 @@ static inline void	   tim16_dcr_set_dba(uint32_t val) { TIM16.DCR = (TIM16.DCR &
 static inline uint32_t tim16_dcr_get_dbl(void) { return (TIM16.DCR & TIM16_DCR_DBL) >> 8; }
 static inline uint32_t tim16_dcr_get_dba(void) { return (TIM16.DCR & TIM16_DCR_DBA) >> 0; }
 
+// TIM16->DMAR DMA address for full transfer
+enum {
+	TIM16_DMAR_DMAB = ((1UL << 16) - 1) << 0,  // DMA register for burst accesses
+};
+static inline void tim16_dmar_set_dmab(uint32_t val) {
+	TIM16.DMAR = (TIM16.DMAR & ~TIM16_DMAR_DMAB) | ((val << 0) & TIM16_DMAR_DMAB);
+}
+static inline uint32_t tim16_dmar_get_dmab(void) { return (TIM16.DMAR & TIM16_DMAR_DMAB) >> 0; }
+
 // TIM16->OR1 TIM16 option register 1
 enum {
 	TIM16_OR1_TI1_RMP = ((1UL << 2) - 1) << 0,	// Input capture 1 remap
@@ -6127,51 +6346,35 @@ enum {
 	TIM16_OR2_BKINE	   = 1UL << 0,	 // BRK BKIN input enable
 };
 
-// Valid Casts:
-
-static inline struct TIM15_Type *TIM16_as_TIM15_Type(struct TIM16_Type *p) { return (struct TIM15_Type *)p; }
-
 /* General-purpose-timers */
 struct TIM2_Type {
-	__IO uint16_t CR1;				 // @0 control register 1
-	uint8_t		  RESERVED0[2];		 // @2
-	__IO uint8_t  CR2;				 // @4 control register 2
-	uint8_t		  RESERVED1[3];		 // @5
-	__IO uint16_t SMCR;				 // @8 slave mode control register
-	uint8_t		  RESERVED2[2];		 // @10
-	__IO uint16_t DIER;				 // @12 DMA/Interrupt enable register
-	uint8_t		  RESERVED3[2];		 // @14
-	__IO uint16_t SR;				 // @16 status register
-	uint8_t		  RESERVED4[2];		 // @18
-	__O uint8_t	  EGR;				 // @20 event generation register
-	uint8_t		  RESERVED5[3];		 // @21
+	__IO uint32_t CR1;				 // @0 control register 1
+	__IO uint32_t CR2;				 // @4 control register 2
+	__IO uint32_t SMCR;				 // @8 slave mode control register
+	__IO uint32_t DIER;				 // @12 DMA/Interrupt enable register
+	__IO uint32_t SR;				 // @16 status register
+	__O uint32_t  EGR;				 // @20 event generation register
 	union {							 // @24
-		__IO uint16_t CCMR1_Output;	 // capture/compare mode register 1 (output mode)
-		__IO uint16_t CCMR1_Input;	 // capture/compare mode register 1 (input mode)
+		__IO uint32_t CCMR1_Output;	 // capture/compare mode register 1 (output mode)
+		__IO uint32_t CCMR1_Input;	 // capture/compare mode register 1 (input mode)
 	};
-	uint8_t RESERVED6[2];			 // @26
 	union {							 // @28
-		__IO uint16_t CCMR2_Output;	 // capture/compare mode register 2 (output mode)
-		__IO uint16_t CCMR2_Input;	 // capture/compare mode register 2 (input mode)
+		__IO uint32_t CCMR2_Output;	 // capture/compare mode register 2 (output mode)
+		__IO uint32_t CCMR2_Input;	 // capture/compare mode register 2 (input mode)
 	};
-	uint8_t		  RESERVED7[2];	  // @30
-	__IO uint16_t CCER;			  // @32 capture/compare enable register
-	uint8_t		  RESERVED8[2];	  // @34
-	__IO uint32_t CNT;			  // @36 counter
-	__IO uint16_t PSC;			  // @40 prescaler
-	uint8_t		  RESERVED9[2];	  // @42
-	__IO uint32_t ARR;			  // @44 auto-reload register
-	uint8_t		  RESERVED10[4];  // @48
-	__IO uint32_t CCR1;			  // @52 capture/compare register 1
-	__IO uint32_t CCR2;			  // @56 capture/compare register 2
-	__IO uint32_t CCR3;			  // @60 capture/compare register 3
-	__IO uint32_t CCR4;			  // @64 capture/compare register 4
-	uint8_t		  RESERVED11[4];  // @68
-	__IO uint16_t DCR;			  // @72 DMA control register
-	uint8_t		  RESERVED12[2];  // @74
-	__IO uint16_t DMAR;			  // @76 DMA address for full transfer
-	uint8_t		  RESERVED13[2];  // @78
-	__IO uint8_t  OR;			  // @80 TIM2 option register
+	__IO uint32_t CCER;			 // @32 capture/compare enable register
+	__IO uint32_t CNT;			 // @36 counter
+	__IO uint32_t PSC;			 // @40 prescaler
+	__IO uint32_t ARR;			 // @44 auto-reload register
+	uint8_t		  RESERVED0[4];	 // @48
+	__IO uint32_t CCR1;			 // @52 capture/compare register 1
+	__IO uint32_t CCR2;			 // @56 capture/compare register 2
+	__IO uint32_t CCR3;			 // @60 capture/compare register 3
+	__IO uint32_t CCR4;			 // @64 capture/compare register 4
+	uint8_t		  RESERVED1[4];	 // @68
+	__IO uint32_t DCR;			 // @72 DMA control register
+	__IO uint32_t DMAR;			 // @76 DMA address for full transfer
+	__IO uint32_t OR;			 // @80 TIM2 option register
 };
 extern struct TIM2_Type TIM2;  // @0x40000000
 extern struct TIM2_Type TIM3;  // @0x40000400
@@ -6365,6 +6568,15 @@ static inline void tim2_cnt_set_cnt_l(struct TIM2_Type *p, uint32_t val) {
 static inline uint32_t tim2_cnt_get_cnt_h(struct TIM2_Type *p) { return (p->CNT & TIM2_CNT_CNT_H) >> 16; }
 static inline uint32_t tim2_cnt_get_cnt_l(struct TIM2_Type *p) { return (p->CNT & TIM2_CNT_CNT_L) >> 0; }
 
+// TIM2->PSC prescaler
+enum {
+	TIM2_PSC_PSC = ((1UL << 16) - 1) << 0,	// Prescaler value
+};
+static inline void tim2_psc_set_psc(struct TIM2_Type *p, uint32_t val) {
+	p->PSC = (p->PSC & ~TIM2_PSC_PSC) | ((val << 0) & TIM2_PSC_PSC);
+}
+static inline uint32_t tim2_psc_get_psc(struct TIM2_Type *p) { return (p->PSC & TIM2_PSC_PSC) >> 0; }
+
 // TIM2->ARR auto-reload register
 enum {
 	TIM2_ARR_ARR_H = ((1UL << 16) - 1) << 16,  // High Auto-reload value (TIM2 only)
@@ -6449,6 +6661,15 @@ static inline void tim2_dcr_set_dba(struct TIM2_Type *p, uint32_t val) {
 static inline uint32_t tim2_dcr_get_dbl(struct TIM2_Type *p) { return (p->DCR & TIM2_DCR_DBL) >> 8; }
 static inline uint32_t tim2_dcr_get_dba(struct TIM2_Type *p) { return (p->DCR & TIM2_DCR_DBA) >> 0; }
 
+// TIM2->DMAR DMA address for full transfer
+enum {
+	TIM2_DMAR_DMAB = ((1UL << 16) - 1) << 0,  // DMA register for burst accesses
+};
+static inline void tim2_dmar_set_dmab(struct TIM2_Type *p, uint32_t val) {
+	p->DMAR = (p->DMAR & ~TIM2_DMAR_DMAB) | ((val << 0) & TIM2_DMAR_DMAB);
+}
+static inline uint32_t tim2_dmar_get_dmab(struct TIM2_Type *p) { return (p->DMAR & TIM2_DMAR_DMAB) >> 0; }
+
 // TIM2->OR TIM2 option register
 enum {
 	TIM2_OR_TI4_RMP = ((1UL << 2) - 1) << 3,  // Internal trigger
@@ -6465,21 +6686,16 @@ static inline uint32_t tim2_or_get_etr_rmp(struct TIM2_Type *p) { return (p->OR 
 
 /* Basic-timers */
 struct TIM6_Type {
-	__IO uint8_t  CR1;			  // @0 control register 1
-	uint8_t		  RESERVED0[3];	  // @1
-	__IO uint8_t  CR2;			  // @4 control register 2
-	uint8_t		  RESERVED1[7];	  // @5
-	__IO uint16_t DIER;			  // @12 DMA/Interrupt enable register
-	uint8_t		  RESERVED2[2];	  // @14
-	__IO uint8_t  SR;			  // @16 status register
-	uint8_t		  RESERVED3[3];	  // @17
-	__O uint8_t	  EGR;			  // @20 event generation register
-	uint8_t		  RESERVED4[15];  // @21
-	__IO uint16_t CNT;			  // @36 counter
-	uint8_t		  RESERVED5[2];	  // @38
-	__IO uint16_t PSC;			  // @40 prescaler
-	uint8_t		  RESERVED6[2];	  // @42
-	__IO uint16_t ARR;			  // @44 auto-reload register
+	__IO uint32_t CR1;			  // @0 control register 1
+	__IO uint32_t CR2;			  // @4 control register 2
+	uint8_t		  RESERVED0[4];	  // @8
+	__IO uint32_t DIER;			  // @12 DMA/Interrupt enable register
+	__IO uint32_t SR;			  // @16 status register
+	__O uint32_t  EGR;			  // @20 event generation register
+	uint8_t		  RESERVED1[12];  // @24
+	__IO uint32_t CNT;			  // @36 counter
+	__IO uint32_t PSC;			  // @40 prescaler
+	__IO uint32_t ARR;			  // @44 auto-reload register
 };
 extern struct TIM6_Type TIM6;  // @0x40001000
 extern struct TIM6_Type TIM7;  // @0x40001400
@@ -6518,242 +6734,262 @@ enum {
 	TIM6_EGR_UG = 1UL << 0,	 // Update generation
 };
 
+// TIM6->CNT counter
+enum {
+	TIM6_CNT_CNT = ((1UL << 16) - 1) << 0,	// Low counter value
+};
+static inline void tim6_cnt_set_cnt(struct TIM6_Type *p, uint32_t val) {
+	p->CNT = (p->CNT & ~TIM6_CNT_CNT) | ((val << 0) & TIM6_CNT_CNT);
+}
+static inline uint32_t tim6_cnt_get_cnt(struct TIM6_Type *p) { return (p->CNT & TIM6_CNT_CNT) >> 0; }
+
+// TIM6->PSC prescaler
+enum {
+	TIM6_PSC_PSC = ((1UL << 16) - 1) << 0,	// Prescaler value
+};
+static inline void tim6_psc_set_psc(struct TIM6_Type *p, uint32_t val) {
+	p->PSC = (p->PSC & ~TIM6_PSC_PSC) | ((val << 0) & TIM6_PSC_PSC);
+}
+static inline uint32_t tim6_psc_get_psc(struct TIM6_Type *p) { return (p->PSC & TIM6_PSC_PSC) >> 0; }
+
+// TIM6->ARR auto-reload register
+enum {
+	TIM6_ARR_ARR = ((1UL << 16) - 1) << 0,	// Low Auto-reload value
+};
+static inline void tim6_arr_set_arr(struct TIM6_Type *p, uint32_t val) {
+	p->ARR = (p->ARR & ~TIM6_ARR_ARR) | ((val << 0) & TIM6_ARR_ARR);
+}
+static inline uint32_t tim6_arr_get_arr(struct TIM6_Type *p) { return (p->ARR & TIM6_ARR_ARR) >> 0; }
+
 /* Universal synchronous asynchronous receiver transmitter */
-struct UART_Type {
-	__IO uint32_t CR1;			 // @0 Control register 1
-	__IO uint32_t CR2;			 // @4 Control register 2
-	__IO uint32_t CR3;			 // @8 Control register 3
-	__IO uint16_t BRR;			 // @12 Baud rate register
-	uint8_t		  RESERVED0[2];	 // @14
-	__IO uint16_t GTPR;			 // @16 Guard time and prescaler register
-	uint8_t		  RESERVED1[2];	 // @18
-	__IO uint32_t RTOR;			 // @20 Receiver timeout register
-	__O uint8_t	  RQR;			 // @24 Request register
-	uint8_t		  RESERVED2[3];	 // @25
-	__I uint32_t  ISR;			 // @28 Interrupt & status register
-	__O uint32_t  ICR;			 // @32 Interrupt flag clear register
-	__I uint16_t  RDR;			 // @36 Receive data register
-	uint8_t		  RESERVED3[2];	 // @38
-	__IO uint16_t TDR;			 // @40 Transmit data register
+struct USART_Type {
+	__IO uint32_t CR1;	 // @0 Control register 1
+	__IO uint32_t CR2;	 // @4 Control register 2
+	__IO uint32_t CR3;	 // @8 Control register 3
+	__IO uint32_t BRR;	 // @12 Baud rate register
+	__IO uint32_t GTPR;	 // @16 Guard time and prescaler register
+	__IO uint32_t RTOR;	 // @20 Receiver timeout register
+	__O uint32_t  RQR;	 // @24 Request register
+	__I uint32_t  ISR;	 // @28 Interrupt & status register
+	__O uint32_t  ICR;	 // @32 Interrupt flag clear register
+	__I uint32_t  RDR;	 // @36 Receive data register
+	__IO uint32_t TDR;	 // @40 Transmit data register
 };
-extern struct UART_Type USART1;	 // @0x40013800
-extern struct UART_Type UART4;	 // @0x40004C00
-extern struct UART_Type USART2;	 // @0x40004400
-extern struct UART_Type USART3;	 // @0x40004800
+extern struct USART_Type USART1;  // @0x40013800
+extern struct USART_Type USART2;  // @0x40004400
 
-// UART->CR1 Control register 1
+// USART->CR1 Control register 1
 enum {
-	UART_CR1_M1		= 1UL << 28,			   // Word length
-	UART_CR1_EOBIE	= 1UL << 27,			   // End of Block interrupt enable
-	UART_CR1_RTOIE	= 1UL << 26,			   // Receiver timeout interrupt enable
-	UART_CR1_DEAT	= ((1UL << 5) - 1) << 21,  // DEAT0
-	UART_CR1_DEDT	= ((1UL << 5) - 1) << 16,  // DEDT0
-	UART_CR1_OVER8	= 1UL << 15,			   // Oversampling mode
-	UART_CR1_CMIE	= 1UL << 14,			   // Character match interrupt enable
-	UART_CR1_MME	= 1UL << 13,			   // Mute mode enable
-	UART_CR1_M0		= 1UL << 12,			   // Word length
-	UART_CR1_WAKE	= 1UL << 11,			   // Receiver wakeup method
-	UART_CR1_PCE	= 1UL << 10,			   // Parity control enable
-	UART_CR1_PS		= 1UL << 9,				   // Parity selection
-	UART_CR1_PEIE	= 1UL << 8,				   // PE interrupt enable
-	UART_CR1_TXEIE	= 1UL << 7,				   // interrupt enable
-	UART_CR1_TCIE	= 1UL << 6,				   // Transmission complete interrupt enable
-	UART_CR1_RXNEIE = 1UL << 5,				   // RXNE interrupt enable
-	UART_CR1_IDLEIE = 1UL << 4,				   // IDLE interrupt enable
-	UART_CR1_TE		= 1UL << 3,				   // Transmitter enable
-	UART_CR1_RE		= 1UL << 2,				   // Receiver enable
-	UART_CR1_UESM	= 1UL << 1,				   // USART enable in Stop mode
-	UART_CR1_UE		= 1UL << 0,				   // USART enable
+	USART_CR1_M1	 = 1UL << 28,				// Word length
+	USART_CR1_EOBIE	 = 1UL << 27,				// End of Block interrupt enable
+	USART_CR1_RTOIE	 = 1UL << 26,				// Receiver timeout interrupt enable
+	USART_CR1_DEAT	 = ((1UL << 5) - 1) << 21,	// DEAT0
+	USART_CR1_DEDT	 = ((1UL << 5) - 1) << 16,	// DEDT0
+	USART_CR1_OVER8	 = 1UL << 15,				// Oversampling mode
+	USART_CR1_CMIE	 = 1UL << 14,				// Character match interrupt enable
+	USART_CR1_MME	 = 1UL << 13,				// Mute mode enable
+	USART_CR1_M0	 = 1UL << 12,				// Word length
+	USART_CR1_WAKE	 = 1UL << 11,				// Receiver wakeup method
+	USART_CR1_PCE	 = 1UL << 10,				// Parity control enable
+	USART_CR1_PS	 = 1UL << 9,				// Parity selection
+	USART_CR1_PEIE	 = 1UL << 8,				// PE interrupt enable
+	USART_CR1_TXEIE	 = 1UL << 7,				// interrupt enable
+	USART_CR1_TCIE	 = 1UL << 6,				// Transmission complete interrupt enable
+	USART_CR1_RXNEIE = 1UL << 5,				// RXNE interrupt enable
+	USART_CR1_IDLEIE = 1UL << 4,				// IDLE interrupt enable
+	USART_CR1_TE	 = 1UL << 3,				// Transmitter enable
+	USART_CR1_RE	 = 1UL << 2,				// Receiver enable
+	USART_CR1_UESM	 = 1UL << 1,				// USART enable in Stop mode
+	USART_CR1_UE	 = 1UL << 0,				// USART enable
 };
-static inline void uart_cr1_set_deat(struct UART_Type *p, uint32_t val) {
-	p->CR1 = (p->CR1 & ~UART_CR1_DEAT) | ((val << 21) & UART_CR1_DEAT);
+static inline void usart_cr1_set_deat(struct USART_Type *p, uint32_t val) {
+	p->CR1 = (p->CR1 & ~USART_CR1_DEAT) | ((val << 21) & USART_CR1_DEAT);
 }
-static inline void uart_cr1_set_dedt(struct UART_Type *p, uint32_t val) {
-	p->CR1 = (p->CR1 & ~UART_CR1_DEDT) | ((val << 16) & UART_CR1_DEDT);
+static inline void usart_cr1_set_dedt(struct USART_Type *p, uint32_t val) {
+	p->CR1 = (p->CR1 & ~USART_CR1_DEDT) | ((val << 16) & USART_CR1_DEDT);
 }
-static inline uint32_t uart_cr1_get_deat(struct UART_Type *p) { return (p->CR1 & UART_CR1_DEAT) >> 21; }
-static inline uint32_t uart_cr1_get_dedt(struct UART_Type *p) { return (p->CR1 & UART_CR1_DEDT) >> 16; }
+static inline uint32_t usart_cr1_get_deat(struct USART_Type *p) { return (p->CR1 & USART_CR1_DEAT) >> 21; }
+static inline uint32_t usart_cr1_get_dedt(struct USART_Type *p) { return (p->CR1 & USART_CR1_DEDT) >> 16; }
 
-// UART->CR2 Control register 2
+// USART->CR2 Control register 2
 enum {
-	UART_CR2_ADD	  = ((1UL << 8) - 1) << 24,	 // Address of the USART node
-	UART_CR2_RTOEN	  = 1UL << 23,				 // Receiver timeout enable
-	UART_CR2_ABRMOD	  = ((1UL << 2) - 1) << 21,	 // Auto baud rate mode
-	UART_CR2_ABREN	  = 1UL << 20,				 // Auto baud rate enable
-	UART_CR2_MSBFIRST = 1UL << 19,				 // Most significant bit first
-	UART_CR2_TAINV	  = 1UL << 18,				 // Binary data inversion
-	UART_CR2_TXINV	  = 1UL << 17,				 // TX pin active level inversion
-	UART_CR2_RXINV	  = 1UL << 16,				 // RX pin active level inversion
-	UART_CR2_SWAP	  = 1UL << 15,				 // Swap TX/RX pins
-	UART_CR2_LINEN	  = 1UL << 14,				 // LIN mode enable
-	UART_CR2_STOP	  = ((1UL << 2) - 1) << 12,	 // STOP bits
-	UART_CR2_CLKEN	  = 1UL << 11,				 // Clock enable
-	UART_CR2_CPOL	  = 1UL << 10,				 // Clock polarity
-	UART_CR2_CPHA	  = 1UL << 9,				 // Clock phase
-	UART_CR2_LBCL	  = 1UL << 8,				 // Last bit clock pulse
-	UART_CR2_LBDIE	  = 1UL << 6,				 // LIN break detection interrupt enable
-	UART_CR2_LBDL	  = 1UL << 5,				 // LIN break detection length
-	UART_CR2_ADDM7	  = 1UL << 4,				 // 7-bit Address Detection/4-bit Address Detection
+	USART_CR2_ADD	   = ((1UL << 8) - 1) << 24,  // Address of the USART node
+	USART_CR2_RTOEN	   = 1UL << 23,				  // Receiver timeout enable
+	USART_CR2_ABRMOD   = ((1UL << 2) - 1) << 21,  // Auto baud rate mode
+	USART_CR2_ABREN	   = 1UL << 20,				  // Auto baud rate enable
+	USART_CR2_MSBFIRST = 1UL << 19,				  // Most significant bit first
+	USART_CR2_TAINV	   = 1UL << 18,				  // Binary data inversion
+	USART_CR2_TXINV	   = 1UL << 17,				  // TX pin active level inversion
+	USART_CR2_RXINV	   = 1UL << 16,				  // RX pin active level inversion
+	USART_CR2_SWAP	   = 1UL << 15,				  // Swap TX/RX pins
+	USART_CR2_LINEN	   = 1UL << 14,				  // LIN mode enable
+	USART_CR2_STOP	   = ((1UL << 2) - 1) << 12,  // STOP bits
+	USART_CR2_CLKEN	   = 1UL << 11,				  // Clock enable
+	USART_CR2_CPOL	   = 1UL << 10,				  // Clock polarity
+	USART_CR2_CPHA	   = 1UL << 9,				  // Clock phase
+	USART_CR2_LBCL	   = 1UL << 8,				  // Last bit clock pulse
+	USART_CR2_LBDIE	   = 1UL << 6,				  // LIN break detection interrupt enable
+	USART_CR2_LBDL	   = 1UL << 5,				  // LIN break detection length
+	USART_CR2_ADDM7	   = 1UL << 4,				  // 7-bit Address Detection/4-bit Address Detection
 };
-static inline void uart_cr2_set_add(struct UART_Type *p, uint32_t val) {
-	p->CR2 = (p->CR2 & ~UART_CR2_ADD) | ((val << 24) & UART_CR2_ADD);
+static inline void usart_cr2_set_add(struct USART_Type *p, uint32_t val) {
+	p->CR2 = (p->CR2 & ~USART_CR2_ADD) | ((val << 24) & USART_CR2_ADD);
 }
-static inline void uart_cr2_set_abrmod(struct UART_Type *p, uint32_t val) {
-	p->CR2 = (p->CR2 & ~UART_CR2_ABRMOD) | ((val << 21) & UART_CR2_ABRMOD);
+static inline void usart_cr2_set_abrmod(struct USART_Type *p, uint32_t val) {
+	p->CR2 = (p->CR2 & ~USART_CR2_ABRMOD) | ((val << 21) & USART_CR2_ABRMOD);
 }
-static inline void uart_cr2_set_stop(struct UART_Type *p, uint32_t val) {
-	p->CR2 = (p->CR2 & ~UART_CR2_STOP) | ((val << 12) & UART_CR2_STOP);
+static inline void usart_cr2_set_stop(struct USART_Type *p, uint32_t val) {
+	p->CR2 = (p->CR2 & ~USART_CR2_STOP) | ((val << 12) & USART_CR2_STOP);
 }
-static inline uint32_t uart_cr2_get_add(struct UART_Type *p) { return (p->CR2 & UART_CR2_ADD) >> 24; }
-static inline uint32_t uart_cr2_get_abrmod(struct UART_Type *p) { return (p->CR2 & UART_CR2_ABRMOD) >> 21; }
-static inline uint32_t uart_cr2_get_stop(struct UART_Type *p) { return (p->CR2 & UART_CR2_STOP) >> 12; }
+static inline uint32_t usart_cr2_get_add(struct USART_Type *p) { return (p->CR2 & USART_CR2_ADD) >> 24; }
+static inline uint32_t usart_cr2_get_abrmod(struct USART_Type *p) { return (p->CR2 & USART_CR2_ABRMOD) >> 21; }
+static inline uint32_t usart_cr2_get_stop(struct USART_Type *p) { return (p->CR2 & USART_CR2_STOP) >> 12; }
 
-// UART->CR3 Control register 3
+// USART->CR3 Control register 3
 enum {
-	UART_CR3_WUFIE	 = 1UL << 22,				// Wakeup from Stop mode interrupt enable
-	UART_CR3_WUS	 = ((1UL << 2) - 1) << 20,	// Wakeup from Stop mode interrupt flag selection
-	UART_CR3_SCARCNT = ((1UL << 3) - 1) << 17,	// Smartcard auto-retry count
-	UART_CR3_DEP	 = 1UL << 15,				// Driver enable polarity selection
-	UART_CR3_DEM	 = 1UL << 14,				// Driver enable mode
-	UART_CR3_DDRE	 = 1UL << 13,				// DMA Disable on Reception Error
-	UART_CR3_OVRDIS	 = 1UL << 12,				// Overrun Disable
-	UART_CR3_ONEBIT	 = 1UL << 11,				// One sample bit method enable
-	UART_CR3_CTSIE	 = 1UL << 10,				// CTS interrupt enable
-	UART_CR3_CTSE	 = 1UL << 9,				// CTS enable
-	UART_CR3_RTSE	 = 1UL << 8,				// RTS enable
-	UART_CR3_DMAT	 = 1UL << 7,				// DMA enable transmitter
-	UART_CR3_DMAR	 = 1UL << 6,				// DMA enable receiver
-	UART_CR3_SCEN	 = 1UL << 5,				// Smartcard mode enable
-	UART_CR3_NACK	 = 1UL << 4,				// Smartcard NACK enable
-	UART_CR3_HDSEL	 = 1UL << 3,				// Half-duplex selection
-	UART_CR3_IRLP	 = 1UL << 2,				// Ir low-power
-	UART_CR3_IREN	 = 1UL << 1,				// Ir mode enable
-	UART_CR3_EIE	 = 1UL << 0,				// Error interrupt enable
+	USART_CR3_WUFIE	  = 1UL << 22,				 // Wakeup from Stop mode interrupt enable
+	USART_CR3_WUS	  = ((1UL << 2) - 1) << 20,	 // Wakeup from Stop mode interrupt flag selection
+	USART_CR3_SCARCNT = ((1UL << 3) - 1) << 17,	 // Smartcard auto-retry count
+	USART_CR3_DEP	  = 1UL << 15,				 // Driver enable polarity selection
+	USART_CR3_DEM	  = 1UL << 14,				 // Driver enable mode
+	USART_CR3_DDRE	  = 1UL << 13,				 // DMA Disable on Reception Error
+	USART_CR3_OVRDIS  = 1UL << 12,				 // Overrun Disable
+	USART_CR3_ONEBIT  = 1UL << 11,				 // One sample bit method enable
+	USART_CR3_CTSIE	  = 1UL << 10,				 // CTS interrupt enable
+	USART_CR3_CTSE	  = 1UL << 9,				 // CTS enable
+	USART_CR3_RTSE	  = 1UL << 8,				 // RTS enable
+	USART_CR3_DMAT	  = 1UL << 7,				 // DMA enable transmitter
+	USART_CR3_DMAR	  = 1UL << 6,				 // DMA enable receiver
+	USART_CR3_SCEN	  = 1UL << 5,				 // Smartcard mode enable
+	USART_CR3_NACK	  = 1UL << 4,				 // Smartcard NACK enable
+	USART_CR3_HDSEL	  = 1UL << 3,				 // Half-duplex selection
+	USART_CR3_IRLP	  = 1UL << 2,				 // Ir low-power
+	USART_CR3_IREN	  = 1UL << 1,				 // Ir mode enable
+	USART_CR3_EIE	  = 1UL << 0,				 // Error interrupt enable
 };
-static inline void uart_cr3_set_wus(struct UART_Type *p, uint32_t val) {
-	p->CR3 = (p->CR3 & ~UART_CR3_WUS) | ((val << 20) & UART_CR3_WUS);
+static inline void usart_cr3_set_wus(struct USART_Type *p, uint32_t val) {
+	p->CR3 = (p->CR3 & ~USART_CR3_WUS) | ((val << 20) & USART_CR3_WUS);
 }
-static inline void uart_cr3_set_scarcnt(struct UART_Type *p, uint32_t val) {
-	p->CR3 = (p->CR3 & ~UART_CR3_SCARCNT) | ((val << 17) & UART_CR3_SCARCNT);
+static inline void usart_cr3_set_scarcnt(struct USART_Type *p, uint32_t val) {
+	p->CR3 = (p->CR3 & ~USART_CR3_SCARCNT) | ((val << 17) & USART_CR3_SCARCNT);
 }
-static inline uint32_t uart_cr3_get_wus(struct UART_Type *p) { return (p->CR3 & UART_CR3_WUS) >> 20; }
-static inline uint32_t uart_cr3_get_scarcnt(struct UART_Type *p) { return (p->CR3 & UART_CR3_SCARCNT) >> 17; }
+static inline uint32_t usart_cr3_get_wus(struct USART_Type *p) { return (p->CR3 & USART_CR3_WUS) >> 20; }
+static inline uint32_t usart_cr3_get_scarcnt(struct USART_Type *p) { return (p->CR3 & USART_CR3_SCARCNT) >> 17; }
 
-// UART->BRR Baud rate register
+// USART->BRR Baud rate register
 enum {
-	UART_BRR_DIV_MANTISSA = ((1UL << 12) - 1) << 4,	 // DIV_Mantissa
-	UART_BRR_DIV_FRACTION = ((1UL << 4) - 1) << 0,	 // DIV_Fraction
+	USART_BRR_DIV_MANTISSA = ((1UL << 12) - 1) << 4,  // DIV_Mantissa
+	USART_BRR_DIV_FRACTION = ((1UL << 4) - 1) << 0,	  // DIV_Fraction
 };
-static inline void uart_brr_set_div_mantissa(struct UART_Type *p, uint32_t val) {
-	p->BRR = (p->BRR & ~UART_BRR_DIV_MANTISSA) | ((val << 4) & UART_BRR_DIV_MANTISSA);
+static inline void usart_brr_set_div_mantissa(struct USART_Type *p, uint32_t val) {
+	p->BRR = (p->BRR & ~USART_BRR_DIV_MANTISSA) | ((val << 4) & USART_BRR_DIV_MANTISSA);
 }
-static inline void uart_brr_set_div_fraction(struct UART_Type *p, uint32_t val) {
-	p->BRR = (p->BRR & ~UART_BRR_DIV_FRACTION) | ((val << 0) & UART_BRR_DIV_FRACTION);
+static inline void usart_brr_set_div_fraction(struct USART_Type *p, uint32_t val) {
+	p->BRR = (p->BRR & ~USART_BRR_DIV_FRACTION) | ((val << 0) & USART_BRR_DIV_FRACTION);
 }
-static inline uint32_t uart_brr_get_div_mantissa(struct UART_Type *p) { return (p->BRR & UART_BRR_DIV_MANTISSA) >> 4; }
-static inline uint32_t uart_brr_get_div_fraction(struct UART_Type *p) { return (p->BRR & UART_BRR_DIV_FRACTION) >> 0; }
+static inline uint32_t usart_brr_get_div_mantissa(struct USART_Type *p) { return (p->BRR & USART_BRR_DIV_MANTISSA) >> 4; }
+static inline uint32_t usart_brr_get_div_fraction(struct USART_Type *p) { return (p->BRR & USART_BRR_DIV_FRACTION) >> 0; }
 
-// UART->GTPR Guard time and prescaler register
+// USART->GTPR Guard time and prescaler register
 enum {
-	UART_GTPR_GT  = ((1UL << 8) - 1) << 8,	// Guard time value
-	UART_GTPR_PSC = ((1UL << 8) - 1) << 0,	// Prescaler value
+	USART_GTPR_GT  = ((1UL << 8) - 1) << 8,	 // Guard time value
+	USART_GTPR_PSC = ((1UL << 8) - 1) << 0,	 // Prescaler value
 };
-static inline void uart_gtpr_set_gt(struct UART_Type *p, uint32_t val) {
-	p->GTPR = (p->GTPR & ~UART_GTPR_GT) | ((val << 8) & UART_GTPR_GT);
+static inline void usart_gtpr_set_gt(struct USART_Type *p, uint32_t val) {
+	p->GTPR = (p->GTPR & ~USART_GTPR_GT) | ((val << 8) & USART_GTPR_GT);
 }
-static inline void uart_gtpr_set_psc(struct UART_Type *p, uint32_t val) {
-	p->GTPR = (p->GTPR & ~UART_GTPR_PSC) | ((val << 0) & UART_GTPR_PSC);
+static inline void usart_gtpr_set_psc(struct USART_Type *p, uint32_t val) {
+	p->GTPR = (p->GTPR & ~USART_GTPR_PSC) | ((val << 0) & USART_GTPR_PSC);
 }
-static inline uint32_t uart_gtpr_get_gt(struct UART_Type *p) { return (p->GTPR & UART_GTPR_GT) >> 8; }
-static inline uint32_t uart_gtpr_get_psc(struct UART_Type *p) { return (p->GTPR & UART_GTPR_PSC) >> 0; }
+static inline uint32_t usart_gtpr_get_gt(struct USART_Type *p) { return (p->GTPR & USART_GTPR_GT) >> 8; }
+static inline uint32_t usart_gtpr_get_psc(struct USART_Type *p) { return (p->GTPR & USART_GTPR_PSC) >> 0; }
 
-// UART->RTOR Receiver timeout register
+// USART->RTOR Receiver timeout register
 enum {
-	UART_RTOR_BLEN = ((1UL << 8) - 1) << 24,  // Block Length
-	UART_RTOR_RTO  = ((1UL << 24) - 1) << 0,  // Receiver timeout value
+	USART_RTOR_BLEN = ((1UL << 8) - 1) << 24,  // Block Length
+	USART_RTOR_RTO	= ((1UL << 24) - 1) << 0,  // Receiver timeout value
 };
-static inline void uart_rtor_set_blen(struct UART_Type *p, uint32_t val) {
-	p->RTOR = (p->RTOR & ~UART_RTOR_BLEN) | ((val << 24) & UART_RTOR_BLEN);
+static inline void usart_rtor_set_blen(struct USART_Type *p, uint32_t val) {
+	p->RTOR = (p->RTOR & ~USART_RTOR_BLEN) | ((val << 24) & USART_RTOR_BLEN);
 }
-static inline void uart_rtor_set_rto(struct UART_Type *p, uint32_t val) {
-	p->RTOR = (p->RTOR & ~UART_RTOR_RTO) | ((val << 0) & UART_RTOR_RTO);
+static inline void usart_rtor_set_rto(struct USART_Type *p, uint32_t val) {
+	p->RTOR = (p->RTOR & ~USART_RTOR_RTO) | ((val << 0) & USART_RTOR_RTO);
 }
-static inline uint32_t uart_rtor_get_blen(struct UART_Type *p) { return (p->RTOR & UART_RTOR_BLEN) >> 24; }
-static inline uint32_t uart_rtor_get_rto(struct UART_Type *p) { return (p->RTOR & UART_RTOR_RTO) >> 0; }
+static inline uint32_t usart_rtor_get_blen(struct USART_Type *p) { return (p->RTOR & USART_RTOR_BLEN) >> 24; }
+static inline uint32_t usart_rtor_get_rto(struct USART_Type *p) { return (p->RTOR & USART_RTOR_RTO) >> 0; }
 
-// UART->RQR Request register
+// USART->RQR Request register
 enum {
-	UART_RQR_TXFRQ = 1UL << 4,	// Transmit data flush request
-	UART_RQR_RXFRQ = 1UL << 3,	// Receive data flush request
-	UART_RQR_MMRQ  = 1UL << 2,	// Mute mode request
-	UART_RQR_SBKRQ = 1UL << 1,	// Send break request
-	UART_RQR_ABRRQ = 1UL << 0,	// Auto baud rate request
+	USART_RQR_TXFRQ = 1UL << 4,	 // Transmit data flush request
+	USART_RQR_RXFRQ = 1UL << 3,	 // Receive data flush request
+	USART_RQR_MMRQ	= 1UL << 2,	 // Mute mode request
+	USART_RQR_SBKRQ = 1UL << 1,	 // Send break request
+	USART_RQR_ABRRQ = 1UL << 0,	 // Auto baud rate request
 };
 
-// UART->ISR Interrupt & status register
+// USART->ISR Interrupt & status register
 enum {
-	UART_ISR_TCBGT = 1UL << 25,	 // Transmission complete before guard time completion
-	UART_ISR_REACK = 1UL << 22,	 // REACK
-	UART_ISR_TEACK = 1UL << 21,	 // TEACK
-	UART_ISR_WUF   = 1UL << 20,	 // WUF
-	UART_ISR_RWU   = 1UL << 19,	 // RWU
-	UART_ISR_SBKF  = 1UL << 18,	 // SBKF
-	UART_ISR_CMF   = 1UL << 17,	 // CMF
-	UART_ISR_BUSY  = 1UL << 16,	 // BUSY
-	UART_ISR_ABRF  = 1UL << 15,	 // ABRF
-	UART_ISR_ABRE  = 1UL << 14,	 // ABRE
-	UART_ISR_EOBF  = 1UL << 12,	 // EOBF
-	UART_ISR_RTOF  = 1UL << 11,	 // RTOF
-	UART_ISR_CTS   = 1UL << 10,	 // CTS
-	UART_ISR_CTSIF = 1UL << 9,	 // CTSIF
-	UART_ISR_LBDF  = 1UL << 8,	 // LBDF
-	UART_ISR_TXE   = 1UL << 7,	 // TXE
-	UART_ISR_TC	   = 1UL << 6,	 // TC
-	UART_ISR_RXNE  = 1UL << 5,	 // RXNE
-	UART_ISR_IDLE  = 1UL << 4,	 // IDLE
-	UART_ISR_ORE   = 1UL << 3,	 // ORE
-	UART_ISR_NF	   = 1UL << 2,	 // NF
-	UART_ISR_FE	   = 1UL << 1,	 // FE
-	UART_ISR_PE	   = 1UL << 0,	 // PE
+	USART_ISR_TCBGT = 1UL << 25,  // Transmission complete before guard time completion
+	USART_ISR_REACK = 1UL << 22,  // REACK
+	USART_ISR_TEACK = 1UL << 21,  // TEACK
+	USART_ISR_WUF	= 1UL << 20,  // WUF
+	USART_ISR_RWU	= 1UL << 19,  // RWU
+	USART_ISR_SBKF	= 1UL << 18,  // SBKF
+	USART_ISR_CMF	= 1UL << 17,  // CMF
+	USART_ISR_BUSY	= 1UL << 16,  // BUSY
+	USART_ISR_ABRF	= 1UL << 15,  // ABRF
+	USART_ISR_ABRE	= 1UL << 14,  // ABRE
+	USART_ISR_EOBF	= 1UL << 12,  // EOBF
+	USART_ISR_RTOF	= 1UL << 11,  // RTOF
+	USART_ISR_CTS	= 1UL << 10,  // CTS
+	USART_ISR_CTSIF = 1UL << 9,	  // CTSIF
+	USART_ISR_LBDF	= 1UL << 8,	  // LBDF
+	USART_ISR_TXE	= 1UL << 7,	  // TXE
+	USART_ISR_TC	= 1UL << 6,	  // TC
+	USART_ISR_RXNE	= 1UL << 5,	  // RXNE
+	USART_ISR_IDLE	= 1UL << 4,	  // IDLE
+	USART_ISR_ORE	= 1UL << 3,	  // ORE
+	USART_ISR_NF	= 1UL << 2,	  // NF
+	USART_ISR_FE	= 1UL << 1,	  // FE
+	USART_ISR_PE	= 1UL << 0,	  // PE
 };
 
-// UART->ICR Interrupt flag clear register
+// USART->ICR Interrupt flag clear register
 enum {
-	UART_ICR_WUCF	= 1UL << 20,  // Wakeup from Stop mode clear flag
-	UART_ICR_CMCF	= 1UL << 17,  // Character match clear flag
-	UART_ICR_EOBCF	= 1UL << 12,  // End of block clear flag
-	UART_ICR_RTOCF	= 1UL << 11,  // Receiver timeout clear flag
-	UART_ICR_CTSCF	= 1UL << 9,	  // CTS clear flag
-	UART_ICR_LBDCF	= 1UL << 8,	  // LIN break detection clear flag
-	UART_ICR_TCCF	= 1UL << 6,	  // Transmission complete clear flag
-	UART_ICR_IDLECF = 1UL << 4,	  // Idle line detected clear flag
-	UART_ICR_ORECF	= 1UL << 3,	  // Overrun error clear flag
-	UART_ICR_NCF	= 1UL << 2,	  // Noise detected clear flag
-	UART_ICR_FECF	= 1UL << 1,	  // Framing error clear flag
-	UART_ICR_PECF	= 1UL << 0,	  // Parity error clear flag
+	USART_ICR_WUCF	 = 1UL << 20,  // Wakeup from Stop mode clear flag
+	USART_ICR_CMCF	 = 1UL << 17,  // Character match clear flag
+	USART_ICR_EOBCF	 = 1UL << 12,  // End of block clear flag
+	USART_ICR_RTOCF	 = 1UL << 11,  // Receiver timeout clear flag
+	USART_ICR_CTSCF	 = 1UL << 9,   // CTS clear flag
+	USART_ICR_LBDCF	 = 1UL << 8,   // LIN break detection clear flag
+	USART_ICR_TCCF	 = 1UL << 6,   // Transmission complete clear flag
+	USART_ICR_IDLECF = 1UL << 4,   // Idle line detected clear flag
+	USART_ICR_ORECF	 = 1UL << 3,   // Overrun error clear flag
+	USART_ICR_NCF	 = 1UL << 2,   // Noise detected clear flag
+	USART_ICR_FECF	 = 1UL << 1,   // Framing error clear flag
+	USART_ICR_PECF	 = 1UL << 0,   // Parity error clear flag
 };
 
-// UART->RDR Receive data register
+// USART->RDR Receive data register
 enum {
-	UART_RDR_RDR = ((1UL << 9) - 1) << 0,  // Receive data value
+	USART_RDR_RDR = ((1UL << 9) - 1) << 0,	// Receive data value
 };
-static inline uint32_t uart_rdr_get_rdr(struct UART_Type *p) { return (p->RDR & UART_RDR_RDR) >> 0; }
+static inline uint32_t usart_rdr_get_rdr(struct USART_Type *p) { return (p->RDR & USART_RDR_RDR) >> 0; }
 
-// UART->TDR Transmit data register
+// USART->TDR Transmit data register
 enum {
-	UART_TDR_TDR = ((1UL << 9) - 1) << 0,  // Transmit data value
+	USART_TDR_TDR = ((1UL << 9) - 1) << 0,	// Transmit data value
 };
-static inline void uart_tdr_set_tdr(struct UART_Type *p, uint32_t val) {
-	p->TDR = (p->TDR & ~UART_TDR_TDR) | ((val << 0) & UART_TDR_TDR);
+static inline void usart_tdr_set_tdr(struct USART_Type *p, uint32_t val) {
+	p->TDR = (p->TDR & ~USART_TDR_TDR) | ((val << 0) & USART_TDR_TDR);
 }
-static inline uint32_t uart_tdr_get_tdr(struct UART_Type *p) { return (p->TDR & UART_TDR_TDR) >> 0; }
+static inline uint32_t usart_tdr_get_tdr(struct USART_Type *p) { return (p->TDR & USART_TDR_TDR) >> 0; }
 
 /* Voltage reference buffer
 There is only one peripheral of type VREFBUF. */
 struct VREFBUF_Type {
-	__IO uint8_t CSR;			// @0 VREF control and status register
-	uint8_t		 RESERVED0[3];	// @1
-	__IO uint8_t CCR;			// @4 calibration control register
+	__IO uint32_t CSR;	// @0 VREF control and status register
+	__IO uint32_t CCR;	// @4 calibration control register
 };
 extern struct VREFBUF_Type VREFBUF;	 // @0x40010030
 
@@ -6777,11 +7013,9 @@ static inline uint32_t vrefbuf_ccr_get_trim(void) { return (VREFBUF.CCR & VREFBU
 /* System window watchdog
 There is only one peripheral of type WWDG. */
 struct WWDG_Type {
-	__IO uint8_t  CR;			 // @0 Control register
-	uint8_t		  RESERVED0[3];	 // @1
-	__IO uint16_t CFR;			 // @4 Configuration register
-	uint8_t		  RESERVED1[2];	 // @6
-	__IO uint8_t  SR;			 // @8 Status register
+	__IO uint32_t CR;	// @0 Control register
+	__IO uint32_t CFR;	// @4 Configuration register
+	__IO uint32_t SR;	// @8 Status register
 };
 extern struct WWDG_Type WWDG;  // @0x40002C00
 

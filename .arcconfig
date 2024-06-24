@@ -1,0 +1,8 @@
+{
+    "phabricator.uri" : "https://p.daedalean.ai/",
+    "//" : "Get this from Phabricator > Projects > your-project > Manage > 'Looks Like' PROJECT_ID",
+    "project_id" : "",
+    "//" : "Get this from Phabricator > Diffusion > rCALLSIGN",
+    "repository.callsign" : "",
+    "base" : "git:merge-base(origin/master), arc:prompt"
+}

@@ -67,3 +67,25 @@ void sort8u32(uint32_t a[8]) {
 		CRC.DR8 = 'O';
 		CRC.DR8 = 'N';
 		printf("crc hw: %lx\n", CRC.DR32);
+
+
+
+
+
+
+
+
+
+
+		// in silent mode, just discard the packets
+		if (0) {
+			if (x) {
+				spiq_deq_tail(&spiq);
+				x = NULL;
+			}
+			if (ev) {
+				spiq_deq_tail(&evq);
+				ev = NULL;
+			}
+			IWDG.KR = 0xAAAA;  // pet the watchdog 
+		}

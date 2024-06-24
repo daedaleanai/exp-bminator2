@@ -27,6 +27,7 @@ type MsgID uint16
 const (
 	EVENTID_ID0           MsgID = 0x8003 // [2]uint32 appinfo.revision, serial number [2]
 	EVENTID_ID1           MsgID = 0x8004 // [2]uint32 Serial number[1][0]
+	EVENTID_ADC           MsgID = 0x8010 // [4]uint16 4 raw adc measurements: vref, thermistor, current, internal temp
 	EVENTID_BARO          MsgID = 0x8020 // [2]uint32 temperature[milliK] pressure[milliPa] bme280
 	EVENTID_HUMID         MsgID = 0x8021 // humidity bme280 [TODO]
 	EVENTID_TEMP          MsgID = 0x8022 // [2]uint32 temperature[milliK] (bmi085 accellerometer, stm32 microcontroller)
@@ -64,6 +65,7 @@ type PldUint64 struct {
 
 type ID0Msg Pld2Uint32
 type ID1Msg Pld2Uint32
+type ADCMsg Pld4Uint16
 type BAROMsg Pld2Uint32
 type HUMIDMsg Pld2Uint32
 type TEMPMsg Pld2Uint32
@@ -86,7 +88,7 @@ func scalexyz(v [4]uint16, s float64) [3]float64 {
 }
 
 func toCelsius(milliK uint32) float64 {
-	return float64(int32(milliK) - 273150) / 1000
+	return float64(int32(milliK)-273150) / 1000
 }
 
 func toPascal(milliPa uint32) float64 {
@@ -101,6 +103,9 @@ func (m *ID0Msg) String() string {
 	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 func (m *ID1Msg) String() string {
+	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
+}
+func (m *ADCMsg) String() string {
 	return fmt.Sprintf("%.6f %14s: %v", float64(m.Ts)/80000000, label(m), m.Val)
 }
 func (m *BAROMsg) String() string {
@@ -157,6 +162,8 @@ func newMsg(word0 uint32) interface{} {
 		return &ID0Msg{}
 	case EVENTID_ID1:
 		return &ID1Msg{}
+	case EVENTID_ADC:
+		return &ADCMsg{}
 	case EVENTID_BARO:
 		return &BAROMsg{}
 	case EVENTID_HUMID:
@@ -205,6 +212,7 @@ const (
 
 var (
 	fMonitorMode = flag.Bool("m", false, "Monitor mode")
+	fDumpFrame   = flag.Bool("f", false, "Dump Frames")
 )
 
 func main() {
@@ -270,7 +278,10 @@ func main() {
 			log.Printf("Invalid crc16 got %016b, expected %016b.", csum, bsum)
 		}
 
-		//fmt.Printf("frame [%d] %x\n", framelen, buf[:framelen])
+		if *fDumpFrame {
+			fmt.Printf("frame [%d] %x\n", framelen, buf[:framelen])
+			continue
+		}
 
 		b := bytes.NewBuffer(buf[:framelen])
 		for {

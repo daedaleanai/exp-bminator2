@@ -26,6 +26,10 @@ struct CommandBuffer cmdbuf							= {{}, 0};
 static enum { RESYNC, MORE, COMPLETE } cmdbuf_state = RESYNC;
 static size_t  cmdpacket_size						= 0;
 
+int calibrate_stationid = 0;
+
+
+
 static inline size_t findbyte(uint8_t *buf, size_t buflen, uint8_t b) {
 	size_t i = 0;
 	for (; i < buflen; ++i)
@@ -46,7 +50,9 @@ static inline int haspfx(uint8_t *buf, size_t buflen, uint8_t *pfx, size_t pfxle
 	return 1;
 }
 
-// return  0,1 for ok, other codes for not ok replies
+// return  0,1 for ok, 
+// 3 for 'calibration mode trigger,
+// other codes for not ok replies
 // and 0xff for when we can't even reply
 // see ICD table 'Acknowledgement codes'
 static uint8_t checkcmdpacket() {
@@ -70,7 +76,7 @@ static uint8_t checkcmdpacket() {
 
 	uint32_t pt = decode_be_uint32(buf);
 	if (pt != 0x05050505) {
-		printf("CMDRX: invalid packet type %lx\n", pt);
+		printf("CMDRX: not command packet type %lx\n", pt);
 		return 0xff;
 	}
 
@@ -92,7 +98,15 @@ static uint8_t checkcmdpacket() {
 	}
 
 	uint32_t addr = decode_be_uint32(cmdbuf.buf + 12);
-	if ((addr & 0xfffffc80) != 0x23000000) {
+	if ((addr & 0xfffffc80) == 0x23000000) {
+		// ok, normal read/write command of BMx registers
+	} else if ((addr & 0xfffffff0) == 0x2300fff0) {
+		// ok, calibrate trigger read command
+		if ((len != 0) || (buf[8] != 0)) {
+			printf("CMDRX: calibrate trigger 0x%08lx non-zero length %ld or non-read %d\n", addr, len, buf[8]);
+			return 0x47;  // malformed packet
+		}
+	} else {
 		printf("CMDRX: invalid address 0x%08lx\n", addr);
 		return 0x40;
 	}
@@ -102,11 +116,11 @@ static uint8_t checkcmdpacket() {
 		switch (addr & 0xffff) {
 		case (GYRO  << 8) | BMI08x_GYRO_RANGE:     // 0x010f
 		case (GYRO  << 8) | BMI08x_GYRO_BANDWIDTH: // 0x0110
-		case (ACCEL << 8) | BMI08x_ACC_CONF:      // 0x0240
-		case (ACCEL << 8) | BMI08x_ACC_RANGE:     // 0x0241
-		case (HUMID << 8) | BME280_REG_CTRLHUM:   // 0x0372
+		case (ACCEL << 8) | BMI08x_ACC_CONF:       // 0x0240
+		case (ACCEL << 8) | BMI08x_ACC_RANGE:      // 0x0241
+		case (HUMID << 8) | BME280_REG_CTRLHUM:    // 0x0372
 		case (HUMID << 8) | BME280_REG_CTRLMEAS:   // 0x0374
-		case (HUMID << 8) | BME280_REG_CONFIG:   // 0x0375
+		case (HUMID << 8) | BME280_REG_CONFIG:     // 0x0375
 			if (len == 1)
 				break;
 			// fallthrough
@@ -128,9 +142,18 @@ static uint8_t checkcmdpacket() {
 		return 0x46;
 	}
 
+	// calibrate trigger read command
+	if ((addr & 0xfffffff0) == 0x2300fff0) {
+		return 3;  // special return code
+	}
+
 	return buf[8];	 // 0: ok to read, 1: ok to write
 }
 
+// see if whatever is in the cmdbuf is a complete command and if so, execute it
+// returns the number of bytes the rx dma should get after this, which is either
+// a new minimum commandbuffer lenght, or more bytes to complete the command frame
+// of which we detected the start.
 size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
 	switch (cmdbuf_state) {
 	case RESYNC:
@@ -215,6 +238,11 @@ size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq) {
 		spiq_enq_head(spiq);
 
 	} break;
+
+	case 3:
+		calibrate_stationid = decode_be_uint32(cmdbuf.buf + 12) & 0xf; // last 4 bits of the address
+		printf("CMDRX: calibrate trigger %d.\n", calibrate_stationid);
+		break;
 
 	case 0xff:
 		// packet too messed up to reply

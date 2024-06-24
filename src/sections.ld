@@ -1,20 +1,19 @@
 /*
-  This file assumes FLASHROM, SRAM1, SRAM2 have been defined before inclusion.
+  This file assumes FLASHROM, CODE, SRAM2 have been defined before inclusion.
 */ 
 
 _estack = ORIGIN(SRAM2) + LENGTH(SRAM2); /* top of the stack */
 
 ENTRY(Reset_Handler)
+EXTERN(vector_table)
 
 SECTIONS
 {
 
   .isr_vector :
   {
-
     . = ALIGN(4);
-    PROVIDE (isr_vector_table_base = .);
-    KEEP(*(.isr_vector)) /* Startup code */
+    KEEP(*(.isr_vector)) /* vector_table */
 
     . = ALIGN(4);
   } >FLASHROM

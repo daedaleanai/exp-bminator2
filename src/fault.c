@@ -1,18 +1,10 @@
-// Print a somewhat informative crash report.
-// We assume USART1/2 is up and clocks are running.
-// See PM0214  Section 2.3 for reference on the exception handling of the Cortex M4.
-
-#include "cortex_m4.h"
-#include "stm32l4xx.h"
 #include <stdarg.h>
 #include <stddef.h>
 
-// putc_ has the only reference to the used USART in this file.
-static void putc_(char c) {
-	while ((USART2.ISR & UART_ISR_TXE) == 0)
-		__NOP();
-	USART2.TDR = c;
-}
+#include "cortex_m4.h"
+#include "stm32l4xx.h"
+
+extern void fault_putc(char c); // in main.c
 
 // dbg printf can ony handle %s and %x
 static void dbg_printf(const char *fmt, ...) {
@@ -23,7 +15,7 @@ static void dbg_printf(const char *fmt, ...) {
 	uint32_t	x;
 	while ((c = *fmt++) != 0) {
 		if (c != '%') {
-			putc_(c);
+			fault_putc(c);
 			continue;
 		}
 		if ((c = *fmt++) == 0) {
@@ -33,28 +25,37 @@ static void dbg_printf(const char *fmt, ...) {
 		case 's':
 			s = va_arg(va, const char *);
 			while (*s) {
-				putc_(*s++);
+				fault_putc(*s++);
 			}
 			break;
 		case 'x':
 			x = va_arg(va, uint32_t);
 			for (int i = 0; i < 8; ++i) {
-				putc_("0123456789abcdef"[(x >> 4 * (7 - i)) & 0xf]);
+				fault_putc("0123456789abcdef"[(x >> 4 * (7 - i)) & 0xf]);
 			}
 			break;
 		default:
-			putc_('%');
-			putc_(c);
+			fault_putc('%');
+			fault_putc(c);
 		}
 	}
 	va_end(va);
 }
 
+// implementing __assert_func means we can include <assert.h> and use the assert() macro in our code.
+void __assert_func(const char *file, int line, const char *func, const char *expr) {
+	__disable_irq();  // stop everything else.
+	dbg_printf("%s:%x (%s) assertion failed: %s\n", file, line, func, expr);
+	for (;;)
+		__BKPT();
+}
+
 static const char *const regname[] = {"r0", "r1", "r2", "r3", "r12", "lr", "pc", "psr"};
-static void				 dumpstack(uint32_t *stack) {
-				 for (int i = 0; i < 8; ++i) {
-					 dbg_printf(" %s = 0x%x\n", regname[i], stack[i]);
-	 }
+
+static void dumpstack(uint32_t *stack) {
+	for (int i = 0; i < 8; ++i) {
+		dbg_printf(" %s = 0x%x\n", regname[i], stack[i]);
+	}
 }
 
 static void printflags(uint32_t val, const char *const *flgs, const char *sep) {
@@ -68,7 +69,6 @@ static void printflags(uint32_t val, const char *const *flgs, const char *sep) {
 	}
 }
 
-// PM0214 sec 4.4.10
 static const char *const cfsrflags[] = {
 		"Instruction access violation",
 		"Data access violation",
@@ -119,26 +119,26 @@ static void handlefault(uint32_t stack, const char *lbl) {
 	}
 	printflags(cfsr, cfsrflags, "\n");
 	dbg_printf("\n------HALT\n");
-	for (;;)
+	for (;;) {
 		__NOP();
+	}
 }
 
-// Declare core exception handlers to omit stack saving prologue
 void HardFault_Handler(void) __attribute__((naked));
 void MemoryManagement_Handler(void) __attribute__((naked));
 void BusFault_Handler(void) __attribute__((naked));
 void UsageFault_Handler(void) __attribute__((naked));
 
-// This firmware only uses the Main Stack Pointer.
 void HardFault_Handler(void) { handlefault(__get_MSP(), "HARD"); }
 void MemoryManagement_Handler(void) { handlefault(__get_MSP(), "MEM"); }
 void BusFault_Handler(void) { handlefault(__get_MSP(), "BUS"); }
 void UsageFault_Handler(void) { handlefault(__get_MSP(), "USAGE"); }
 
-// Called from vector.c default_IRQ_Handler
+// called from vector.c default_IRQ_Handler
 void unhandled_interrupt(uint32_t irq) {
 	dbg_printf("Unhandled IRQ %x\n----HALT\n", irq);
 	__BKPT(1);
-	for (;;)
+	for (;;) {
 		__NOP();
+	}
 }

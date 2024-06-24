@@ -18,7 +18,7 @@ static inline uint64_t cycleCount(void) {
     uint32_t val = stk_val_get_current();
     uint64_t cc = clockticks;
     if (STK.CTRL & STK_CTRL_COUNTFLAG) {
-				// Rare event when overflow happens during access to 'clockticks' and timer counter value
+		// Rare event when overflow happens during access to 'clockticks' and timer counter value
         val = stk_val_get_current();
         cc = clockticks;
     }

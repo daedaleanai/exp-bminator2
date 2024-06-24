@@ -11,8 +11,8 @@ func main() {
 	packet := []uint32{
 		bytex4(0x5),                 // tagged command
 		bytex4(byte(rand.Uint32())), // random tag
-		0x00000010,                  // read 16 bytes
-		0x23000100,                  // from gyro address space
+		0x00000000,                  // read 0 bytes
+		0x2300FFFf,                  // from trigger address space, all stations
 	}
 
 	os.Stdout.WriteString("IRON")

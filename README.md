@@ -11,7 +11,7 @@ The full interface description is documented in [the ICD](doc/ddln-bminator2-ICD
 | PA0  | CK_IN      | in  |                      | (reserved for 8Mhz external clock source) |
 | PA1  | EXTINT A1  | in  | PullUp               | bmi088 INT1 (Accel) open drain/active low |
 | PA2  | USART2 TX  | out | AF_PP 50MHz          | debug serial/ boot0 loader console RX     |
-| PA3  | EXTINT A3  | in  | PullUp               | bmi088 INT3 (Gyro) open drain/active low  |
+| PA3  | USART2 RX  | in  | PullUp               | debug serial/ boot0 loader console TX     |
 | PA4  | ADC1 IN9   | in  | Analog Input         | Heater Thermistor input                   |
 | PA5  | GPIO PA5   | out | OUT_PP 2MHz          | Heater 24V  Enable                        |
 | PA6  | ADC1 IN11  | in  | Analog Input         | Heater current sense                      |
@@ -19,7 +19,7 @@ The full interface description is documented in [the ICD](doc/ddln-bminator2-ICD
 | PA8  |            |     |                      |                                           |
 | PA9  | USART1 TX  | out | AF_PP 50MHz          | host serial input                         |
 | PA10 | USART1 RX  | in  | PullUp (5V tolerant) | host serial output                        |
-| PA11 |            |     |                      | (reserved for CAN RX)                     |
+| PA11 | EXTINT A11 | in  | PullUp               | bmi088 INT3 (Gyro) open drain/active low  |
 | PA12 |            |     |                      | (reserved for CAN TX)                     |
 | PA13 | JTMS/SWDIO |     |                      | debug SWD connector                       |
 | PA14 | JTCK/SWCLK |     |                      | debug SWD connector                       |
@@ -39,7 +39,7 @@ RMA0394 Section 6.1.1 p.182 'External Clock (HSE Bypass)'
 The SPI1 bus connects SCK, MISO, MOSI to the BMI088 and BME280. They each require their own
 separate CSB (active low).
 
-TODO(lvd): Kaya version has PA3 USART2 RX debug serial console and PA11 bmi088 INT3 (EXTI11).
+TODO(lvd): early ddln version has PA3 bmi088 INT3 .
 
 
 ## DMA Mappings
@@ -50,6 +50,8 @@ TODO(lvd): Kaya version has PA3 USART2 RX debug serial console and PA11 bmi088 I
 | SPI1 TX   | 1   | 3   | Write spi devices |
 | USART1 TX | 2   | 6   | Serial Output     |
 | USART1 RX | 2   | 7   | Serial Input      |
+| USART2 TX | 1   | 7   | Serial Output     |
+| USART2 RX | 1   | 6   | Serial Input      |
 
 ## Connectors
 
