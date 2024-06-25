@@ -204,16 +204,12 @@ size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq, struct Scratch *scr
 			msg_append32(msg, bytex4(sts));			   // the status
 
 			if (sts) {  // write
-				memmove(scratch->buf + (addr ^ 0x8000), cmdbuf.buf+16, len);
-				msgq_push_head(cmdq);
-
-				printf("writing to scratch buf.");
-
+				memmove(scratch->buf + ((addr & 0x0000ffff) ^ 0x8000), cmdbuf.buf+16, len);
 
 			} else { // read
+					 //
 				msg_append32(msg,4); // number of bytes read
-				msg_appendbuf(msg, scratch->buf + (addr^0x8000), 4); // data
-				printf("reading to scratch buf.");
+				msg_appendbuf(msg, scratch->buf + ((addr & 0x0000ffff) ^ 0x8000), 4); // data
 			}
 			msgq_push_head(cmdq);
 		} else {
@@ -270,3 +266,5 @@ size_t input_cmdrx(struct MsgQueue *cmdq, struct SPIQ *spiq, struct Scratch *scr
 	cmdbuf.head	 = 0;
 	return CMDMINSIZE;
 }
+
+
